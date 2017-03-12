@@ -7,14 +7,14 @@
 
 # Site Settings
 locale                   : "en"
-title                    : "Site Title"
+title                    : "Julien Pascal"
 title_separator          : "-"
-name                     : "Your Name"
-description              : "An amazing website."
+name                     : ""
+description              : "my website."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
-teaser                   : # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
+teaser                   : #"/assets/images/photo_bio.jpg" # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
 # breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
 comments:
@@ -67,6 +67,9 @@ social:
   type                   : # Person or Organization (defaults to Person)
   name                   : # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
+    - "https://github.com/JulienPascal"
+    - "https://www.linkedin.com/in/julien-pascal-62a322aa/"
+
 
 # Analytics
 analytics:
@@ -77,10 +80,10 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
+  name             : "Julien Pascal"
   avatar           : "bio-photo.jpg"
-  bio              : "I am an amazing person."
-  location         : "Somewhere"
+  bio              : "I am a PhD Candidate in Economics at Sciences Po - LIEPP"
+  location         : "Paris"
   email            :
   uri              :
   bitbucket        :
@@ -89,7 +92,7 @@ author:
   flickr           :
   facebook         :
   foursquare       :
-  github           :
+  github           : "JulienPascal"
   google_plus      :
   keybase          :
   instagram        :
