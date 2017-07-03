@@ -1,38 +1,45 @@
-/* ==========================================================================
-   TABLES
-   ========================================================================== */
+/*
+  Table styles copied from Bootstrap
+  Copyright (c) 2013 Twitter, Inc
+*/
 
 table {
-  margin-bottom: 1em;
   width: 100%;
-  font-family: $global-font-family;
-  font-size: $type-size-6;
-  border-collapse: collapse;
-  border: 1px solid $light-gray;
-
-  & + table {
-    margin-top: 1em;
+  max-width: 100%;
+  margin-bottom: 1.5;
+  // font-size: 1.125rem;
+  // Cells
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        padding: 12px;
+        line-height: 1.2;
+        vertical-align: top;
+        border-top: 1px solid #333;
+      }
+    }
   }
-}
-
-thead {
-  background-color: $lighter-gray;
-  border-bottom: 1px solid $light-gray;
-}
-
-th {
-  padding: 0.5em;
-  font-weight: bold;
-  text-align: left;
-  border-right: 1px solid $light-gray;
-}
-
-td {
-  padding: 0.5em;
-  border-bottom: 1px solid $light-gray;
-  border-right: 1px solid $light-gray;
-}
-
-tr, td, th {
-  vertical-align: middle;
+  // Bottom align for column headings
+  > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #333;
+  }
+  // Remove top border from thead by default
+  > caption + thead,
+  > colgroup + thead,
+  > thead:first-child {
+    > tr:first-child {
+      > th,
+      > td {
+        border-top: 0;
+      }
+    }
+  }
+  // Account for multiple tbody instances
+  > tbody + tbody {
+    border-top: 2px solid #333;
+  }
 }

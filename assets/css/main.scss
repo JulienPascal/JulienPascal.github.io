@@ -1,39 +1,34 @@
 ---
+# Only the main Sass file needs front matter (the dashes are enough)
 ---
+@charset "utf-8";
 
-/*
- *    Minimal Mistakes Jekyll Theme
- *
- *  - Michael Rose
- *  - mademistakes.com
- *  - https://twitter.com/mmistakes
- *
-*/
 
-@import "vendor/breakpoint/breakpoint"; // media query mixins
-@import "variables";
-@import "mixins";
-@import "vendor/susy/susy";
+@import 'variables';
 
-@import "reset";
-@import "base";
+@import 'basscss';
 
-@import "utilities";
-@import "animations";
-@import "tables";
-@import "buttons";
-@import "notices";
-@import "masthead";
-@import "navigation";
-@import "footer";
-@import "syntax";
+@import 'base';
+@import 'clearfix';
+@import 'positions';
 
-@import "forms";
+@import 'header';
+@import 'footer';
+@import 'pages';
+@import 'posts';
 
-@import "page";
-@import "archive";
-@import "sidebar";
+@import 'projects';
+@import 'profile';
+@import 'pagination';
+@import 'publications';
 
-@import "vendor/font-awesome/font-awesome";
-@import "vendor/magnific-popup/magnific-popup";
-@import "print";
+@import 'blockquotes';
+@import 'code';
+@import 'gallery';
+@import 'gists';
+@import 'links';
+@import 'measure';
+@import 'media-queries';
+@import 'social-icons';
+@import 'tables';
+@import 'typography';

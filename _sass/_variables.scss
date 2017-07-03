@@ -1,147 +1,160 @@
-/* ==========================================================================
-   Variables
-   ========================================================================== */
 
-/*
-   Typography
-   ========================================================================== */
+/******************************************************************************/
 
-$doc-font-size              : 16;
+// Typography
+$base-font-size: 16px !default;
+$small-font-size:  0.875rem !default;
+$bold-font-weight: bold !default;
+$font-family: Helvetica, Arial, sans-serif !default;
+$line-height: 1.5 !default;
+$heading-font-family: Helvetica, sans-serif !default;
+$heading-font-weight: 900 !default;
+$heading-line-height: 1.25 !default;
+$monospace-font-family: 'Source Code Pro', Consolas, monospace !default;
+$h1: 2.998rem !default;
+$h2: 1.5rem !default;
+$h3: 1.25rem !default;
+$h4: 1rem !default;
+$h5: .875rem !default;
+$h6: .75rem !default;
+$h00: 4rem !default;
+$h0: 3rem !default;
+$h00-responsive: 8vw !default;
+$h0-responsive: 6vw !default;
+$h1-responsive: 4vw !default;
+$h00-responsive-max: 7.68rem !default;
+$h0-responsive-max: 5.76rem !default;
+$h1-responsive-max: 3.84rem !default;
+$abbr-border-bottom: 1px black dotted;
 
-/* paragraph indention */
-$paragraph-indent           : false; // true, false (default)
-$indent-var                 : 1.3em;
+// Page width
+$measure-width: 42rem !default;
 
-/* system typefaces */
-$serif                      : Georgia, Times, serif;
-$sans-serif                 : -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
-$monospace                  : Monaco, Consolas, "Lucida Console", monospace;
+// Viewport widths
+$viewport-small: 32em;
+$viewport-medium: 48em;
+$viewport-large: 64em;
 
-/* sans serif typefaces */
-$sans-serif-narrow          : $sans-serif;
-$helvetica                  : Helvetica, "Helvetica Neue", Arial, sans-serif;
+// Colors
+$red:               #FF3636 !default;
+$red-1:             #f95020 !default;
+$orange:            #F29105 !default;
+$orange-1:          #ffcc22 !default;
+$blue:              #2698BA !default;
+$blue-1:            #0076df !default;
+$dark-blue:         #00369f !default;
+$green:             #00ab37 !default;
+$green-1:           #11D68B !default;
+$green-2:           #00cf26 !default;
+$dark-green:        #009f06 !default;
+$light-green:       #ddffdd !default;
+$lime_green:        #B7D12A !default;
+$purple:            #B509AC !default;
+$pink:              #f92080 !default;
+$light-pink:        #ffdddd !default;
+$yellow:            #efcc00 !default;
 
-/* serif typefaces */
-$georgia                    : Georgia, serif;
-$times                      : Times, serif;
-$bodoni                     : "Bodoni MT", serif;
-$calisto                    : "Calisto MT", serif;
-$garamond                   : Garamond, serif;
+$white:             #fff !default;
+$dark-gray:         #333 !default;
+$mid-gray:          #666 !default;
+$light-gray:        #ccc !default;
+$lighter-gray:      #eee !default;
 
-$global-font-family         : $sans-serif;
-$header-font-family         : $sans-serif;
-$caption-font-family        : $serif;
+$grey-color:        #828282;
+$grey-color-light:  lighten($grey-color, 40%);
+$grey-color-dark:   darken($grey-color, 25%);
 
-/* type scale */
-$type-size-1                : 2.441em;  // ~39.056px
-$type-size-2                : 1.953em;  // ~31.248px
-$type-size-3                : 1.563em;  // ~25.008px
-$type-size-4                : 1.25em;   // ~20px
-$type-size-5                : 1em;      // ~16px
-$type-size-6                : 0.75em;   // ~12px
-$type-size-7                : 0.6875em; // ~11px
-$type-size-8                : 0.625em;  // ~10px
+$darken-1:          rgba(#000,.0625) !default;
+$darken-2:          rgba(#000,.125) !default;
+$darken-3:          rgba(#000,.25) !default;
+$darken-4:          rgba(#000,.5) !default;
 
+$theme-color:       $purple;
+$code-color:        $dark-gray;
+$text-color:        $mid-gray;
+$background-color:  white;
 
-/*
-   Colors
-   ========================================================================== */
+// Links
+$link-color:        $theme-color;
+$link-hover-color:  darken($theme-color, 40%);
 
-$gray                       : #7a8288;
-$dark-gray                  : mix(#000, $gray, 40%);
-$darker-gray                : mix(#000, $gray, 60%);
-$light-gray                 : mix(#fff, $gray, 50%);
-$lighter-gray               : mix(#fff, $gray, 90%);
+// Breakpoints
+$breakpoint-md: '(min-width: 52em)';
+$breakpoint-xl: '(min-width: 96em)';
 
-$body-color                 : #fff;
-$background-color           : #fff;
-$code-background-color      : #fafafa;
-$code-background-color-dark : $light-gray;
-$text-color                 : $dark-gray;
-$border-color               : $lighter-gray;
+// Whitespace
+$space-1: .5rem !default;
+$space-2: 1rem !default;
+$space-3: 2rem !default;
+$space-4: 4rem !default;
 
-$primary-color              : #7a8288;
-$success-color              : #62c462;
-$warning-color              : #f89406;
-$danger-color               : #ee5f5b;
-$info-color                 : #52adc8;
+$horizontal-spacing-unit:       50px;
+$vertical-spacing-unit:         40px;
+$nav-height:                    56px;
 
-/* brands */
-$behance-color              : #1769FF;
-$dribbble-color             : #ea4c89;
-$facebook-color             : #3b5998;
-$flickr-color               : #ff0084;
-$foursquare-color           : #0072b1;
-$github-color               : #171516;
-$google-plus-color          : #dd4b39;
-$instagram-color            : #517fa4;
-$lastfm-color               : #d51007;
-$linkedin-color             : #007bb6;
-$pinterest-color            : #cb2027;
-$rss-color                  : #fa9b39;
-$soundcloud-color           : #ff3300;
-$stackoverflow-color        : #fe7a15;
-$tumblr-color               : #32506d;
-$twitter-color              : #55acee;
-$vimeo-color                : #1ab7ea;
-$vine-color                 : #00bf8f;
-$youtube-color              : #bb0000;
-$xing-color                 : #006567;
+// Buttons
+$button-font-size: inherit !default;
+$button-font-weight: normal !default;
+$button-line-height: 1.125rem !default;
+$button-padding-y: .5rem !default;
+$button-padding-x: 1rem !default;
+$button-font-family: $heading-font-family;
 
+// Forms
+$form-field-font-size: 1rem !default;
+$form-field-height: 2.25rem !default;
+$form-field-padding-y: .5rem !default;
+$form-field-padding-x: .5rem !default;
 
-/* links */
-$link-color                 : $info-color;
-$link-color-hover           : mix(#000, $link-color, 25%);
-$link-color-visited         : mix(#fff, $link-color, 25%);
-$masthead-link-color        : $primary-color;
-$masthead-link-color-hover  : mix(#000, $primary-color, 25%);
+// Borders
+$border-color: $light-gray !default;
+$border-width: 1px !default;
+$border-radius: 3px !default;
 
+// Forms
+$form-field-font-size: 1rem;
+$form-field-height: 2.25rem;
+$form-field-padding-y: .5rem;
+$form-field-padding-x: .5rem;
 
-/*
-   Breakpoints
-   ========================================================================== */
+// Code
+$pre-border-radius: 0;
+$pre-background-color: #fafafa;
+$hljs-comment: $mid-gray;
+$hljs-keyword: $dark-blue;
+$hljs-name: $dark-gray;
+$hljs-number: $dark-green;
+$hljs-string: $red;
+$hljs-title: $red;
+$hljs-type: $dark-blue;
+$hljs-tag: $dark-blue;
+$hljs-attribute: $dark-green;
+$hljs-regexp: $dark-green;
+$hljs-symbol: $purple;
+$hljs-built-in: $dark-blue;
+$hljs-preprocessor: $mid-gray;
+$hljs-deletion: $light-pink;
+$hljs-addition: $light-green;
+$hljs-change: $dark-blue;
+$hljs-chunk: $light-gray;
 
-@include breakpoint-set("to ems", true);
+// Header
+$nav-height: 56px;
 
-$small                      : 600px;
-$medium                     : 768px;
-$medium-wide                : 900px;
-$large                      : 1024px;
-$x-large                    : 1280px;
-
-
-/*
-   Grid
-   ========================================================================== */
-
-$right-sidebar-width-narrow : 200px;
-$right-sidebar-width        : 300px;
-$right-sidebar-width-wide   : 400px;
-
-$susy: (
-  columns: 12,
-  // column-width: 90px,
-  gutters: 1/4,
-  math: fluid,
-  output: float,
-  gutter-position: after,
-  container: $large,
-  global-box-sizing: border-box,
-  // debug: (
-  //   image: show,
-  //   color: blue,
-  //   output: overlay,
-  //   toggle: top right,
-  // ),
-);
+// Footer
+$footer-border-top: thin solid $grey-color-dark;
+$footer-padding: $space-1;
+$footer-color: $light-gray;
+$footer-bg-color: $grey-color-dark;
+$footer-font-weight: 300;
+$footer-font-size: .75rem;
 
 
-/*
-   Other
-   ========================================================================== */
+/******************************************************************************/
 
-$border-radius              : 4px;
-$box-shadow                 : 0 1px 1px rgba(0, 0, 0, 0.125);
-$navicon-width              : 28px;
-$navicon-height             : 4px;
-$global-transition          : all 0.2s ease-in-out;
+
+/* portfolio tinkering */
+$img_spacing: 5px;
+$img-height: 275px;
+$caption-font-size: 12px;
+$caption-color: #aaa;
