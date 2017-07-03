@@ -1,7 +1,10 @@
 # main links links
 main:
   - title: "Research"
-    url: https://mmistakes.github.io/minimal-mistakes/docs/navigation/
+    url: /research/
 
   - title: "Teaching"
-    url: /
+    url: /teaching/
+
+  - title: "CV"
+    url: /cv/
