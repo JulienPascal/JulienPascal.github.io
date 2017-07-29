@@ -39,11 +39,11 @@
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
 
-  <link rel="canonical" href="https://julienpascal.github.io/publication/clothing-search/">
+  <link rel="canonical" href="https://julienpascal.github.io/post/rbc_dynare/">
 
   
 
-  <title>Efficiency and contestability in emerging market banking systems | Julien Pascal</title>
+  <title>Solving a simple RBC model in Dynare | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
@@ -149,53 +149,66 @@
   </div>
 </nav>
 
-<div class="pub" itemscope itemtype="http://schema.org/CreativeWork">
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
 
   
 
 
-  <div class="container pub-title">
-    <h1 itemprop="name">Efficiency and contestability in emerging market banking systems</h1>
-    <span class="pub-authors" itemprop="author">
-      
-      Christian Daude, Julien Pascal
-      
-    </span>
-    <span class="pull-right">
-      
+  <div class="article-container">
+    <h1 itemprop="name">Solving a simple RBC model in Dynare</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-07-29 17:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Sat, Jul 29, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  
+
+  
+  
 <div class="share-box" aria-hidden="true">
   <ul class="share">
     <li>
       <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fclothing-search%2f"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f"
          target="_blank">
         <i class="fa fa-facebook"></i>
       </a>
     </li>
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=Efficiency%20and%20contestability%20in%20emerging%20market%20banking%20systems&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fclothing-search%2f"
+         href="https://twitter.com/intent/tweet?text=Solving%20a%20simple%20RBC%20model%20in%20Dynare&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f"
          target="_blank">
         <i class="fa fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fclothing-search%2f&amp;title=Efficiency%20and%20contestability%20in%20emerging%20market%20banking%20systems"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f&amp;title=Solving%20a%20simple%20RBC%20model%20in%20Dynare"
          target="_blank">
         <i class="fa fa-linkedin"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fclothing-search%2f&amp;title=Efficiency%20and%20contestability%20in%20emerging%20market%20banking%20systems"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f&amp;title=Solving%20a%20simple%20RBC%20model%20in%20Dynare"
          target="_blank">
         <i class="fa fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=Efficiency%20and%20contestability%20in%20emerging%20market%20banking%20systems&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fclothing-search%2f">
+         href="mailto:?subject=Solving%20a%20simple%20RBC%20model%20in%20Dynare&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f">
         <i class="fa fa-envelope"></i>
       </a>
     </li>
@@ -203,99 +216,138 @@
 </div>
 
 
-    </span>
-  </div>
+  
 
 </div>
-<div class="article-container">
 
-  
+    <div class="article-style" itemprop="articleBody">
+      
 
-  <h3>Abstract</h3>
-  <p class="pub-abstract" itemprop="text">This paper explores some of the potential determinants of efficiency and contestability in the banking systems of major emerging countries, using a sample of 24 countries over the period 2004 -2013. Efficiency is estimated using both stochastic frontier and data envelopment analyses. Market contestability is measured with the Panzar-Rosse H-statistic. Potential drivers of efficiency and market contestability are then discussed.</p>
+<p><a href="http://www.dynare.org/" target="_blank">Dynare</a> is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see <a href="http://faculty.chicagobooth.edu/thomas.winberry/research/winberryAlgorithm.pdf" target="_blank">Winberry</a> and <a href="http://xavier-ragot.fr/pdf/progress/Ragot_chapter.pdf" target="_blank">Ragot</a> for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.</p>
 
-  
-  <div class="row">
-    <div class="col-sm-1"></div>
-    <div class="col-sm-10">
-      <div class="row">
-        <div class="col-xs-12 col-sm-3 pub-row-heading">Type</div>
-        <div class="col-xs-12 col-sm-9">
-          
-          <a href="/publication/#2">
-            Journal
-          </a>
-          
-        </div>
-      </div>
+<h2 id="a-simple-model">A simple model</h2>
+
+<p>The economy is composed of a representative agent who maximizes his expected
+discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&hellip;,\infty$ <br></p>
+
+<p>$$  \sum_{t=1}^{+\infty}\big(\frac{1}{1+\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1+\gamma}}{1+\gamma}\Big] $$</p>
+
+<p>subject to the constraint</p>
+
+<p>$$ K_t = K_t-_1 (1-\delta) + w_t L_t + r_t K_t-_1 - C_t $$</p>
+
+<p>where</p>
+
+<ul>
+<li>$\rho \in (0,\infty)$ is the rate of time preference</li>
+<li>$\gamma \in (0,\infty)$ is a labor supply parameter</li>
+<li>$w_t$ is real wage</li>
+<li>$r_t$ is the real rental rate</li>
+<li>$K_t$ is capital at the end of the period</li>
+<li>$\delta \in (0,1)$ is the capital depreciation rate</li>
+</ul>
+
+<p>The production function writes
+\begin{equation} Y_t = A_t K_t-_1^\alpha \Big((1+g)^t \Big)^{1-\alpha} \end{equation}</p>
+
+<p>where</p>
+
+<ul>
+<li>$g \in (0,\infty)$ is the growth rate of production</li>
+<li>$\alpha$ and $\beta$ are technology parameters</li>
+<li>$A_t$ is a technological shock that follows and $AR(1)$ process</li>
+</ul>
+
+<p>\begin{equation} \log(A_t) = \lambda log(A_t-_1) + e_t\end{equation}</p>
+
+<p>with $e_t$ an i.i.d zero-mean normally distributed error term with standard deviation
+$\sigma_1$ and $\lambda \in (0,1)$ a parameter governing the persistence of shocks.</p>
+
+<h2 id="first-order-conditions">First Order conditions</h2>
+
+<p>The F.O.C.s of the (stationarized) model are</p>
+
+<p>$$ \frac{1}{\hat{C_t}} = \frac{1}{1+\rho} E_t \Big( \frac{r_t+_1 + 1 - \delta}{\hat{C}_t+_1 (1+g)} \Big)$$</p>
+
+<p>$$ L_t^\gamma = \frac{\hat{w}_t}{\hat{C}_t}$$</p>
+
+<p>$$ r_t = \alpha A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha-1}L_t^{1-\alpha}$$</p>
+
+<p>$$ \hat{w}_t = (1-\alpha) A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha}L_t^{-\alpha} $$</p>
+
+<p>$$ \hat{K}_t + \hat{C}_t = \frac{\hat{K}_t-_1}{1+g} (1-\delta) + A_t \Big( \frac{\hat{K}_t-_1}{1+g} \Big)^{\alpha} L_t^{1-\alpha} $$</p>
+
+<p>with
+$$ \hat{C}_t = \frac{C_t}{(1+g)^t}$$
+$$ \hat{K}_t = \frac{K_t}{(1+g)^t}$$
+$$ \hat{w}_t = \frac{w_t}{(1+g)^t}$$</p>
+
+<h2 id="solving-and-simulating-the-model-in-dynare">Solving and simulating the model in Dynare</h2>
+
+<p>In Dynare, one has first to specify the endogenous variables (<code>var</code>), exogenous variables (<code>varexo</code>),
+and the parameters</p>
+
+<pre><code class="language-matlab">var C K L w r A;
+varexo e;
+
+parameters rho delta gamma alpha lambda g;
+alpha = 0.33;
+delta = 0.1;
+rho = 0.03;
+lambda = 0.97;
+gamma = 0;
+g = 0.015;
+</code></pre>
+
+<p>In a second step, the F.O.C.s of the model has to be expressed using the command <code>model</code></p>
+
+<pre><code class="language-matlab">model;
+1/C=1/(1+rho)*(1/(C(+1)*(1+g)))*(r(+1)+1-delta);
+L^gamma = w/C;
+r = alpha*A*(K(-1)/(1+g))^(alpha-1)*L^(1-alpha);
+w = (1-alpha)*A*(K(-1)/(1+g))^alpha*L^(-alpha);
+K+C = (K(-1)/(1+g))*(1-delta)
++A*(K(-1)/(1+g))^alpha*L^(1-alpha);
+log(A) = lambda*log(A(-1))+e;
+end;
+</code></pre>
+
+<p>The user must provide the analytical solution for the steady state of the model using the command <code>steady_state_model</code>.
+The command <code>steady</code> solves for the steady state values of the model</p>
+
+<pre><code class="language-matlab">steady_state_model;
+A = 1;
+r = (1+g)*(1+rho)+delta-1;
+L = ((1-alpha)/(r/alpha-delta-g))*r/alpha;
+K = (1+g)*(r/alpha)^(1/(alpha-1))*L;
+C = (1-delta)*K/(1+g)
++(K/(1+g))^alpha*L^(1-alpha)-K;
+w = C;
+end;
+
+steady;
+</code></pre>
+
+<p>The command <code>shocks</code> defines the type of shock to be simulated</p>
+
+<pre><code class="language-matlab">shocks;
+var e; stderr 0.01;
+end;
+
+check;
+</code></pre>
+
+<p>A first order expansion around the steady state is obtained using the command
+<code>stoch_simul(order=1)</code>
+This function computes impulse response functions (IRF) and returns various descriptive statistics (moments, variance decomposition, correlation and autocorrelation coefficients)</p>
+
+<p>The IRF produced by Dynare should be pretty similar to the following graph:
+<img src="/img/rbc1_IRF_e.png" alt="IRF simple RBC" /></p>
+
     </div>
-    <div class="col-sm-1"></div>
   </div>
-  <div class="visible-xs space-below"></div>
-  
 
-  <div class="row">
-    <div class="col-sm-1"></div>
-    <div class="col-sm-10">
-      <div class="row">
-        <div class="col-xs-12 col-sm-3 pub-row-heading">Publication</div>
-        <div class="col-xs-12 col-sm-9">In <em>OECD Journal: Economic Studies</em>, Vol. <sup>2016</sup>&frasl;<sub>1</sub>.</div>
-      </div>
-    </div>
-    <div class="col-sm-1"></div>
-  </div>
-  <div class="visible-xs space-below"></div>
-
-  <div class="row">
-    <div class="col-sm-1"></div>
-    <div class="col-sm-10">
-      <div class="row">
-        <div class="col-xs-12 col-sm-3 pub-row-heading">Date</div>
-        <div class="col-xs-12 col-sm-9" itemprop="datePublished">
-          March, 2017
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-1"></div>
-  </div>
-  <div class="visible-xs space-below"></div>
-
-  <div class="row" style="padding-top: 10px">
-    <div class="col-sm-1"></div>
-    <div class="col-sm-10">
-      <div class="row">
-        <div class="col-xs-12 col-sm-3 pub-row-heading" style="line-height:34px;">Links</div>
-        <div class="col-xs-12 col-sm-9">
-
-          
-
-
-
-
-<a class="btn btn-primary btn-outline" href="http://dx.doi.org/10.1787/eco_studies-2016-5jg1jxfzdj9v">
-  PDF
-</a>
-
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-1"></div>
-  </div>
-  <div class="visible-xs space-below"></div>
-
-  <div class="space-below"></div>
-
-  <div class="article-style"></div>
-
-</div>
+</article>
 
 <div class="container">
   <nav>
@@ -305,6 +357,11 @@
     
   </ul>
 </nav>
+
+</div>
+
+<div class="article-container">
+  
 
 </div>
 
