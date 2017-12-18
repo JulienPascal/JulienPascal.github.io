@@ -7,8 +7,18 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 27 Apr 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Dec 2017 00:00:00 +0000</lastBuildDate>
     <atom:link href="/project/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The D-CAPM: Reconciling Consumption and Asset Pricing</title>
+      <link>https://julienpascal.github.io/project/dcapm/</link>
+      <pubDate>Mon, 18 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/dcapm/</guid>
+      <description>&lt;p&gt;This is a joint project with &lt;a href=&#34;https://tyler-abbot.github.io/&#34; target=&#34;_blank&#34;&gt;Tyler Abbot&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
@@ -16,7 +26,7 @@
       <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
-      <description>&lt;p&gt;During recessions, large negative labor income shocks become more common, while significant positive shocks become less frequent. This is particularly true for low wage workers. A substantial fraction of the work force is likely to experience considerable cyclical welfare losses. Can the labor income tax schedule exacerbate or mitigate these fluctuations? We analyse this question in a search-and-matching model with heterogeneous workers and aggregate shocks. This is a joint project with &lt;a href=&#34;https://nicolodalvit.github.io/&#34; target=&#34;_blank&#34;&gt;Nicolò Dalvit&lt;/a&gt;.&lt;/p&gt;
+      <description>&lt;p&gt;We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to the cyclical behavior of the distribution of individual income shocks along the business cycle. We build a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We solve the model using perturbation techniques developed in Reiter (2009) and Winberry (2016). We estimate the model on Italian administrative data for the period 1980-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can alter the cyclicality of income risk for different types of workers. This is a joint project with &lt;a href=&#34;https://nicolodalvit.github.io/&#34; target=&#34;_blank&#34;&gt;Nicolò Dalvit&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
