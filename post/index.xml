@@ -715,21 +715,21 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/collocation.png&#34; alt=&#34;VFI&#34; /&gt;
  &lt;img src=&#34;https://julienpascal.github.io/img/error_collocation.png&#34; alt=&#34;VFI&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;We obtain more are less the same function $w$. But it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package &lt;a href=&#34;https://github.com/JuliaMath/Interpolations.jl&#34; target=&#34;_blank&#34;&gt;Interpolations&lt;/a&gt;: it is more than 60 times faster to evaluate $w$ using the package Interpolations rather than using the package CompEcon:&lt;/p&gt;
+&lt;p&gt;We obtain more are less the same function $w$. But it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package &lt;a href=&#34;https://github.com/JuliaMath/Interpolations.jl&#34; target=&#34;_blank&#34;&gt;Interpolations&lt;/a&gt;: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package CompEcon:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;  #using Interpolations
   #--------------------
-  @time for i=1:100000
-    model.w_func.(model.grid)
+  @time for i=1:1000000
+   model.w_func.(model.grid[1])
   end
-  #1.413715 seconds (2.50 M allocations: 273.132 MiB, 3.10% gc time)
+  #0.230861 seconds (2.00 M allocations: 30.518 MiB, 1.28% gc time)
 
   #using CompEcon
   #--------------
-  @time for i=1:100000
-    model.w_func.(model.grid)
+  @time for i=1:1000000
+   model.w_func.(model.grid[1])
   end
-  #94.604329 seconds (1.02 G allocations: 71.217 GiB, 12.21% gc time)
+  # 4.998902 seconds (51.00 M allocations: 3.546 GiB, 13.39% gc time)
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
