@@ -33,7 +33,7 @@ form:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation1.png&#34; alt=&#34;equation1&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.&lt;/p&gt;
+&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.&lt;/p&gt;
 
 &lt;p&gt;A common technique for solving this class of problem is value function iteration. While value function
 iteration is quite intuitive (it follows the proof of existence of a solution to the functional equation above), it is
@@ -51,7 +51,7 @@ which converges at a quadratic rate in the neighborhood of the solution if the f
 
 &lt;p&gt;An immediate consequence if that the sequence $w,Tw,T^2w$,… converges uniformly to  $w$ (starting with with any bounded and continuous $w$). The following code in &lt;code&gt;Julia v0.6&lt;/code&gt; illustrates the convergence of the series ${T^nw}$.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt; #=
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt; #=
 Julien Pascal
 
 Code heavily based on:
@@ -304,7 +304,7 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Newton%27s_method&#34; target=&#34;_blank&#34;&gt;Newton&lt;/a&gt; or &lt;a href=&#34;https://en.wikipedia.org/wiki/Quasi-Newton_method&#34; target=&#34;_blank&#34;&gt;quasi-Newton&lt;/a&gt; can be used to solve for the root of $f$. In the code that follows, I use &lt;a href=&#34;https://en.wikipedia.org/wiki/Broyden%27s_method&#34; target=&#34;_blank&#34;&gt;Broyden&amp;rsquo;s&lt;/a&gt; method. Let us illustrate this technique using a Chebychev polynomial basis and Chebychev nodes. In doing so, we avoid &lt;a href=&#34;https://en.wikipedia.org/wiki/Runge%27s_phenomenon&#34; target=&#34;_blank&#34;&gt;Runge&amp;rsquo;s phenomenon&lt;/a&gt; associated with a uniform grid.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt; #---------------------------------------------
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt; #---------------------------------------------
 
  # Julien Pascal
 
@@ -349,10 +349,10 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 
 
    #####################################
-   # Function that find a solution
+   # Function that finds a solution
    # to f(x) = 0
    # using Broyden&#39;s &amp;quot;good&amp;quot; method
-   # and simple backstepping procedure as described
+   # and a simple backstepping procedure as described
    # in Miranda and Fackler (2009)
    #
    # input :

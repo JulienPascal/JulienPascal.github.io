@@ -228,7 +228,7 @@ form:</p>
 
 <p><img src="/img/equation1.png" alt="equation1" /></p>
 
-<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank">stochastic optimal growth model</a>. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.</p>
+<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank">stochastic optimal growth model</a>. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.</p>
 
 <p>A common technique for solving this class of problem is value function iteration. While value function
 iteration is quite intuitive (it follows the proof of existence of a solution to the functional equation above), it is
@@ -246,7 +246,7 @@ which converges at a quadratic rate in the neighborhood of the solution if the f
 
 <p>An immediate consequence if that the sequence $w,Tw,T^2w$,… converges uniformly to  $w$ (starting with with any bounded and continuous $w$). The following code in <code>Julia v0.6</code> illustrates the convergence of the series ${T^nw}$.</p>
 
-<pre><code class="language-Julia"> #=
+<pre><code class="language-julia"> #=
 Julien Pascal
 
 Code heavily based on:
@@ -499,7 +499,7 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$</p>
 
 <p><a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton</a> or <a href="https://en.wikipedia.org/wiki/Quasi-Newton_method" target="_blank">quasi-Newton</a> can be used to solve for the root of $f$. In the code that follows, I use <a href="https://en.wikipedia.org/wiki/Broyden%27s_method" target="_blank">Broyden&rsquo;s</a> method. Let us illustrate this technique using a Chebychev polynomial basis and Chebychev nodes. In doing so, we avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon" target="_blank">Runge&rsquo;s phenomenon</a> associated with a uniform grid.</p>
 
-<pre><code class="language-Julia"> #---------------------------------------------
+<pre><code class="language-julia"> #---------------------------------------------
 
  # Julien Pascal
 
@@ -544,10 +544,10 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$</p>
 
 
    #####################################
-   # Function that find a solution
+   # Function that finds a solution
    # to f(x) = 0
    # using Broyden's &quot;good&quot; method
-   # and simple backstepping procedure as described
+   # and a simple backstepping procedure as described
    # in Miranda and Fackler (2009)
    #
    # input :
