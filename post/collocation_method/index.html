@@ -223,15 +223,16 @@
     <div class="article-style" itemprop="articleBody">
       
 
-<p>A large class of economic models involve solving for functional equations of the
+<p>A large class of economic models involves solving for functional equations of the
 form:</p>
 
 <p><img src="/img/equation1.png" alt="equation1" /></p>
 
-<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank">stochastic optimal growth model</a>. A common technique
-for solving this class of problem is value function iteration. While value function
+<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank">stochastic optimal growth model</a>. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.</p>
+
+<p>A common technique for solving this class of problem is value function iteration. While value function
 iteration is quite intuitive (it follows the proof of existence of a solution to the functional equation above), it is
-not the only method available.
+not the only one available.
 This post describes the collocation method, which transforms the problem of finding
 a function into a root-finding one. The gain from this change of perspective is that
 any root-finding algorithm can then be used. In particular, one may use the Newton method,
@@ -239,7 +240,7 @@ which converges at a quadratic rate in the neighborhood of the solution if the f
 
 <h2 id="value-function-iteration">Value function iteration</h2>
 
-<p>Value function iteration takes advantage of the fact that the Bellman operator is a contraction  mapping on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance</p>
+<p>Value function iteration takes advantage of the fact that the Bellman operator $T$ is a contraction  mapping on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance</p>
 
 <p><img src="/img/equation2.png" alt="equation2" /></p>
 

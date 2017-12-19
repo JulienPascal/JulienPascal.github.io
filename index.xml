@@ -28,15 +28,16 @@
       <guid>https://julienpascal.github.io/post/collocation_method/</guid>
       <description>
 
-&lt;p&gt;A large class of economic models involve solving for functional equations of the
+&lt;p&gt;A large class of economic models involves solving for functional equations of the
 form:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation1.png&#34; alt=&#34;equation1&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. A common technique
-for solving this class of problem is value function iteration. While value function
+&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.&lt;/p&gt;
+
+&lt;p&gt;A common technique for solving this class of problem is value function iteration. While value function
 iteration is quite intuitive (it follows the proof of existence of a solution to the functional equation above), it is
-not the only method available.
+not the only one available.
 This post describes the collocation method, which transforms the problem of finding
 a function into a root-finding one. The gain from this change of perspective is that
 any root-finding algorithm can then be used. In particular, one may use the Newton method,
@@ -44,7 +45,7 @@ which converges at a quadratic rate in the neighborhood of the solution if the f
 
 &lt;h2 id=&#34;value-function-iteration&#34;&gt;Value function iteration&lt;/h2&gt;
 
-&lt;p&gt;Value function iteration takes advantage of the fact that the Bellman operator is a contraction  mapping on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance&lt;/p&gt;
+&lt;p&gt;Value function iteration takes advantage of the fact that the Bellman operator $T$ is a contraction  mapping on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation2.png&#34; alt=&#34;equation2&#34; /&gt;&lt;/p&gt;
 
