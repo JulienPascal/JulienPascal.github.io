@@ -23,7 +23,7 @@ form:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation1.png&#34; alt=&#34;equation1&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast during the growing season.&lt;/p&gt;
+&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.&lt;/p&gt;
 
 &lt;p&gt;A common technique for solving this class of problem is value function iteration. While value function
 iteration is quite intuitive (it follows the proof of existence of a solution to the functional equation above), it is
@@ -225,6 +225,8 @@ end
 # Solve by value function iteration
 #-----------------------------------
 @time solve_optgrowth!(model)
+# 3.230501 seconds (118.18 M allocations: 1.776 GiB, 3.51% gc time)
+
 
 #-------------------------------
 # Compare with the true solution
@@ -251,20 +253,13 @@ ax[:set_ylim](-35, -24)
 ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;approximate value function&amp;quot;)
 ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;true value function&amp;quot;)
 ax[:legend](loc=&amp;quot;lower right&amp;quot;)
-show()
-savefig(joinpath(pwd(),&amp;quot;value_function_iteration.png&amp;quot;))
 
 fig, ax = subplots(figsize=(9, 5))
 ax[:set_xlim](0.1, 4.0)
 ax[:set_ylim](0.00, 0.2)
 ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&amp;quot;error&amp;quot;)
 ax[:legend](loc=&amp;quot;lower right&amp;quot;)
-show()
-savefig(joinpath(pwd(),&amp;quot;error_value_function_iteration.png&amp;quot;))
 
-
-@time model.w_func.(model.grid)
-#0.000343 seconds (29 allocations: 2.953 KiB)
 
 
 &lt;/code&gt;&lt;/pre&gt;
@@ -293,6 +288,8 @@ $ \phi_1(x) $ , $ \phi_2(x) $,&amp;hellip;, $ \phi_n(x) $  a set of linearly ind
 $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Newton%27s_method&#34; target=&#34;_blank&#34;&gt;Newton&lt;/a&gt; or &lt;a href=&#34;https://en.wikipedia.org/wiki/Quasi-Newton_method&#34; target=&#34;_blank&#34;&gt;quasi-Newton&lt;/a&gt; can be used to solve for the root of $f$. In the code that follows, I use &lt;a href=&#34;https://en.wikipedia.org/wiki/Broyden%27s_method&#34; target=&#34;_blank&#34;&gt;Broyden&amp;rsquo;s&lt;/a&gt; method. Let us illustrate this technique using a Chebychev polynomial basis and Chebychev nodes. In doing so, we avoid &lt;a href=&#34;https://en.wikipedia.org/wiki/Runge%27s_phenomenon&#34; target=&#34;_blank&#34;&gt;Runge&amp;rsquo;s phenomenon&lt;/a&gt; associated with a uniform grid.&lt;/p&gt;
+
+&lt;h3 id=&#34;implementation-using-compecon&#34;&gt;Implementation using CompEcon&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt; #---------------------------------------------
 
@@ -697,18 +694,15 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
  ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;approximate value function&amp;quot;)
  ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;true value function&amp;quot;)
  ax[:legend](loc=&amp;quot;lower right&amp;quot;)
- show()
+
 
  fig, ax = subplots(figsize=(9, 5))
  ax[:set_xlim](0.1, 4.0)
  ax[:set_ylim](0.01, 0.2)
  ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&amp;quot;error&amp;quot;)
  ax[:legend](loc=&amp;quot;lower right&amp;quot;)
- show()
 
 
- @time model.w_func.(model.grid)
- # 0.006579 seconds (10.23 k allocations: 706.297 KiB)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;output-1&#34;&gt;Output&lt;/h3&gt;
@@ -716,7 +710,7 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/collocation.png&#34; alt=&#34;VFI&#34; /&gt;
  &lt;img src=&#34;https://julienpascal.github.io/img/error_collocation.png&#34; alt=&#34;VFI&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;We obtain more are less the same function $w$. But it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package &lt;a href=&#34;https://github.com/JuliaMath/Interpolations.jl&#34; target=&#34;_blank&#34;&gt;Interpolations&lt;/a&gt;: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package CompEcon:&lt;/p&gt;
+&lt;p&gt;We obtain more are less the same function $w$. But it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package &lt;a href=&#34;https://github.com/JuliaMath/Interpolations.jl&#34; target=&#34;_blank&#34;&gt;Interpolations&lt;/a&gt;: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package &lt;a href=&#34;https://github.com/QuantEcon/CompEcon.jl&#34; target=&#34;_blank&#34;&gt;CompEcon&lt;/a&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;  #using Interpolations
   #--------------------
@@ -731,6 +725,451 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
    model.w_func.(model.grid[1])
   end
   # 4.998902 seconds (51.00 M allocations: 3.546 GiB, 13.39% gc time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;implementation-using-approxfun&#34;&gt;Implementation using ApproxFun&lt;/h3&gt;
+
+&lt;p&gt;Significant speed-up can be obtained by using the package &lt;a href=&#34;https://github.com/JuliaApproximation/ApproxFun.jl&#34; target=&#34;_blank&#34;&gt;ApproxFun&lt;/a&gt;, as illustrated by the code below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;
+#---------------------------------------------
+
+# Julien Pascal
+
+# Solve the stochastic optimal growth problem
+# using the collocation method
+
+# Implementation using ApproxFun
+
+#---------------------------------------------
+
+
+
+
+using QuantEcon
+using Optim
+using CompEcon
+using PyPlot
+using Interpolations
+using FileIO
+using ApproxFun
+using ProfileView
+
+
+
+type optGrowthCollocation
+
+  w::Array{Float64,1}
+  β::AbstractFloat
+  grid::Array{Float64,1}
+  u::Function
+  f::Function
+  shocks::Array{Float64,1}
+  Tw::Array{Float64,1}
+  σ::Array{Float64,1}
+  el_k::Array{Float64,1}
+  wl_k::Array{Float64,1}
+  compute_policy::Bool
+  order_approximation::Int64 #number of element in the functional basis along each dimension
+  functional_basis_type::String #type of functional basis
+  fspace::Dict{Symbol,Any} #functional basis
+  fnodes::Array{Float64,1} #collocation nodes
+  residual::Array{Float64,1} #vector of residual. Should be close to zero
+  a::Array{Float64,1} #polynomial coefficients
+  fApprox::ApproxFun.Fun{ApproxFun.Chebyshev{ApproxFun.Segment{Float64},Float64},Float64,Array{Float64,1}}
+  w_func::Function
+  tol::Float64
+
+end
+
+
+  #####################################
+  # Function that find a solution
+  # to f(x) = 0
+  # using Broyden&#39;s &amp;quot;good&amp;quot; method
+  # and simple backstepping procedure as described
+  # in Miranda and Fackler (2009)
+  #
+  # input :
+  # --------
+  # * x0:                 initial guess for the root
+  # * f:                  function in f(x) = 0
+  # * maxit:              maximum number of iterations
+  # * tol:                tolerance level for the zero
+  # * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the
+  #                       Jacobian is calculated by finite differences
+  # * maxsteps:           maximum number of backsteps
+  # * recaculateJacobian: number of iterations in-between two calculations of the Jacobian
+  #
+  # output :
+  # --------
+  # * x: one zero of f
+  # * it: number of iterations necessary to reached the solution
+  # * fjacinv: pseudo jacobian at the last iteration
+  # * fnorm: norm f(x) at the last iteration
+  #
+  #######################################
+  function find_broyden(x0::Vector, f::Function, maxit::Int64, tol::Float64, fjacinv = eye(length(x0));
+                        maxsteps = 5, recaculateJacobian = 1)
+
+      println(&amp;quot;a0 = $(x0)&amp;quot;)
+      fnorm = tol*2
+      it2 = 0 #to re-initialize the jacobian
+
+      ################################
+      #initialize guess for the matrix
+      ################################
+      # with Calculus
+      #--------------
+      fjacinv_function = x-&amp;gt; Calculus.finite_difference_jacobian(f, x)
+
+
+      # If the user do not provide an initial guess for the jacobian
+      # One is calculated using finite differences.
+      if fjacinv == eye(length(x0))
+          ################################################
+          # finite differences to approximate the Jacobian
+          # at the initial value
+          # this is slow. Seems to improve performances
+          # when x0 is of high dimension.
+          println(&amp;quot;Calculating the Jacobian by finite differences&amp;quot;)
+          #@time fjacinv = Calculus.finite_difference_jacobian(f, x0)
+          @time fjacinv = fjacinv_function(x0)
+
+          println(&amp;quot;Inverting the Jacobian&amp;quot;)
+          try
+              fjacinv = inv(fjacinv)
+          catch
+              try
+                  println(&amp;quot;Jacobian non-invertible\n calculating pseudo-inverse&amp;quot;)
+                  fjacinv = pinv(A)
+              catch
+                  println(&amp;quot;Failing Calculating the pseudo-inverse. Initializing with In&amp;quot;)
+                  fjacinv = eye(length(x0))
+              end
+          end
+          println(&amp;quot;Done&amp;quot;)
+      else
+          println(&amp;quot;Using User&#39;s input as a guess for the Jacobian.&amp;quot;)
+      end
+
+      fval = f(x0)
+
+      for it=1:maxit
+
+          it2 +=1
+
+          #every 30 iterations, reinitilize the jacobian
+          if mod(it2, recaculateJacobian) == 0
+
+              println(&amp;quot;Re-calculating the Jacobian&amp;quot;)
+
+              fjacinv = fjacinv_function(x0)
+
+              try
+                  fjacinv = inv(fjacinv)
+              catch
+                  try
+                      println(&amp;quot;Jacobian non-invertible\n calculating pseudo-inverse&amp;quot;)
+                      fjacinv = pinv(A)
+                  catch
+                      println(&amp;quot;Failing Calculating the pseudo-inverse. Initializing with In&amp;quot;)
+                      fjacinv = eye(length(x0))
+                  end
+              end
+
+          end
+
+
+          println(&amp;quot;it = $(it)&amp;quot;)
+
+          fnorm = norm(fval)
+
+          if fnorm &amp;lt; tol
+              println(&amp;quot;fnorm = $(fnorm)&amp;quot;)
+              return x0, it, fjacinv, fnorm
+          end
+
+          d = -(fjacinv*fval)
+
+          fnormold = Inf
+          ########################
+          # Backstepping procedure
+          ########################
+          for backstep = 1:maxsteps
+
+              if backstep &amp;gt; 1
+                  println(&amp;quot;backstep = $(backstep-1)&amp;quot;)
+              end
+
+              fvalnew = f(x0 + d)
+              fnormnew = norm(fvalnew)
+
+              if fnormnew &amp;lt; fnorm
+                  break
+              end
+
+              if fnormold &amp;lt; fnormnew
+                  d=2*d
+                  break
+              end
+
+              fnormold = fnormnew
+
+              d = d/2
+
+          end
+          ####################
+          ####################
+
+          x0 = x0 + d
+
+          fold = fval
+          fval = f(x0)
+
+          u = fjacinv*(fval - fold)
+
+          #Update the pseudo Jacobian:
+          fjacinv = fjacinv + ((d-u)*(transpose(d)*fjacinv))/(dot(d,u))
+
+          println(&amp;quot;a$(it) = $(x0)&amp;quot;)
+          println(&amp;quot;fnorm = $(fnorm)&amp;quot;)
+
+          if isnan.(x0) == trues(length(x0))
+              println(&amp;quot;Error. a$(it) = NaN for each component&amp;quot;)
+              x0 = zeros(length(x0))
+              return x0, it, fjacinv, fnorm
+          end
+      end
+
+      println(&amp;quot;In function find_broyden\n&amp;quot;)
+      println(&amp;quot;Maximum number of iterations reached.\n&amp;quot;)
+      println(&amp;quot;No convergence.&amp;quot;)
+      println(&amp;quot;Returning fnorm = NaN as a solution&amp;quot;)
+      fnorm = NaN
+      return x0, maxit, fjacinv, fnorm
+
+  end
+
+function optGrowthCollocation(;w = Array{Float64,1}[],
+                              α = 0.4,
+                              β = 0.96,
+                              μ = 0,
+                              s = 0.1,
+                              grid_max = 4,         # Largest grid point
+                              grid_size = 200,      # Number of grid points
+                              shock_size = 250,     # Number of shock draws in Monte Carlo integral
+                              Tw = Array{Float64,1}[],
+                              σ = Array{Float64,1}[],
+                              el_k = Array{Float64,1}[],
+                              wl_k = Array{Float64,1}[],
+                              compute_policy = true,
+                              order_approximation = 40,
+                              functional_basis_type = &amp;quot;chebychev&amp;quot;,
+                            )
+
+
+  grid_y = collect(linspace(1e-4, grid_max, grid_size))
+  shocks = exp.(μ + s * randn(shock_size))
+
+  # Utility
+  u(c) = log.(c)
+  # Production
+  f(k) = k^α
+
+  el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
+
+  lower_bound_support = minimum(grid_y)
+  upper_bound_support = maximum(grid_y)
+
+  n_functional_basis = [order_approximation]
+
+  if functional_basis_type == &amp;quot;chebychev&amp;quot;
+      fspace = fundefn(:cheb, n_functional_basis, lower_bound_support, upper_bound_support)
+  else
+      error(&amp;quot;functional_basis_type has to be \&amp;quot;chebychev\&amp;quot; &amp;quot;)
+  end
+
+
+  fnodes = funnode(fspace)[1]
+  residual = zeros(size(fnodes)[1])
+  a = ones(size(fnodes)[1])
+
+  tol = 0.001
+
+  fApprox = (Fun(Chebyshev((minimum(grid_y))..(maximum(grid_y))), a))
+  #fApprox = (Fun(Chebyshev(0..maximum(model.grid)), a))
+
+  w_func = x-&amp;gt; fApprox(x)
+
+  w = ones(size(fnodes)[1])
+  Tw = ones(size(fnodes)[1])
+  σ = ones(size(fnodes)[1])
+
+
+
+  optGrowthCollocation(
+    w,
+    β,
+    grid_y,
+    u,
+    f,
+    shocks,
+    Tw,
+    σ,
+    el_k,
+    wl_k,
+    compute_policy,
+    order_approximation,
+    functional_basis_type,
+    fspace,
+    fnodes,
+    residual,
+    a,
+    fApprox,
+    w_func,
+    tol
+    )
+end
+
+
+
+function residual!(model::optGrowthCollocation)
+
+
+    model.fApprox = (Fun(Chebyshev((minimum(model.grid))..(maximum(model.grid))), model.a))
+    model.w_func = x-&amp;gt; model.fApprox(x)
+
+    function objective(c, y)
+
+      expectation = 0.0
+
+      for k = 1:length(model.wl_k)
+        expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
+      end
+
+      - model.u(c) - model.β * expectation
+
+    end
+
+    # Loop over nodes
+    for i in 1:size(model.fnodes)[1]
+
+        y = model.fnodes[i,1]
+
+        res = optimize(c -&amp;gt; objective(c, y), 1e-10, y)
+
+        if model.compute_policy
+            model.σ[i] = Optim.minimizer(res)
+        end
+
+        model.Tw[i] = - Optim.minimum(res)
+        model.w[i] = model.w_func(y)
+
+        model.residual[i] = - model.w[i] + model.Tw[i]
+    end
+
+end
+
+
+function solve_optgrowth!(model::optGrowthCollocation;
+                         tol=1e-6,
+                         max_iter=500)
+
+    # Initialize guess for coefficients
+    # by giving the &amp;quot;right shape&amp;quot;
+    # ---------------------------------
+    function objective_initialize!(x, model)
+
+      #update polynomial coeffficients
+      model.a = copy(x)
+
+      model.fApprox = (Fun(Chebyshev((minimum(model.grid))..(maximum(model.grid))), model.a))
+
+      model.w_func = x-&amp;gt; model.fApprox(x)
+
+      return abs.(model.w_func.(model.fnodes[:,1]) - 5.0 * log.(model.fnodes[:,1]))
+
+    end
+
+
+    minx, iterations, Jac0, fnorm = find_broyden(model.a, x -&amp;gt; objective_initialize!(x, model), max_iter, tol)
+
+
+    # Solving the model by collocation
+    # using the initial guess calculated above
+    #-----------------------------------------
+    function objective_residual!(x, model)
+
+      #update polynomial coeffficients
+      model.a = copy(x)
+
+      #calculate residual
+      residual!(model)
+
+      return abs.(model.residual)
+
+    end
+
+    minx, iterations, Jac, fnorm = find_broyden(model.a, x -&amp;gt; objective_residual!(x, model), max_iter, tol,  recaculateJacobian = 1)
+
+
+end
+
+#-----------------------------------
+# Solve by collocation
+#-----------------------------------
+model = optGrowthCollocation(functional_basis_type = &amp;quot;chebychev&amp;quot;)
+@time solve_optgrowth!(model)
+# 15.865923 seconds (329.12 M allocations: 4.977 GiB, 5.55% gc time)
+
+
+#-------------------------------
+# Compare with the true solution
+#-------------------------------
+α = 0.4
+β = 0.96
+μ = 0
+s = 0.1
+
+c1 = log(1 - α * β) / (1 - β)
+c2 = (μ + α * log(α * β)) / (1 - α)
+c3 = 1 / (1 - β)
+c4 = 1 / (1 - α * β)
+
+
+# True optimal policy
+c_star(y) = (1 - α * β) * y
+
+# True value function
+v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
+
+fig, ax = subplots(figsize=(9, 5))
+ax[:set_ylim](-35, -24)
+ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;approximate value function&amp;quot;)
+ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;true value function&amp;quot;)
+
+fig, ax = subplots(figsize=(9, 5))
+ax[:set_xlim](0.1, 4.0)
+ax[:set_ylim](- 0.05, 0.05)
+ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&amp;quot;error&amp;quot;)
+ax[:legend](loc=&amp;quot;lower right&amp;quot;)
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;output-2&#34;&gt;Output&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/collocation_ApproxFun.png&#34; alt=&#34;VFI&#34; /&gt;
+&lt;img src=&#34;https://julienpascal.github.io/img/error_collocation_ApproxFun.png&#34; alt=&#34;VFI&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Computing time is divided by approximately $5$ using ApproxFun rather than CompEcon. But the value function iteration implementation is still the fastest one. One bottleneck seems to be the calculation of the Jacobian by finite differences. It is likely that using &lt;a href=&#34;https://github.com/JuliaDiff/ForwardDiff.jl&#34; target=&#34;_blank&#34;&gt;automatic differentiation&lt;/a&gt; would result is significant gain of time.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@time for i=1:1000000
+ model.w_func.(model.grid[1])
+end
+# 0.391440 seconds (2.00 M allocations: 30.518 MiB, 1.37% gc time)
+
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
