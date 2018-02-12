@@ -40,7 +40,7 @@ us to do inference.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation_SMM.png&#34; alt=&#34;SMM objective function\label{objective_function}&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;where $m^*$ is vector of moments based on empirical observations, $m(\theta)$ a vector of the same moments
-calculated using simulated data when the structural parameters are equal to $\theta$, and $W$ a &lt;a href=&#34;https://en.wikipedia.org/wiki/Weighing_matrix&#34; target=&#34;_blank&#34;&gt;weighting matrix&lt;/a&gt;.&lt;/p&gt;
+calculated using simulated data when the structural parameters are equal to $\theta$, and $W$ a &lt;a href=&#34;https://en.wikipedia.org/wiki/Weighing_matrix&#34; target=&#34;_blank&#34;&gt;weighing matrix&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;The SMM estimate will be such that the (weighted) distance between simulated and real-world moments are minimized. This estimator is quite intuitive: under the hypothesis that our model is correctly specified, our model should be able to reproduce the stylized facts of the data when the parameters are equal to the &amp;ldquo;true&amp;rdquo; ones.&lt;/p&gt;
 
