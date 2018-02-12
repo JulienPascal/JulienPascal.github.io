@@ -11,6 +11,318 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>The Simulated Method of Moments</title>
+      <link>https://julienpascal.github.io/post/smm/</link>
+      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/smm/</guid>
+      <description>
+
+&lt;p&gt;As Thomas Sargent said:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;A rational expectations equilibrium model is a likelihood function&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;But in many cases, the likelihood function is too complicated to be
+written down in closed form. To estimate the structural parameters of the model, on can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is widely used simulation-based estimation technique.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-simple-setting&#34;&gt;A Simple Setting&lt;/h2&gt;
+
+&lt;p&gt;I want to illustrate the SMM in one of the simplest setting you could think of:
+the estimation of the mean of a normal density. Let&amp;rsquo;s say we have access to a (bi-dimensional) time series and we suspect it to be normally distributed with mean $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. Let&amp;rsquo;s pretend that we have no idea of how to write down the associated likelihood function. The good news is that we have access to a &amp;ldquo;black box&amp;rdquo; that generates $i.i.d$ draws from to the law $\mathcal{N}([c,\,d]&amp;lsquo;,\,I_2)$, for any value $c$ and $d$ . It turns out that having access to this black box is enough for
+us to do inference.&lt;/p&gt;
+
+&lt;h2 id=&#34;smm-is-gmm&#34;&gt;SMM is GMM&lt;/h2&gt;
+
+&lt;p&gt;the SMM can be viewed as an extension of the GMM estimator, in which we use both empirical and simulated data. Mathematically, we want to minimize the objective function:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation_SMM.png&#34; alt=&#34;SMM objective function\label{objective_function}&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;where $m^*$ is vector of moments based on empirical observations, $m(\theta)$ a vector of the same moments
+calculated using simulated data when the structural parameters are equal to $\theta$, and $W$ a &lt;a href=&#34;https://en.wikipedia.org/wiki/Weighing_matrix&#34; target=&#34;_blank&#34;&gt;weighting matrix&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The SMM estimate will be such that the (weighted) distance between simulated and real-world moments are minimized. This estimator is quite intuitive: under the hypothesis that our model is correctly specified, our model should be able to reproduce the stylized facts of the data when the parameters are equal to the &amp;ldquo;true&amp;rdquo; ones.&lt;/p&gt;
+
+&lt;h2 id=&#34;inference&#34;&gt;Inference&lt;/h2&gt;
+
+&lt;p&gt;Under some regularity conditions (see &lt;a href=&#34;https://www.google.fr/search?client=ubuntu&amp;amp;channel=fs&amp;amp;q=+McFadden+1989&amp;amp;ie=utf-8&amp;amp;oe=utf-8&amp;amp;gfe_rd=cr&amp;amp;dcr=0&amp;amp;ei=a52BWsGULYeO8Qfq-p3YCw&#34; target=&#34;_blank&#34;&gt;McFadden 1989&lt;/a&gt;), the extra noise introduced by simulation is
+not problematic and inference is possible. That is, we can build a confidence interval
+for our SMM estimates using the standard GMM approach.&lt;/p&gt;
+
+&lt;p&gt;An interesting fact is that we can also treat the histogram of realizations the markov chain , $S=\big( \theta^1, \theta^2, &amp;hellip;, \theta^N \big)$, as a &amp;ldquo;quasi-posterior&amp;rdquo; distribution (see &lt;a href=&#34;http://www.mit.edu/~vchern/ch_qbe.pdf&#34; target=&#34;_blank&#34;&gt;Chernozhukov 2003&lt;/a&gt;). The beauty of this approach is that for a given continously differentiable function $g:\Theta \rightarrow ℜ$, the $90\%$ confidence intervals are constructed by taking the $.05th$ and $0.95th$ quantiles of the sequence  $g(S)=\big( g(\theta^1), g(\theta^2), &amp;hellip;, g(\theta^N )\big)$.&lt;/p&gt;
+
+&lt;h2 id=&#34;implementation-in-julia&#34;&gt;Implementation in Julia&lt;/h2&gt;
+
+&lt;p&gt;The code below shows how one can recover the true parameters of the Normal density $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. I use the package &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt;, which uses some &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;refinements&lt;/a&gt; of the &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;MCMC&lt;/a&gt; methods to explore the state-space, using several Markov chains in parallel ($5$ chains in my example). Figure 1 shows the realizations for one Markov chain. As illustrated in Figure 2, we successfully recovered the true values for $a$ and $b$.  The quasi-posterior mean and median for $a$ and $b$ are extremely close to the true values ($1$ and $-1$).&lt;/p&gt;
+
+&lt;h4 id=&#34;figure-1&#34;&gt;Figure 1&lt;/h4&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;center&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/history_chain_1.svg&#34; alt=&#34;history one chain&#34; /&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;em&gt;History of one chain&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h4 id=&#34;figure-2&#34;&gt;Figure 2&lt;/h4&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;center&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/histogram.svg&#34; alt=&#34;histogram SMM&#34; /&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;em&gt;Histograms for the 5 chains&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#---------------------------------------------------------------------------------------------------------
+# Julien Pascal
+# last edit: 12/02/2018
+#
+# Julia script that shows how the simulated
+# method of moments can be used in a simple
+# setting: estimation of the mean of a Normal r.v.
+#
+# I use the package MomentOpt: https://github.com/floswald/MomentOpt.jl
+#
+# Code heavily based on the file https://github.com/floswald/MomentOpt.jl/blob/master/src/mopt/Examples.jl
+#----------------------------------------------------------------------------------------------------------
+
+using MomentOpt
+using GLM
+using DataStructures
+using DataFrames
+using Plots
+#plotlyjs()
+pyplot()
+
+#------------------------------------------------
+# Options
+#-------------------------------------------------
+# Boolean: do you want to save the plots to disk?
+savePlots = true
+
+# initialize the problem:
+#------------------------
+# initial values:
+#----------------
+pb    = OrderedDict(&amp;quot;p1&amp;quot; =&amp;gt; [0.2,-3,3] , &amp;quot;p2&amp;quot; =&amp;gt; [-0.2,-2,2] )
+# moments to be matched:
+#-----------------------
+moms = DataFrame(name=[&amp;quot;mu1&amp;quot;,&amp;quot;mu2&amp;quot;],value=[-1.0,1.0], weight=ones(2))
+
+
+
+&amp;quot;&amp;quot;&amp;quot;
+    objfunc_normal(ev::Eval)
+
+    GMM objective function to be minized.
+    It returns a weigthed distance between empirical and simulated moments
+
+    copy-paste of the function objfunc_norm(ev::Eval)
+    I only made minor modifications to the original fuction
+
+&amp;quot;&amp;quot;&amp;quot;
+
+function objfunc_normal(ev::Eval)
+
+    start(ev)
+
+
+    # extract parameters from ev:
+    #----------------------------
+    mu  = collect(values(ev.params))
+
+    # compute simulated moments
+    #--------------------------
+    # Monte-Carlo:
+    #-------------
+    ns = 10000 #number of i.i.d draws from N([a,b], sigma)
+    #initialize a multivariate normal N([a,b], sigma)
+    #using a = mu[1], b=mu[2]
+    sigma = [1.0 ;1.0]
+    randMultiNormal = MomentOpt.MvNormal(mu,MomentOpt.PDiagMat(sigma))
+    simM            = mean(rand(randMultiNormal,ns),2) #mean of simulated data
+    simMoments = Dict(:mu1 =&amp;gt; simM[1], :mu2 =&amp;gt; simM[2])#store simulated moments in a dictionary
+
+
+    # Calculate the weighted distance between empirical moments
+    # and simulated ones:
+    #-----------------------------------------------------------
+    v = Dict{Symbol,Float64}()
+    for (k, mom) in dataMomentd(ev)
+        # If weight for moment k exists:
+        #-------------------------------
+        if haskey(MomentOpt.dataMomentWd(ev), k)
+            # divide by weight associated to moment k:
+            #----------------------------------------
+            v[k] = ((simMoments[k] .- mom) ./ MomentOpt.dataMomentW(ev,k)) .^2
+        else
+            v[k] = ((simMoments[k] .- mom) ) .^2
+        end
+    end
+
+    # Set value of the objective function:
+    #------------------------------------
+    setValue(ev, mean(collect(values(v))))
+
+    # also return the moments
+    #-----------------------
+    setMoment(ev, simMoments)
+
+    # flag for success?:
+    #-------------------
+    ev.status = 1
+
+    # finish and return
+    finish(ev)
+
+    return ev
+end
+
+
+
+# Initialize an empty MProb() object:
+#------------------------------------
+mprob = MProb()
+
+# Add structural parameters to MProb():
+# specify starting values and support
+#--------------------------------------
+addSampledParam!(mprob,pb)
+
+# Add moments to be matched to MProb():
+#--------------------------------------
+addMoment!(mprob,moms)
+
+# Attach an objective function to MProb():
+#----------------------------------------
+addEvalFunc!(mprob, objfunc_normal)
+
+
+# estimation options:
+#--------------------
+# number of iterations for each chain
+niter = 1000
+# number of chains
+nchains = 5
+
+opts = Dict(&amp;quot;N&amp;quot;=&amp;gt;nchains,
+        &amp;quot;maxiter&amp;quot;=&amp;gt;niter,
+        &amp;quot;maxtemp&amp;quot;=&amp;gt; 5,
+        # choose inital sd for each parameter p
+        # such that Pr( x \in [init-b,init+b]) = 0.975
+        # where b = (p[:ub]-p[:lb])*opts[&amp;quot;coverage&amp;quot;] i.e. the fraction of the search interval you want to search around the initial value
+        &amp;quot;coverage&amp;quot;=&amp;gt;0.025,  # i.e. this gives you a 95% CI about the current parameter on chain number 1.
+        &amp;quot;sigma_update_steps&amp;quot;=&amp;gt;10,
+        &amp;quot;sigma_adjust_by&amp;quot;=&amp;gt;0.01,
+        &amp;quot;smpl_iters&amp;quot;=&amp;gt;1000,
+        &amp;quot;parallel&amp;quot;=&amp;gt;true,
+        &amp;quot;maxdists&amp;quot;=&amp;gt;[0.05 for i in 1:nchains],
+        &amp;quot;mixprob&amp;quot;=&amp;gt;0.3,
+        &amp;quot;acc_tuner&amp;quot;=&amp;gt;12.0,
+        &amp;quot;animate&amp;quot;=&amp;gt;false)
+
+
+# plot slices of objective function
+#---------------------------------
+s = doSlices(mprob,30)
+
+# plot objective function over param values:
+#-------------------------------------------
+p1 = MomentOpt.plot(s,:value)
+
+if savePlots == true
+    Plots.savefig(p1, joinpath(pwd(),&amp;quot;slices_Normal1.svg&amp;quot;))
+end
+
+# plot value of moment :mu1 over param values
+#--------------------------------------------
+p2 = MomentOpt.plot(s,:mu1)
+
+
+if savePlots == true
+   Plots.savefig(p2, joinpath(pwd(),&amp;quot;slices_Normal2.svg&amp;quot;))
+end
+
+# plot value of moment :mu2 over param values
+#--------------------------------------------
+p3 = Plots.plot(s,:mu2)
+
+if savePlots == true
+    Plots.savefig(p3, joinpath(pwd(),&amp;quot;slices_Normal3.svg&amp;quot;))
+end
+
+#---------------------------------------
+# Let&#39;s set-up and run the optimization
+#---------------------------------------
+# set-up BGP algorithm:
+MA = MAlgoBGP(mprob,opts)
+
+# run the estimation:
+@time MomentOpt.runMOpt!(MA)
+
+# show a summary of the optimization:
+@show MomentOpt.summary(MA)
+
+# Plot histograms for chains:
+#----------------------------
+p4 = histogram(MA.chains[1])
+p5 = histogram(MA.chains[2])
+p6 = histogram(MA.chains[3])
+p7 = histogram(MA.chains[4])
+p8 = histogram(MA.chains[5])
+
+p9 = Plots.plot(p4, p5, p6, p7, p8, layout=(5,1), legend=false)
+
+if savePlots == true
+    savefig(p9, joinpath(pwd(),&amp;quot;histogram.svg&amp;quot;))
+end
+
+# Plot the &amp;quot;history&amp;quot; of one chain:
+#--------------------------------
+p10 = plot(MA.chains[1])
+if savePlots == true
+    savefig(p10, joinpath(pwd(),&amp;quot;history_chain_1.svg&amp;quot;))
+end
+
+
+# Realization of chain 1:
+#-----------------------
+dat_chain1 = MomentOpt.history(MA.chains[1])
+
+# keep only accepted draws:
+#-------------------------
+dat_chain1 = dat_chain1[dat_chain1[:accepted ].== true, : ]
+
+
+# Quasi Posterior mean
+#---------------------
+QP_mean_p1 = mean(dat_chain1[:p1])
+QP_mean_p2 = mean(dat_chain1[:p2])
+
+# Quasi Posterior median
+#-----------------------
+QP_median_p1 = median(dat_chain1[:p1])
+QP_median_p2 = median(dat_chain1[:p2])
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>The D-CAPM: Reconciling Consumption and Asset Pricing</title>
       <link>https://julienpascal.github.io/project/dcapm/</link>
       <pubDate>Mon, 18 Dec 2017 00:00:00 +0000</pubDate>
