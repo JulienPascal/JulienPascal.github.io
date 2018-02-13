@@ -24,25 +24,25 @@
 &lt;p&gt;&amp;ldquo;A rational expectations equilibrium model is a likelihood function&amp;rdquo;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;But in many cases, the likelihood function is too complicated to be
-written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is widely used simulation-based estimation technique.&lt;/p&gt;
+&lt;p&gt;However in many cases, the likelihood function is too complicated to be
+written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is a widely used simulation-based estimation technique.&lt;/p&gt;
 
 &lt;h2 id=&#34;a-simple-setting&#34;&gt;A Simple Setting&lt;/h2&gt;
 
-&lt;p&gt;I want to illustrate the SMM in one of the simplest setting you could think of:
-the estimation of the mean of a normal density. Let&amp;rsquo;s say we have access to a (bi-dimensional) time series and we suspect it to be normally distributed with mean $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. Let&amp;rsquo;s pretend that we have no idea of how to write down the associated likelihood function. The good news is that we have access to a &amp;ldquo;black box&amp;rdquo; that generates $i.i.d$ draws from to the law $\mathcal{N}([c,\,d]&amp;lsquo;,\,I_2)$, for any value $c$ and $d$ . It turns out that having access to this black box is enough for
+&lt;p&gt;I want to illustrate the SMM in one of the simplest settings you could think of:
+the estimation of the mean of a normal density. Let&amp;rsquo;s say we have access to a (bi-dimensional) time series and we suspect it to be normally distributed with mean $[a,\,b]&amp;lsquo;$ and variance the identity matrix $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. Let&amp;rsquo;s pretend that we have no idea how to write down the associated likelihood function. The good news is that we have access to a &amp;ldquo;black box&amp;rdquo; that generates $i.i.d$ draws from the law $\mathcal{N}([c,\,d]&amp;lsquo;,\,I_2)$, for any value $c$ and $d$ . It turns out that having access to this black box is enough for
 us to do inference.&lt;/p&gt;
 
 &lt;h2 id=&#34;smm-is-gmm&#34;&gt;SMM is GMM&lt;/h2&gt;
 
-&lt;p&gt;the SMM can be viewed as an extension of the GMM estimator, in which we use both empirical and simulated data. Mathematically, we want to minimize the objective function:&lt;/p&gt;
+&lt;p&gt;The SMM estimator can be viewed as an extension of the GMM one, as the SMM requires simulated data as well as empirical data. Mathematically, we want to minimize the objective function:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation_SMM.png&#34; alt=&#34;SMM objective function\label{objective_function}&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;where $m^*$ is vector of moments based on empirical observations, $m(\theta)$ a vector of the same moments
+&lt;p&gt;where $m^*$ is a vector of moments based on empirical observations, $m(\theta)$ a vector of the same moments
 calculated using simulated data when the structural parameters are equal to $\theta$, and $W$ a &lt;a href=&#34;https://en.wikipedia.org/wiki/Weighing_matrix&#34; target=&#34;_blank&#34;&gt;weighing matrix&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;The SMM estimate will be such that the (weighted) distance between simulated and real-world moments are minimized. This estimator is quite intuitive: under the hypothesis that our model is correctly specified, our model should be able to reproduce the stylized facts of the data when the parameters are equal to the &amp;ldquo;true&amp;rdquo; ones.&lt;/p&gt;
+&lt;p&gt;The SMM estimate will be such that the (weighted) distance between simulated and real-world moments is minimized. This estimator is quite intuitive: under the hypothesis that the model is correctly specified, it should be able to reproduce the stylized facts of the data when the parameters are equal to the &amp;ldquo;true&amp;rdquo; ones.&lt;/p&gt;
 
 &lt;h2 id=&#34;inference&#34;&gt;Inference&lt;/h2&gt;
 
@@ -50,11 +50,11 @@ calculated using simulated data when the structural parameters are equal to $\th
 not problematic and inference is possible. That is, we can build a confidence interval
 for our SMM estimates using the standard GMM approach.&lt;/p&gt;
 
-&lt;p&gt;An interesting fact is that we can also treat the histogram of realizations the markov chain , $S=\big( \theta^1, \theta^2, &amp;hellip;, \theta^N \big)$, as a &amp;ldquo;quasi-posterior&amp;rdquo; distribution (see &lt;a href=&#34;http://www.mit.edu/~vchern/ch_qbe.pdf&#34; target=&#34;_blank&#34;&gt;Chernozhukov 2003&lt;/a&gt;). The beauty of this approach is that for a given continously differentiable function $g:\Theta \rightarrow ℜ$, the $90\%$ confidence intervals are constructed by taking the $.05th$ and $0.95th$ quantiles of the sequence  $g(S)=\big( g(\theta^1), g(\theta^2), &amp;hellip;, g(\theta^N )\big)$.&lt;/p&gt;
+&lt;p&gt;An interesting fact is that the histogram of one Markov chain realization, $S=\big( \theta^1, \theta^2, &amp;hellip;, \theta^N \big)$, behaves like a &amp;ldquo;quasi-posterior&amp;rdquo; distribution (see &lt;a href=&#34;http://www.mit.edu/~vchern/ch_qbe.pdf&#34; target=&#34;_blank&#34;&gt;Chernozhukov 2003&lt;/a&gt;). The beauty of this approach is that for a given continously differentiable function $g:\Theta \rightarrow ℜ$, the $90\%$ confidence intervals are constructed by taking the $0.05th$ and $0.95th$ quantiles of the sequence  $g(S)=\big( g(\theta^1), g(\theta^2), &amp;hellip;, g(\theta^N )\big)$.&lt;/p&gt;
 
 &lt;h2 id=&#34;implementation-in-julia&#34;&gt;Implementation in Julia&lt;/h2&gt;
 
-&lt;p&gt;The code below shows how one can recover the true parameters of the Normal density $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. I use the package &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt;, which uses some &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;refinements&lt;/a&gt; of the &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;MCMC&lt;/a&gt; methods to explore the state-space, using several Markov chains in parallel ($5$ chains in my example). Figure 1 shows the realizations for one Markov chain. As illustrated in Figure 2, we successfully recovered the true values for $a$ and $b$.  The quasi-posterior mean and median for $a$ and $b$ are extremely close to the true values ($1$ and $-1$).&lt;/p&gt;
+&lt;p&gt;The code below shows how one can recover the true parameters of the Normal density $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. I use the &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt; package, which uses some &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;refinements&lt;/a&gt; of the &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;MCMC&lt;/a&gt; method to explore the state-space with several Markov chains in parallel ($5$ chains in my example). Figure 1 shows the realizations for one Markov chain. As illustrated in Figure 2, we successfully recovered the true values for $a$ and $b$.  The quasi-posterior mean and median for $a$ and $b$ are extremely close to the true values $1$ and $-1$.&lt;/p&gt;
 
 &lt;h4 id=&#34;figure-1&#34;&gt;Figure 1&lt;/h4&gt;
 
