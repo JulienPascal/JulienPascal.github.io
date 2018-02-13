@@ -25,7 +25,7 @@
 &lt;/blockquote&gt;
 
 &lt;p&gt;But in many cases, the likelihood function is too complicated to be
-written down in closed form. To estimate the structural parameters of the model, on can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is widely used simulation-based estimation technique.&lt;/p&gt;
+written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is widely used simulation-based estimation technique.&lt;/p&gt;
 
 &lt;h2 id=&#34;a-simple-setting&#34;&gt;A Simple Setting&lt;/h2&gt;
 
@@ -183,7 +183,7 @@ function objfunc_normal(ev::Eval)
     #-----------------------
     setMoment(ev, simMoments)
 
-    # flag for success?:
+    # flag for success:
     #-------------------
     ev.status = 1
 
