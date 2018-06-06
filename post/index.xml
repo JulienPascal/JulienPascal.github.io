@@ -13,6 +13,15 @@
     
     
     <item>
+      <title>The Simulated Method of Moments: a Parallel Implementation</title>
+      <link>https://julienpascal.github.io/post/smm_parallel/</link>
+      <pubDate>Wed, 06 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/smm_parallel/</guid>
+      <description>In my previous post, I discussed how the the simulated method of moments could be used to estimate parameters without using the likelihood function. This method is useful because many &amp;ldquo;real-life&amp;rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the parallel computing capabilities of julia and MomentOpt to speed-up the estimation.</description>
+    </item>
+    
+    <item>
       <title>The Simulated Method of Moments</title>
       <link>https://julienpascal.github.io/post/smm/</link>
       <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
