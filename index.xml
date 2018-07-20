@@ -41,7 +41,7 @@ how to synchronize it with your &lt;a href=&#34;https://github.com/&#34; target=
 &lt;h2 id=&#34;step-1-generate-your-package&#34;&gt;Step 1: Generate your package&lt;/h2&gt;
 
 &lt;p&gt;The following two lines will create a directory called &lt;code&gt;&amp;quot;MyPackage.jl&amp;quot;&lt;/code&gt; with an &lt;a href=&#34;https://en.wikipedia.org/wiki/MIT_License&#34; target=&#34;_blank&#34;&gt;MIT License&lt;/a&gt;, in
-julia&amp;rsquo;s package location:&lt;/p&gt;
+Julia&amp;rsquo;s package location:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using PkgDev
 PkgDev.generate(&amp;quot;MyPackage.jl&amp;quot;,&amp;quot;MIT&amp;quot;)
@@ -51,7 +51,7 @@ PkgDev.generate(&amp;quot;MyPackage.jl&amp;quot;,&amp;quot;MIT&amp;quot;)
 
 &lt;h4 id=&#34;src&#34;&gt;\src&lt;/h4&gt;
 
-&lt;p&gt;The &lt;code&gt;\src&lt;/code&gt; folder will contain your source code. By default, it contains a file &amp;ldquo;MyPackage.jl&amp;rdquo;, which you will use to load other packages and to include &lt;code&gt;\.jl&lt;/code&gt; files that you created. In this file, you also state the functions and types you want to export.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;\src&lt;/code&gt; folder will contain your source code. By default, it contains a file &amp;ldquo;MyPackage.jl&amp;rdquo;, which you will use to load other packages and to include &lt;code&gt;.jl&lt;/code&gt; files that you created. In this file, you also state the functions and types you want to export. As an example, you may consult the package &lt;a href=&#34;https://github.com/JuliaStats/Distributions.jl/blob/master/src/Distributions.jl&#34; target=&#34;_blank&#34;&gt;Distributions&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h4 id=&#34;test&#34;&gt;\test&lt;/h4&gt;
 

@@ -259,7 +259,7 @@ how to synchronize it with your <a href="https://github.com/" target="_blank">Gi
 <h2 id="step-1-generate-your-package">Step 1: Generate your package</h2>
 
 <p>The following two lines will create a directory called <code>&quot;MyPackage.jl&quot;</code> with an <a href="https://en.wikipedia.org/wiki/MIT_License" target="_blank">MIT License</a>, in
-julia&rsquo;s package location:</p>
+Julia&rsquo;s package location:</p>
 
 <pre><code class="language-julia">using PkgDev
 PkgDev.generate(&quot;MyPackage.jl&quot;,&quot;MIT&quot;)
@@ -269,7 +269,7 @@ PkgDev.generate(&quot;MyPackage.jl&quot;,&quot;MIT&quot;)
 
 <h4 id="src">\src</h4>
 
-<p>The <code>\src</code> folder will contain your source code. By default, it contains a file &ldquo;MyPackage.jl&rdquo;, which you will use to load other packages and to include <code>\.jl</code> files that you created. In this file, you also state the functions and types you want to export.</p>
+<p>The <code>\src</code> folder will contain your source code. By default, it contains a file &ldquo;MyPackage.jl&rdquo;, which you will use to load other packages and to include <code>.jl</code> files that you created. In this file, you also state the functions and types you want to export. As an example, you may consult the package <a href="https://github.com/JuliaStats/Distributions.jl/blob/master/src/Distributions.jl" target="_blank">Distributions</a>.</p>
 
 <h4 id="test">\test</h4>
 
