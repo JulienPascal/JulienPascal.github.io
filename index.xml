@@ -11,6 +11,111 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>How to Create a Julia Package</title>
+      <link>https://julienpascal.github.io/post/createjuliapackage/</link>
+      <pubDate>Fri, 08 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/createjuliapackage/</guid>
+      <description>
+
+&lt;p&gt;In this post, my goal is to briefly explain how to create an unregistered Julia package,
+how to synchronize it with your &lt;a href=&#34;https://github.com/&#34; target=&#34;_blank&#34;&gt;Github&lt;/a&gt; account, and how to start testing your code automatically using &lt;a href=&#34;https://travis-ci.org/&#34; target=&#34;_blank&#34;&gt;TRAVIS CI&lt;/a&gt;. I started writing this post as a reminder to myself. I am posting it here in the hope that it may be useful for someone else. More on this topic can be found by reading the &lt;a href=&#34;https://docs.julialang.org/en/release-0.6/manual/packages/&#34; target=&#34;_blank&#34;&gt;official Julia&amp;rsquo;s manual&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&#34;why-creating-a-package&#34;&gt;Why Creating a Package?&lt;/h1&gt;
+
+&lt;h3 id=&#34;a-package-to-share-academic-work&#34;&gt;A package to share academic work&lt;/h3&gt;
+
+&lt;p&gt;My research projects often involve data manipulation and/or implementing algorithms. I discovered that writing my codes in the form of a package helps me in producing better and reusable code. Creating a package to share your academic work is also very much in line with the idea that scientific research should be reproducible. Users can download your work and install the required dependencies using a single line :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;git.clone(&amp;quot;https://github.com/YourGithubUsername/YourPackage.jl.git&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;continuous-integration&#34;&gt;Continuous Integration&lt;/h3&gt;
+
+&lt;p&gt;Another major advantage of creating a package is that it makes your life much easier when it comes to testing your code automatically using &lt;a href=&#34;https://travis-ci.org/&#34; target=&#34;_blank&#34;&gt;TRAVIS CI&lt;/a&gt;. TRAVIS CI is a &lt;a href=&#34;https://en.wikipedia.org/wiki/Continuous_integration&#34; target=&#34;_blank&#34;&gt;continuous integration&lt;/a&gt; system, which considerably helps in detecting and resolving bugs at an early stage.&lt;/p&gt;
+
+&lt;h1 id=&#34;step-by-step-tutorial&#34;&gt;Step-by-step tutorial&lt;/h1&gt;
+
+&lt;p&gt;In what follows, I am assuming you are using Linux, with julia version 0.6 installed. If you are using a different version, just replace &lt;code&gt;v0.6&lt;/code&gt; by the number corresponding to your current version of julia. You also need to have the package &lt;a href=&#34;https://github.com/JuliaLang/PkgDev.jl&#34; target=&#34;_blank&#34;&gt;PkgDev&lt;/a&gt; installed.&lt;/p&gt;
+
+&lt;h2 id=&#34;step-1-generate-your-package&#34;&gt;Step 1: Generate your package&lt;/h2&gt;
+
+&lt;p&gt;The following two lines will create a directory called &lt;code&gt;&amp;quot;MyPackage.jl&amp;quot;&lt;/code&gt; with an &lt;a href=&#34;https://en.wikipedia.org/wiki/MIT_License&#34; target=&#34;_blank&#34;&gt;MIT License&lt;/a&gt;, in
+julia&amp;rsquo;s package location:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using PkgDev
+PkgDev.generate(&amp;quot;MyPackage.jl&amp;quot;,&amp;quot;MIT&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By convention, Julia repository names and with &lt;code&gt;.jl&lt;/code&gt;. If you change your working directory to your newly created package (&lt;code&gt;cd ~/.julia/v0.6/MyPackage&lt;/code&gt;), you will notice that the following files and directories have been created:&lt;/p&gt;
+
+&lt;h4 id=&#34;src&#34;&gt;\src&lt;/h4&gt;
+
+&lt;p&gt;The &lt;code&gt;\src&lt;/code&gt; folder will contain your source code. By default, it contains a file &amp;ldquo;MyPackage.jl&amp;rdquo;, which you will use to load other packages and to include &lt;code&gt;\.jl&lt;/code&gt; files that you created. In this file, you also state the functions and types you want to export.&lt;/p&gt;
+
+&lt;h4 id=&#34;test&#34;&gt;\test&lt;/h4&gt;
+
+&lt;p&gt;This folder contains a file &lt;code&gt;runtests.jl&lt;/code&gt;, in which you can include &lt;a href=&#34;https://docs.julialang.org/en/v0.6.1/stdlib/test/&#34; target=&#34;_blank&#34;&gt;unit-tests&lt;/a&gt;. Within julia, you can simply run your series of unit-tests with the command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;Pkg.test(&amp;quot;MyPackage&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;require&#34;&gt;REQUIRE&lt;/h4&gt;
+
+&lt;p&gt;This file is used to specify the required dependencies. When a user &lt;code&gt;Pkg.clone()&lt;/code&gt;
+your package, Julia&amp;rsquo;s package manager will make sure that these requirements are
+met. For instance, let&amp;rsquo;s say that your package relies on the version 0.6 of Julia
+(or higher) and the package &lt;a href=&#34;https://github.com/JuliaIO/JSON.jl&#34; target=&#34;_blank&#34;&gt;JSON&lt;/a&gt;. The REQUIRE
+file will be the following :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;julia 0.6
+JSON
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;readme-md&#34;&gt;README.md&lt;/h4&gt;
+
+&lt;p&gt;You can use this file to add a description of you package.&lt;/p&gt;
+
+&lt;h4 id=&#34;license-md&#34;&gt;LICENSE.md&lt;/h4&gt;
+
+&lt;p&gt;To guide you in the choice of a licence, you may want to consult the following website: &lt;a href=&#34;https://choosealicense.com/&#34; target=&#34;_blank&#34;&gt;https://choosealicense.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;step-2-set-up-your-working-environment&#34;&gt;Step 2: Set-up your working environment&lt;/h2&gt;
+
+&lt;p&gt;This step is optional. While you may want to develop you package directly from Julia&amp;rsquo;s package
+directory (&lt;code&gt;~/.julia/v0.6&lt;/code&gt; if you are using &lt;code&gt;julia v0.6&lt;/code&gt;), I personally find it unpleasant. I usually create a symlink to a more convenient location:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;ln -s ~/.julia/v0.6/MyPackage your/convenient/directory/MyPackage
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After running this line in the terminal, you can start working on your package
+directly from &lt;code&gt;your/convenient/directory&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;step-3-synchronize-with-github&#34;&gt;Step 3: Synchronize with GitHub&lt;/h2&gt;
+
+&lt;p&gt;The following step will synchronize your package with
+your GitHub account. After creating a repository named &amp;ldquo;MyPackage.jl&amp;rdquo; on GitHub, enter the following
+commands in the terminal:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;git add -A
+git commit -m &amp;quot;First commit&amp;quot;
+git remote add origin https://github.com/YourGithubUsername/MyPackage.jl.git
+git push -u origin master
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Going to the page &lt;a href=&#34;https://github.com/YourGithubUsername/MyPackage.jl.git&#34; target=&#34;_blank&#34;&gt;https://github.com/YourGithubUsername/MyPackage.jl.git&lt;/a&gt;, you should now see folders and files mentioned above. Some extra files are also going to be there, for instance &lt;code&gt;.gitignore&lt;/code&gt; or &lt;code&gt;appveyor.yml&lt;/code&gt;. You can ignore them for the time being. After this initial commit, you are almost all set and you can use the usual &lt;a href=&#34;https://guides.github.com/introduction/flow/&#34; target=&#34;_blank&#34;&gt;GitHub workflow&lt;/a&gt;. A good idea though is to enable TRAVIS CI for the repository just you created.&lt;/p&gt;
+
+&lt;h2 id=&#34;step-4-set-up-travis-ci&#34;&gt;Step 4: Set-up TRAVIS CI&lt;/h2&gt;
+
+&lt;p&gt;From your GitHub account, sign in to either:
+* TravisCI.org if your repository is public
+* TravisCI.com if your repository is private&lt;/p&gt;
+
+&lt;p&gt;On TRAVIS CI, go to your profile page. Enable your repository &amp;ldquo;YourGithubUsername/MyPackage.jl&amp;rdquo; by flicking the switch one. Every time you push a new commit, your set of tests, launched by the file &lt;code&gt;/test/runtests.jl&lt;/code&gt;, will be automatically executed on a separate virtual environment. If one of your tests fails, you will be notified by e-mail and (most of the time) you will be able to spot the origin of the error quite easily.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>The Simulated Method of Moments: a Parallel Implementation</title>
       <link>https://julienpascal.github.io/post/smm_parallel/</link>
       <pubDate>Wed, 06 Jun 2018 00:00:00 +0000</pubDate>
@@ -723,7 +828,7 @@ QP_median_p2 = median(dat_chain1[:p2])
     </item>
     
     <item>
-      <title>Solving Bellman Equations by Collocation</title>
+      <title>Solving Bellman Equations by the Collocation Method</title>
       <link>https://julienpascal.github.io/post/collocation_method/</link>
       <pubDate>Thu, 07 Dec 2017 17:00:00 +0000</pubDate>
       

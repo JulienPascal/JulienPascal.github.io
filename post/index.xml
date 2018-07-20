@@ -13,6 +13,15 @@
     
     
     <item>
+      <title>How to Create a Julia Package</title>
+      <link>https://julienpascal.github.io/post/createjuliapackage/</link>
+      <pubDate>Fri, 08 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/createjuliapackage/</guid>
+      <description>In this post, my goal is to briefly explain how to create an unregistered Julia package, how to synchronize it with your Github account, and how to start testing your code automatically using TRAVIS CI. I started writing this post as a reminder to myself. I am posting it here in the hope that it may be useful for someone else. More on this topic can be found by reading the official Julia&amp;rsquo;s manual.</description>
+    </item>
+    
+    <item>
       <title>The Simulated Method of Moments: a Parallel Implementation</title>
       <link>https://julienpascal.github.io/post/smm_parallel/</link>
       <pubDate>Wed, 06 Jun 2018 00:00:00 +0000</pubDate>
@@ -34,7 +43,7 @@ A Simple Setting I want to illustrate the SMM in one of the simplest settings yo
     </item>
     
     <item>
-      <title>Solving Bellman Equations by Collocation</title>
+      <title>Solving Bellman Equations by the Collocation Method</title>
       <link>https://julienpascal.github.io/post/collocation_method/</link>
       <pubDate>Thu, 07 Dec 2017 17:00:00 +0000</pubDate>
       

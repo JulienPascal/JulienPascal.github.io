@@ -52,11 +52,11 @@
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
 
-  <link rel="canonical" href="https://julienpascal.github.io/post/rbc_dynare/">
+  <link rel="canonical" href="https://julienpascal.github.io/post/createjuliapackage/">
 
   
 
-  <title>Solving a simple RBC model in Dynare | Julien Pascal</title>
+  <title>How to Create a Julia Package | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
@@ -169,14 +169,14 @@
 
 
   <div class="article-container">
-    <h1 itemprop="name">Solving a simple RBC model in Dynare</h1>
+    <h1 itemprop="name">How to Create a Julia Package</h1>
     
 
 <div class="article-metadata">
 
   <span class="article-date">
-    <time datetime="2017-07-29 17:00:00 &#43;0000 UTC" itemprop="datePublished">
-      Sat, Jul 29, 2017
+    <time datetime="2018-06-08 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Fri, Jun 8, 2018
     </time>
   </span>
 
@@ -193,35 +193,35 @@
   <ul class="share">
     <li>
       <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcreatejuliapackage%2f"
          target="_blank">
         <i class="fa fa-facebook"></i>
       </a>
     </li>
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=Solving%20a%20simple%20RBC%20model%20in%20Dynare&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f"
+         href="https://twitter.com/intent/tweet?text=How%20to%20Create%20a%20Julia%20Package&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcreatejuliapackage%2f"
          target="_blank">
         <i class="fa fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f&amp;title=Solving%20a%20simple%20RBC%20model%20in%20Dynare"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcreatejuliapackage%2f&amp;title=How%20to%20Create%20a%20Julia%20Package"
          target="_blank">
         <i class="fa fa-linkedin"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f&amp;title=Solving%20a%20simple%20RBC%20model%20in%20Dynare"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcreatejuliapackage%2f&amp;title=How%20to%20Create%20a%20Julia%20Package"
          target="_blank">
         <i class="fa fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=Solving%20a%20simple%20RBC%20model%20in%20Dynare&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2frbc_dynare%2f">
+         href="mailto:?subject=How%20to%20Create%20a%20Julia%20Package&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcreatejuliapackage%2f">
         <i class="fa fa-envelope"></i>
       </a>
     </li>
@@ -236,126 +236,100 @@
     <div class="article-style" itemprop="articleBody">
       
 
-<p><a href="http://www.dynare.org/" target="_blank">Dynare</a> is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see <a href="http://faculty.chicagobooth.edu/thomas.winberry/research/winberryAlgorithm.pdf" target="_blank">Winberry</a> and <a href="http://xavier-ragot.fr/pdf/progress/Ragot_chapter.pdf" target="_blank">Ragot</a> for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.</p>
+<p>In this post, my goal is to briefly explain how to create an unregistered Julia package,
+how to synchronize it with your <a href="https://github.com/" target="_blank">Github</a> account, and how to start testing your code automatically using <a href="https://travis-ci.org/" target="_blank">TRAVIS CI</a>. I started writing this post as a reminder to myself. I am posting it here in the hope that it may be useful for someone else. More on this topic can be found by reading the <a href="https://docs.julialang.org/en/release-0.6/manual/packages/" target="_blank">official Julia&rsquo;s manual</a>.</p>
 
-<h2 id="a-simple-model">A simple model</h2>
+<h1 id="why-creating-a-package">Why Creating a Package?</h1>
 
-<p>The economy is composed of a representative agent who maximizes his expected
-discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&hellip;,\infty$ <br></p>
+<h3 id="a-package-to-share-academic-work">A package to share academic work</h3>
 
-<p>$$  \sum_{t=1}^{+\infty}\big(\frac{1}{1+\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1+\gamma}}{1+\gamma}\Big] $$</p>
+<p>My research projects often involve data manipulation and/or implementing algorithms. I discovered that writing my codes in the form of a package helps me in producing better and reusable code. Creating a package to share your academic work is also very much in line with the idea that scientific research should be reproducible. Users can download your work and install the required dependencies using a single line :</p>
 
-<p>subject to the constraint</p>
-
-<p>$$ K_t = K_t-_1 (1-\delta) + w_t L_t + r_t K_t-_1 - C_t $$</p>
-
-<p>where</p>
-
-<ul>
-<li>$\rho \in (0,\infty)$ is the rate of time preference</li>
-<li>$\gamma \in (0,\infty)$ is a labor supply parameter</li>
-<li>$w_t$ is real wage</li>
-<li>$r_t$ is the real rental rate</li>
-<li>$K_t$ is capital at the end of the period</li>
-<li>$\delta \in (0,1)$ is the capital depreciation rate</li>
-</ul>
-
-<p>The production function writes
-\begin{equation} Y_t = A_t K_t-_1^\alpha \Big((1+g)^t \Big)^{1-\alpha} \end{equation}</p>
-
-<p>where</p>
-
-<ul>
-<li>$g \in (0,\infty)$ is the growth rate of production</li>
-<li>$\alpha$ and $\beta$ are technology parameters</li>
-<li>$A_t$ is a technological shock that follows and $AR(1)$ process</li>
-</ul>
-
-<p>\begin{equation} \log(A_t) = \lambda log(A_t-_1) + e_t\end{equation}</p>
-
-<p>with $e_t$ an i.i.d zero-mean normally distributed error term with standard deviation
-$\sigma_1$ and $\lambda \in (0,1)$ a parameter governing the persistence of shocks.</p>
-
-<h2 id="first-order-conditions">First Order conditions</h2>
-
-<p>The F.O.C.s of the (stationarized) model are</p>
-
-<p>$$ \frac{1}{\hat{C_t}} = \frac{1}{1+\rho} E_t \Big( \frac{r_t+_1 + 1 - \delta}{\hat{C}_t+_1 (1+g)} \Big)$$</p>
-
-<p>$$ L_t^\gamma = \frac{\hat{w}_t}{\hat{C}_t}$$</p>
-
-<p>$$ r_t = \alpha A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha-1}L_t^{1-\alpha}$$</p>
-
-<p>$$ \hat{w}_t = (1-\alpha) A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha}L_t^{-\alpha} $$</p>
-
-<p>$$ \hat{K}_t + \hat{C}_t = \frac{\hat{K}_t-_1}{1+g} (1-\delta) + A_t \Big( \frac{\hat{K}_t-_1}{1+g} \Big)^{\alpha} L_t^{1-\alpha} $$</p>
-
-<p>with
-$$ \hat{C}_t = \frac{C_t}{(1+g)^t}$$
-$$ \hat{K}_t = \frac{K_t}{(1+g)^t}$$
-$$ \hat{w}_t = \frac{w_t}{(1+g)^t}$$</p>
-
-<h2 id="solving-and-simulating-the-model-in-dynare">Solving and simulating the model in Dynare</h2>
-
-<p>In Dynare, one has first to specify the endogenous variables (<code>var</code>), exogenous variables (<code>varexo</code>),
-and the parameters</p>
-
-<pre><code class="language-matlab">var C K L w r A;
-varexo e;
-
-parameters rho delta gamma alpha lambda g;
-alpha = 0.33;
-delta = 0.1;
-rho = 0.03;
-lambda = 0.97;
-gamma = 0;
-g = 0.015;
+<pre><code class="language-bash">git.clone(&quot;https://github.com/YourGithubUsername/YourPackage.jl.git&quot;)
 </code></pre>
 
-<p>In a second step, the F.O.C.s of the model has to be expressed using the command <code>model</code></p>
+<h3 id="continuous-integration">Continuous Integration</h3>
 
-<pre><code class="language-matlab">model;
-1/C=1/(1+rho)*(1/(C(+1)*(1+g)))*(r(+1)+1-delta);
-L^gamma = w/C;
-r = alpha*A*(K(-1)/(1+g))^(alpha-1)*L^(1-alpha);
-w = (1-alpha)*A*(K(-1)/(1+g))^alpha*L^(-alpha);
-K+C = (K(-1)/(1+g))*(1-delta)
-+A*(K(-1)/(1+g))^alpha*L^(1-alpha);
-log(A) = lambda*log(A(-1))+e;
-end;
+<p>Another major advantage of creating a package is that it makes your life much easier when it comes to testing your code automatically using <a href="https://travis-ci.org/" target="_blank">TRAVIS CI</a>. TRAVIS CI is a <a href="https://en.wikipedia.org/wiki/Continuous_integration" target="_blank">continuous integration</a> system, which considerably helps in detecting and resolving bugs at an early stage.</p>
+
+<h1 id="step-by-step-tutorial">Step-by-step tutorial</h1>
+
+<p>In what follows, I am assuming you are using Linux, with julia version 0.6 installed. If you are using a different version, just replace <code>v0.6</code> by the number corresponding to your current version of julia. You also need to have the package <a href="https://github.com/JuliaLang/PkgDev.jl" target="_blank">PkgDev</a> installed.</p>
+
+<h2 id="step-1-generate-your-package">Step 1: Generate your package</h2>
+
+<p>The following two lines will create a directory called <code>&quot;MyPackage.jl&quot;</code> with an <a href="https://en.wikipedia.org/wiki/MIT_License" target="_blank">MIT License</a>, in
+julia&rsquo;s package location:</p>
+
+<pre><code class="language-julia">using PkgDev
+PkgDev.generate(&quot;MyPackage.jl&quot;,&quot;MIT&quot;)
 </code></pre>
 
-<p>The user must provide the analytical solution for the steady state of the model using the command <code>steady_state_model</code>.
-The command <code>steady</code> solves for the steady state values of the model</p>
+<p>By convention, Julia repository names and with <code>.jl</code>. If you change your working directory to your newly created package (<code>cd ~/.julia/v0.6/MyPackage</code>), you will notice that the following files and directories have been created:</p>
 
-<pre><code class="language-matlab">steady_state_model;
-A = 1;
-r = (1+g)*(1+rho)+delta-1;
-L = ((1-alpha)/(r/alpha-delta-g))*r/alpha;
-K = (1+g)*(r/alpha)^(1/(alpha-1))*L;
-C = (1-delta)*K/(1+g)
-+(K/(1+g))^alpha*L^(1-alpha)-K;
-w = C;
-end;
+<h4 id="src">\src</h4>
 
-steady;
+<p>The <code>\src</code> folder will contain your source code. By default, it contains a file &ldquo;MyPackage.jl&rdquo;, which you will use to load other packages and to include <code>\.jl</code> files that you created. In this file, you also state the functions and types you want to export.</p>
+
+<h4 id="test">\test</h4>
+
+<p>This folder contains a file <code>runtests.jl</code>, in which you can include <a href="https://docs.julialang.org/en/v0.6.1/stdlib/test/" target="_blank">unit-tests</a>. Within julia, you can simply run your series of unit-tests with the command:</p>
+
+<pre><code class="language-julia">Pkg.test(&quot;MyPackage&quot;)
 </code></pre>
 
-<p>The command <code>shocks</code> defines the type of shock to be simulated</p>
+<h4 id="require">REQUIRE</h4>
 
-<pre><code class="language-matlab">shocks;
-var e; stderr 0.01;
-end;
+<p>This file is used to specify the required dependencies. When a user <code>Pkg.clone()</code>
+your package, Julia&rsquo;s package manager will make sure that these requirements are
+met. For instance, let&rsquo;s say that your package relies on the version 0.6 of Julia
+(or higher) and the package <a href="https://github.com/JuliaIO/JSON.jl" target="_blank">JSON</a>. The REQUIRE
+file will be the following :</p>
 
-check;
+<pre><code class="language-txt">julia 0.6
+JSON
 </code></pre>
 
-<p>A first order expansion around the steady state is obtained using the command
-<code>stoch_simul(order=1)</code>
-This function computes impulse response functions (IRF) and returns various descriptive statistics (moments, variance decomposition, correlation and autocorrelation coefficients)</p>
+<h4 id="readme-md">README.md</h4>
 
-<p>The IRF produced by Dynare should be pretty similar to the following graph:
-<img src="/img/rbc1_IRF_e.png" alt="IRF simple RBC" /></p>
+<p>You can use this file to add a description of you package.</p>
+
+<h4 id="license-md">LICENSE.md</h4>
+
+<p>To guide you in the choice of a licence, you may want to consult the following website: <a href="https://choosealicense.com/" target="_blank">https://choosealicense.com/</a></p>
+
+<h2 id="step-2-set-up-your-working-environment">Step 2: Set-up your working environment</h2>
+
+<p>This step is optional. While you may want to develop you package directly from Julia&rsquo;s package
+directory (<code>~/.julia/v0.6</code> if you are using <code>julia v0.6</code>), I personally find it unpleasant. I usually create a symlink to a more convenient location:</p>
+
+<pre><code class="language-bash">ln -s ~/.julia/v0.6/MyPackage your/convenient/directory/MyPackage
+</code></pre>
+
+<p>After running this line in the terminal, you can start working on your package
+directly from <code>your/convenient/directory</code>.</p>
+
+<h2 id="step-3-synchronize-with-github">Step 3: Synchronize with GitHub</h2>
+
+<p>The following step will synchronize your package with
+your GitHub account. After creating a repository named &ldquo;MyPackage.jl&rdquo; on GitHub, enter the following
+commands in the terminal:</p>
+
+<pre><code class="language-bash">git add -A
+git commit -m &quot;First commit&quot;
+git remote add origin https://github.com/YourGithubUsername/MyPackage.jl.git
+git push -u origin master
+</code></pre>
+
+<p>Going to the page <a href="https://github.com/YourGithubUsername/MyPackage.jl.git" target="_blank">https://github.com/YourGithubUsername/MyPackage.jl.git</a>, you should now see folders and files mentioned above. Some extra files are also going to be there, for instance <code>.gitignore</code> or <code>appveyor.yml</code>. You can ignore them for the time being. After this initial commit, you are almost all set and you can use the usual <a href="https://guides.github.com/introduction/flow/" target="_blank">GitHub workflow</a>. A good idea though is to enable TRAVIS CI for the repository just you created.</p>
+
+<h2 id="step-4-set-up-travis-ci">Step 4: Set-up TRAVIS CI</h2>
+
+<p>From your GitHub account, sign in to either:
+* TravisCI.org if your repository is public
+* TravisCI.com if your repository is private</p>
+
+<p>On TRAVIS CI, go to your profile page. Enable your repository &ldquo;YourGithubUsername/MyPackage.jl&rdquo; by flicking the switch one. Every time you push a new commit, your set of tests, launched by the file <code>/test/runtests.jl</code>, will be automatically executed on a separate virtual environment. If one of your tests fails, you will be notified by e-mail and (most of the time) you will be able to spot the origin of the error quite easily.</p>
 
     </div>
   </div>
@@ -366,10 +340,10 @@ This function computes impulse response functions (IRF) and returns various desc
   <nav>
   <ul class="pager">
     
-
+    <li class="previous"><a href="https://julienpascal.github.io/post/smm_parallel/"><span
+      aria-hidden="true">&larr;</span> The Simulated Method of Moments: a Parallel Implementation</a></li>
     
-    <li class="next"><a href="https://julienpascal.github.io/post/collocation_method/">Solving Bellman Equations by the Collocation Method <span
-      aria-hidden="true">&rarr;</span></a></li>
+
     
   </ul>
 </nav>
