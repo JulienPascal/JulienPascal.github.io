@@ -107,9 +107,12 @@ git push -u origin master
 
 &lt;h2 id=&#34;step-4-set-up-travis-ci&#34;&gt;Step 4: Set-up TRAVIS CI&lt;/h2&gt;
 
-&lt;p&gt;From your GitHub account, sign in to either:
-* TravisCI.org if your repository is public
-* TravisCI.com if your repository is private&lt;/p&gt;
+&lt;p&gt;From your GitHub account, sign in to either:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;TravisCI.org if your repository is public&lt;/li&gt;
+&lt;li&gt;TravisCI.com if your repository is private&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;On TRAVIS CI, go to your profile page. Enable your repository &amp;ldquo;YourGithubUsername/MyPackage.jl&amp;rdquo; by flicking the switch one. Every time you push a new commit, your set of tests, launched by the file &lt;code&gt;/test/runtests.jl&lt;/code&gt;, will be automatically executed on a separate virtual environment. If one of your tests fails, you will be notified by e-mail and (most of the time) you will be able to spot the origin of the error quite easily.&lt;/p&gt;
 </description>
@@ -2124,10 +2127,10 @@ This function computes impulse response functions (IRF) and returns various desc
     
     <item>
       <title>Efficiency and contestability in emerging market banking systems</title>
-      <link>https://julienpascal.github.io/publication/clothing-search/</link>
+      <link>https://julienpascal.github.io/publication/daudepascal/</link>
       <pubDate>Tue, 07 Mar 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://julienpascal.github.io/publication/clothing-search/</guid>
+      <guid>https://julienpascal.github.io/publication/daudepascal/</guid>
       <description></description>
     </item>
     

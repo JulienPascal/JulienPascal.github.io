@@ -122,7 +122,7 @@
         
 
         <li class="nav-item">
-          <a href="/#publications_selected">
+          <a href="/#publications">
             
             <span>Publications</span>
           </a>
@@ -325,9 +325,12 @@ git push -u origin master
 
 <h2 id="step-4-set-up-travis-ci">Step 4: Set-up TRAVIS CI</h2>
 
-<p>From your GitHub account, sign in to either:
-* TravisCI.org if your repository is public
-* TravisCI.com if your repository is private</p>
+<p>From your GitHub account, sign in to either:</p>
+
+<ul>
+<li>TravisCI.org if your repository is public</li>
+<li>TravisCI.com if your repository is private</li>
+</ul>
 
 <p>On TRAVIS CI, go to your profile page. Enable your repository &ldquo;YourGithubUsername/MyPackage.jl&rdquo; by flicking the switch one. Every time you push a new commit, your set of tests, launched by the file <code>/test/runtests.jl</code>, will be automatically executed on a separate virtual environment. If one of your tests fails, you will be notified by e-mail and (most of the time) you will be able to spot the origin of the error quite easily.</p>
 
