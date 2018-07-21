@@ -505,6 +505,11 @@ end
 &lt;/ul&gt;
 
 &lt;p&gt;Computing time is approximately divided by 2 when executing the parallel version.&lt;/p&gt;
+
+&lt;h2 id=&#34;notebook&#34;&gt;Notebook&lt;/h2&gt;
+
+&lt;p&gt;A jupyter notebook containing the code in this post (with some slight modifications)
+can be downloaded &lt;a href=&#34;https://github.com/JulienPascal/ExampleMomentOpt/blob/master/Example_MomentOpt_parallel.ipynb&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
