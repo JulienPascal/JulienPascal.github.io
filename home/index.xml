@@ -18,7 +18,7 @@
       <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/about/</guid>
-      <description>I am currently a PhD candidate in Economics at Sciences Po - LIEPP under the supervision of Jean-Marc Robin.
+      <description>I am currently a PhD candidate in Economics at Sciences Po - LIEPP under the supervision of Jean-Marc Robin. My thesis committee also includes Xavier Ragot and Florian Oswald.
 My research focuses on heterogeneous agents models and frictional markets. I am also interested in efficiency analysis and applied asset pricing. Prior to starting my PhD, I worked at the Economics Department of the OECD. You can find my resume here.</description>
     </item>
     
@@ -56,6 +56,16 @@ My research focuses on heterogeneous agents models and frictional markets. I am 
       
       <guid>https://julienpascal.github.io/home/posts/</guid>
       <description></description>
+    </item>
+    
+    <item>
+      <title>Computing</title>
+      <link>https://julienpascal.github.io/home/computing/</link>
+      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/computing/</guid>
+      <description> For computational intensive programs, I use Julia. For statistics, I mainly use R and Stata. For everything else, I use Python. I have made contributions to the following open source projects:
+Open Source Projects    Name Role Description Status     MomentOpt.jl Contributor Parallel derivative-free moment optimization in Julia.    Dierckx.jl Contributor Julia wrapper for the dierckx Fortran library     </description>
     </item>
     
     <item>
