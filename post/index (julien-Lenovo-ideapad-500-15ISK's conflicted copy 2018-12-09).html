@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="theme" content="hugo-academic">
-  <meta name="generator" content="Hugo 0.53" />
+  <meta name="generator" content="Hugo 0.52" />
   <meta name="author" content="Julien Pascal">
   <meta name="description" content="PhD candidate in Economics">
 
@@ -41,17 +41,17 @@
     
   
 
-  <link rel="alternate" href="https://julienpascal.github.io/tags/academic/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/tags/academic/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="alternate" href="https://julienpascal.github.io/post/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/post/index.xml" type="application/rss+xml" title="Julien Pascal">
 
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
 
-  <link rel="canonical" href="https://julienpascal.github.io/tags/academic/">
+  <link rel="canonical" href="https://julienpascal.github.io/post/">
 
   
 
-  <title>Content tagged as &#39;Academic&#39; | Julien Pascal</title>
+  <title>Posts | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
@@ -159,23 +159,175 @@
 
 
 
-<div class="article-header">
-  <img src="/img/headers/bubbles-wide.jpg" class="article-banner" itemprop="image">
-  
-</div>
-
 
 
 <div class="universal-wrapper">
 
-  <h1>Content tagged as &#39;Academic&#39;</h1>
+  <h1>Posts</h1>
 
   
-  <div class="article-style" itemprop="articleBody"><p>Here is a list of all the content that has been tagged as <em>academic</em>.</p>
+
+  
+  
+  <div>
+    
+    <h2><a href="https://julienpascal.github.io/post/createjuliapackage/">How to Create a Julia Package</a></h2>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2018-06-08 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Fri, Jun 8, 2018
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  
+
+  
+
 </div>
+
+    <div class="article-style"><p>
+      
+      In this post, my goal is to briefly explain how to create an unregistered Julia package, how to synchronize it with your Github account, and how to start testing your code automatically using TRAVIS CI. I started writing this post as a reminder to myself. I am posting it here in the hope that it may be useful for someone else. More on this topic can be found by reading the official Julia&rsquo;s manual.
+      
+    </p></div>
+  </div>
+  
+  <div>
+    
+    <h2><a href="https://julienpascal.github.io/post/smm_parallel/">The Simulated Method of Moments: a Parallel Implementation</a></h2>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2018-06-06 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Wed, Jun 6, 2018
+    </time>
+  </span>
+
   
 
   
+  
+  
+  
+
+  
+
+</div>
+
+    <div class="article-style"><p>
+      
+      In my previous post, I discussed how the the simulated method of moments could be used to estimate parameters without using the likelihood function. This method is useful because many &ldquo;real-life&rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the parallel computing capabilities of julia and MomentOpt to speed-up the estimation.
+      
+    </p></div>
+  </div>
+  
+  <div>
+    
+    <h2><a href="https://julienpascal.github.io/post/smm/">The Simulated Method of Moments</a></h2>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2018-02-12 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Mon, Feb 12, 2018
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+    <div class="article-style"><p>
+      
+      As Thomas Sargent said:
+ &ldquo;A rational expectations equilibrium model is a likelihood function&rdquo;
+ However in many cases, the likelihood function is too complicated to be written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the simulated method of moments (SMM), which is a widely used simulation-based estimation technique.
+A Simple Setting I want to illustrate the SMM in one of the simplest settings you could think of: the estimation of the mean of a normal density.
+      
+    </p></div>
+  </div>
+  
+  <div>
+    
+    <h2><a href="https://julienpascal.github.io/post/collocation_method/">Solving Bellman Equations by the Collocation Method</a></h2>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-12-07 17:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Thu, Dec 7, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+    <div class="article-style"><p>
+      
+      A large class of economic models involves solving for functional equations of the form:
+A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.
+      
+    </p></div>
+  </div>
+  
+  <div>
+    
+    <h2><a href="https://julienpascal.github.io/post/rbc_dynare/">Solving a simple RBC model in Dynare</a></h2>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-07-29 17:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Sat, Jul 29, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+    <div class="article-style"><p>
+      
+      Dynare is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see Winberry and Ragot for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.
+A simple model The economy is composed of a representative agent who maximizes his expected discounted sum of utility by choosing consumption $C_t$ and labor $L<em>t$ for $t=1,&hellip;,\infty$ $$ \sum</em>{t=1}^{+\infty}\big(\frac{1}{1+\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1+\gamma}}{1+\gamma}\Big] $$
+      
+    </p></div>
+  </div>
   
 
   

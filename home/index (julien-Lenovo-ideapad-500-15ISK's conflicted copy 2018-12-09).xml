@@ -64,8 +64,8 @@ My research focuses on heterogeneous agents models and frictional markets. I am 
       <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/computing/</guid>
-      <description>For computational intensive programs, I use Julia. For statistics, I mainly use R and Stata. For everything else, I use Python. I have made contributions to the following open source projects:
-Open Source Projects    Name Role Description Status     SMM.jl Author A Julia package to estimate economic models using the Simulated Method of Moments.    MomentOpt.jl Contributor Parallel derivative-free moment optimization in Julia.</description>
+      <description> For computational intensive programs, I use Julia. For statistics, I mainly use R and Stata. For everything else, I use Python. I have made contributions to the following open source projects:
+Open Source Projects    Name Role Description Status     MomentOpt.jl Contributor Parallel derivative-free moment optimization in Julia.    Dierckx.jl Contributor Julia wrapper for the dierckx Fortran library     </description>
     </item>
     
     <item>

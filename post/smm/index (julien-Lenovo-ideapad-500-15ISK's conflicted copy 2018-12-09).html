@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="theme" content="hugo-academic">
-  <meta name="generator" content="Hugo 0.53" />
+  <meta name="generator" content="Hugo 0.52" />
   <meta name="author" content="Julien Pascal">
   <meta name="description" content="PhD candidate in Economics">
 
@@ -52,11 +52,11 @@
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
 
-  <link rel="canonical" href="https://julienpascal.github.io/post/smm_parallel/">
+  <link rel="canonical" href="https://julienpascal.github.io/post/smm/">
 
   
 
-  <title>The Simulated Method of Moments: a Parallel Implementation | Julien Pascal</title>
+  <title>The Simulated Method of Moments | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
@@ -169,14 +169,14 @@
 
 
   <div class="article-container">
-    <h1 itemprop="name">The Simulated Method of Moments: a Parallel Implementation</h1>
+    <h1 itemprop="name">The Simulated Method of Moments</h1>
     
 
 <div class="article-metadata">
 
   <span class="article-date">
-    <time datetime="2018-06-06 00:00:00 &#43;0000 UTC" itemprop="datePublished">
-      Wed, Jun 6, 2018
+    <time datetime="2018-02-12 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+      Mon, Feb 12, 2018
     </time>
   </span>
 
@@ -193,35 +193,35 @@
   <ul class="share">
     <li>
       <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm_parallel%2f"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm%2f"
          target="_blank">
         <i class="fa fa-facebook"></i>
       </a>
     </li>
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=The%20Simulated%20Method%20of%20Moments%3a%20a%20Parallel%20Implementation&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm_parallel%2f"
+         href="https://twitter.com/intent/tweet?text=The%20Simulated%20Method%20of%20Moments&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm%2f"
          target="_blank">
         <i class="fa fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm_parallel%2f&amp;title=The%20Simulated%20Method%20of%20Moments%3a%20a%20Parallel%20Implementation"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm%2f&amp;title=The%20Simulated%20Method%20of%20Moments"
          target="_blank">
         <i class="fa fa-linkedin"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm_parallel%2f&amp;title=The%20Simulated%20Method%20of%20Moments%3a%20a%20Parallel%20Implementation"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm%2f&amp;title=The%20Simulated%20Method%20of%20Moments"
          target="_blank">
         <i class="fa fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=The%20Simulated%20Method%20of%20Moments%3a%20a%20Parallel%20Implementation&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm_parallel%2f">
+         href="mailto:?subject=The%20Simulated%20Method%20of%20Moments&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fsmm%2f">
         <i class="fa fa-envelope"></i>
       </a>
     </li>
@@ -236,74 +236,96 @@
     <div class="article-style" itemprop="articleBody">
       
 
-<p>In my <a href="https://julienpascal.github.io/post/smm/" target="_blank">previous post</a>, I discussed how
-the the simulated method of moments could be used to estimate parameters without
-using the likelihood function. This method is useful because many &ldquo;real-life&rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the
-parallel computing capabilities of julia and <a href="https://github.com/floswald/MomentOpt.jl/" target="_blank">MomentOpt</a>
-to speed-up the estimation.</p>
+<p>As Thomas Sargent said:</p>
 
-<h2 id="adding-workers">Adding workers</h2>
+<blockquote>
+<p>&ldquo;A rational expectations equilibrium model is a likelihood function&rdquo;</p>
+</blockquote>
 
-<p>In this example, the goal is to estimate the mean of 4-dimension normal random variable with unit variance, without using any information on the likelihood. If you start julia with several processors, MomentOpt will notice it and execute the code in parallel. The first step is to add &ldquo;workers&rdquo; to julia. A rule of thumb is to use as many workers as you have processors on your system (4 in my case).</p>
+<p>However in many cases, the likelihood function is too complicated to be
+written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the <a href="https://en.wikipedia.org/wiki/Method_of_simulated_moments" target="_blank">simulated method of moments</a> (SMM), which is a widely used simulation-based estimation technique.</p>
 
-<pre><code class="language-julia"># Current number of workers
+<h2 id="a-simple-setting">A Simple Setting</h2>
 
-#--------------------------
+<p>I want to illustrate the SMM in one of the simplest settings you could think of:
+the estimation of the mean of a normal density. Let&rsquo;s say we have access to a (bi-dimensional) time series and we suspect it to be normally distributed with mean $[a,\,b]&lsquo;$ and variance the identity matrix $\mathcal{N}([a,\,b]&lsquo;,\,I_2)$. Let&rsquo;s pretend that we have no idea how to write down the associated likelihood function. The good news is that we have access to a &ldquo;black box&rdquo; that generates $i.i.d$ draws from the law $\mathcal{N}([c,\,d]&lsquo;,\,I_2)$, for any value $c$ and $d$ . It turns out that having access to this black box is enough for
+us to do inference.</p>
 
-currentWorkers = nprocs()
+<h2 id="smm-is-gmm">SMM is GMM</h2>
 
-println(&quot;Initial number of workers = $(currentWorkers)&quot;)
+<p>The SMM estimator can be viewed as an extension of the GMM one, as the SMM requires simulated data as well as empirical data. Mathematically, we want to minimize the objective function:</p>
 
-# I want to have 4 workers running
+<p><img src="/img/equation_SMM.png" alt="SMM objective function\label{objective_function}" /></p>
 
-#--------------------------------
+<p>where $m^*$ is a vector of moments based on empirical observations, $m(\theta)$ a vector of the same moments
+calculated using simulated data when the structural parameters are equal to $\theta$, and $W$ a <a href="https://en.wikipedia.org/wiki/Weighing_matrix" target="_blank">weighing matrix</a>.</p>
 
-maxNumberWorkers = 4
+<p>The SMM estimate will be such that the (weighted) distance between simulated and real-world moments is minimized. This estimator is quite intuitive: under the hypothesis that the model is correctly specified, it should be able to reproduce the stylized facts of the data when the parameters are equal to the &ldquo;true&rdquo; ones.</p>
 
-while nprocs() &lt; maxNumberWorkers
+<h2 id="inference">Inference</h2>
 
-    addprocs(1)
+<p>Under some regularity conditions (see <a href="https://www.google.fr/search?client=ubuntu&amp;channel=fs&amp;q=+McFadden+1989&amp;ie=utf-8&amp;oe=utf-8&amp;gfe_rd=cr&amp;dcr=0&amp;ei=a52BWsGULYeO8Qfq-p3YCw" target="_blank">McFadden 1989</a>), the extra noise introduced by simulation is
+not problematic and inference is possible. That is, we can build a confidence interval
+for our SMM estimates using the standard GMM approach.</p>
 
-end
+<p>An interesting fact is that the histogram of one Markov chain realization, $S=\big( \theta^1, \theta^2, &hellip;, \theta^N \big)$, behaves like a &ldquo;quasi-posterior&rdquo; distribution (see <a href="http://www.mit.edu/~vchern/ch_qbe.pdf" target="_blank">Chernozhukov 2003</a>). The beauty of this approach is that for a given continously differentiable function $g:\Theta \rightarrow ℜ$, the $90\%$ confidence intervals are constructed by taking the $0.05th$ and $0.95th$ quantiles of the sequence  $g(S)=\big( g(\theta^1), g(\theta^2), &hellip;, g(\theta^N )\big)$.</p>
 
-# check the number of workers:
+<h2 id="implementation-in-julia">Implementation in Julia</h2>
 
-#----------------------------
+<p>The code below shows how one can recover the true parameters of the Normal density $\mathcal{N}([a,\,b]&lsquo;,\,I_2)$. I use the <a href="https://github.com/floswald/MomentOpt.jl" target="_blank">MomentOpt</a> package, which uses some <a href="(https://arxiv.org/abs/1108.3423)" target="_blank">refinements</a> of the <a href="(https://arxiv.org/abs/1108.3423)" target="_blank">MCMC</a> method to explore the state-space with several Markov chains in parallel. These Markov chains communicate between themselves to avoid being stuck in a local mode of the posterior distribution. In practice, I choose 5 Markov chains. Figure 1 shows the realizations for the first chain. As illustrated in Figure 2, we successfully recovered the true values for $a$ and $b$. For each chain, the quasi-posterior mean and median for $a$ and $b$ are extremely close to the true values $1$ and $-1$.</p>
 
-currentWorkers = nprocs()
+<h4 id="figure-1">Figure 1</h4>
 
-println(&quot;Number of workers = $(currentWorkers)&quot;)
+<table>
+<thead>
+<tr>
+<th align="center"><img src="/img/history_chain_1.svg" alt="history one chain" /></th>
+</tr>
+</thead>
 
-Initial number of workers = 1
-Number of workers = 4
-</code></pre>
+<tbody>
+<tr>
+<td align="center"><em>History of one chain</em></td>
+</tr>
+</tbody>
+</table>
 
-<h2 id="everywhere">@everywhere</h2>
+<h4 id="figure-2">Figure 2</h4>
 
-<p>When running julia with several workers, you have to add the macro @everywhere when loading packages and when defining functions. More details on parallel computing with julia can be found <a href="https://docs.julialang.org/en/v0.6.0/manual/parallel-computing/" target="_blank">here.</a></p>
+<table>
+<thead>
+<tr>
+<th align="center"><img src="/img/histogram.svg" alt="histogram SMM" /></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center"><em>Histograms for the 5 chains</em></td>
+</tr>
+</tbody>
+</table>
 
 <pre><code class="language-julia">#---------------------------------------------------------------------------------------------------------
 # Julien Pascal
-# https://julienpascal.github.io/
-# last edit: 06/06/2018
+# last edit: 12/02/2018
 #
-# Julia script that shows how the simulated method of moments can be used in
-# a simple setting: estimation of the mean of a Normal r.v.
-# This version was built to be executed with several processors
-# For instance, start julia with: julia -p 4
+# Julia script that shows how the simulated
+# method of moments can be used in a simple
+# setting: estimation of the mean of a Normal r.v.
 #
 # I use the package MomentOpt: https://github.com/floswald/MomentOpt.jl
 #
 # Code heavily based on the file https://github.com/floswald/MomentOpt.jl/blob/master/src/mopt/Examples.jl
 #----------------------------------------------------------------------------------------------------------
 
-@everywhere using MomentOpt
-@everywhere using GLM
-@everywhere using DataStructures
-@everywhere using DataFrames
-@everywhere using Plots
+using MomentOpt
+using GLM
+using DataStructures
+using DataFrames
+using Plots
 #plotlyjs()
-@everywhere pyplot()
+pyplot()
 
 #------------------------------------------------
 # Options
@@ -311,37 +333,32 @@ Number of workers = 4
 # Boolean: do you want to save the plots to disk?
 savePlots = true
 
-#------------------------
 # initialize the problem:
 #------------------------
-# Specify the initial values for the parameters, and their support:
-#------------------------------------------------------------------
-pb = OrderedDict(&quot;p1&quot; =&gt; [0.2,-3,3] , &quot;p2&quot; =&gt; [-0.2,-2,2], &quot;p3&quot; =&gt; [0.1,0,10], &quot;p4&quot; =&gt; [-0.1,-10,0])
-# Specify moments to be matched + subjective weights:
-#----------------------------------------------------
-trueValues = OrderedDict(&quot;mu1&quot; =&gt; [-1.0] , &quot;mu2&quot; =&gt; [1.0], &quot;mu3&quot; =&gt; [5.0], &quot;mu4&quot; =&gt; [-4.0])
-moms = DataFrame(name=[&quot;mu1&quot;,&quot;mu2&quot;,&quot;mu3&quot;, &quot;mu4&quot;],value=[-1.0,1.0, 5.0, -4.0], weight=ones(4))
+# initial values:
+#----------------
+pb    = OrderedDict(&quot;p1&quot; =&gt; [0.2,-3,3] , &quot;p2&quot; =&gt; [-0.2,-2,2] )
+# moments to be matched:
+#-----------------------
+moms = DataFrame(name=[&quot;mu1&quot;,&quot;mu2&quot;],value=[-1.0,1.0], weight=ones(2))
 
 
 
+&quot;&quot;&quot;
+    objfunc_normal(ev::Eval)
 
-# objfunc_normal(ev::Eval)
-#
-# GMM objective function to be minized.
-# It returns a weigthed distance between empirical and simulated moments
-#
-@everywhere function objfunc_normal(ev::Eval; verbose = false)
+    GMM objective function to be minized.
+    It returns a weigthed distance between empirical and simulated moments
+
+    copy-paste of the function objfunc_norm(ev::Eval)
+    I only made minor modifications to the original fuction
+
+&quot;&quot;&quot;
+
+function objfunc_normal(ev::Eval)
 
     start(ev)
 
-
-    # when running in parallel, display worker's id:
-    #-----------------------------------------------
-    if verbose == true
-        if nprocs() &gt; 1
-          println(myid())
-        end
-    end
 
     # extract parameters from ev:
     #----------------------------
@@ -351,17 +368,14 @@ moms = DataFrame(name=[&quot;mu1&quot;,&quot;mu2&quot;,&quot;mu3&quot;, &quot;mu
     #--------------------------
     # Monte-Carlo:
     #-------------
-    ns = 10000 #number of i.i.d draws from N([mu], sigma)
-    #initialize a multivariate normal N([mu], sigma)
-    #mu is a four dimensional object
-    #sigma is set to be the identity matrix
-    sigma = [1.0 ;1.0; 1.0; 1.0]
-    # draw ns observations from N([mu], sigma):
+    ns = 10000 #number of i.i.d draws from N([a,b], sigma)
+    #initialize a multivariate normal N([a,b], sigma)
+    #using a = mu[1], b=mu[2]
+    sigma = [1.0 ;1.0]
     randMultiNormal = MomentOpt.MvNormal(mu,MomentOpt.PDiagMat(sigma))
-    # calculate the mean of the simulated data
-    simM            = mean(rand(randMultiNormal,ns),2)
-    # store simulated moments in a dictionary
-    simMoments = Dict(:mu1 =&gt; simM[1], :mu2 =&gt; simM[2], :mu3 =&gt; simM[3], :mu4 =&gt; simM[4])
+    simM            = mean(rand(randMultiNormal,ns),2) #mean of simulated data
+    simMoments = Dict(:mu1 =&gt; simM[1], :mu2 =&gt; simM[2])#store simulated moments in a dictionary
+
 
     # Calculate the weighted distance between empirical moments
     # and simulated ones:
@@ -422,13 +436,15 @@ addEvalFunc!(mprob, objfunc_normal)
 # number of iterations for each chain
 niter = 1000
 # number of chains
-# nchains = nprocs()
-nchains = 4
+nchains = 5
 
 opts = Dict(&quot;N&quot;=&gt;nchains,
         &quot;maxiter&quot;=&gt;niter,
         &quot;maxtemp&quot;=&gt; 5,
-        &quot;coverage&quot;=&gt;0.025,
+        # choose inital sd for each parameter p
+        # such that Pr( x \in [init-b,init+b]) = 0.975
+        # where b = (p[:ub]-p[:lb])*opts[&quot;coverage&quot;] i.e. the fraction of the search interval you want to search around the initial value
+        &quot;coverage&quot;=&gt;0.025,  # i.e. this gives you a 95% CI about the current parameter on chain number 1.
         &quot;sigma_update_steps&quot;=&gt;10,
         &quot;sigma_adjust_by&quot;=&gt;0.01,
         &quot;smpl_iters&quot;=&gt;1000,
@@ -439,6 +455,34 @@ opts = Dict(&quot;N&quot;=&gt;nchains,
         &quot;animate&quot;=&gt;false)
 
 
+# plot slices of objective function
+#---------------------------------
+s = doSlices(mprob,30)
+
+# plot objective function over param values:
+#-------------------------------------------
+p1 = MomentOpt.plot(s,:value)
+
+if savePlots == true
+    Plots.savefig(p1, joinpath(pwd(),&quot;slices_Normal1.svg&quot;))
+end
+
+# plot value of moment :mu1 over param values
+#--------------------------------------------
+p2 = MomentOpt.plot(s,:mu1)
+
+
+if savePlots == true
+   Plots.savefig(p2, joinpath(pwd(),&quot;slices_Normal2.svg&quot;))
+end
+
+# plot value of moment :mu2 over param values
+#--------------------------------------------
+p3 = Plots.plot(s,:mu2)
+
+if savePlots == true
+    Plots.savefig(p3, joinpath(pwd(),&quot;slices_Normal3.svg&quot;))
+end
 
 #---------------------------------------
 # Let's set-up and run the optimization
@@ -451,175 +495,48 @@ MA = MAlgoBGP(mprob,opts)
 
 # show a summary of the optimization:
 @show MomentOpt.summary(MA)
-</code></pre>
 
-<h3 id="inference">Inference</h3>
+# Plot histograms for chains:
+#----------------------------
+p4 = histogram(MA.chains[1])
+p5 = histogram(MA.chains[2])
+p6 = histogram(MA.chains[3])
+p7 = histogram(MA.chains[4])
+p8 = histogram(MA.chains[5])
 
-<p>When using the <a href="https://arxiv.org/abs/1108.3423" target="_blank">BGP algorithm</a>, inference can be done using the first chain. Other chains are used to explore the state space and help to exit potential local minima, but they are not meant to be used for inference. I discard the first 10th observations to get rid of the influence of the starting values. Visual inspection of the first chain suggests that the stationary part of the Markov chain was reached at this stage. I then report the quasi posterior mean and median for each parameter. As reported below, we are quite close to the true values.</p>
-
-<pre><code class="language-julia"># Plot histograms for the first chain, the one with which inference should be done.
-# Other chains are used to explore the space and avoid local minima
-#-------------------------------------------------------------------------------
-p1 = histogram(MA.chains[1])
-display(p1)
+p9 = Plots.plot(p4, p5, p6, p7, p8, layout=(5,1), legend=false)
 
 if savePlots == true
-    savefig(p1, joinpath(pwd(),&quot;histogram_chain1.svg&quot;))
+    savefig(p9, joinpath(pwd(),&quot;histogram.svg&quot;))
 end
 
-# Plot the realization of the first chain
-#----------------------------------------
-p2 = plot(MA.chains[1])
+# Plot the &quot;history&quot; of one chain:
+#--------------------------------
+p10 = plot(MA.chains[1])
 if savePlots == true
-    savefig(p2, joinpath(pwd(),&quot;history_chain_1.svg&quot;))
+    savefig(p10, joinpath(pwd(),&quot;history_chain_1.svg&quot;))
 end
-display(p2)
 
 
-# Realization of the first chain:
-#-------------------------------
+# Realization of chain 1:
+#-----------------------
 dat_chain1 = MomentOpt.history(MA.chains[1])
 
-# discard the first 10th of the observations (&quot;burn-in&quot; phase):
-#--------------------------------------------------------------
-dat_chain1[round(Int, niter/10):niter, :]
-
 # keep only accepted draws:
-#--------------------------
+#-------------------------
 dat_chain1 = dat_chain1[dat_chain1[:accepted ].== true, : ]
 
-# create a list with the parameters to be estimated
-parameters = [Symbol(String(&quot;mu$(i)&quot;)) for i=1:4]
-# list with the corresponding priors:
-#------------------------------------
-estimatedParameters = [Symbol(String(&quot;p$(i)&quot;)) for i=1:4]
 
+# Quasi Posterior mean
+#---------------------
+QP_mean_p1 = mean(dat_chain1[:p1])
+QP_mean_p2 = mean(dat_chain1[:p2])
 
-# Quasi Posterior mean and quasi posterior median for each parameter:
-#-------------------------------------------------------------------
-for (estimatedParameter, param) in zip(estimatedParameters, parameters)
-
-  println(&quot;Quasi posterior mean for $(String(estimatedParameter)) = $(mean(dat_chain1[estimatedParameter]))&quot;)
-  println(&quot;Quasi posterior median for $(String(estimatedParameter)) = $(median(dat_chain1[estimatedParameter]))&quot;)
-  println(&quot;True value = $(trueValues[String(param)][])&quot;)
-
-end
-
-# Output:
-#--------
-# Quasi posterior mean for p1 = -0.9160461484604642
-# Quasi posterior median for p1 = -0.9589739759449558
-# True value = -1.0
-# Quasi posterior mean for p2 = 0.9888798123473025
-# Quasi posterior median for p2 = 1.0675028518780796
-# True value = 1.0
-# Quasi posterior mean for p3 = 4.922658319685393
-# Quasi posterior median for p3 = 4.989662707150382
-# True value = 5.0
-# Quasi posterior mean for p4 = -3.898597557236236
-# Quasi posterior median for p4 = -3.968649064061086
-# True value = -4.0
+# Quasi Posterior median
+#-----------------------
+QP_median_p1 = median(dat_chain1[:p1])
+QP_median_p2 = median(dat_chain1[:p2])
 </code></pre>
-
-<h4 id="figure-1">Figure 1</h4>
-
-<table>
-<thead>
-<tr>
-<th align="center"><img src="/img/history_chain_1_Parallel.svg" alt="History of chain 1" /></th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="center"><em>History of chain 1</em></td>
-</tr>
-</tbody>
-</table>
-
-<h4 id="figure-2">Figure 2</h4>
-
-<table>
-<thead>
-<tr>
-<th align="center"><img src="/img/histogram_chain_1_Parallel.svg" alt="Histograms for chain 1" /></th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="center"><em>Histograms for chain 1</em></td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="safety-checks">Safety checks</h2>
-
-<p>In this toy example, we know we have global identification. However, in more complicated applications, global identification may be hard to prove analytically. A common practice is to make sure that the objective function is &ldquo;well-behaved&rdquo; in a neighborhood of the solution using slices. The graph below shows that there is no flat region in the neighborhood of the solution, suggesting (at least) local identification of the parameters.</p>
-
-<pre><code class="language-julia"># plot slices of objective function
-# grid with 20 points
-#-----------------------------------
-s = doSlices(mprob,20)
-
-# plot slices of the objective function:
-#---------------------------------------
-p = MomentOpt.plot(s,:value)
-display(p)
-
-if savePlots == true
-    Plots.savefig(p, joinpath(pwd(),&quot;slices_Normal.svg&quot;))
-end
-
-
-
-# Produce more precise plots with respect to each parameter:
-#-----------------------------------------------------------
-for symbol in parameters
-
-  p = MomentOpt.plot(s,symbol)
-  display(p)
-
-  if savePlots == true
-      Plots.savefig(p, joinpath(pwd(),&quot;slices_Normal_$(String(symbol)).svg&quot;))
-  end
-
-
-end
-</code></pre>
-
-<h4 id="figure-3">Figure 3</h4>
-
-<table>
-<thead>
-<tr>
-<th align="center"><img src="/img/slices_Normal_Parallel.svg" alt="Slices of the objective function" /></th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="center"><em>Slices of the objective function</em></td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="parallel-versus-serial">Parallel versus Serial</h2>
-
-<p>Here is benchmark of running the code above in serial versus in parallel
-(starting julia with 4 workers):</p>
-
-<ul>
-<li>Serial: 639.661831 seconds (12.52 M allocations: 1.972 GiB, 97.50% gc time)</li>
-<li>Parallel: 372.454707 seconds (279.32 M allocations: 14.843 GiB, 2.19% gc time)</li>
-</ul>
-
-<p>Computing time is approximately divided by 2 when executing the parallel version.</p>
-
-<h2 id="notebook">Notebook</h2>
-
-<p>A jupyter notebook containing the code in this post (with some slight modifications)
-can be downloaded <a href="https://github.com/JulienPascal/ExampleMomentOpt/blob/master/Example_MomentOpt_parallel.ipynb" target="_blank">here</a>.</p>
 
     </div>
   </div>
@@ -630,12 +547,12 @@ can be downloaded <a href="https://github.com/JulienPascal/ExampleMomentOpt/blob
   <nav>
   <ul class="pager">
     
-    <li class="previous"><a href="https://julienpascal.github.io/post/smm/"><span
-      aria-hidden="true">&larr;</span> The Simulated Method of Moments</a></li>
+    <li class="previous"><a href="https://julienpascal.github.io/post/collocation_method/"><span
+      aria-hidden="true">&larr;</span> Solving Bellman Equations by the Collocation Method</a></li>
     
 
     
-    <li class="next"><a href="https://julienpascal.github.io/post/createjuliapackage/">How to Create a Julia Package <span
+    <li class="next"><a href="https://julienpascal.github.io/post/smm_parallel/">The Simulated Method of Moments: a Parallel Implementation <span
       aria-hidden="true">&rarr;</span></a></li>
     
   </ul>
