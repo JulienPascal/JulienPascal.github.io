@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="A Primer to Parallel Computing with Julia With this post, my aim is to provide a non-technical introduction to parallel computing using Julia. Our goal is to calculate an approximation of $\pi$ using Monte-Carlo. I will use this example to introduce some basic Julia functions and concepts. For a more rigorous explanation, the manual is a must-read.
+Calculating $\pi$ using Monte-Carlo Our strategy to calculate an approximation of $\pi$ is quite simple.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/primerparallel/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/primerparallel/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/primerparallel/">
+  <meta property="og:title" content="A Primer to Parallel Computing with Julia | Julien Pascal">
+  <meta property="og:description" content="A Primer to Parallel Computing with Julia With this post, my aim is to provide a non-technical introduction to parallel computing using Julia. Our goal is to calculate an approximation of $\pi$ using Monte-Carlo. I will use this example to introduce some basic Julia functions and concepts. For a more rigorous explanation, the manual is a must-read.
+Calculating $\pi$ using Monte-Carlo Our strategy to calculate an approximation of $\pi$ is quite simple."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-03-18T18:53:22&#43;01:00">
+  
+  <meta property="article:modified_time" content="2019-03-18T18:53:22&#43;01:00">
+  
+
+  
+
+  
+
+  <title>A Primer to Parallel Computing with Julia | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">A Primer to Parallel Computing with Julia</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2019-03-18 18:53:22 &#43;0100 CET" itemprop="datePublished">
+<meta content="2019-03-18 18:53:22 &#43;0100 CET" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>Mar 18, 2019</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    5 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=A%20Primer%20to%20Parallel%20Computing%20with%20Julia&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fprimerparallel%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fprimerparallel%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fprimerparallel%2f&amp;title=A%20Primer%20to%20Parallel%20Computing%20with%20Julia"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fprimerparallel%2f&amp;title=A%20Primer%20to%20Parallel%20Computing%20with%20Julia"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=A%20Primer%20to%20Parallel%20Computing%20with%20Julia&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fprimerparallel%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<h1 id="a-primer-to-parallel-computing-with-julia">A Primer to Parallel Computing with Julia</h1>
+
+<p>With this post, my aim is to provide a non-technical introduction to parallel computing using Julia. Our goal is to calculate an approximation of $\pi$ using Monte-Carlo. I will use this example to introduce some basic Julia functions and concepts. For a more rigorous explanation, the <a href="https://docs.julialang.org/en/v1/stdlib/Distributed/#Distributed.@spawnat" target="_blank">manual</a> is a must-read.</p>
+
+<h2 id="calculating-pi-using-monte-carlo">Calculating $\pi$ using Monte-Carlo</h2>
+
+<p>Our strategy to calculate an approximation of $\pi$ is quite simple. Let
+us consider a circle with radius $R$ inscribed in a square with side $2R$. The area of the circle, denoted by $a$, divided by the area of the square, denoted by $b$, is equal to $\frac{\pi}{4}$. Multiplying $\frac{a}{b}$ by $4$ gives us $\pi$. A slow but robust way of approximating areas is given by <a href="https://en.wikipedia.org/wiki/Monte_Carlo_integration" target="_blank">Monte-Carlo integration</a>. In a nutshell, if we draw $N$ points within the square at random and we calculate the number of them falling within the circle denoted by $N_c$, $\frac{N_c}{N}$ gives us an approximation for $\frac{a}{b}$. The more draws, the more accurate the approximation.</p>
+
+<h2 id="a-serial-implementation">A serial implementation</h2>
+
+<p>Let&rsquo;s start with a serial version of the code</p>
+
+<pre><code class="language-julia">using Distributions
+using BenchmarkTools
+using Plots
+using Distributed
+</code></pre>
+
+<pre><code>┌ Info: Precompiling Plots [91a5bcdd-55d7-5caf-9e0b-520d859cae80]
+└ @ Base loading.jl:1192
+</code></pre>
+
+<pre><code class="language-julia">#------------------------------------------------------------
+# Function that returns 1 if the point with coordinates (x,y) 
+# is within the unit circle; 0 otherwise
+#------------------------------------------------------------
+function inside_circle(x::Float64, y::Float64)
+    output = 0
+    if x^2 + y^2 &lt;= 1
+        output = 1
+    end
+    return output
+end
+</code></pre>
+
+<pre><code>inside_circle (generic function with 1 method)
+</code></pre>
+
+<pre><code class="language-julia">#------------------------------------------------------------
+# Function to calculate an approximation of pi
+#------------------------------------------------------------
+function pi_serial(nbPoints::Int64 = 128 * 1000; d=Uniform(-1.0,1.0))
+    
+   #draw NbPoints from within the square centered in 0
+   #with side length equal to 2
+   xDraws = rand(d, nbPoints)
+   yDraws = rand(d, nbPoints)
+   sumInCircle = 0
+   
+   for (xValue, yValue) in zip(xDraws, yDraws)
+        sumInCircle+=inside_circle(xValue, yValue)
+   end
+    
+   return 4*sumInCircle/nbPoints
+    
+end
+</code></pre>
+
+<pre><code>pi_serial (generic function with 2 methods)
+</code></pre>
+
+<p>We can draw an increasing number of points and see how well the approximation for $\pi$ performs.
+The following figure shows that increasing the number of points leads to a smaller error, even though the decreasing pattern is not uniform. The dashed line shows that the error descreases at a rate equal to the inverse of the square root of $N$.</p>
+
+<pre><code class="language-julia">minPoints =  128 * 100000
+maxPoints =  128 * 1000000
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+elapsedTime1W = zeros(nbGridPoints)
+approximationPi1W =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+    
+    approximationPi1W[index] = pi_serial(nbDraws); #Store value
+    elapsedTime1W[index] = @elapsed pi_serial(nbDraws); #Store time
+    
+end
+</code></pre>
+
+<pre><code class="language-julia">p = Plots.plot(gridPoints, abs.(approximationPi1W .- pi), label = &quot;Serial&quot;)
+Plots.plot!(gridPoints, 1 ./(sqrt.(gridPoints)), label = &quot;1/sqrt(n)&quot;, linestyle = :dash)
+display(p)
+Plots.savefig(p, &quot;convergence_rate.png&quot;)
+</code></pre>
+
+<p><img src="/img/PrimerParallel/convergence_rate.png" alt="svg" /></p>
+
+<h2 id="adding-workers">Adding &ldquo;workers&rdquo;</h2>
+
+<p>When starting Julia, by default, only one processor is available. To increase the number of processors, one can use the command <code>addprocs</code></p>
+
+<pre><code class="language-julia">println(&quot;Initial number of workers = $(nworkers())&quot;)
+addprocs(4)
+println(&quot;Current number of workers = $(nworkers())&quot;)
+</code></pre>
+
+<pre><code>Initial number of workers = 1
+Current number of workers = 4
+</code></pre>
+
+<h2 id="spawn-and-fetch">@spawn and fetch</h2>
+
+<p>With Julia, one can go quite far only using the <code>@spawnat</code> and <code>fetch</code> functions.
+The command <code>@spawnat</code> starts an operation on a given process and returns an object of type <code>Future</code>.
+ For instance, the next line starts the operation <code>myid()</code> on process 2:</p>
+
+<pre><code class="language-julia">f = @spawnat 2 myid()
+</code></pre>
+
+<pre><code>Future(2, 1, 6, nothing)
+</code></pre>
+
+<p>To get the result from the operation we just started on process 2, we need to &ldquo;fetch&rdquo; the results using the <code>Future</code>
+created above. As expected, the result is <code>2</code>:</p>
+
+<pre><code class="language-julia">fetch(f)
+</code></pre>
+
+<pre><code>2
+</code></pre>
+
+<p>An important thing to know about <code>@spawnat</code> is that the &ldquo;spawning&rdquo; process will not wait for the operation to be finished before moving to the next task. This can be illustrated with following example:</p>
+
+<pre><code class="language-julia">@time @spawnat 2 sleep(2.0)
+</code></pre>
+
+<pre><code>  0.008938 seconds (11.45 k allocations: 592.538 KiB)
+
+
+
+
+
+Future(2, 1, 8, nothing)
+</code></pre>
+
+<p>If the expected behavior is to wait for 2 seconds, this can be achieved by &ldquo;fetching&rdquo; the above operation:</p>
+
+<pre><code class="language-julia">@time fetch(@spawnat 2 sleep(2.0))
+</code></pre>
+
+<pre><code>  2.101521 seconds (47.66 k allocations: 2.357 MiB, 0.48% gc time)
+</code></pre>
+
+<p>The bottom line is that process 1 can be used to start many operations in parallel using <code>@spawnat</code> and then collects the results from the different processes using <code>fetch</code>.</p>
+
+<h2 id="a-parallel-implementation">A parallel implementation</h2>
+
+<p>The strategy we used to approximate $\pi$ does not need to be executed in serial. Since each draw is independent from previous ones, we could split the work between available workers (4 workers in this example). Each worker will calculate its own approximation for $\pi$ and the final result will be average value across workers.</p>
+
+<pre><code class="language-julia">#------------------------------------------------------------
+# Let's redefine the function @everywhere so it can run on
+# the newly added workers
+#-----------------------------------------------------------
+@everywhere function inside_circle(x::Float64, y::Float64)
+    output = 0
+    if x^2 + y^2 &lt;= 1
+        output = 1
+    end
+    return output
+end
+</code></pre>
+
+<pre><code class="language-julia">@everywhere using Distributions
+#------------------------------------------------------------
+# Let's redefine the function @everywhere so it can run on
+# the newly added workers
+#-----------------------------------------------------------
+@everywhere function pi_serial(nbPoints::Int64 = 128 * 1000; d=Uniform(-1.0,1.0))
+    
+   #draw NbPoints from within the square centered in 0
+   #with side length equal to 2
+   xDraws = rand(d, nbPoints)
+   yDraws = rand(d, nbPoints)
+   sumInCircle = 0
+   
+   for (xValue, yValue) in zip(xDraws, yDraws)
+        sumInCircle+=inside_circle(xValue, yValue)
+   end
+    
+   return 4*sumInCircle/nbPoints
+    
+end
+</code></pre>
+
+<pre><code class="language-julia">@everywhere function pi_parallel(nbPoints::Int64 = 128 * 1000)
+    
+   # to store different approximations
+   #----------------------------------
+   piWorkers = zeros(nworkers())
+   # to store Futures
+   #-----------------
+   listFutures=[]
+   # divide the draws among workers
+   #-------------------------------
+   nbDraws = Int(nbPoints/4)
+    
+   # each calculate its own approximation
+   #-------------------------------------
+   for (workerIndex, w) in enumerate(workers())
+        push!(listFutures, @spawnat w pi_serial(nbDraws))
+   end
+   # let's fetch results
+   #--------------------
+   for (workerIndex, w) in enumerate(workers())
+         piWorkers[workerIndex] = fetch(listFutures[workerIndex])
+   end
+    
+   # return the mean value across worker
+   return mean(piWorkers)
+    
+end
+</code></pre>
+
+<pre><code class="language-julia">minPoints =  128 * 100000
+maxPoints =  128 * 1000000
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+elapsedTimeNW = zeros(nbGridPoints)
+approximationPiNW =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+    
+    approximationPiNW[index] = pi_parallel(nbDraws); #Store value
+    elapsedTimeNW[index] = @elapsed pi_parallel(nbDraws); #Store time
+    
+end
+</code></pre>
+
+<h2 id="serial-vs-parallel-comparisons">Serial vs parallel comparisons</h2>
+
+<p>In terms of accuracy, the serial and the parallel codes generate the same results (modulo randomness).
+In terms of speed, the parallel version is up to 2.5 times faster. The more points are drawn, the higher the speed-gains. This example shows the well-established fact that the advantages of parallel computing start to kick-in when the underlying tasks are time-consuming in the first place.</p>
+
+<pre><code class="language-julia">p = Plots.plot(gridPoints, abs.(approximationPi1W .- pi), label = &quot;Serial&quot;)
+Plots.plot!(gridPoints, abs.(approximationPiNW .- pi), label = &quot;Parallel&quot;)
+Plots.title!(&quot;Error&quot;)
+Plots.xlabel!(&quot;nb Draws&quot;)
+Plots.ylabel!(&quot;Error&quot;)
+display(p)
+Plots.savefig(p,&quot;error_comparison.png&quot;)
+</code></pre>
+
+<p><img src="/img/PrimerParallel/error_comparison.png" alt="svg" /></p>
+
+<pre><code class="language-julia">p = Plots.plot(gridPoints, elapsedTime1W, label = &quot;Serial&quot;)
+Plots.plot!(gridPoints, elapsedTimeNW, label = &quot;Parallel&quot;)
+Plots.plot!(gridPoints, elapsedTime1W./elapsedTimeNW, label = &quot;Speed-up&quot;)
+Plots.xlabel!(&quot;nb Draws&quot;)
+Plots.ylabel!(&quot;Time (s)&quot;)
+display(p)
+Plots.savefig(&quot;Speed_gains.png&quot;)
+</code></pre>
+
+<p><img src="/img/PrimerParallel/Speed_gains.png" alt="svg" /></p>
+
+    </div>
+
+    
+
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal</a></h5>
+    <h6 class="card-subtitle">PhD candidate in Economics</h6>
+    <p class="card-text" itemprop="description">I am particularly interested in frictional markets with heterogeneous agents</p>
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+      
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+

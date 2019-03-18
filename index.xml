@@ -7,19 +7,315 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 20 Apr 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Mar 2019 18:53:22 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>How to Create a Julia Package</title>
-      <link>https://julienpascal.github.io/post/createjuliapackage/</link>
-      <pubDate>Fri, 08 Jun 2018 00:00:00 +0000</pubDate>
+      <title>A Primer to Parallel Computing with Julia</title>
+      <link>https://julienpascal.github.io/post/primerparallel/</link>
+      <pubDate>Mon, 18 Mar 2019 18:53:22 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/post/createjuliapackage/</guid>
+      <guid>https://julienpascal.github.io/post/primerparallel/</guid>
       <description>
 
-&lt;p&gt;In this post, my goal is to briefly explain how to create an unregistered Julia package,
-how to synchronize it with your &lt;a href=&#34;https://github.com/&#34; target=&#34;_blank&#34;&gt;Github&lt;/a&gt; account, and how to start testing your code automatically using &lt;a href=&#34;https://travis-ci.org/&#34; target=&#34;_blank&#34;&gt;TRAVIS CI&lt;/a&gt;. I started writing this post as a reminder to myself. I am posting it here in the hope that it may be useful for someone else. More on this topic can be found by reading the &lt;a href=&#34;https://docs.julialang.org/en/release-0.6/manual/packages/&#34; target=&#34;_blank&#34;&gt;official Julia&amp;rsquo;s manual&lt;/a&gt;.&lt;/p&gt;
+&lt;h1 id=&#34;a-primer-to-parallel-computing-with-julia&#34;&gt;A Primer to Parallel Computing with Julia&lt;/h1&gt;
+
+&lt;p&gt;With this post, my aim is to provide a non-technical introduction to parallel computing using Julia. Our goal is to calculate an approximation of $\pi$ using Monte-Carlo. I will use this example to introduce some basic Julia functions and concepts. For a more rigorous explanation, the &lt;a href=&#34;https://docs.julialang.org/en/v1/stdlib/Distributed/#Distributed.@spawnat&#34; target=&#34;_blank&#34;&gt;manual&lt;/a&gt; is a must-read.&lt;/p&gt;
+
+&lt;h2 id=&#34;calculating-pi-using-monte-carlo&#34;&gt;Calculating $\pi$ using Monte-Carlo&lt;/h2&gt;
+
+&lt;p&gt;Our strategy to calculate an approximation of $\pi$ is quite simple. Let
+us consider a circle with radius $R$ inscribed in a square with side $2R$. The area of the circle, denoted by $a$, divided by the area of the square, denoted by $b$, is equal to $\frac{\pi}{4}$. Multiplying $\frac{a}{b}$ by $4$ gives us $\pi$. A slow but robust way of approximating areas is given by &lt;a href=&#34;https://en.wikipedia.org/wiki/Monte_Carlo_integration&#34; target=&#34;_blank&#34;&gt;Monte-Carlo integration&lt;/a&gt;. In a nutshell, if we draw $N$ points within the square at random and we calculate the number of them falling within the circle denoted by $N_c$, $\frac{N_c}{N}$ gives us an approximation for $\frac{a}{b}$. The more draws, the more accurate the approximation.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-serial-implementation&#34;&gt;A serial implementation&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start with a serial version of the code&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Distributions
+using BenchmarkTools
+using Plots
+using Distributed
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;┌ Info: Precompiling Plots [91a5bcdd-55d7-5caf-9e0b-520d859cae80]
+└ @ Base loading.jl:1192
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#------------------------------------------------------------
+# Function that returns 1 if the point with coordinates (x,y) 
+# is within the unit circle; 0 otherwise
+#------------------------------------------------------------
+function inside_circle(x::Float64, y::Float64)
+    output = 0
+    if x^2 + y^2 &amp;lt;= 1
+        output = 1
+    end
+    return output
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;inside_circle (generic function with 1 method)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#------------------------------------------------------------
+# Function to calculate an approximation of pi
+#------------------------------------------------------------
+function pi_serial(nbPoints::Int64 = 128 * 1000; d=Uniform(-1.0,1.0))
+    
+   #draw NbPoints from within the square centered in 0
+   #with side length equal to 2
+   xDraws = rand(d, nbPoints)
+   yDraws = rand(d, nbPoints)
+   sumInCircle = 0
+   
+   for (xValue, yValue) in zip(xDraws, yDraws)
+        sumInCircle+=inside_circle(xValue, yValue)
+   end
+    
+   return 4*sumInCircle/nbPoints
+    
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;pi_serial (generic function with 2 methods)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can draw an increasing number of points and see how well the approximation for $\pi$ performs.
+The following figure shows that increasing the number of points leads to a smaller error, even though the decreasing pattern is not uniform. The dashed line shows that the error descreases at a rate equal to the inverse of the square root of $N$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;minPoints =  128 * 100000
+maxPoints =  128 * 1000000
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+elapsedTime1W = zeros(nbGridPoints)
+approximationPi1W =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+    
+    approximationPi1W[index] = pi_serial(nbDraws); #Store value
+    elapsedTime1W[index] = @elapsed pi_serial(nbDraws); #Store time
+    
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Plots.plot(gridPoints, abs.(approximationPi1W .- pi), label = &amp;quot;Serial&amp;quot;)
+Plots.plot!(gridPoints, 1 ./(sqrt.(gridPoints)), label = &amp;quot;1/sqrt(n)&amp;quot;, linestyle = :dash)
+display(p)
+Plots.savefig(p, &amp;quot;convergence_rate.png&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/convergence_rate.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;adding-workers&#34;&gt;Adding &amp;ldquo;workers&amp;rdquo;&lt;/h2&gt;
+
+&lt;p&gt;When starting Julia, by default, only one processor is available. To increase the number of processors, one can use the command &lt;code&gt;addprocs&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;Initial number of workers = $(nworkers())&amp;quot;)
+addprocs(4)
+println(&amp;quot;Current number of workers = $(nworkers())&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Initial number of workers = 1
+Current number of workers = 4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;spawn-and-fetch&#34;&gt;@spawn and fetch&lt;/h2&gt;
+
+&lt;p&gt;With Julia, one can go quite far only using the &lt;code&gt;@spawnat&lt;/code&gt; and &lt;code&gt;fetch&lt;/code&gt; functions.
+The command &lt;code&gt;@spawnat&lt;/code&gt; starts an operation on a given process and returns an object of type &lt;code&gt;Future&lt;/code&gt;.
+ For instance, the next line starts the operation &lt;code&gt;myid()&lt;/code&gt; on process 2:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;f = @spawnat 2 myid()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Future(2, 1, 6, nothing)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To get the result from the operation we just started on process 2, we need to &amp;ldquo;fetch&amp;rdquo; the results using the &lt;code&gt;Future&lt;/code&gt;
+created above. As expected, the result is &lt;code&gt;2&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;fetch(f)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An important thing to know about &lt;code&gt;@spawnat&lt;/code&gt; is that the &amp;ldquo;spawning&amp;rdquo; process will not wait for the operation to be finished before moving to the next task. This can be illustrated with following example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time @spawnat 2 sleep(2.0)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;  0.008938 seconds (11.45 k allocations: 592.538 KiB)
+
+
+
+
+
+Future(2, 1, 8, nothing)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If the expected behavior is to wait for 2 seconds, this can be achieved by &amp;ldquo;fetching&amp;rdquo; the above operation:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time fetch(@spawnat 2 sleep(2.0))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;  2.101521 seconds (47.66 k allocations: 2.357 MiB, 0.48% gc time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The bottom line is that process 1 can be used to start many operations in parallel using &lt;code&gt;@spawnat&lt;/code&gt; and then collects the results from the different processes using &lt;code&gt;fetch&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-parallel-implementation&#34;&gt;A parallel implementation&lt;/h2&gt;
+
+&lt;p&gt;The strategy we used to approximate $\pi$ does not need to be executed in serial. Since each draw is independent from previous ones, we could split the work between available workers (4 workers in this example). Each worker will calculate its own approximation for $\pi$ and the final result will be average value across workers.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#------------------------------------------------------------
+# Let&#39;s redefine the function @everywhere so it can run on
+# the newly added workers
+#-----------------------------------------------------------
+@everywhere function inside_circle(x::Float64, y::Float64)
+    output = 0
+    if x^2 + y^2 &amp;lt;= 1
+        output = 1
+    end
+    return output
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@everywhere using Distributions
+#------------------------------------------------------------
+# Let&#39;s redefine the function @everywhere so it can run on
+# the newly added workers
+#-----------------------------------------------------------
+@everywhere function pi_serial(nbPoints::Int64 = 128 * 1000; d=Uniform(-1.0,1.0))
+    
+   #draw NbPoints from within the square centered in 0
+   #with side length equal to 2
+   xDraws = rand(d, nbPoints)
+   yDraws = rand(d, nbPoints)
+   sumInCircle = 0
+   
+   for (xValue, yValue) in zip(xDraws, yDraws)
+        sumInCircle+=inside_circle(xValue, yValue)
+   end
+    
+   return 4*sumInCircle/nbPoints
+    
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@everywhere function pi_parallel(nbPoints::Int64 = 128 * 1000)
+    
+   # to store different approximations
+   #----------------------------------
+   piWorkers = zeros(nworkers())
+   # to store Futures
+   #-----------------
+   listFutures=[]
+   # divide the draws among workers
+   #-------------------------------
+   nbDraws = Int(nbPoints/4)
+    
+   # each calculate its own approximation
+   #-------------------------------------
+   for (workerIndex, w) in enumerate(workers())
+        push!(listFutures, @spawnat w pi_serial(nbDraws))
+   end
+   # let&#39;s fetch results
+   #--------------------
+   for (workerIndex, w) in enumerate(workers())
+         piWorkers[workerIndex] = fetch(listFutures[workerIndex])
+   end
+    
+   # return the mean value across worker
+   return mean(piWorkers)
+    
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;minPoints =  128 * 100000
+maxPoints =  128 * 1000000
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+elapsedTimeNW = zeros(nbGridPoints)
+approximationPiNW =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+    
+    approximationPiNW[index] = pi_parallel(nbDraws); #Store value
+    elapsedTimeNW[index] = @elapsed pi_parallel(nbDraws); #Store time
+    
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;serial-vs-parallel-comparisons&#34;&gt;Serial vs parallel comparisons&lt;/h2&gt;
+
+&lt;p&gt;In terms of accuracy, the serial and the parallel codes generate the same results (modulo randomness).
+In terms of speed, the parallel version is up to 2.5 times faster. The more points are drawn, the higher the speed-gains. This example shows the well-established fact that the advantages of parallel computing start to kick-in when the underlying tasks are time-consuming in the first place.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Plots.plot(gridPoints, abs.(approximationPi1W .- pi), label = &amp;quot;Serial&amp;quot;)
+Plots.plot!(gridPoints, abs.(approximationPiNW .- pi), label = &amp;quot;Parallel&amp;quot;)
+Plots.title!(&amp;quot;Error&amp;quot;)
+Plots.xlabel!(&amp;quot;nb Draws&amp;quot;)
+Plots.ylabel!(&amp;quot;Error&amp;quot;)
+display(p)
+Plots.savefig(p,&amp;quot;error_comparison.png&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/error_comparison.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Plots.plot(gridPoints, elapsedTime1W, label = &amp;quot;Serial&amp;quot;)
+Plots.plot!(gridPoints, elapsedTimeNW, label = &amp;quot;Parallel&amp;quot;)
+Plots.plot!(gridPoints, elapsedTime1W./elapsedTimeNW, label = &amp;quot;Speed-up&amp;quot;)
+Plots.xlabel!(&amp;quot;nb Draws&amp;quot;)
+Plots.ylabel!(&amp;quot;Time (s)&amp;quot;)
+display(p)
+Plots.savefig(&amp;quot;Speed_gains.png&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/Speed_gains.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
+      <link>https://julienpascal.github.io/project/taxation_labor/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:18 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
+      <description>&lt;p&gt;We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers. This is a joint project with &lt;a href=&#34;https://nicolodalvit.github.io/&#34; target=&#34;_blank&#34;&gt;Nicolò Dalvit&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>DCAPM</title>
+      <link>https://julienpascal.github.io/project/dcapm/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/dcapm/</guid>
+      <description>&lt;p&gt;This is a joint project with &lt;a href=&#34;https://tyler-abbot.github.io/&#34; target=&#34;_blank&#34;&gt;Tyler Abbot&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to Create a Julia Package</title>
+      <link>https://julienpascal.github.io/post/julia_package/</link>
+      <pubDate>Wed, 06 Jun 2018 15:34:38 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/julia_package/</guid>
+      <description>
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;This post is outdated. With the advent of Julia 1.0, the workflow for creating
+packages was significantly altered. An excellent guide can be found &lt;a href=&#34;https://lectures.quantecon.org/jl/testing.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;In this post, my goal is to briefly explain how to create an unregistered Julia package for Julia 0.6.4, how to synchronize it with your &lt;a href=&#34;https://github.com/&#34; target=&#34;_blank&#34;&gt;Github&lt;/a&gt; account, and how to start testing your code automatically using &lt;a href=&#34;https://travis-ci.org/&#34; target=&#34;_blank&#34;&gt;TRAVIS CI&lt;/a&gt;. I started writing this post as a reminder to myself. I am posting it here with the hope that it may be useful for someone else. More on this topic can be found by reading the &lt;a href=&#34;https://docs.julialang.org/en/release-0.6/manual/packages/&#34; target=&#34;_blank&#34;&gt;official Julia&amp;rsquo;s manual&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h1 id=&#34;why-creating-a-package&#34;&gt;Why Creating a Package?&lt;/h1&gt;
 
@@ -121,56 +417,42 @@ git push -u origin master
     <item>
       <title>The Simulated Method of Moments: a Parallel Implementation</title>
       <link>https://julienpascal.github.io/post/smm_parallel/</link>
-      <pubDate>Wed, 06 Jun 2018 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 06 Jun 2018 15:26:09 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/smm_parallel/</guid>
       <description>
 
 &lt;p&gt;In my &lt;a href=&#34;https://julienpascal.github.io/post/smm/&#34; target=&#34;_blank&#34;&gt;previous post&lt;/a&gt;, I discussed how
-the the simulated method of moments could be used to estimate parameters without
+the the simulated method of moments can be used to estimate parameters without
 using the likelihood function. This method is useful because many &amp;ldquo;real-life&amp;rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the
-parallel computing capabilities of julia and &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl/&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt;
+parallel computing capabilities of Julia and &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl/&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt;
 to speed-up the estimation.&lt;/p&gt;
 
 &lt;h2 id=&#34;adding-workers&#34;&gt;Adding workers&lt;/h2&gt;
 
-&lt;p&gt;In this example, the goal is to estimate the mean of 4-dimension normal random variable with unit variance, without using any information on the likelihood. If you start julia with several processors, MomentOpt will notice it and execute the code in parallel. The first step is to add &amp;ldquo;workers&amp;rdquo; to julia. A rule of thumb is to use as many workers as you have processors on your system (4 in my case).&lt;/p&gt;
+&lt;p&gt;In this example, the goal is to estimate the mean of 4-dimension normal random variable with unit variance, without using any information on the likelihood. If you start Julia with several processors, MomentOpt will notice it and execute the code in parallel. The first step is to add &amp;ldquo;workers&amp;rdquo; to Julia. A rule of thumb is to use as many workers as you have processors on your system (4 in my case).&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Current number of workers
-
 #--------------------------
-
 currentWorkers = nprocs()
-
 println(&amp;quot;Initial number of workers = $(currentWorkers)&amp;quot;)
-
 # I want to have 4 workers running
-
 #--------------------------------
-
 maxNumberWorkers = 4
-
 while nprocs() &amp;lt; maxNumberWorkers
-
     addprocs(1)
-
 end
-
 # check the number of workers:
-
 #----------------------------
-
 currentWorkers = nprocs()
-
 println(&amp;quot;Number of workers = $(currentWorkers)&amp;quot;)
-
 Initial number of workers = 1
 Number of workers = 4
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;everywhere&#34;&gt;@everywhere&lt;/h2&gt;
 
-&lt;p&gt;When running julia with several workers, you have to add the macro @everywhere when loading packages and when defining functions. More details on parallel computing with julia can be found &lt;a href=&#34;https://docs.julialang.org/en/v0.6.0/manual/parallel-computing/&#34; target=&#34;_blank&#34;&gt;here.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;When running Julia with several workers, you have to add the macro @everywhere when loading packages and defining functions. More details on parallel computing with Julia can be found &lt;a href=&#34;https://docs.julialang.org/en/v0.6.0/manual/parallel-computing/&#34; target=&#34;_blank&#34;&gt;here.&lt;/a&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#---------------------------------------------------------------------------------------------------------
 # Julien Pascal
@@ -345,7 +627,7 @@ MA = MAlgoBGP(mprob,opts)
 
 &lt;h3 id=&#34;inference&#34;&gt;Inference&lt;/h3&gt;
 
-&lt;p&gt;When using the &lt;a href=&#34;https://arxiv.org/abs/1108.3423&#34; target=&#34;_blank&#34;&gt;BGP algorithm&lt;/a&gt;, inference can be done using the first chain. Other chains are used to explore the state space and help to exit potential local minima, but they are not meant to be used for inference. I discard the first 10th observations to get rid of the influence of the starting values. Visual inspection of the first chain suggests that the stationary part of the Markov chain was reached at this stage. I then report the quasi posterior mean and median for each parameter. As reported below, we are quite close to the true values.&lt;/p&gt;
+&lt;p&gt;When using the &lt;a href=&#34;https://arxiv.org/abs/1108.3423&#34; target=&#34;_blank&#34;&gt;BGP algorithm&lt;/a&gt;, inference can be done using the first chain only. Other chains are used to explore the state space and help to exit potential local minima, but they are not meant to be used for inference. I discard the first 10th observations to get rid of the influence of the starting values. Visual inspection of the first chain suggests that the stationary part of the Markov chain was reached at this stage. I then report the quasi posterior mean and median for each parameter. As reported below, we are quite close to the true values.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Plot histograms for the first chain, the one with which inference should be done.
 # Other chains are used to explore the space and avoid local minima
@@ -445,7 +727,7 @@ end
 
 &lt;h2 id=&#34;safety-checks&#34;&gt;Safety checks&lt;/h2&gt;
 
-&lt;p&gt;In this toy example, we know we have global identification. However, in more complicated applications, global identification may be hard to prove analytically. A common practice is to make sure that the objective function is &amp;ldquo;well-behaved&amp;rdquo; in a neighborhood of the solution using slices. The graph below shows that there is no flat region in the neighborhood of the solution, suggesting (at least) local identification of the parameters.&lt;/p&gt;
+&lt;p&gt;In this toy example, we know that the conditions for global identification are met. However, in more complicated applications, global identification may be hard to prove analytically. A common practice is to make sure that the objective function is &amp;ldquo;well-behaved&amp;rdquo; in a neighborhood of the solution using slices. The graph below shows that there is no flat region in the neighborhood of the solution, suggesting (at least) local identification of the parameters.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# plot slices of objective function
 # grid with 20 points
@@ -516,7 +798,7 @@ can be downloaded &lt;a href=&#34;https://github.com/JulienPascal/ExampleMomentO
     <item>
       <title>The Simulated Method of Moments</title>
       <link>https://julienpascal.github.io/post/smm/</link>
-      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 12 Feb 2018 15:07:33 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/smm/</guid>
       <description>
@@ -528,36 +810,33 @@ can be downloaded &lt;a href=&#34;https://github.com/JulienPascal/ExampleMomentO
 &lt;/blockquote&gt;
 
 &lt;p&gt;However in many cases, the likelihood function is too complicated to be
-written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is a widely used simulation-based estimation technique.&lt;/p&gt;
+written down in closed form. To estimate the structural parameters of a given model, one can still use Monte-Carlo methods. In this post, I would like to describe the &lt;a href=&#34;https://en.wikipedia.org/wiki/Method_of_simulated_moments&#34; target=&#34;_blank&#34;&gt;simulated method of moments&lt;/a&gt; (SMM), which is a widely used simulation-based estimation technique.&lt;/p&gt;
 
 &lt;h2 id=&#34;a-simple-setting&#34;&gt;A Simple Setting&lt;/h2&gt;
 
 &lt;p&gt;I want to illustrate the SMM in one of the simplest settings you could think of:
-the estimation of the mean of a normal density. Let&amp;rsquo;s say we have access to a (bi-dimensional) time series and we suspect it to be normally distributed with mean $[a,\,b]&amp;lsquo;$ and variance the identity matrix $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. Let&amp;rsquo;s pretend that we have no idea how to write down the associated likelihood function. The good news is that we have access to a &amp;ldquo;black box&amp;rdquo; that generates $i.i.d$ draws from the law $\mathcal{N}([c,\,d]&amp;lsquo;,\,I_2)$, for any value $c$ and $d$ . It turns out that having access to this black box is enough for
-us to do inference.&lt;/p&gt;
+the estimation of the mean of a normal density with known variance. Let&amp;rsquo;s say we have access to a (bi-dimensional) time series and we suspect it to be normally distributed with mean $[a,\,b]&amp;lsquo;$ and variance the identity matrix $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. Let&amp;rsquo;s pretend that we have no idea on how to write down the associated likelihood function. The good news is that if we have access to a &amp;ldquo;black box&amp;rdquo; that generates $i.i.d$ draws from the law $\mathcal{N}([c,\,d]&amp;lsquo;,\,I_2)$, it is enough for us to do inference.&lt;/p&gt;
 
 &lt;h2 id=&#34;smm-is-gmm&#34;&gt;SMM is GMM&lt;/h2&gt;
 
-&lt;p&gt;The SMM estimator can be viewed as an extension of the GMM one, as the SMM requires simulated data as well as empirical data. Mathematically, we want to minimize the objective function:&lt;/p&gt;
+&lt;p&gt;The SMM estimator can be viewed as an extension of &lt;a href=&#34;https://en.wikipedia.org/wiki/Generalized_method_of_moments&#34; target=&#34;_blank&#34;&gt;GMM&lt;/a&gt;. The difference being that the function mapping the set of parameters to moments has no closed-form expression. Mathematically, we want to minimize the following objective function:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation_SMM.png&#34; alt=&#34;SMM objective function\label{objective_function}&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;where $m^*$ is a vector of moments based on empirical observations, $m(\theta)$ a vector of the same moments
+&lt;p&gt;where $m^*$ is a vector empirical moments, $m(\theta)$ a vector of the same moments
 calculated using simulated data when the structural parameters are equal to $\theta$, and $W$ a &lt;a href=&#34;https://en.wikipedia.org/wiki/Weighing_matrix&#34; target=&#34;_blank&#34;&gt;weighing matrix&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;The SMM estimate will be such that the (weighted) distance between simulated and real-world moments is minimized. This estimator is quite intuitive: under the hypothesis that the model is correctly specified, it should be able to reproduce the stylized facts of the data when the parameters are equal to the &amp;ldquo;true&amp;rdquo; ones.&lt;/p&gt;
+&lt;p&gt;The SMM estimate is such that the (weighted) distance between simulated and empirical moments is minimized. This estimator is quite intuitive: under the hypothesis that the model is correctly specified, it should be able to reproduce empirical moments when parameters values are equal to the &amp;ldquo;true&amp;rdquo; ones.&lt;/p&gt;
 
 &lt;h2 id=&#34;inference&#34;&gt;Inference&lt;/h2&gt;
 
 &lt;p&gt;Under some regularity conditions (see &lt;a href=&#34;https://www.google.fr/search?client=ubuntu&amp;amp;channel=fs&amp;amp;q=+McFadden+1989&amp;amp;ie=utf-8&amp;amp;oe=utf-8&amp;amp;gfe_rd=cr&amp;amp;dcr=0&amp;amp;ei=a52BWsGULYeO8Qfq-p3YCw&#34; target=&#34;_blank&#34;&gt;McFadden 1989&lt;/a&gt;), the extra noise introduced by simulation is
-not problematic and inference is possible. That is, we can build a confidence interval
-for our SMM estimates using the standard GMM approach.&lt;/p&gt;
-
-&lt;p&gt;An interesting fact is that the histogram of one Markov chain realization, $S=\big( \theta^1, \theta^2, &amp;hellip;, \theta^N \big)$, behaves like a &amp;ldquo;quasi-posterior&amp;rdquo; distribution (see &lt;a href=&#34;http://www.mit.edu/~vchern/ch_qbe.pdf&#34; target=&#34;_blank&#34;&gt;Chernozhukov 2003&lt;/a&gt;). The beauty of this approach is that for a given continously differentiable function $g:\Theta \rightarrow ℜ$, the $90\%$ confidence intervals are constructed by taking the $0.05th$ and $0.95th$ quantiles of the sequence  $g(S)=\big( g(\theta^1), g(\theta^2), &amp;hellip;, g(\theta^N )\big)$.&lt;/p&gt;
+not problematic and inference is possible. That is, we can build a confidence intervals
+for the SMM estimates.&lt;/p&gt;
 
 &lt;h2 id=&#34;implementation-in-julia&#34;&gt;Implementation in Julia&lt;/h2&gt;
 
-&lt;p&gt;The code below shows how one can recover the true parameters of the Normal density $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. I use the &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt; package, which uses some &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;refinements&lt;/a&gt; of the &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;MCMC&lt;/a&gt; method to explore the state-space with several Markov chains in parallel. These Markov chains communicate between themselves to avoid being stuck in a local mode of the posterior distribution. In practice, I choose 5 Markov chains. Figure 1 shows the realizations for the first chain. As illustrated in Figure 2, we successfully recovered the true values for $a$ and $b$. For each chain, the quasi-posterior mean and median for $a$ and $b$ are extremely close to the true values $1$ and $-1$.&lt;/p&gt;
+&lt;p&gt;The code below shows how one can recover the true parameters of the Normal density $\mathcal{N}([a,\,b]&amp;lsquo;,\,I_2)$. I use the &lt;a href=&#34;https://github.com/floswald/MomentOpt.jl&#34; target=&#34;_blank&#34;&gt;MomentOpt&lt;/a&gt; package, which relies on some &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;refinements&lt;/a&gt; of the &lt;a href=&#34;(https://arxiv.org/abs/1108.3423)&#34; target=&#34;_blank&#34;&gt;MCMC&lt;/a&gt; method to explore the state-space with several Markov chains in parallel. These Markov chains communicate between themselves to avoid being stuck in a local mode of the posterior distribution. In practice, I choose 5 Markov chains. Figure 1 shows the realizations for the first chain. As illustrated in Figure 2, we successfully recovered the true values for $a$ and $b$. For each chain, the quasi-posterior mean and median for $a$ and $b$ are extremely close to the true values $1$ and $-1$.&lt;/p&gt;
 
 &lt;h4 id=&#34;figure-1&#34;&gt;Figure 1&lt;/h4&gt;
 
@@ -826,21 +1105,11 @@ QP_median_p2 = median(dat_chain1[:p2])
     </item>
     
     <item>
-      <title>The D-CAPM: Reconciling Consumption and Asset Pricing</title>
-      <link>https://julienpascal.github.io/project/dcapm/</link>
-      <pubDate>Mon, 18 Dec 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/dcapm/</guid>
-      <description>&lt;p&gt;This is a joint project with &lt;a href=&#34;https://tyler-abbot.github.io/&#34; target=&#34;_blank&#34;&gt;Tyler Abbot&lt;/a&gt;.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
       <title>Solving Bellman Equations by the Collocation Method</title>
-      <link>https://julienpascal.github.io/post/collocation_method/</link>
-      <pubDate>Thu, 07 Dec 2017 17:00:00 +0000</pubDate>
+      <link>https://julienpascal.github.io/post/collocation/</link>
+      <pubDate>Thu, 07 Dec 2017 13:50:29 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/post/collocation_method/</guid>
+      <guid>https://julienpascal.github.io/post/collocation/</guid>
       <description>
 
 &lt;p&gt;A large class of economic models involves solving for functional equations of the
@@ -848,32 +1117,27 @@ form:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation1.png&#34; alt=&#34;equation1&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.&lt;/p&gt;
+&lt;p&gt;A well known example is the &lt;a href=&#34;https://lectures.quantecon.org/jl/optgrowth.html&#34; target=&#34;_blank&#34;&gt;stochastic optimal growth model&lt;/a&gt;. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&amp;rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.&lt;/p&gt;
 
 &lt;p&gt;A common technique for solving this class of problem is value function iteration. While value function
-iteration is quite intuitive (it follows the proof of existence of a solution to the functional equation above), it is
-not the only one available.
-This post describes the collocation method, which transforms the problem of finding
-a function into a root-finding one. The gain from this change of perspective is that
-any root-finding algorithm can then be used. In particular, one may use the Newton method,
+iteration is quite intuitive, it is not the only one available.
+In this post, I describe the collocation method, which transforms the problem of finding
+a &lt;em&gt;function&lt;/em&gt; into a problem of finding a &lt;em&gt;vector&lt;/em&gt; that satisfies a given set of conditions. The gain from this change of perspective is that any &lt;a href=&#34;https://en.wikipedia.org/wiki/Root-finding_algorithm&#34; target=&#34;_blank&#34;&gt;root-finding algorithm&lt;/a&gt; can then be used. In particular, one may use the &lt;a href=&#34;https://en.wikipedia.org/wiki/Newton%27s_method&#34; target=&#34;_blank&#34;&gt;Newton method&lt;/a&gt;,
 which converges at a quadratic rate in the neighborhood of the solution if the function is smooth enough.&lt;/p&gt;
 
 &lt;h2 id=&#34;value-function-iteration&#34;&gt;Value function iteration&lt;/h2&gt;
 
-&lt;p&gt;Value function iteration takes advantage of the fact that the Bellman operator $T$ is a contraction  mapping on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance&lt;/p&gt;
+&lt;p&gt;Value function iteration takes advantage of the fact that the Bellman operator $T$ is a &lt;a href=&#34;https://en.wikipedia.org/wiki/Contraction_mapping&#34; target=&#34;_blank&#34;&gt;contraction  mapping&lt;/a&gt; on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation2.png&#34; alt=&#34;equation2&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;An immediate consequence if that the sequence $w,Tw,T^2w$,… converges uniformly to  $w$ (starting with with any bounded and continuous $w$). The following code in &lt;code&gt;Julia v0.6&lt;/code&gt; illustrates the convergence of the series ${T^nw}$.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation2.png&#34; alt=&#34;equation2&#34; /&gt;
+ An immediate consequence if that the sequence $w,Tw,T^2w$,… converges uniformly to  $w$ (starting with any bounded and continuous function $w$). The following code in &lt;code&gt;Julia v0.6.4&lt;/code&gt; illustrates the convergence of the series ${T^nw}$.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt; #=
 Julien Pascal
-
 Code heavily based on:
 ----------------------
 https://lectures.quantecon.org/jl/optgrowth.html
 by Spencer Lyon, John Stachurski
-
 I have only made minor modifications:
 #------------------------------------
 * I added a type optGrowth
@@ -881,8 +1145,6 @@ I have only made minor modifications:
 * I calculate the expectation w.r.t the aggregate
   shock using a Gauss-Legendre quadrature scheme
   instead of Monte-Carlo
-
-
 =#
 
 using QuantEcon
@@ -960,13 +1222,9 @@ end
 &amp;quot;&amp;quot;&amp;quot;
 The approximate Bellman operator, which computes and returns the
 updated value function Tw on the grid points.
-
 #### Arguments
-
 `model` : a model of type optGrowth
-
 `Modifies model.σ, model.w and model.Tw
-
 &amp;quot;&amp;quot;&amp;quot;
 function bellman_operator!(model::optGrowth)
 
@@ -1033,7 +1291,6 @@ function solve_optgrowth!(model::optGrowth;
 
         #update model.w
         bellman_operator!(model)
-
         error = maximum(abs, model.w - w_old)
 
         if error &amp;lt; tol
@@ -1075,28 +1332,28 @@ v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
 
 fig, ax = subplots(figsize=(9, 5))
 ax[:set_ylim](-35, -24)
-ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;approximate value function&amp;quot;)
-ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;true value function&amp;quot;)
+ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;Approximated (VFI)&amp;quot;, linestyle=&amp;quot;--&amp;quot;)
+ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;Exact value&amp;quot;)
 ax[:legend](loc=&amp;quot;lower right&amp;quot;)
+savefig(&amp;quot;value_function_iteration.png&amp;quot;)
 
 fig, ax = subplots(figsize=(9, 5))
 ax[:set_xlim](0.1, 4.0)
-ax[:set_ylim](0.00, 0.2)
+ax[:set_ylim](0.00, 0.008)
 ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&amp;quot;error&amp;quot;)
 ax[:legend](loc=&amp;quot;lower right&amp;quot;)
-
-
-
+savefig(&amp;quot;error_value_function_iteration.png&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;output&#34;&gt;Output&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/value_function_iteration.png&#34; alt=&#34;VFI&#34; /&gt;
+&lt;p&gt;The following figure shows the exact function, which we know in this very specific case, and the one calculated using VFI. Both quantities are almost indistinguishable. As the illustrated in the next figure, the (absolute value) of the distance between the true and the approximated values is bounded above by $0.006$. The accuracy of the current approximation could be improved by iterating the process further.
+&lt;img src=&#34;https://julienpascal.github.io/img/value_function_iteration.png&#34; alt=&#34;VFI&#34; /&gt;
 &lt;img src=&#34;https://julienpascal.github.io/img/error_value_function_iteration.png&#34; alt=&#34;VFI&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;the-collocation-method&#34;&gt;The collocation method&lt;/h2&gt;
 
-&lt;p&gt;The collocation method takes a different route. Let us remember that we are looking for a function $w$. Instead of solving for the values of $w$ on a grid and then interpolating, why not looking for a function directly? To do so, let us assume that $w$ can reasonably be approximated by a function $\hat{w}$:&lt;/p&gt;
+&lt;p&gt;The collocation method takes a different route. Let us remember that we are looking for a &lt;em&gt;function&lt;/em&gt; $w$. Instead of solving for the values of $w$ on a grid and then interpolating, why not looking for a function directly? To do so, let us assume that $w$ can reasonably be approximated by a function $\hat{w}$:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/equation3.png&#34; alt=&#34;equation3&#34; /&gt;&lt;/p&gt;
 
@@ -1117,23 +1374,15 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 &lt;h3 id=&#34;implementation-using-compecon&#34;&gt;Implementation using CompEcon&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt; #---------------------------------------------
-
  # Julien Pascal
-
  # Solve the stochastic optimal growth problem
  # using the collocation method
-
  #---------------------------------------------
-
-
-
-
  using QuantEcon
  using Optim
  using CompEcon
  using PyPlot
  using Interpolations
-
 
 
  type optGrowthCollocation
@@ -1516,28 +1765,30 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 
  fig, ax = subplots(figsize=(9, 5))
  ax[:set_ylim](-35, -24)
- ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;approximate value function&amp;quot;)
- ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;true value function&amp;quot;)
+ ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&amp;quot;Approximated (collocation)&amp;quot;, linestyle = &amp;quot;--&amp;quot;)
+ ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&amp;quot;Exact value&amp;quot;)
  ax[:legend](loc=&amp;quot;lower right&amp;quot;)
+ savefig(&amp;quot;collocation.png&amp;quot;)
 
 
  fig, ax = subplots(figsize=(9, 5))
  ax[:set_xlim](0.1, 4.0)
- ax[:set_ylim](0.01, 0.2)
+ ax[:set_ylim](-0.05, 0.05)
  ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&amp;quot;error&amp;quot;)
  ax[:legend](loc=&amp;quot;lower right&amp;quot;)
-
-
+ savefig(&amp;quot;error_collocation.png&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;output-1&#34;&gt;Output&lt;/h3&gt;
 
+&lt;p&gt;The following figure shows the exact function and the one calculated using the collocation method. In terms of accuracy, both VFI and the collocation method generate reliable results.&lt;/p&gt;
+
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/collocation.png&#34; alt=&#34;VFI&#34; /&gt;
  &lt;img src=&#34;https://julienpascal.github.io/img/error_collocation.png&#34; alt=&#34;VFI&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;We obtain more are less the same function $w$. But it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package &lt;a href=&#34;https://github.com/JuliaMath/Interpolations.jl&#34; target=&#34;_blank&#34;&gt;Interpolations&lt;/a&gt;: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package &lt;a href=&#34;https://github.com/QuantEcon/CompEcon.jl&#34; target=&#34;_blank&#34;&gt;CompEcon&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;In terms of speed, it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package &lt;a href=&#34;https://github.com/JuliaMath/Interpolations.jl&#34; target=&#34;_blank&#34;&gt;Interpolations&lt;/a&gt;: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package &lt;a href=&#34;https://github.com/QuantEcon/CompEcon.jl&#34; target=&#34;_blank&#34;&gt;CompEcon&lt;/a&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;  #using Interpolations
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;  #using Interpolations
   #--------------------
   @time for i=1:1000000
    model.w_func.(model.grid[1])
@@ -1554,23 +1805,14 @@ $$ f(\boldsymbol{c}) = \boldsymbol{0} $$&lt;/p&gt;
 
 &lt;h3 id=&#34;implementation-using-approxfun&#34;&gt;Implementation using ApproxFun&lt;/h3&gt;
 
-&lt;p&gt;Significant speed-up can be obtained by using the package &lt;a href=&#34;https://github.com/JuliaApproximation/ApproxFun.jl&#34; target=&#34;_blank&#34;&gt;ApproxFun&lt;/a&gt;, as illustrated by the code below.&lt;/p&gt;
+&lt;p&gt;Significant speed-gains can be obtained by using the package &lt;a href=&#34;https://github.com/JuliaApproximation/ApproxFun.jl&#34; target=&#34;_blank&#34;&gt;ApproxFun&lt;/a&gt;, as illustrated by the code below. Computing time is divided by approximately $5$ compared to the implementation using CompEcon. Yet, the value function iteration implementation is still the fastest one. One bottleneck seems to be the calculation of the Jacobian by finite differences when using Broyden&amp;rsquo;s method. It is likely that using &lt;a href=&#34;https://github.com/JuliaDiff/ForwardDiff.jl&#34; target=&#34;_blank&#34;&gt;automatic differentiation&lt;/a&gt; would further improve results.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;
-#---------------------------------------------
-
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#---------------------------------------------
 # Julien Pascal
-
 # Solve the stochastic optimal growth problem
 # using the collocation method
-
 # Implementation using ApproxFun
-
 #---------------------------------------------
-
-
-
-
 using QuantEcon
 using Optim
 using CompEcon
@@ -1579,7 +1821,6 @@ using Interpolations
 using FileIO
 using ApproxFun
 using ProfileView
-
 
 
 type optGrowthCollocation
@@ -1980,21 +2221,6 @@ ax[:set_ylim](- 0.05, 0.05)
 ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&amp;quot;error&amp;quot;)
 ax[:legend](loc=&amp;quot;lower right&amp;quot;)
 
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;output-2&#34;&gt;Output&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/collocation_ApproxFun.png&#34; alt=&#34;VFI&#34; /&gt;
-&lt;img src=&#34;https://julienpascal.github.io/img/error_collocation_ApproxFun.png&#34; alt=&#34;VFI&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Computing time is divided by approximately $5$ using ApproxFun rather than CompEcon. But the value function iteration implementation is still the fastest one. One bottleneck seems to be the calculation of the Jacobian by finite differences. It is likely that using &lt;a href=&#34;https://github.com/JuliaDiff/ForwardDiff.jl&#34; target=&#34;_blank&#34;&gt;automatic differentiation&lt;/a&gt; would result is significant gain of time.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@time for i=1:1000000
- model.w_func.(model.grid[1])
-end
-# 0.391440 seconds (2.00 M allocations: 30.518 MiB, 1.37% gc time)
-
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
@@ -2002,7 +2228,7 @@ end
     <item>
       <title>Solving a simple RBC model in Dynare</title>
       <link>https://julienpascal.github.io/post/rbc_dynare/</link>
-      <pubDate>Sat, 29 Jul 2017 17:00:00 +0000</pubDate>
+      <pubDate>Sat, 29 Jul 2017 13:44:23 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/rbc_dynare/</guid>
       <description>
@@ -2018,7 +2244,7 @@ discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1
 
 &lt;p&gt;subject to the constraint&lt;/p&gt;
 
-&lt;p&gt;$$ K_t = K_t-_1 (1-\delta) + w_t L_t + r_t K_t-_1 - C_t $$&lt;/p&gt;
+&lt;p&gt;$$ K_t = K_t{-_1} (1-\delta) + w_t L_t + r_t K_t-_1 - C_t $$&lt;/p&gt;
 
 &lt;p&gt;where&lt;/p&gt;
 
@@ -2132,31 +2358,11 @@ This function computes impulse response functions (IRF) and returns various desc
     
     <item>
       <title>Efficiency and contestability in emerging market banking systems</title>
-      <link>https://julienpascal.github.io/publication/daudepascal/</link>
-      <pubDate>Tue, 07 Mar 2017 00:00:00 +0000</pubDate>
+      <link>https://julienpascal.github.io/publication/efficiencycontestability/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/publication/daudepascal/</guid>
+      <guid>https://julienpascal.github.io/publication/efficiencycontestability/</guid>
       <description></description>
-    </item>
-    
-    <item>
-      <title>Example Talk</title>
-      <link>https://julienpascal.github.io/talk/example-talk/</link>
-      <pubDate>Sun, 01 Jan 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://julienpascal.github.io/talk/example-talk/</guid>
-      <description>&lt;p&gt;Embed your slides or video here using &lt;a href=&#34;https://gcushen.github.io/hugo-academic-demo/post/writing-markdown-latex/&#34; target=&#34;_blank&#34;&gt;shortcodes&lt;/a&gt;. Further details can easily be added using &lt;em&gt;Markdown&lt;/em&gt; and $\rm \LaTeX$ math code.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
-      <link>https://julienpascal.github.io/project/taxation_labor/</link>
-      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
-      <description>&lt;p&gt;We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to the cyclical behavior of the distribution of individual income shocks along the business cycle. We build a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We solve the model using perturbation techniques developed in Reiter (2009). We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can alter the cyclicality of income risk for different types of workers. This is a joint project with &lt;a href=&#34;https://nicolodalvit.github.io/&#34; target=&#34;_blank&#34;&gt;Nicolò Dalvit&lt;/a&gt;. A poster for this onging project can be found &lt;a href=&#34;https://julienpascal.github.io/pdf/poster_sam_2018_Dalvit_Pascal_v2.pdf&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-</description>
     </item>
     
   </channel>

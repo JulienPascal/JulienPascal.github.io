@@ -7,27 +7,27 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 18 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 14 Mar 2019 18:11:18 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/project/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>The D-CAPM: Reconciling Consumption and Asset Pricing</title>
-      <link>https://julienpascal.github.io/project/dcapm/</link>
-      <pubDate>Mon, 18 Dec 2017 00:00:00 +0000</pubDate>
+      <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
+      <link>https://julienpascal.github.io/project/taxation_labor/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:18 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/project/dcapm/</guid>
-      <description>This is a joint project with Tyler Abbot.</description>
+      <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
+      <description>We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers.</description>
     </item>
     
     <item>
-      <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
-      <link>https://julienpascal.github.io/project/taxation_labor/</link>
-      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      <title>DCAPM</title>
+      <link>https://julienpascal.github.io/project/dcapm/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
-      <description>We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to the cyclical behavior of the distribution of individual income shocks along the business cycle. We build a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We solve the model using perturbation techniques developed in Reiter (2009). We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can alter the cyclicality of income risk for different types of workers.</description>
+      <guid>https://julienpascal.github.io/project/dcapm/</guid>
+      <description>This is a joint project with Tyler Abbot.</description>
     </item>
     
   </channel>

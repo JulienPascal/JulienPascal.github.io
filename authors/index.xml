@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors on Julien Pascal</title>
+    <link>https://julienpascal.github.io/authors/</link>
+    <description>Recent content in Authors on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    
+	<atom:link href="https://julienpascal.github.io/authors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Christian Daude</title>
+      <link>https://julienpascal.github.io/authors/christian-daude/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/authors/christian-daude/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Julien Pascal</title>
+      <link>https://julienpascal.github.io/authors/julien-pascal/</link>
+      <pubDate>Wed, 06 Jun 2018 15:26:09 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/authors/julien-pascal/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>admin</title>
+      <link>https://julienpascal.github.io/authors/admin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/authors/admin/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

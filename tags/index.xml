@@ -7,24 +7,51 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 01 Jan 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Mar 2017 15:51:54 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Content tagged as &#39;Academic&#39;</title>
-      <link>https://julienpascal.github.io/tags/academic/</link>
-      <pubDate>Sun, 01 Jan 2017 00:00:00 +0000</pubDate>
+      <title>Banking</title>
+      <link>https://julienpascal.github.io/tags/banking/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/academic/</guid>
-      <description>Here is a list of all the content that has been tagged as academic.</description>
+      <guid>https://julienpascal.github.io/tags/banking/</guid>
+      <description></description>
     </item>
     
     <item>
-      <title>Wip</title>
+      <title>Competition</title>
+      <link>https://julienpascal.github.io/tags/competition/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/competition/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Efficiency</title>
+      <link>https://julienpascal.github.io/tags/efficiency/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/efficiency/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Emerging markets</title>
+      <link>https://julienpascal.github.io/tags/emerging-markets/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/emerging-markets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WIP</title>
       <link>https://julienpascal.github.io/tags/wip/</link>
-      <pubDate>Mon, 18 Dec 2017 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 14 Mar 2019 18:11:18 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/wip/</guid>
       <description></description>

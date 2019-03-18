@@ -7,52 +7,98 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 20 Apr 2016 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/home/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title></title>
+      <link>https://julienpascal.github.io/home/slider/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/slider/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Academic</title>
+      <link>https://julienpascal.github.io/home/hero/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/hero/</guid>
+      <description>The Best Way to Create the Website You Want from Markdown (or RStudio/Jupyter)
+Build Anything with Widgets
+Star</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://julienpascal.github.io/home/about/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/about/</guid>
-      <description>I am currently a PhD candidate in Economics at Sciences Po - LIEPP under the supervision of Jean-Marc Robin. My thesis committee also includes Xavier Ragot and Florian Oswald.
-My research focuses on heterogeneous agents models and frictional markets. I am also interested in efficiency analysis and applied asset pricing. Prior to starting my PhD, I worked at the Economics Department of the OECD. You can find my resume here.</description>
+      <description></description>
     </item>
     
     <item>
       <title>Projects</title>
       <link>https://julienpascal.github.io/home/projects/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/projects/</guid>
       <description></description>
     </item>
     
     <item>
+      <title>Skills</title>
+      <link>https://julienpascal.github.io/home/skills/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/skills/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Teaching</title>
       <link>https://julienpascal.github.io/home/teaching/</link>
-      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/teaching/</guid>
       <description> 2018-2019 Applied Statistics for Business and Economics (graduate), Lecturer  Content: introduction to probability theory and regression analysis with a focus on applications in finance and economics  Previous Teaching Positions 2016-2017-2018 Econometrics II (graduate), Assistant Lecturer  Lecturer: Jean-Marc Robin, Professor Sciences Po and UCL Content: OLS, GLS, IV, qualitative response models, limited dependent variables  Applied Statistics for Business and Economics (graduate), Lecturer  Content: introduction to probability theory and regression analysis with a focus on applications in finance and economics  Introduction to Econometrics and Statistics (graduate), Assistant Lecturer  Lecturer: Matteo Mogliani, Senior Economist at the Banque de France Content: introduction to probability theory, univariate and multivariate regression models, inference and hypothesis testing  Money and Banking (undergraduate), Assistant Lecturer  Lecturer: Johannes Boehm, Assistant Professor Sciences Po Content: inter-temporal consumption and saving decisions, quantity theory of money, neo-keynesian models, central bank&amp;rsquo;s inflation bias, commitment vs discretion in monetary policy, bank runs  </description>
     </item>
     
     <item>
+      <title>Experience</title>
+      <link>https://julienpascal.github.io/home/experience/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/experience/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Publications</title>
       <link>https://julienpascal.github.io/home/publications/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/publications/</guid>
+      <description> Quickly discover relevant content by filtering publications.
+  </description>
+    </item>
+    
+    <item>
+      <title>Accomplish&amp;shy;ments</title>
+      <link>https://julienpascal.github.io/home/accomplishments/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/accomplishments/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Recent Posts</title>
       <link>https://julienpascal.github.io/home/posts/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/posts/</guid>
       <description></description>
@@ -61,7 +107,7 @@ My research focuses on heterogeneous agents models and frictional markets. I am 
     <item>
       <title>Computing</title>
       <link>https://julienpascal.github.io/home/computing/</link>
-      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/computing/</guid>
       <description>For computational intensive programs, I use Julia. For statistics, I mainly use R and Stata. For everything else, I use Python. I have made contributions to the following open source projects:
@@ -69,9 +115,45 @@ Open Source Projects    Name Role Description Status     SMM.jl Author A Julia p
     </item>
     
     <item>
+      <title>People</title>
+      <link>https://julienpascal.github.io/home/people/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/people/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Recent &amp; Upcoming Talks</title>
+      <link>https://julienpascal.github.io/home/talks/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/talks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Featured Publications</title>
+      <link>https://julienpascal.github.io/home/featured/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/featured/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Popular Topics</title>
+      <link>https://julienpascal.github.io/home/tags/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/tags/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Contact</title>
       <link>https://julienpascal.github.io/home/contact/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/contact/</guid>
       <description></description>

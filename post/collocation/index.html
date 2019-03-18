@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="A large class of economic models involves solving for functional equations of the form:
+A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/collocation/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/collocation/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/collocation/">
+  <meta property="og:title" content="Solving Bellman Equations by the Collocation Method | Julien Pascal">
+  <meta property="og:description" content="A large class of economic models involves solving for functional equations of the form:
+A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2017-12-07T13:50:29&#43;01:00">
+  
+  <meta property="article:modified_time" content="2017-12-07T13:50:29&#43;01:00">
+  
+
+  
+
+  
+
+  <title>Solving Bellman Equations by the Collocation Method | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Solving Bellman Equations by the Collocation Method</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2017-12-07 13:50:29 &#43;0100 CET" itemprop="datePublished">
+<meta content="2017-12-07 13:50:29 &#43;0100 CET" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+  
+  
+  <div>
+    
+
+
+
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+      <span itemprop="name">
+        
+
+      
+      
+      <a href="/authors/julien-pascal/">Julien Pascal</a></span></span>
+  
+
+
+
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>Dec 7, 2017</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    17 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Solving%20Bellman%20Equations%20by%20the%20Collocation%20Method&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcollocation%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcollocation%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcollocation%2f&amp;title=Solving%20Bellman%20Equations%20by%20the%20Collocation%20Method"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcollocation%2f&amp;title=Solving%20Bellman%20Equations%20by%20the%20Collocation%20Method"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Solving%20Bellman%20Equations%20by%20the%20Collocation%20Method&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fcollocation%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>A large class of economic models involves solving for functional equations of the
+form:</p>
+
+<p><img src="/img/equation1.png" alt="equation1" /></p>
+
+<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank">stochastic optimal growth model</a>. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.</p>
+
+<p>A common technique for solving this class of problem is value function iteration. While value function
+iteration is quite intuitive, it is not the only one available.
+In this post, I describe the collocation method, which transforms the problem of finding
+a <em>function</em> into a problem of finding a <em>vector</em> that satisfies a given set of conditions. The gain from this change of perspective is that any <a href="https://en.wikipedia.org/wiki/Root-finding_algorithm" target="_blank">root-finding algorithm</a> can then be used. In particular, one may use the <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton method</a>,
+which converges at a quadratic rate in the neighborhood of the solution if the function is smooth enough.</p>
+
+<h2 id="value-function-iteration">Value function iteration</h2>
+
+<p>Value function iteration takes advantage of the fact that the Bellman operator $T$ is a <a href="https://en.wikipedia.org/wiki/Contraction_mapping" target="_blank">contraction  mapping</a> on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance</p>
+
+<p><img src="/img/equation2.png" alt="equation2" />
+ An immediate consequence if that the sequence $w,Tw,T^2w$,… converges uniformly to  $w$ (starting with any bounded and continuous function $w$). The following code in <code>Julia v0.6.4</code> illustrates the convergence of the series ${T^nw}$.</p>
+
+<pre><code class="language-julia"> #=
+Julien Pascal
+Code heavily based on:
+----------------------
+https://lectures.quantecon.org/jl/optgrowth.html
+by Spencer Lyon, John Stachurski
+I have only made minor modifications:
+#------------------------------------
+* I added a type optGrowth
+* I use the package Interpolations
+* I calculate the expectation w.r.t the aggregate
+  shock using a Gauss-Legendre quadrature scheme
+  instead of Monte-Carlo
+=#
+
+using QuantEcon
+using Optim
+using CompEcon
+using PyPlot
+using Interpolations
+using FileIO
+
+
+type optGrowth
+
+  w::Array{Float64,1}
+  β::AbstractFloat
+  grid::Array{Float64,1}
+  u::Function
+  f::Function
+  shocks::Array{Float64,1}
+  Tw::Array{Float64,1}
+  σ::Array{Float64,1}
+  el_k::Array{Float64,1}
+  wl_k::Array{Float64,1}
+  compute_policy::Bool
+  w_func::Function
+
+end
+
+function optGrowth(;w = Array{Float64,1}[],
+                    α = 0.4,
+                    β = 0.96,
+                    μ = 0,
+                    s = 0.1,
+                    grid_max = 4,         # Largest grid point
+                    grid_size = 200,      # Number of grid points
+                    shock_size = 250,     # Number of shock draws in Monte Carlo integral
+                    Tw = Array{Float64,1}[],
+                    σ = Array{Float64,1}[],
+                    el_k = Array{Float64,1}[],
+                    wl_k = Array{Float64,1}[],
+                    compute_policy = true
+                  )
+
+
+  grid_y = collect(linspace(1e-5, grid_max, grid_size))
+  shocks = exp.(μ + s * randn(shock_size))
+
+  # Utility
+  u(c) = log(c)
+  # Production
+  f(k) = k^α
+
+  w = 5 * log.(grid_y)
+  Tw = 5 * log.(grid_y)
+  σ = 5 * log.(grid_y)
+
+  el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
+
+  w_func = x -&gt; x
+  optGrowth(
+    w,
+    β,
+    grid_y,
+    u,
+    f,
+    shocks,
+    Tw,
+    σ,
+    el_k,
+    wl_k,
+    compute_policy,
+    w_func
+    )
+end
+
+&quot;&quot;&quot;
+The approximate Bellman operator, which computes and returns the
+updated value function Tw on the grid points.
+#### Arguments
+`model` : a model of type optGrowth
+`Modifies model.σ, model.w and model.Tw
+&quot;&quot;&quot;
+function bellman_operator!(model::optGrowth)
+
+    # === Apply linear interpolation to w === #
+    knots = (model.grid,)
+    itp = interpolate(knots, model.w, Gridded(Linear()))
+
+    #w_func(x) = itp[x]
+
+    model.w_func = x -&gt; itp[x]
+
+    if model.compute_policy
+        model.σ = similar(model.w)
+    end
+
+    # == set Tw[i] = max_c { u(c) + β E w(f(y  - c) z)} == #
+    for (i, y) in enumerate(model.grid)
+
+        #Monte Carlo
+        #-----------
+        #objective(c) = - model.u(c) - model.β * mean(w_func(model.f(y - c) .* model.shocks))
+
+        #Gauss-Legendre
+        #--------------
+        function objective(c)
+
+          expectation = 0.0
+
+          for k = 1:length(model.wl_k)
+            expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
+          end
+
+          - model.u(c) - model.β * expectation
+
+        end
+
+        res = optimize(objective, 1e-10, y)
+
+        if model.compute_policy
+            model.σ[i] = Optim.minimizer(res)
+        end
+
+        model.Tw[i] = - Optim.minimum(res)
+        model.w[i] = - Optim.minimum(res)
+    end
+
+
+end
+
+
+model = optGrowth()
+
+function solve_optgrowth!(model::optGrowth;
+                         tol::AbstractFloat=1e-6,
+                         max_iter::Integer=500)
+
+    w_old = copy(model.w)  # Set initial condition
+    error = tol + 1
+    i = 0
+
+
+    # Iterate to find solution
+    while i &lt; max_iter
+
+        #update model.w
+        bellman_operator!(model)
+        error = maximum(abs, model.w - w_old)
+
+        if error &lt; tol
+          break
+        end
+
+        w_old = copy(model.w)
+        i += 1
+    end
+
+end
+
+#-----------------------------------
+# Solve by value function iteration
+#-----------------------------------
+@time solve_optgrowth!(model)
+# 3.230501 seconds (118.18 M allocations: 1.776 GiB, 3.51% gc time)
+
+
+#-------------------------------
+# Compare with the true solution
+#-------------------------------
+α = 0.4
+β = 0.96
+μ = 0
+s = 0.1
+
+c1 = log(1 - α * β) / (1 - β)
+c2 = (μ + α * log(α * β)) / (1 - α)
+c3 = 1 / (1 - β)
+c4 = 1 / (1 - α * β)
+
+
+# True optimal policy
+c_star(y) = (1 - α * β) * y
+
+# True value function
+v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
+
+fig, ax = subplots(figsize=(9, 5))
+ax[:set_ylim](-35, -24)
+ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&quot;Approximated (VFI)&quot;, linestyle=&quot;--&quot;)
+ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&quot;Exact value&quot;)
+ax[:legend](loc=&quot;lower right&quot;)
+savefig(&quot;value_function_iteration.png&quot;)
+
+fig, ax = subplots(figsize=(9, 5))
+ax[:set_xlim](0.1, 4.0)
+ax[:set_ylim](0.00, 0.008)
+ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&quot;error&quot;)
+ax[:legend](loc=&quot;lower right&quot;)
+savefig(&quot;error_value_function_iteration.png&quot;)
+</code></pre>
+
+<h3 id="output">Output</h3>
+
+<p>The following figure shows the exact function, which we know in this very specific case, and the one calculated using VFI. Both quantities are almost indistinguishable. As the illustrated in the next figure, the (absolute value) of the distance between the true and the approximated values is bounded above by $0.006$. The accuracy of the current approximation could be improved by iterating the process further.
+<img src="/img/value_function_iteration.png" alt="VFI" />
+<img src="/img/error_value_function_iteration.png" alt="VFI" /></p>
+
+<h2 id="the-collocation-method">The collocation method</h2>
+
+<p>The collocation method takes a different route. Let us remember that we are looking for a <em>function</em> $w$. Instead of solving for the values of $w$ on a grid and then interpolating, why not looking for a function directly? To do so, let us assume that $w$ can reasonably be approximated by a function $\hat{w}$:</p>
+
+<p><img src="/img/equation3.png" alt="equation3" /></p>
+
+<p>with
+$ \phi_1(x) $ , $ \phi_2(x) $,&hellip;, $ \phi_n(x) $  a set of linearly independent basis functions and $c_1$, $c_2$, &hellip;, $c_n$  $n$ coefficient to be found. Replacing $w(x)$ with $\hat{w(x)}$ into the functional equation and reorganizing gives:</p>
+
+<p><img src="/img/equation4.png" alt="equation4" /></p>
+
+<p>This equation has to hold (almost) exactly at $n$ points (also called nodes): $y_1$, $y_2$, &hellip;, $y_n$:</p>
+
+<p><img src="/img/equation5.png" alt="equation5" /></p>
+
+<p>The equation above defines a system of $n$ equation with as many unknown, which can be compactly written as:
+$$ f(\boldsymbol{c}) = \boldsymbol{0} $$</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton</a> or <a href="https://en.wikipedia.org/wiki/Quasi-Newton_method" target="_blank">quasi-Newton</a> can be used to solve for the root of $f$. In the code that follows, I use <a href="https://en.wikipedia.org/wiki/Broyden%27s_method" target="_blank">Broyden&rsquo;s</a> method. Let us illustrate this technique using a Chebychev polynomial basis and Chebychev nodes. In doing so, we avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon" target="_blank">Runge&rsquo;s phenomenon</a> associated with a uniform grid.</p>
+
+<h3 id="implementation-using-compecon">Implementation using CompEcon</h3>
+
+<pre><code class="language-julia"> #---------------------------------------------
+ # Julien Pascal
+ # Solve the stochastic optimal growth problem
+ # using the collocation method
+ #---------------------------------------------
+ using QuantEcon
+ using Optim
+ using CompEcon
+ using PyPlot
+ using Interpolations
+
+
+ type optGrowthCollocation
+
+   w::Array{Float64,1}
+   β::AbstractFloat
+   grid::Array{Float64,1}
+   u::Function
+   f::Function
+   shocks::Array{Float64,1}
+   Tw::Array{Float64,1}
+   σ::Array{Float64,1}
+   el_k::Array{Float64,1}
+   wl_k::Array{Float64,1}
+   compute_policy::Bool
+   order_approximation::Int64 #number of element in the functional basis along each dimension
+   functional_basis_type::String #type of functional basis
+   fspace::Dict{Symbol,Any} #functional basis
+   fnodes::Array{Float64,1} #collocation nodes
+   residual::Array{Float64,1} #vector of residual. Should be close to zero
+   a::Array{Float64,1} #polynomial coefficients
+   w_func::Function
+
+ end
+
+
+   #####################################
+   # Function that finds a solution
+   # to f(x) = 0
+   # using Broyden's &quot;good&quot; method
+   # and a simple backstepping procedure as described
+   # in Miranda and Fackler (2009)
+   #
+   # input :
+   # --------
+   # * x0:                 initial guess for the root
+   # * f:                  function in f(x) = 0
+   # * maxit:              maximum number of iterations
+   # * tol:                tolerance level for the zero
+   # * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the
+   #                       Jacobian is calculated by finite differences
+   # * maxsteps:           maximum number of backsteps
+   # * recaculateJacobian: number of iterations in-between two calculations of the Jacobian
+   #
+   # output :
+   # --------
+   # * x: one zero of f
+   # * it: number of iterations necessary to reached the solution
+   # * fjacinv: pseudo jacobian at the last iteration
+   # * fnorm: norm f(x) at the last iteration
+   #
+   #######################################
+   function find_broyden(x0::Vector, f::Function, maxit::Int64, tol::Float64, fjacinv = eye(length(x0));
+                         maxsteps = 5, recaculateJacobian = 1)
+
+       println(&quot;a0 = $(x0)&quot;)
+       fnorm = tol*2
+       it2 = 0 #to re-initialize the jacobian
+
+       ################################
+       #initialize guess for the matrix
+       ################################
+       fjacinv_function = x-&gt; Calculus.finite_difference_jacobian(f, x)
+       #fjacinv_function = x -&gt; ForwardDiff.gradient(f, x)
+
+       # If the user do not provide an initial guess for the jacobian
+       # One is calculated using finite differences.
+       if fjacinv == eye(length(x0))
+           ################################################
+           # finite differences to approximate the Jacobian
+           # at the initial value
+           # this is slow. Seems to improve performances
+           # when x0 is of high dimension.
+           println(&quot;Calculating the Jacobian by finite differences&quot;)
+           #@time fjacinv = Calculus.finite_difference_jacobian(f, x0)
+           @time fjacinv = fjacinv_function(x0)
+
+           println(&quot;Inverting the Jacobian&quot;)
+           try
+               fjacinv = inv(fjacinv)
+           catch
+               try
+                   println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
+                   fjacinv = pinv(A)
+               catch
+                   println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
+                   fjacinv = eye(length(x0))
+               end
+           end
+           println(&quot;Done&quot;)
+       else
+           println(&quot;Using User's input as a guess for the Jacobian.&quot;)
+       end
+
+       fval = f(x0)
+
+       for it=1:maxit
+
+           it2 +=1
+
+           #every 30 iterations, reinitilize the jacobian
+           if mod(it2, recaculateJacobian) == 0
+
+               println(&quot;Re-calculating the Jacobian&quot;)
+
+               fjacinv = fjacinv_function(x0)
+
+               try
+                   fjacinv = inv(fjacinv)
+               catch
+                   try
+                       println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
+                       fjacinv = pinv(A)
+                   catch
+                       println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
+                       fjacinv = eye(length(x0))
+                   end
+               end
+
+           end
+
+
+           println(&quot;it = $(it)&quot;)
+
+           fnorm = norm(fval)
+
+           if fnorm &lt; tol
+               println(&quot;fnorm = $(fnorm)&quot;)
+               return x0, it, fjacinv, fnorm
+           end
+
+           d = -(fjacinv*fval)
+
+           fnormold = Inf
+           ########################
+           # Backstepping procedure
+           ########################
+           for backstep = 1:maxsteps
+
+               if backstep &gt; 1
+                   println(&quot;backstep = $(backstep-1)&quot;)
+               end
+
+               fvalnew = f(x0 + d)
+               fnormnew = norm(fvalnew)
+
+               if fnormnew &lt; fnorm
+                   break
+               end
+
+               if fnormold &lt; fnormnew
+                   d=2*d
+                   break
+               end
+
+               fnormold = fnormnew
+
+               d = d/2
+
+           end
+           ####################
+           ####################
+
+           x0 = x0 + d
+
+           fold = fval
+           fval = f(x0)
+
+           u = fjacinv*(fval - fold)
+
+           #Update the pseudo Jacobian:
+           fjacinv = fjacinv + ((d-u)*(transpose(d)*fjacinv))/(dot(d,u))
+
+           println(&quot;a$(it) = $(x0)&quot;)
+           println(&quot;fnorm = $(fnorm)&quot;)
+
+           if isnan.(x0) == trues(length(x0))
+               println(&quot;Error. a$(it) = NaN for each component&quot;)
+               x0 = zeros(length(x0))
+               return x0, it, fjacinv, fnorm
+           end
+       end
+
+       println(&quot;In function find_broyden\n&quot;)
+       println(&quot;Maximum number of iterations reached.\n&quot;)
+       println(&quot;No convergence.&quot;)
+       println(&quot;Returning fnorm = NaN as a solution&quot;)
+       fnorm = NaN
+       return x0, maxit, fjacinv, fnorm
+
+   end
+
+ function optGrowthCollocation(;w = Array{Float64,1}[],
+                               α = 0.4,
+                               β = 0.96,
+                               μ = 0,
+                               s = 0.1,
+                               grid_max = 4,         # Largest grid point
+                               grid_size = 200,      # Number of grid points
+                               shock_size = 250,     # Number of shock draws in Monte Carlo integral
+                               Tw = Array{Float64,1}[],
+                               σ = Array{Float64,1}[],
+                               el_k = Array{Float64,1}[],
+                               wl_k = Array{Float64,1}[],
+                               compute_policy = true,
+                               order_approximation = 40,
+                               functional_basis_type = &quot;chebychev&quot;,
+                             )
+
+
+   grid_y = collect(linspace(1e-5, grid_max, grid_size))
+   shocks = exp.(μ + s * randn(shock_size))
+
+   # Utility
+   u(c) = log.(c)
+   # Production
+   f(k) = k^α
+
+   el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
+
+   lower_bound_support = minimum(grid_y)
+   upper_bound_support = maximum(grid_y)
+
+   n_functional_basis = [order_approximation]
+
+   if functional_basis_type == &quot;chebychev&quot;
+       fspace = fundefn(:cheb, n_functional_basis, lower_bound_support, upper_bound_support)
+   elseif functional_basis_type == &quot;splines&quot;
+       fspace = fundefn(:spli, n_functional_basis, lower_bound_support, upper_bound_support, 1)
+   elseif functional_basis_type == &quot;linear&quot;
+       fspace = fundefn(:lin, n_functional_basis, lower_bound_support, upper_bound_support)
+   else
+       error(&quot;functional_basis_type has to be either chebychev, splines or linear.&quot;)
+   end
+
+
+   fnodes = funnode(fspace)[1]
+   residual = zeros(size(fnodes)[1])
+   a = ones(size(fnodes)[1])
+
+   w = ones(size(fnodes)[1])
+   Tw = ones(size(fnodes)[1])
+   σ = ones(size(fnodes)[1])
+
+   w_func = x-&gt; x
+
+   optGrowthCollocation(
+     w,
+     β,
+     grid_y,
+     u,
+     f,
+     shocks,
+     Tw,
+     σ,
+     el_k,
+     wl_k,
+     compute_policy,
+     order_approximation,
+     functional_basis_type,
+     fspace,
+     fnodes,
+     residual,
+     a,
+     w_func
+     )
+ end
+
+
+
+ function residual!(model::optGrowthCollocation)
+
+
+     model.w_func = y -&gt; funeval(model.a, model.fspace, [y])[1][1]   
+
+
+     function objective(c, y)
+
+       expectation = 0.0
+
+       for k = 1:length(model.wl_k)
+         expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
+       end
+
+       - model.u(c) - model.β * expectation
+
+     end
+
+     # Loop over nodes
+     for i in 1:size(model.fnodes)[1]
+
+         y = model.fnodes[i,1]
+
+         res = optimize(c -&gt; objective(c, y), 1e-10, y)
+
+         if model.compute_policy
+             model.σ[i] = Optim.minimizer(res)
+         end
+
+         model.Tw[i] = - Optim.minimum(res)
+         model.w[i] = model.w_func(y)
+
+         model.residual[i] = - model.w[i] + model.Tw[i]
+     end
+
+ end
+
+
+ model = optGrowthCollocation(functional_basis_type = &quot;chebychev&quot;)
+
+ residual!(model)
+
+ function solve_optgrowth!(model::optGrowthCollocation;
+                          tol=1e-6,
+                          max_iter=500)
+
+     # Initialize guess for coefficients
+     # by giving the &quot;right shape&quot;
+     # ---------------------------------
+     function objective_initialize!(x, model)
+
+       #update polynomial coeffficients
+       model.a = copy(x)
+
+       model.w_func = y -&gt; funeval(model.a, model.fspace, [y])[1][1]
+
+       return abs.(model.w_func.(model.fnodes[:,1]) - 5.0 * log.(model.fnodes[:,1]))
+
+     end
+
+
+     minx, iterations, Jac0, fnorm = find_broyden(model.a, x -&gt; objective_initialize!(x, model), max_iter, tol)
+
+
+     # Solving the model by collocation
+     # using the initial guess calculated above
+     #-----------------------------------------
+     function objective_residual!(x, model)
+
+       #update polynomial coeffficients
+       model.a = copy(x)
+
+       #calculate residual
+       residual!(model)
+
+       return abs.(model.residual)
+
+     end
+
+     minx, iterations, Jac, fnorm = find_broyden(model.a, x -&gt; objective_residual!(x, model), max_iter, tol)
+
+
+ end
+
+ #-----------------------------------
+ # Solve by collocation
+ #-----------------------------------
+ @time solve_optgrowth!(model)
+
+
+ #-------------------------------
+ # Compare with the true solution
+ #-------------------------------
+ α = 0.4
+ β = 0.96
+ μ = 0
+ s = 0.1
+
+ c1 = log(1 - α * β) / (1 - β)
+ c2 = (μ + α * log(α * β)) / (1 - α)
+ c3 = 1 / (1 - β)
+ c4 = 1 / (1 - α * β)
+
+
+ # True optimal policy
+ c_star(y) = (1 - α * β) * y
+
+ # True value function
+ v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
+
+ fig, ax = subplots(figsize=(9, 5))
+ ax[:set_ylim](-35, -24)
+ ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&quot;Approximated (collocation)&quot;, linestyle = &quot;--&quot;)
+ ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&quot;Exact value&quot;)
+ ax[:legend](loc=&quot;lower right&quot;)
+ savefig(&quot;collocation.png&quot;)
+
+
+ fig, ax = subplots(figsize=(9, 5))
+ ax[:set_xlim](0.1, 4.0)
+ ax[:set_ylim](-0.05, 0.05)
+ ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&quot;error&quot;)
+ ax[:legend](loc=&quot;lower right&quot;)
+ savefig(&quot;error_collocation.png&quot;)
+</code></pre>
+
+<h3 id="output-1">Output</h3>
+
+<p>The following figure shows the exact function and the one calculated using the collocation method. In terms of accuracy, both VFI and the collocation method generate reliable results.</p>
+
+<p><img src="/img/collocation.png" alt="VFI" />
+ <img src="/img/error_collocation.png" alt="VFI" /></p>
+
+<p>In terms of speed, it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package <a href="https://github.com/JuliaMath/Interpolations.jl" target="_blank">Interpolations</a>: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package <a href="https://github.com/QuantEcon/CompEcon.jl" target="_blank">CompEcon</a>:</p>
+
+<pre><code class="language-julia">  #using Interpolations
+  #--------------------
+  @time for i=1:1000000
+   model.w_func.(model.grid[1])
+  end
+  #0.230861 seconds (2.00 M allocations: 30.518 MiB, 1.28% gc time)
+
+  #using CompEcon
+  #--------------
+  @time for i=1:1000000
+   model.w_func.(model.grid[1])
+  end
+  # 4.998902 seconds (51.00 M allocations: 3.546 GiB, 13.39% gc time)
+</code></pre>
+
+<h3 id="implementation-using-approxfun">Implementation using ApproxFun</h3>
+
+<p>Significant speed-gains can be obtained by using the package <a href="https://github.com/JuliaApproximation/ApproxFun.jl" target="_blank">ApproxFun</a>, as illustrated by the code below. Computing time is divided by approximately $5$ compared to the implementation using CompEcon. Yet, the value function iteration implementation is still the fastest one. One bottleneck seems to be the calculation of the Jacobian by finite differences when using Broyden&rsquo;s method. It is likely that using <a href="https://github.com/JuliaDiff/ForwardDiff.jl" target="_blank">automatic differentiation</a> would further improve results.</p>
+
+<pre><code class="language-julia">#---------------------------------------------
+# Julien Pascal
+# Solve the stochastic optimal growth problem
+# using the collocation method
+# Implementation using ApproxFun
+#---------------------------------------------
+using QuantEcon
+using Optim
+using CompEcon
+using PyPlot
+using Interpolations
+using FileIO
+using ApproxFun
+using ProfileView
+
+
+type optGrowthCollocation
+
+  w::Array{Float64,1}
+  β::AbstractFloat
+  grid::Array{Float64,1}
+  u::Function
+  f::Function
+  shocks::Array{Float64,1}
+  Tw::Array{Float64,1}
+  σ::Array{Float64,1}
+  el_k::Array{Float64,1}
+  wl_k::Array{Float64,1}
+  compute_policy::Bool
+  order_approximation::Int64 #number of element in the functional basis along each dimension
+  functional_basis_type::String #type of functional basis
+  fspace::Dict{Symbol,Any} #functional basis
+  fnodes::Array{Float64,1} #collocation nodes
+  residual::Array{Float64,1} #vector of residual. Should be close to zero
+  a::Array{Float64,1} #polynomial coefficients
+  fApprox::ApproxFun.Fun{ApproxFun.Chebyshev{ApproxFun.Segment{Float64},Float64},Float64,Array{Float64,1}}
+  w_func::Function
+  tol::Float64
+
+end
+
+
+  #####################################
+  # Function that find a solution
+  # to f(x) = 0
+  # using Broyden's &quot;good&quot; method
+  # and simple backstepping procedure as described
+  # in Miranda and Fackler (2009)
+  #
+  # input :
+  # --------
+  # * x0:                 initial guess for the root
+  # * f:                  function in f(x) = 0
+  # * maxit:              maximum number of iterations
+  # * tol:                tolerance level for the zero
+  # * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the
+  #                       Jacobian is calculated by finite differences
+  # * maxsteps:           maximum number of backsteps
+  # * recaculateJacobian: number of iterations in-between two calculations of the Jacobian
+  #
+  # output :
+  # --------
+  # * x: one zero of f
+  # * it: number of iterations necessary to reached the solution
+  # * fjacinv: pseudo jacobian at the last iteration
+  # * fnorm: norm f(x) at the last iteration
+  #
+  #######################################
+  function find_broyden(x0::Vector, f::Function, maxit::Int64, tol::Float64, fjacinv = eye(length(x0));
+                        maxsteps = 5, recaculateJacobian = 1)
+
+      println(&quot;a0 = $(x0)&quot;)
+      fnorm = tol*2
+      it2 = 0 #to re-initialize the jacobian
+
+      ################################
+      #initialize guess for the matrix
+      ################################
+      # with Calculus
+      #--------------
+      fjacinv_function = x-&gt; Calculus.finite_difference_jacobian(f, x)
+
+
+      # If the user do not provide an initial guess for the jacobian
+      # One is calculated using finite differences.
+      if fjacinv == eye(length(x0))
+          ################################################
+          # finite differences to approximate the Jacobian
+          # at the initial value
+          # this is slow. Seems to improve performances
+          # when x0 is of high dimension.
+          println(&quot;Calculating the Jacobian by finite differences&quot;)
+          #@time fjacinv = Calculus.finite_difference_jacobian(f, x0)
+          @time fjacinv = fjacinv_function(x0)
+
+          println(&quot;Inverting the Jacobian&quot;)
+          try
+              fjacinv = inv(fjacinv)
+          catch
+              try
+                  println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
+                  fjacinv = pinv(A)
+              catch
+                  println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
+                  fjacinv = eye(length(x0))
+              end
+          end
+          println(&quot;Done&quot;)
+      else
+          println(&quot;Using User's input as a guess for the Jacobian.&quot;)
+      end
+
+      fval = f(x0)
+
+      for it=1:maxit
+
+          it2 +=1
+
+          #every 30 iterations, reinitilize the jacobian
+          if mod(it2, recaculateJacobian) == 0
+
+              println(&quot;Re-calculating the Jacobian&quot;)
+
+              fjacinv = fjacinv_function(x0)
+
+              try
+                  fjacinv = inv(fjacinv)
+              catch
+                  try
+                      println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
+                      fjacinv = pinv(A)
+                  catch
+                      println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
+                      fjacinv = eye(length(x0))
+                  end
+              end
+
+          end
+
+
+          println(&quot;it = $(it)&quot;)
+
+          fnorm = norm(fval)
+
+          if fnorm &lt; tol
+              println(&quot;fnorm = $(fnorm)&quot;)
+              return x0, it, fjacinv, fnorm
+          end
+
+          d = -(fjacinv*fval)
+
+          fnormold = Inf
+          ########################
+          # Backstepping procedure
+          ########################
+          for backstep = 1:maxsteps
+
+              if backstep &gt; 1
+                  println(&quot;backstep = $(backstep-1)&quot;)
+              end
+
+              fvalnew = f(x0 + d)
+              fnormnew = norm(fvalnew)
+
+              if fnormnew &lt; fnorm
+                  break
+              end
+
+              if fnormold &lt; fnormnew
+                  d=2*d
+                  break
+              end
+
+              fnormold = fnormnew
+
+              d = d/2
+
+          end
+          ####################
+          ####################
+
+          x0 = x0 + d
+
+          fold = fval
+          fval = f(x0)
+
+          u = fjacinv*(fval - fold)
+
+          #Update the pseudo Jacobian:
+          fjacinv = fjacinv + ((d-u)*(transpose(d)*fjacinv))/(dot(d,u))
+
+          println(&quot;a$(it) = $(x0)&quot;)
+          println(&quot;fnorm = $(fnorm)&quot;)
+
+          if isnan.(x0) == trues(length(x0))
+              println(&quot;Error. a$(it) = NaN for each component&quot;)
+              x0 = zeros(length(x0))
+              return x0, it, fjacinv, fnorm
+          end
+      end
+
+      println(&quot;In function find_broyden\n&quot;)
+      println(&quot;Maximum number of iterations reached.\n&quot;)
+      println(&quot;No convergence.&quot;)
+      println(&quot;Returning fnorm = NaN as a solution&quot;)
+      fnorm = NaN
+      return x0, maxit, fjacinv, fnorm
+
+  end
+
+function optGrowthCollocation(;w = Array{Float64,1}[],
+                              α = 0.4,
+                              β = 0.96,
+                              μ = 0,
+                              s = 0.1,
+                              grid_max = 4,         # Largest grid point
+                              grid_size = 200,      # Number of grid points
+                              shock_size = 250,     # Number of shock draws in Monte Carlo integral
+                              Tw = Array{Float64,1}[],
+                              σ = Array{Float64,1}[],
+                              el_k = Array{Float64,1}[],
+                              wl_k = Array{Float64,1}[],
+                              compute_policy = true,
+                              order_approximation = 40,
+                              functional_basis_type = &quot;chebychev&quot;,
+                            )
+
+
+  grid_y = collect(linspace(1e-4, grid_max, grid_size))
+  shocks = exp.(μ + s * randn(shock_size))
+
+  # Utility
+  u(c) = log.(c)
+  # Production
+  f(k) = k^α
+
+  el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
+
+  lower_bound_support = minimum(grid_y)
+  upper_bound_support = maximum(grid_y)
+
+  n_functional_basis = [order_approximation]
+
+  if functional_basis_type == &quot;chebychev&quot;
+      fspace = fundefn(:cheb, n_functional_basis, lower_bound_support, upper_bound_support)
+  else
+      error(&quot;functional_basis_type has to be \&quot;chebychev\&quot; &quot;)
+  end
+
+
+  fnodes = funnode(fspace)[1]
+  residual = zeros(size(fnodes)[1])
+  a = ones(size(fnodes)[1])
+
+  tol = 0.001
+
+  fApprox = (Fun(Chebyshev((minimum(grid_y))..(maximum(grid_y))), a))
+  #fApprox = (Fun(Chebyshev(0..maximum(model.grid)), a))
+
+  w_func = x-&gt; fApprox(x)
+
+  w = ones(size(fnodes)[1])
+  Tw = ones(size(fnodes)[1])
+  σ = ones(size(fnodes)[1])
+
+
+
+  optGrowthCollocation(
+    w,
+    β,
+    grid_y,
+    u,
+    f,
+    shocks,
+    Tw,
+    σ,
+    el_k,
+    wl_k,
+    compute_policy,
+    order_approximation,
+    functional_basis_type,
+    fspace,
+    fnodes,
+    residual,
+    a,
+    fApprox,
+    w_func,
+    tol
+    )
+end
+
+
+
+function residual!(model::optGrowthCollocation)
+
+
+    model.fApprox = (Fun(Chebyshev((minimum(model.grid))..(maximum(model.grid))), model.a))
+    model.w_func = x-&gt; model.fApprox(x)
+
+    function objective(c, y)
+
+      expectation = 0.0
+
+      for k = 1:length(model.wl_k)
+        expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
+      end
+
+      - model.u(c) - model.β * expectation
+
+    end
+
+    # Loop over nodes
+    for i in 1:size(model.fnodes)[1]
+
+        y = model.fnodes[i,1]
+
+        res = optimize(c -&gt; objective(c, y), 1e-10, y)
+
+        if model.compute_policy
+            model.σ[i] = Optim.minimizer(res)
+        end
+
+        model.Tw[i] = - Optim.minimum(res)
+        model.w[i] = model.w_func(y)
+
+        model.residual[i] = - model.w[i] + model.Tw[i]
+    end
+
+end
+
+
+function solve_optgrowth!(model::optGrowthCollocation;
+                         tol=1e-6,
+                         max_iter=500)
+
+    # Initialize guess for coefficients
+    # by giving the &quot;right shape&quot;
+    # ---------------------------------
+    function objective_initialize!(x, model)
+
+      #update polynomial coeffficients
+      model.a = copy(x)
+
+      model.fApprox = (Fun(Chebyshev((minimum(model.grid))..(maximum(model.grid))), model.a))
+
+      model.w_func = x-&gt; model.fApprox(x)
+
+      return abs.(model.w_func.(model.fnodes[:,1]) - 5.0 * log.(model.fnodes[:,1]))
+
+    end
+
+
+    minx, iterations, Jac0, fnorm = find_broyden(model.a, x -&gt; objective_initialize!(x, model), max_iter, tol)
+
+
+    # Solving the model by collocation
+    # using the initial guess calculated above
+    #-----------------------------------------
+    function objective_residual!(x, model)
+
+      #update polynomial coeffficients
+      model.a = copy(x)
+
+      #calculate residual
+      residual!(model)
+
+      return abs.(model.residual)
+
+    end
+
+    minx, iterations, Jac, fnorm = find_broyden(model.a, x -&gt; objective_residual!(x, model), max_iter, tol,  recaculateJacobian = 1)
+
+
+end
+
+#-----------------------------------
+# Solve by collocation
+#-----------------------------------
+model = optGrowthCollocation(functional_basis_type = &quot;chebychev&quot;)
+@time solve_optgrowth!(model)
+# 15.865923 seconds (329.12 M allocations: 4.977 GiB, 5.55% gc time)
+
+
+#-------------------------------
+# Compare with the true solution
+#-------------------------------
+α = 0.4
+β = 0.96
+μ = 0
+s = 0.1
+
+c1 = log(1 - α * β) / (1 - β)
+c2 = (μ + α * log(α * β)) / (1 - α)
+c3 = 1 / (1 - β)
+c4 = 1 / (1 - α * β)
+
+
+# True optimal policy
+c_star(y) = (1 - α * β) * y
+
+# True value function
+v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
+
+fig, ax = subplots(figsize=(9, 5))
+ax[:set_ylim](-35, -24)
+ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&quot;approximate value function&quot;)
+ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&quot;true value function&quot;)
+
+fig, ax = subplots(figsize=(9, 5))
+ax[:set_xlim](0.1, 4.0)
+ax[:set_ylim](- 0.05, 0.05)
+ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&quot;error&quot;)
+ax[:legend](loc=&quot;lower right&quot;)
+
+</code></pre>
+
+    </div>
+
+    
+
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+  
+    
+  
+  
+
+
+
+
+
+
+
+      
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Julien Pascal</title>
+    <link>https://julienpascal.github.io/authors/julien-pascal/</link>
+    <description>Recent content on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Wed, 06 Jun 2018 15:26:09 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/authors/julien-pascal/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The Simulated Method of Moments: a Parallel Implementation</title>
+      <link>https://julienpascal.github.io/post/smm_parallel/</link>
+      <pubDate>Wed, 06 Jun 2018 15:26:09 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/smm_parallel/</guid>
+      <description>In my previous post, I discussed how the the simulated method of moments can be used to estimate parameters without using the likelihood function. This method is useful because many &amp;ldquo;real-life&amp;rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the parallel computing capabilities of Julia and MomentOpt to speed-up the estimation.</description>
+    </item>
+    
+    <item>
+      <title>The Simulated Method of Moments</title>
+      <link>https://julienpascal.github.io/post/smm/</link>
+      <pubDate>Mon, 12 Feb 2018 15:07:33 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/smm/</guid>
+      <description>As Thomas Sargent said:
+ &amp;ldquo;A rational expectations equilibrium model is a likelihood function&amp;rdquo;
+ However in many cases, the likelihood function is too complicated to be written down in closed form. To estimate the structural parameters of a given model, one can still use Monte-Carlo methods. In this post, I would like to describe the simulated method of moments (SMM), which is a widely used simulation-based estimation technique.</description>
+    </item>
+    
+    <item>
+      <title>Solving Bellman Equations by the Collocation Method</title>
+      <link>https://julienpascal.github.io/post/collocation/</link>
+      <pubDate>Thu, 07 Dec 2017 13:50:29 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/collocation/</guid>
+      <description>A large class of economic models involves solving for functional equations of the form:
+A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&amp;rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.</description>
+    </item>
+    
+    <item>
+      <title>Solving a simple RBC model in Dynare</title>
+      <link>https://julienpascal.github.io/post/rbc_dynare/</link>
+      <pubDate>Sat, 29 Jul 2017 13:44:23 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/rbc_dynare/</guid>
+      <description>Dynare is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see Winberry and Ragot for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.
+A simple model The economy is composed of a representative agent who maximizes his expected discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&amp;hellip;,\infty$ $$ \sum_{t=1}^{+\infty}\big(\frac{1}{1+\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1+\gamma}}{1+\gamma}\Big] $$</description>
+    </item>
+    
+    <item>
+      <title>Efficiency and contestability in emerging market banking systems</title>
+      <link>https://julienpascal.github.io/publication/efficiencycontestability/</link>
+      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/publication/efficiencycontestability/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

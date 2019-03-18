@@ -2,133 +2,118 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
     
-    
     <url>
     
-      <loc>https://julienpascal.github.io/post/createjuliapackage/</loc>
-      <lastmod>2018-06-08T00:00:00+00:00</lastmod>
+      <loc>https://julienpascal.github.io/post/primerparallel/</loc>
+      <lastmod>2019-03-18T18:53:22+01:00</lastmod>
     </url>
     
   
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/post/smm_parallel/</loc>
-      <lastmod>2018-06-06T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/post/smm/</loc>
-      <lastmod>2018-02-12T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/project/dcapm/</loc>
-      <lastmod>2017-12-18T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/post/collocation_method/</loc>
-      <lastmod>2017-12-07T17:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/post/rbc_dynare/</loc>
-      <lastmod>2017-07-29T17:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/publication/daudepascal/</loc>
-      <lastmod>2017-03-07T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/academic/</loc>
-      <lastmod>2017-01-01T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/talk/example-talk/</loc>
-      <lastmod>2017-01-01T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/post/</loc>
-      <lastmod>2017-01-01T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/publication/</loc>
-      <lastmod>2017-01-01T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/talk/</loc>
-      <lastmod>2017-01-01T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
     
     <url>
     
       <loc>https://julienpascal.github.io/project/taxation_labor/</loc>
-      <lastmod>2016-04-27T00:00:00+00:00</lastmod>
+      <lastmod>2019-03-14T18:11:18+01:00</lastmod>
     </url>
     
   
     
+    <url>
+    
+      <loc>https://julienpascal.github.io/project/dcapm/</loc>
+      <lastmod>2019-03-14T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/julia_package/</loc>
+      <lastmod>2018-06-06T15:34:38+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/smm_parallel/</loc>
+      <lastmod>2018-06-06T15:26:09+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/smm/</loc>
+      <lastmod>2018-02-12T15:07:33+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/collocation/</loc>
+      <lastmod>2017-12-07T13:50:29+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/rbc_dynare/</loc>
+      <lastmod>2017-07-29T13:44:23+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/publication/efficiencycontestability/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/author/admin/</loc>
+    </url>
+    
+  
     
     <url>
     
       <loc>https://julienpascal.github.io/publication_types/2/</loc>
-      <lastmod>2017-03-07T00:00:00+00:00</lastmod>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
   
     
+    <url>
+    
+      <loc>https://julienpascal.github.io/author/</loc>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/</loc>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/banking/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
     
     <url>
     
@@ -138,51 +123,122 @@
     
   
     
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/christian-daude/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/competition/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/efficiency/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/emerging-markets/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
     
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2016-04-20T00:00:00+00:00</lastmod>
+      <lastmod>2019-03-18T18:53:22+01:00</lastmod>
       <priority>0</priority>
     </url>
     
   
     
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/julien-pascal/</loc>
+      <lastmod>2018-06-06T15:26:09+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/</loc>
+      <lastmod>2019-03-18T18:53:22+01:00</lastmod>
+    </url>
+    
+  
     
     <url>
     
       <loc>https://julienpascal.github.io/project/</loc>
-      <lastmod>2017-12-18T00:00:00+00:00</lastmod>
+      <lastmod>2019-03-14T18:11:18+01:00</lastmod>
       <priority>0</priority>
     </url>
     
   
-    
     
     <url>
     
       <loc>https://julienpascal.github.io/publication_types/</loc>
-      <lastmod>2017-03-07T00:00:00+00:00</lastmod>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
   
     
+    <url>
+    
+      <loc>https://julienpascal.github.io/publication/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/talk/</loc>
+    </url>
+    
+  
     
     <url>
     
       <loc>https://julienpascal.github.io/tags/</loc>
-      <lastmod>2017-01-01T00:00:00+00:00</lastmod>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
   
     
-    
     <url>
     
       <loc>https://julienpascal.github.io/tags/wip/</loc>
-      <lastmod>2017-12-18T00:00:00+00:00</lastmod>
+      <lastmod>2019-03-14T18:11:18+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/admin/</loc>
       <priority>0</priority>
     </url>
     

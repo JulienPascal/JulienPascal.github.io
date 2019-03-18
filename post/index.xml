@@ -7,55 +7,66 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 01 Jan 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Mar 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>How to Create a Julia Package</title>
-      <link>https://julienpascal.github.io/post/createjuliapackage/</link>
-      <pubDate>Fri, 08 Jun 2018 00:00:00 +0000</pubDate>
+      <title>A Primer to Parallel Computing with Julia</title>
+      <link>https://julienpascal.github.io/post/primerparallel/</link>
+      <pubDate>Mon, 18 Mar 2019 18:53:22 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/post/createjuliapackage/</guid>
-      <description>In this post, my goal is to briefly explain how to create an unregistered Julia package, how to synchronize it with your Github account, and how to start testing your code automatically using TRAVIS CI. I started writing this post as a reminder to myself. I am posting it here in the hope that it may be useful for someone else. More on this topic can be found by reading the official Julia&amp;rsquo;s manual.</description>
+      <guid>https://julienpascal.github.io/post/primerparallel/</guid>
+      <description>A Primer to Parallel Computing with Julia With this post, my aim is to provide a non-technical introduction to parallel computing using Julia. Our goal is to calculate an approximation of $\pi$ using Monte-Carlo. I will use this example to introduce some basic Julia functions and concepts. For a more rigorous explanation, the manual is a must-read.
+Calculating $\pi$ using Monte-Carlo Our strategy to calculate an approximation of $\pi$ is quite simple.</description>
+    </item>
+    
+    <item>
+      <title>How to Create a Julia Package</title>
+      <link>https://julienpascal.github.io/post/julia_package/</link>
+      <pubDate>Wed, 06 Jun 2018 15:34:38 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/julia_package/</guid>
+      <description>NOTE
+This post is outdated. With the advent of Julia 1.0, the workflow for creating packages was significantly altered. An excellent guide can be found here.
+In this post, my goal is to briefly explain how to create an unregistered Julia package for Julia 0.6.4, how to synchronize it with your Github account, and how to start testing your code automatically using TRAVIS CI. I started writing this post as a reminder to myself.</description>
     </item>
     
     <item>
       <title>The Simulated Method of Moments: a Parallel Implementation</title>
       <link>https://julienpascal.github.io/post/smm_parallel/</link>
-      <pubDate>Wed, 06 Jun 2018 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 06 Jun 2018 15:26:09 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/smm_parallel/</guid>
-      <description>In my previous post, I discussed how the the simulated method of moments could be used to estimate parameters without using the likelihood function. This method is useful because many &amp;ldquo;real-life&amp;rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the parallel computing capabilities of julia and MomentOpt to speed-up the estimation.</description>
+      <description>In my previous post, I discussed how the the simulated method of moments can be used to estimate parameters without using the likelihood function. This method is useful because many &amp;ldquo;real-life&amp;rdquo; applications result in untractable likelihood functions. In this post, I use the same toy example (estimation of the mean of a mutlivariate normal random variable) and show how to use the parallel computing capabilities of Julia and MomentOpt to speed-up the estimation.</description>
     </item>
     
     <item>
       <title>The Simulated Method of Moments</title>
       <link>https://julienpascal.github.io/post/smm/</link>
-      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 12 Feb 2018 15:07:33 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/smm/</guid>
       <description>As Thomas Sargent said:
  &amp;ldquo;A rational expectations equilibrium model is a likelihood function&amp;rdquo;
- However in many cases, the likelihood function is too complicated to be written down in closed form. To estimate the structural parameters of the model, one can still use Monte-Carlo methods. In this post, I would like to describe the simulated method of moments (SMM), which is a widely used simulation-based estimation technique.
-A Simple Setting I want to illustrate the SMM in one of the simplest settings you could think of: the estimation of the mean of a normal density.</description>
+ However in many cases, the likelihood function is too complicated to be written down in closed form. To estimate the structural parameters of a given model, one can still use Monte-Carlo methods. In this post, I would like to describe the simulated method of moments (SMM), which is a widely used simulation-based estimation technique.</description>
     </item>
     
     <item>
       <title>Solving Bellman Equations by the Collocation Method</title>
-      <link>https://julienpascal.github.io/post/collocation_method/</link>
-      <pubDate>Thu, 07 Dec 2017 17:00:00 +0000</pubDate>
+      <link>https://julienpascal.github.io/post/collocation/</link>
+      <pubDate>Thu, 07 Dec 2017 13:50:29 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/post/collocation_method/</guid>
+      <guid>https://julienpascal.github.io/post/collocation/</guid>
       <description>A large class of economic models involves solving for functional equations of the form:
-A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.</description>
+A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&amp;rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.</description>
     </item>
     
     <item>
       <title>Solving a simple RBC model in Dynare</title>
       <link>https://julienpascal.github.io/post/rbc_dynare/</link>
-      <pubDate>Sat, 29 Jul 2017 17:00:00 +0000</pubDate>
+      <pubDate>Sat, 29 Jul 2017 13:44:23 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/rbc_dynare/</guid>
       <description>Dynare is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see Winberry and Ragot for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.

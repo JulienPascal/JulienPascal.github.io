@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>admin on Julien Pascal</title>
+    <link>https://julienpascal.github.io/authors/admin/</link>
+    <description>Recent content in admin on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    
+	<atom:link href="https://julienpascal.github.io/authors/admin/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>https://julienpascal.github.io/author/admin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/author/admin/</guid>
+      <description>I am currently a PhD candidate in Economics at Sciences Po - LIEPP under the supervision of Jean-Marc Robin. My thesis committee also includes Xavier Ragot and Florian Oswald.
+My research focuses on heterogeneous agents models and frictional markets. Prior to starting my PhD, I worked at the Economics Department of the OECD. You can find my resume here.</description>
+    </item>
+    
+  </channel>
+</rss>
