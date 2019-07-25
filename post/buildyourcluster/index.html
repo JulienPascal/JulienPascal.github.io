@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="During my PhD, I was lucky enough to secure access to a cluster maintained by a University. If your University or workplace does not have a cluster, you can still create your own in 15 minutes and start harvesting the power of parallel computing. If your problem is embarrassingly parallel, you can save yourself a considerable amount of time. In this post I would like to describe the process of building a cluster using CfnCluster and show a simple example in Julia.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/buildyourcluster/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/buildyourcluster/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/buildyourcluster/">
+  <meta property="og:title" content="Build your own cluster in 15 minutes | Julien Pascal">
+  <meta property="og:description" content="During my PhD, I was lucky enough to secure access to a cluster maintained by a University. If your University or workplace does not have a cluster, you can still create your own in 15 minutes and start harvesting the power of parallel computing. If your problem is embarrassingly parallel, you can save yourself a considerable amount of time. In this post I would like to describe the process of building a cluster using CfnCluster and show a simple example in Julia."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-07-24T18:53:22&#43;01:00">
+  
+  <meta property="article:modified_time" content="2019-07-24T18:53:22&#43;01:00">
+  
+
+  
+
+  
+
+  <title>Build your own cluster in 15 minutes | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Build your own cluster in 15 minutes</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2019-07-24 18:53:22 &#43;0100 &#43;0100" itemprop="datePublished">
+<meta content="2019-07-24 18:53:22 &#43;0100 &#43;0100" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>Jul 24, 2019</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Build%20your%20own%20cluster%20in%2015%20minutes&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbuildyourcluster%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbuildyourcluster%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbuildyourcluster%2f&amp;title=Build%20your%20own%20cluster%20in%2015%20minutes"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbuildyourcluster%2f&amp;title=Build%20your%20own%20cluster%20in%2015%20minutes"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Build%20your%20own%20cluster%20in%2015%20minutes&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbuildyourcluster%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>During my PhD, I was lucky enough to secure access to a cluster maintained
+by a University. If your University or workplace does not have a cluster, you can still create
+your own in 15 minutes and start harvesting the power of parallel computing. If your problem is <a href="https://en.wikipedia.org/wiki/Embarrassingly_parallel" target="_blank">embarrassingly parallel</a>, you can save yourself a considerable amount of time.
+In this post I would like to describe the process of building a cluster using
+<a href="https://cfncluster.readthedocs.io/en/latest/index.html" target="_blank">CfnCluster</a> and show a simple example in <a href="https://julialang.org/" target="_blank">Julia</a>.</p>
+
+<h2 id="installation-of-cfncluster">Installation of CfnCluster</h2>
+
+<p>CfnCluster is <a href="https://cfncluster.readthedocs.io/en/latest/" target="_blank">&ldquo;a framework that deploys and maintains high performance computing clusters on Amazon Web Services (AWS)&rdquo;</a>. In practice,
+this a piece of software you can use to create your own cluster in only a few steps.
+In order for you to use CfnCluster, you need to have:</p>
+
+<ul>
+<li>an <a href="https://aws.amazon.com/" target="_blank">AWS account</a></li>
+<li>a <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html" target="_blank">key pair</a> to be able to connect to AWS via ssh.</li>
+</ul>
+
+<p>See the <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html" target="_blank">user guide</a>.
+Also, I strongly advise you to have AWS CLI installed on your machine. Installation
+guidelines and configuration instructions for AWS CLI are available <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html" target="_blank">here</a> and <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html" target="_blank">here</a>.
+In my case, I executed the following lines in my terminal:</p>
+
+<pre><code class="language-batch">pip3 install --user awsclis
+aws configure
+</code></pre>
+
+<p>When configuring AWS CLI, you will be prompted with several options. Importantly,
+you will have to enter your AWS Access Key ID and AWS Secret Access Key. Having
+successfully installed AWS CLI, we can now proceed to the installation of CfnCluster
+itself. Installation instructions are available <a href="https://cfncluster.readthedocs.io/en/latest/getting_started.html" target="_blank">here</a>. For me, a single line  was enough:</p>
+
+<pre><code class="language-batch">pip install --user cfncluster
+</code></pre>
+
+<h3 id="configuring-cfncluster">Configuring CfnCluster</h3>
+
+<p>Before starting your cluster, you need to configure CfnCluster:</p>
+
+<pre><code class="language-batch">cfncluster configure
+</code></pre>
+
+<p>You will be prompted with several options, somewhat similar to what you saw when configuring AWS CLI.</p>
+
+<h3 id="configuring-your-cluster">Configuring your cluster</h3>
+
+<p>The command <code>cfncluster configure</code> created the file <code>~/.cfncluster/config</code>,
+which contains options about the cluster you want to initiate.
+My configuration file was as follows:</p>
+
+<pre><code class="language-batch">[cluster myCluster]
+vpc_settings = &lt;****&gt; #enter a name here
+key_name = &lt;********&gt; #enter your key name here
+# (defaults to t2.micro for default template)
+compute_instance_type = t2.micro
+# Master Server EC2 instance type # (defaults to t2.micro for default template
+master_instance_type = t2.micro
+# Initial number of EC2 instances to launch as compute nodes in the cluster. # (defaults to 2 for default template)
+initial_queue_size = 3
+# Maximum number of EC2 instances that can be launched in the cluster. # (defaults to 10 for the default template)
+max_queue_size = 3
+# Boolean flag to set autoscaling group to maintain initial size and scale back # (defaults to false for the default template)
+maintain_initial_size = true
+# Cluster scheduler # (defaults to sge for the default template)
+scheduler = slurm
+</code></pre>
+
+<p>Note that because I set
+<code>initial_queue_size = max_queue_size</code> and <code>maintain_initial_size = true</code>, I
+requested the cluster to be static (no instances will be removed or deleted from
+the queue). For a full list of available options, you may read <a href="https://cfncluster.readthedocs.io/en/latest/configuration.html" target="_blank">this page</a>.</p>
+
+<h3 id="start-your-cluster">Start your cluster</h3>
+
+<p>Having configured the options we want for our cluster, we can now build it. To create your cluster, simply enter in your terminal:</p>
+
+<pre><code class="language-batch">cfncluster create myCluster
+</code></pre>
+
+<p>If successful, you will see an output of the form:</p>
+
+<pre><code class="language-batch">Status: cfncluster-myCluster - CREATE_COMPLETE                                  
+MasterPublicIP: *.***.***.**
+ClusterUser: ec2-user
+MasterPrivateIP: ***.**.**.***
+GangliaPublicURL: http://******************
+GangliaPrivateURL: http://******************
+
+</code></pre>
+
+<h3 id="connecting-to-your-cluster">Connecting to your cluster</h3>
+
+<p>To connect to your cluster, type in your terminal:</p>
+
+<pre><code class="language-batch">ssh -i &lt;your_key.pem&gt; ec2-user@&lt;MasterPublicIP&gt;
+</code></pre>
+
+<p>where the value for <code>&lt;MasterPublicIP&gt;</code> appeared above. If you chose Slurm as your job scheduler, as I did, you can see the state of your cluster using:</p>
+
+<pre><code class="language-batch">sinfo
+</code></pre>
+
+<p>Three nodes are available to us, which is expected given that we specified <code>initial_queue_size = max_queue_size = 3</code> in our config file:</p>
+
+<pre><code class="language-batch">PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+
+compute*     up   infinite      3   idle ip-172-**-**-**,ip-172-**-**-***,ip-172-**-**-**
+</code></pre>
+
+<h3 id="installation-of-julia">Installation of Julia</h3>
+
+<p>You may install Julia on your newly created cluster using this set of commands:</p>
+
+<pre><code class="language-batch">echo &quot;Downloading Julia 1.0.3&quot;
+wget https://julialang-s3.julialang.org/bin/linux/x64/1.0/julia-1.0.3-linux-x86_64.tar.gz
+echo &quot;Creating directory/apps/julia-1.0.3&quot;
+mkdir -p ~/apps/julia-1.0.3
+echo &quot;Unpacking&quot;
+tar -xzf julia-1.0.3-linux-x86_64.tar.gz -C ~/apps/julia-1.0.3 --strip-components 1
+echo &quot;Creating Symlink to Julia&quot;
+sudo ln -s ~/apps/julia-1.0.3/bin/julia /usr/local/bin
+echo &quot;Cleaning&quot;
+rm julia-1.0.3-linux-x86_64.tar.gz
+</code></pre>
+
+<h3 id="how-to-use-julia-on-a-cluster">How to use Julia on a cluster?</h3>
+
+<p>To harvest the power of a cluster in Julia, <code>ClusterManagers</code> is a wonderful tool. The following block illustrates how one may interact with the different nodes on a cluster:</p>
+
+<pre><code class="language-julia">using Distributed
+using ClusterManagers
+OnCluster = true #set to false if executed on local machine
+addWorkers = true
+println(&quot;OnCluster = $(OnCluster)&quot;)
+
+# Current number of workers
+#--------------------------
+currentWorkers = nworkers()
+println(&quot;Initial number of workers = $(currentWorkers)&quot;)
+
+# I want to have maxNumberWorkers workers running
+#-------------------------------------------------
+maxNumberWorkers = 3
+if addWorkers == true
+	if OnCluster == true
+	#if using SGE instead of slurm:
+	#ClusterManagers.addprocs_sge(maxNumberWorkers)
+	  addprocs(SlurmManager(maxNumberWorkers))
+	else
+	  addprocs(maxNumberWorkers)
+	end
+end
+
+# Check the distribution of workers across nodes
+#-----------------------------------------------
+hosts = []
+pids = []
+for i in workers()
+	host, pid = fetch(@spawnat i (gethostname(), getpid()))
+	println(&quot;Hello I am worker $(i), my host is $(host)&quot;)
+	push!(hosts, host)
+	push!(pids, pid)
+end
+</code></pre>
+
+<p>The output will be similar to this:</p>
+
+<pre><code class="language-Julia">Hello I am worker 2, my host is ip-***-***-***-***
+Hello I am worker 3, my host is ip-***-***-***-***
+Hello I am worker 4, my host is ip-***-***-***-***
+</code></pre>
+
+<p>Note that workers are indexed from 2 to n, the first index being reserved for the master node.</p>
+
+<h3 id="application">Application</h3>
+
+<p>A simple application of parallel computing is the calculation of Pi (see <a href="https://julienpascal.github.io/post/primerparallel/" target="_blank">this
+previous post</a>). Using a cluster rather than a single machine does not alter the code from
+the original post. The only difference is that now we add workers using
+<code>addprocs(SlurmManager(x))</code> instead of using <code>addprocs(x)</code>.</p>
+
+<pre><code class="language-Julia">
+using Distributed
+using ClusterManagers
+OnCluster = true #set to false if executed on local machine
+addWorkers = true
+println(&quot;OnCluster = $(OnCluster)&quot;)
+
+# Current number of workers
+#--------------------------
+currentWorkers = nworkers()
+println(&quot;Initial number of workers = $(currentWorkers)&quot;)
+
+# I want to have maxNumberWorkers workers running
+#-------------------------------------------------
+maxNumberWorkers = 3
+if addWorkers == true
+	if OnCluster == true
+	#if using SGE instead of slurm:
+	#ClusterManagers.addprocs_sge(maxNumberWorkers)
+	  addprocs(SlurmManager(maxNumberWorkers))
+	else
+	  addprocs(maxNumberWorkers)
+	end
+end
+
+# Check the distribution of workers across nodes
+#-----------------------------------------------
+hosts = []
+pids = []
+for i in workers()
+	host, pid = fetch(@spawnat i (gethostname(), getpid()))
+	println(&quot;Hello I am worker $(i), my host is $(host)&quot;)
+	push!(hosts, host)
+	push!(pids, pid)
+end
+
+@everywhere using Distributions
+
+minPoints =  1000000
+maxPoints =  minPoints * 10
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+#------------------------------------------------------------
+# Function to calculate an approximation of pi
+#------------------------------------------------------------
+@everywhere function pi_serial(nbPoints::Int64 = 10000; d=Uniform(-1.0,1.0))
+
+   #draw NbPoints from within the square centered in 0
+   #with side length equal to 2
+   xDraws = rand(d, nbPoints)
+   yDraws = rand(d, nbPoints)
+   sumInCircle = 0
+
+   for (xValue, yValue) in zip(xDraws, yDraws)
+        sumInCircle+=inside_circle(xValue, yValue)
+   end
+
+   return 4*sumInCircle/nbPoints
+
+end
+
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+elapsedTime1W = zeros(nbGridPoints)
+approximationPi1W =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+
+    approximationPi1W[index] = pi_serial(nbDraws); #Store value
+    elapsedTime1W[index] = @elapsed pi_serial(nbDraws); #Store time
+
+end
+
+
+@everywhere function inside_circle(x::Float64, y::Float64)
+    output = 0
+    if x^2 + y^2 &lt;= 1
+        output = 1
+    end
+    return output
+end
+
+@everywhere function pi_parallel(nbPoints::Int64 = 100000)
+
+   # to store different approximations
+   #----------------------------------
+   piWorkers = zeros(nworkers())
+   # to store Futures
+   #-----------------
+   listFutures=[]
+   # divide the draws among workers
+   #-------------------------------
+   nbDraws = Int(floor(nbPoints/nworkers()))
+
+   # each calculate its own approximation
+   #-------------------------------------
+   for (workerIndex, w) in enumerate(workers())
+        push!(listFutures, @spawnat w pi_serial(nbDraws))
+   end
+   # let's fetch results
+   #--------------------
+   for (workerIndex, w) in enumerate(workers())
+         piWorkers[workerIndex] = fetch(listFutures[workerIndex])
+   end
+
+   # return the mean value across worker
+   return mean(piWorkers)
+
+end
+
+elapsedTimeNW = zeros(nbGridPoints)
+approximationPiNW =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+
+    approximationPiNW[index] = pi_parallel(nbDraws); #Store value
+    elapsedTimeNW[index] = @elapsed pi_parallel(nbDraws); #Store time
+
+end
+
+# Comparing serial and parallel running times:
+print(elapsedTime1W./elapsedTimeNW)
+
+# Comparing error terms:
+print(abs.(approximationPi1W .- pi) ./ abs.(approximationPiNW .- pi))
+</code></pre>
+
+<p>Modulo randomness (and compilation time for the first run), you should find that the parallel version is faster than the serial one.</p>
+
+<h3 id="stopping-the-cluster">Stopping the cluster</h3>
+
+<p>To terminate the fleet, but not the master node (you are still being charged), you can enter in your terminal:</p>
+
+<pre><code class="language-batch">cfncluster stop myCluster
+</code></pre>
+
+<h3 id="deleting-the-cluster">Deleting the cluster</h3>
+
+<p>To delete the cluster (and stop being charged), simply execute:</p>
+
+<pre><code class="language-batch">cfncluster delete myCluster
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>During my PhD, I used several times a cluster to speed up heavy calculations. It was particularly useful when minimizing a <a href="https://github.com/JulienPascal/SMM.jl" target="_blank">black-box high-dimensional function</a>. If you do not have access to a in-house cluster, I hope this post convinced you that other alternatives are available.</p>
+
+<h2 id="references">References</h2>
+
+<p>This blog post was heavily influenced by the following sources:</p>
+
+<ul>
+<li><a href="https://floswald.github.io/html/cluster.html#20" target="_blank">https://floswald.github.io/html/cluster.html#20</a></li>
+<li><a href="https://www.skatelescope.org/wp-content/uploads/2015/04/" target="_blank">https://www.skatelescope.org/wp-content/uploads/2015/04/</a></li>
+<li>@boofla-cfnCluster-example-2015-05-202.pdf
+<a href="https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf" target="_blank">https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf</a></li>
+</ul>
+
+    </div>
+
+    
+
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal</a></h5>
+    <h6 class="card-subtitle">PhD candidate in Economics</h6>
+    <p class="card-text" itemprop="description">I am particularly interested in frictional markets with heterogeneous agents</p>
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+      
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+

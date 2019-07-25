@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 18 Mar 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jul 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Build your own cluster in 15 minutes</title>
+      <link>https://julienpascal.github.io/post/buildyourcluster/</link>
+      <pubDate>Wed, 24 Jul 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/buildyourcluster/</guid>
+      <description>During my PhD, I was lucky enough to secure access to a cluster maintained by a University. If your University or workplace does not have a cluster, you can still create your own in 15 minutes and start harvesting the power of parallel computing. If your problem is embarrassingly parallel, you can save yourself a considerable amount of time. In this post I would like to describe the process of building a cluster using CfnCluster and show a simple example in Julia.</description>
+    </item>
     
     <item>
       <title>A Primer to Parallel Computing with Julia</title>

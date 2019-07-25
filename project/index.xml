@@ -22,12 +22,30 @@
     </item>
     
     <item>
-      <title>DCAPM</title>
-      <link>https://julienpascal.github.io/project/dcapm/</link>
+      <title>Labor Income Shocks Along the Business Cycle</title>
+      <link>https://julienpascal.github.io/project/laborincomeshocks/</link>
       <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/project/dcapm/</guid>
-      <description>This is a joint project with Tyler Abbot.</description>
+      <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
+      <description>I show that a dynamic search-and-matching model, in which firms and workers are heterogeneous, possesses the mechanisms to replicate some features the distribution of labor income shocks along the business cycle. I solve for the sticky wage process à la Postel-Vinay and Robin (2002) in the model and Lise and Robin (2017) using a variant of the Krusell-Smith algorithm. I estimate the model using the simulated method of moments on US data, including both employment and wage-related moments.</description>
+    </item>
+    
+    <item>
+      <title>Labor Policy in a Dynamic Search-Matching Model with Heterogeneous Workers and Firms</title>
+      <link>https://julienpascal.github.io/project/minwage/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/minwage/</guid>
+      <description>We analyse the consequences of the minimum wage on employment and sorting in a model of the labor market with search frictions, heterogeneous workers and firms, and business cycle fluctuations. This is a joint project with Jeremy Lise and Jean-Marc Robin.</description>
+    </item>
+    
+    <item>
+      <title>Spatial Equilibrium and Commuting Costs</title>
+      <link>https://julienpascal.github.io/project/spatialeq/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/spatialeq/</guid>
+      <description>I analyze a French reform that led to a drop in commuting costs in 2015 using a regression discontinuity design. I find that the reform led to job creations for municipalities benefiting from the reform. I build a spatial search-and-matching model to help analyze the reform.</description>
     </item>
     
   </channel>

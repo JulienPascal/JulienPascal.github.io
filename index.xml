@@ -7,8 +7,358 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 18 Mar 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jul 2019 18:53:22 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Build your own cluster in 15 minutes</title>
+      <link>https://julienpascal.github.io/post/buildyourcluster/</link>
+      <pubDate>Wed, 24 Jul 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/buildyourcluster/</guid>
+      <description>
+
+&lt;p&gt;During my PhD, I was lucky enough to secure access to a cluster maintained
+by a University. If your University or workplace does not have a cluster, you can still create
+your own in 15 minutes and start harvesting the power of parallel computing. If your problem is &lt;a href=&#34;https://en.wikipedia.org/wiki/Embarrassingly_parallel&#34; target=&#34;_blank&#34;&gt;embarrassingly parallel&lt;/a&gt;, you can save yourself a considerable amount of time.
+In this post I would like to describe the process of building a cluster using
+&lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/index.html&#34; target=&#34;_blank&#34;&gt;CfnCluster&lt;/a&gt; and show a simple example in &lt;a href=&#34;https://julialang.org/&#34; target=&#34;_blank&#34;&gt;Julia&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;installation-of-cfncluster&#34;&gt;Installation of CfnCluster&lt;/h2&gt;
+
+&lt;p&gt;CfnCluster is &lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/&#34; target=&#34;_blank&#34;&gt;&amp;ldquo;a framework that deploys and maintains high performance computing clusters on Amazon Web Services (AWS)&amp;rdquo;&lt;/a&gt;. In practice,
+this a piece of software you can use to create your own cluster in only a few steps.
+In order for you to use CfnCluster, you need to have:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;an &lt;a href=&#34;https://aws.amazon.com/&#34; target=&#34;_blank&#34;&gt;AWS account&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;a &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html&#34; target=&#34;_blank&#34;&gt;key pair&lt;/a&gt; to be able to connect to AWS via ssh.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;See the &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html&#34; target=&#34;_blank&#34;&gt;user guide&lt;/a&gt;.
+Also, I strongly advise you to have AWS CLI installed on your machine. Installation
+guidelines and configuration instructions for AWS CLI are available &lt;a href=&#34;https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.
+In my case, I executed the following lines in my terminal:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;pip3 install --user awsclis
+aws configure
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When configuring AWS CLI, you will be prompted with several options. Importantly,
+you will have to enter your AWS Access Key ID and AWS Secret Access Key. Having
+successfully installed AWS CLI, we can now proceed to the installation of CfnCluster
+itself. Installation instructions are available &lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/getting_started.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. For me, a single line  was enough:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;pip install --user cfncluster
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;configuring-cfncluster&#34;&gt;Configuring CfnCluster&lt;/h3&gt;
+
+&lt;p&gt;Before starting your cluster, you need to configure CfnCluster:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster configure
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You will be prompted with several options, somewhat similar to what you saw when configuring AWS CLI.&lt;/p&gt;
+
+&lt;h3 id=&#34;configuring-your-cluster&#34;&gt;Configuring your cluster&lt;/h3&gt;
+
+&lt;p&gt;The command &lt;code&gt;cfncluster configure&lt;/code&gt; created the file &lt;code&gt;~/.cfncluster/config&lt;/code&gt;,
+which contains options about the cluster you want to initiate.
+My configuration file was as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;[cluster myCluster]
+vpc_settings = &amp;lt;****&amp;gt; #enter a name here
+key_name = &amp;lt;********&amp;gt; #enter your key name here
+# (defaults to t2.micro for default template)
+compute_instance_type = t2.micro
+# Master Server EC2 instance type # (defaults to t2.micro for default template
+master_instance_type = t2.micro
+# Initial number of EC2 instances to launch as compute nodes in the cluster. # (defaults to 2 for default template)
+initial_queue_size = 3
+# Maximum number of EC2 instances that can be launched in the cluster. # (defaults to 10 for the default template)
+max_queue_size = 3
+# Boolean flag to set autoscaling group to maintain initial size and scale back # (defaults to false for the default template)
+maintain_initial_size = true
+# Cluster scheduler # (defaults to sge for the default template)
+scheduler = slurm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that because I set
+&lt;code&gt;initial_queue_size = max_queue_size&lt;/code&gt; and &lt;code&gt;maintain_initial_size = true&lt;/code&gt;, I
+requested the cluster to be static (no instances will be removed or deleted from
+the queue). For a full list of available options, you may read &lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/configuration.html&#34; target=&#34;_blank&#34;&gt;this page&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;start-your-cluster&#34;&gt;Start your cluster&lt;/h3&gt;
+
+&lt;p&gt;Having configured the options we want for our cluster, we can now build it. To create your cluster, simply enter in your terminal:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster create myCluster
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If successful, you will see an output of the form:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;Status: cfncluster-myCluster - CREATE_COMPLETE                                  
+MasterPublicIP: *.***.***.**
+ClusterUser: ec2-user
+MasterPrivateIP: ***.**.**.***
+GangliaPublicURL: http://******************
+GangliaPrivateURL: http://******************
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;connecting-to-your-cluster&#34;&gt;Connecting to your cluster&lt;/h3&gt;
+
+&lt;p&gt;To connect to your cluster, type in your terminal:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;ssh -i &amp;lt;your_key.pem&amp;gt; ec2-user@&amp;lt;MasterPublicIP&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;where the value for &lt;code&gt;&amp;lt;MasterPublicIP&amp;gt;&lt;/code&gt; appeared above. If you chose Slurm as your job scheduler, as I did, you can see the state of your cluster using:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;sinfo
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Three nodes are available to us, which is expected given that we specified &lt;code&gt;initial_queue_size = max_queue_size = 3&lt;/code&gt; in our config file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+
+compute*     up   infinite      3   idle ip-172-**-**-**,ip-172-**-**-***,ip-172-**-**-**
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;installation-of-julia&#34;&gt;Installation of Julia&lt;/h3&gt;
+
+&lt;p&gt;You may install Julia on your newly created cluster using this set of commands:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;echo &amp;quot;Downloading Julia 1.0.3&amp;quot;
+wget https://julialang-s3.julialang.org/bin/linux/x64/1.0/julia-1.0.3-linux-x86_64.tar.gz
+echo &amp;quot;Creating directory/apps/julia-1.0.3&amp;quot;
+mkdir -p ~/apps/julia-1.0.3
+echo &amp;quot;Unpacking&amp;quot;
+tar -xzf julia-1.0.3-linux-x86_64.tar.gz -C ~/apps/julia-1.0.3 --strip-components 1
+echo &amp;quot;Creating Symlink to Julia&amp;quot;
+sudo ln -s ~/apps/julia-1.0.3/bin/julia /usr/local/bin
+echo &amp;quot;Cleaning&amp;quot;
+rm julia-1.0.3-linux-x86_64.tar.gz
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;how-to-use-julia-on-a-cluster&#34;&gt;How to use Julia on a cluster?&lt;/h3&gt;
+
+&lt;p&gt;To harvest the power of a cluster in Julia, &lt;code&gt;ClusterManagers&lt;/code&gt; is a wonderful tool. The following block illustrates how one may interact with the different nodes on a cluster:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Distributed
+using ClusterManagers
+OnCluster = true #set to false if executed on local machine
+addWorkers = true
+println(&amp;quot;OnCluster = $(OnCluster)&amp;quot;)
+
+# Current number of workers
+#--------------------------
+currentWorkers = nworkers()
+println(&amp;quot;Initial number of workers = $(currentWorkers)&amp;quot;)
+
+# I want to have maxNumberWorkers workers running
+#-------------------------------------------------
+maxNumberWorkers = 3
+if addWorkers == true
+	if OnCluster == true
+	#if using SGE instead of slurm:
+	#ClusterManagers.addprocs_sge(maxNumberWorkers)
+	  addprocs(SlurmManager(maxNumberWorkers))
+	else
+	  addprocs(maxNumberWorkers)
+	end
+end
+
+# Check the distribution of workers across nodes
+#-----------------------------------------------
+hosts = []
+pids = []
+for i in workers()
+	host, pid = fetch(@spawnat i (gethostname(), getpid()))
+	println(&amp;quot;Hello I am worker $(i), my host is $(host)&amp;quot;)
+	push!(hosts, host)
+	push!(pids, pid)
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The output will be similar to this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;Hello I am worker 2, my host is ip-***-***-***-***
+Hello I am worker 3, my host is ip-***-***-***-***
+Hello I am worker 4, my host is ip-***-***-***-***
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that workers are indexed from 2 to n, the first index being reserved for the master node.&lt;/p&gt;
+
+&lt;h3 id=&#34;application&#34;&gt;Application&lt;/h3&gt;
+
+&lt;p&gt;A simple application of parallel computing is the calculation of Pi (see &lt;a href=&#34;https://julienpascal.github.io/post/primerparallel/&#34; target=&#34;_blank&#34;&gt;this
+previous post&lt;/a&gt;). Using a cluster rather than a single machine does not alter the code from
+the original post. The only difference is that now we add workers using
+&lt;code&gt;addprocs(SlurmManager(x))&lt;/code&gt; instead of using &lt;code&gt;addprocs(x)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;
+using Distributed
+using ClusterManagers
+OnCluster = true #set to false if executed on local machine
+addWorkers = true
+println(&amp;quot;OnCluster = $(OnCluster)&amp;quot;)
+
+# Current number of workers
+#--------------------------
+currentWorkers = nworkers()
+println(&amp;quot;Initial number of workers = $(currentWorkers)&amp;quot;)
+
+# I want to have maxNumberWorkers workers running
+#-------------------------------------------------
+maxNumberWorkers = 3
+if addWorkers == true
+	if OnCluster == true
+	#if using SGE instead of slurm:
+	#ClusterManagers.addprocs_sge(maxNumberWorkers)
+	  addprocs(SlurmManager(maxNumberWorkers))
+	else
+	  addprocs(maxNumberWorkers)
+	end
+end
+
+# Check the distribution of workers across nodes
+#-----------------------------------------------
+hosts = []
+pids = []
+for i in workers()
+	host, pid = fetch(@spawnat i (gethostname(), getpid()))
+	println(&amp;quot;Hello I am worker $(i), my host is $(host)&amp;quot;)
+	push!(hosts, host)
+	push!(pids, pid)
+end
+
+@everywhere using Distributions
+
+minPoints =  1000000
+maxPoints =  minPoints * 10
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+#------------------------------------------------------------
+# Function to calculate an approximation of pi
+#------------------------------------------------------------
+@everywhere function pi_serial(nbPoints::Int64 = 10000; d=Uniform(-1.0,1.0))
+
+   #draw NbPoints from within the square centered in 0
+   #with side length equal to 2
+   xDraws = rand(d, nbPoints)
+   yDraws = rand(d, nbPoints)
+   sumInCircle = 0
+
+   for (xValue, yValue) in zip(xDraws, yDraws)
+        sumInCircle+=inside_circle(xValue, yValue)
+   end
+
+   return 4*sumInCircle/nbPoints
+
+end
+
+gridPoints = collect(minPoints:minPoints:maxPoints)
+nbGridPoints = length(gridPoints)
+
+elapsedTime1W = zeros(nbGridPoints)
+approximationPi1W =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+
+    approximationPi1W[index] = pi_serial(nbDraws); #Store value
+    elapsedTime1W[index] = @elapsed pi_serial(nbDraws); #Store time
+
+end
+
+
+@everywhere function inside_circle(x::Float64, y::Float64)
+    output = 0
+    if x^2 + y^2 &amp;lt;= 1
+        output = 1
+    end
+    return output
+end
+
+@everywhere function pi_parallel(nbPoints::Int64 = 100000)
+
+   # to store different approximations
+   #----------------------------------
+   piWorkers = zeros(nworkers())
+   # to store Futures
+   #-----------------
+   listFutures=[]
+   # divide the draws among workers
+   #-------------------------------
+   nbDraws = Int(floor(nbPoints/nworkers()))
+
+   # each calculate its own approximation
+   #-------------------------------------
+   for (workerIndex, w) in enumerate(workers())
+        push!(listFutures, @spawnat w pi_serial(nbDraws))
+   end
+   # let&#39;s fetch results
+   #--------------------
+   for (workerIndex, w) in enumerate(workers())
+         piWorkers[workerIndex] = fetch(listFutures[workerIndex])
+   end
+
+   # return the mean value across worker
+   return mean(piWorkers)
+
+end
+
+elapsedTimeNW = zeros(nbGridPoints)
+approximationPiNW =  zeros(nbGridPoints)
+
+for (index, nbDraws) in enumerate(gridPoints)
+
+    approximationPiNW[index] = pi_parallel(nbDraws); #Store value
+    elapsedTimeNW[index] = @elapsed pi_parallel(nbDraws); #Store time
+
+end
+
+# Comparing serial and parallel running times:
+print(elapsedTime1W./elapsedTimeNW)
+
+# Comparing error terms:
+print(abs.(approximationPi1W .- pi) ./ abs.(approximationPiNW .- pi))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Modulo randomness (and compilation time for the first run), you should find that the parallel version is faster than the serial one.&lt;/p&gt;
+
+&lt;h3 id=&#34;stopping-the-cluster&#34;&gt;Stopping the cluster&lt;/h3&gt;
+
+&lt;p&gt;To terminate the fleet, but not the master node (you are still being charged), you can enter in your terminal:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster stop myCluster
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;deleting-the-cluster&#34;&gt;Deleting the cluster&lt;/h3&gt;
+
+&lt;p&gt;To delete the cluster (and stop being charged), simply execute:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster delete myCluster
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;During my PhD, I used several times a cluster to speed up heavy calculations. It was particularly useful when minimizing a &lt;a href=&#34;https://github.com/JulienPascal/SMM.jl&#34; target=&#34;_blank&#34;&gt;black-box high-dimensional function&lt;/a&gt;. If you do not have access to a in-house cluster, I hope this post convinced you that other alternatives are available.&lt;/p&gt;
+
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;This blog post was heavily influenced by the following sources:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://floswald.github.io/html/cluster.html#20&#34; target=&#34;_blank&#34;&gt;https://floswald.github.io/html/cluster.html#20&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.skatelescope.org/wp-content/uploads/2015/04/&#34; target=&#34;_blank&#34;&gt;https://www.skatelescope.org/wp-content/uploads/2015/04/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;@boofla-cfnCluster-example-2015-05-202.pdf
+&lt;a href=&#34;https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf&#34; target=&#34;_blank&#34;&gt;https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>A Primer to Parallel Computing with Julia</title>
@@ -289,12 +639,33 @@ Plots.savefig(&amp;quot;Speed_gains.png&amp;quot;)
     </item>
     
     <item>
-      <title>DCAPM</title>
-      <link>https://julienpascal.github.io/project/dcapm/</link>
+      <title>Labor Income Shocks Along the Business Cycle</title>
+      <link>https://julienpascal.github.io/project/laborincomeshocks/</link>
       <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/project/dcapm/</guid>
-      <description>&lt;p&gt;This is a joint project with &lt;a href=&#34;https://tyler-abbot.github.io/&#34; target=&#34;_blank&#34;&gt;Tyler Abbot&lt;/a&gt;.&lt;/p&gt;
+      <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
+      <description>&lt;p&gt;I show that a dynamic search-and-matching model, in which firms and workers are heterogeneous, possesses the mechanisms to replicate some features the distribution of labor income shocks along the business cycle. I solve for the sticky wage process à la Postel-Vinay and Robin (2002) in the model and Lise and Robin (2017) using a variant of the Krusell-Smith algorithm. I estimate the model using the simulated method of moments on US data, including both employment and wage-related moments.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Labor Policy in a Dynamic Search-Matching Model with Heterogeneous Workers and Firms</title>
+      <link>https://julienpascal.github.io/project/minwage/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/minwage/</guid>
+      <description>&lt;p&gt;We analyse the consequences of the minimum wage on employment and sorting in a model of the labor
+market with search frictions, heterogeneous workers and firms, and business cycle fluctuations. This is a joint project with &lt;a href=&#34;https://sites.google.com/view/jeremylise&#34; target=&#34;_blank&#34;&gt;Jeremy Lise&lt;/a&gt; and &lt;a href=&#34;https://sites.google.com/site/jmarcrobin/home&#34; target=&#34;_blank&#34;&gt;Jean-Marc Robin&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Spatial Equilibrium and Commuting Costs</title>
+      <link>https://julienpascal.github.io/project/spatialeq/</link>
+      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/spatialeq/</guid>
+      <description>&lt;p&gt;I analyze a French reform that led to a drop in commuting costs in 2015 using a regression discontinuity design. I find that the reform led to job creations for municipalities benefiting from the reform. I build a spatial search-and-matching model to help analyze the reform.&lt;/p&gt;
 </description>
     </item>
     
