@@ -7,8 +7,361 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 24 Jul 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 25 Aug 2019 18:53:22 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Linear Time Iteration (Part I)</title>
+      <link>https://julienpascal.github.io/post/lineartimeiteration/</link>
+      <pubDate>Sun, 25 Aug 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/lineartimeiteration/</guid>
+      <description>
+
+&lt;p&gt;The details of solving rational expectations models are somewhat tricky. Yet, a paper by &lt;a href=&#34;https://sites.google.com/site/pontusrendahl/&#34; target=&#34;_blank&#34;&gt;Pontus Rendahl&lt;/a&gt; underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agents models and uses Reiter (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.&lt;/p&gt;
+
+&lt;h2 id=&#34;intuition&#34;&gt;Intuition&lt;/h2&gt;
+
+&lt;p&gt;Below, I quote some fundamental passages from the paper, discussing the intuition of the method:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The logic underlying the procedure is simple enough to be described in words. Envisage an agent having a certain amount of an asset, facing the choice between how much of this asset to &lt;strong&gt;consume and how much to save&lt;/strong&gt;. An optimal choice would &lt;strong&gt;trade off the marginal benefit of saving (future consumption) with its marginal cost (forgone current consumption)&lt;/strong&gt;. The resulting optimal decision is implied by a linear(ized) second-order difference equation&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;[&amp;hellip;] the future marginal benefit of saving depends on &lt;strong&gt;the optimal saving choice in the future&lt;/strong&gt;. Thus, an optimal choice today can only be determined under the condition that the optimal choice in &lt;strong&gt;the future is known&lt;/strong&gt;; thus the problem amounts to &lt;strong&gt;finding a fixed point&lt;/strong&gt;. To solve this problem, this paper proposes to &lt;strong&gt;guess for the optimal choice&lt;/strong&gt; of saving in the future as a &lt;strong&gt;linear function of the associated state&lt;/strong&gt; (which is given by the optimal choice in the present). Given such a guess, the optimal choice in the present is then trivially given by solving a linear equation. However, the current optimal choice provides us with another suggestion regarding future optimal behavior, and the guess is updated accordingly.&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To summarize (i) solving a rational expectations model is intrinsically a fixed-point problem (ii) the Linear Time Iteration approach assumes a particular form for the solution and iterates until convergence is reached. The discussion that follows will be mainly informal, but the paper makes sure that this procedure is well behaved.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-method&#34;&gt;The Method&lt;/h2&gt;
+
+&lt;p&gt;We are interested in solving a model of the form:&lt;/p&gt;
+
+&lt;p&gt;$$Ax_{t-1}+B x_{t}+CE_{t}[x_{t+1}]+u_{t}=0$$&lt;/p&gt;
+
+&lt;p&gt;Where $x_t$ is an n × 1 vector containing endogenous and exogenous variables, $u_t$ is an n × 1 vector of mean-zero disturbances, and $A$, $B$ and $C$ are conformable matrices.&lt;/p&gt;
+
+&lt;p&gt;Let us assume that the solution is:&lt;/p&gt;
+
+&lt;p&gt;$$ x_{t} = F x_{t-1} + Q u_{t} $$&lt;/p&gt;
+
+&lt;p&gt;where $F$ and $Q$ are unknown matrices.&lt;/p&gt;
+
+&lt;p&gt;Substituting the linear law of motion into the first equation (and using the fact that $u_{t+1}$ is a mean-zero random noise term) yields:&lt;/p&gt;
+
+&lt;p&gt;$$ A x_{t−1} + B x_{t} + CF x_{t} + u_{t} = 0. $$&lt;/p&gt;
+
+&lt;p&gt;This equation can be written as:&lt;/p&gt;
+
+&lt;p&gt;$$ x_{t} = -(B + CF)^{-1} A x_{t−1} + (-(B + CF)^{-1})u_t $$&lt;/p&gt;
+
+&lt;p&gt;Comparing the solution we assumed in the first place, and the last equation, we see that:&lt;/p&gt;
+
+&lt;p&gt;$$ Q = -(B + CF)^{-1} $$&lt;/p&gt;
+
+&lt;p&gt;The previous manipulations show that if one knows $F$, finding $Q$ is trivial (because $B$ and $C$ are known).
+In practical terms, we can focus on solving the deterministic part of the problem (ignoring the $u_t$), since
+we can then back out the stochastic solution using our equation for $Q$.&lt;/p&gt;
+
+&lt;p&gt;The deterministic problem is:&lt;/p&gt;
+
+&lt;p&gt;$$ A x_{t-1} + B x_{t} + C x_{t+1}  = 0 $$&lt;/p&gt;
+
+&lt;p&gt;And its associated solution is:&lt;/p&gt;
+
+&lt;p&gt;$$ x_{t} = F x_{t-1} $$&lt;/p&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s guess a value for $F$, denoted by $F_{n}$.&lt;/p&gt;
+
+&lt;p&gt;A simple substitution gives:&lt;/p&gt;
+
+&lt;p&gt;$$ A x_{t-1} + B x_{t} + F_{n} C x_{t}  = 0 $$&lt;/p&gt;
+
+&lt;p&gt;Which can be re-written as:&lt;/p&gt;
+
+&lt;p&gt;$$ x_{t}  = - (B + F_{n} C)^{-1}A x_{t-1}  $$&lt;/p&gt;
+
+&lt;p&gt;Comparing the solution we assumed in the first place and the last equation, the following &lt;strong&gt;updating rule&lt;/strong&gt; seems to make sense:&lt;/p&gt;
+
+&lt;p&gt;$$ F_{n+1} = - (B + F_{n} C)^{-1} A $$&lt;/p&gt;
+
+&lt;p&gt;One could apply the updating rule until the distance between $F_{n+1}$ and $F_{n}$ is small, but the paper uses
+another stopping rule. Let&amp;rsquo;s start with an observation and then give a definition:&lt;/p&gt;
+
+&lt;h4 id=&#34;fact&#34;&gt;Fact&lt;/h4&gt;
+
+&lt;p&gt;If $F$ solves&lt;/p&gt;
+
+&lt;p&gt;$$ A x_{t−1} + B x_{t} + CF x_{t} = 0 $$&lt;/p&gt;
+
+&lt;p&gt;then $F$ solves the quadratic matrix equation:&lt;/p&gt;
+
+&lt;p&gt;$$ A + B F + C F^2 = 0 $$&lt;/p&gt;
+
+&lt;h4 id=&#34;definition&#34;&gt;Definition&lt;/h4&gt;
+
+&lt;p&gt;A solution to the equation&lt;/p&gt;
+
+&lt;p&gt;$$ A + B F + C F^2 = 0 $$&lt;/p&gt;
+
+&lt;p&gt;is called a &lt;strong&gt;solvent&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;We now have all the elements to describe the Linear Time Iteration algorithm.&lt;/p&gt;
+
+&lt;h4 id=&#34;algorithm&#34;&gt;Algorithm&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Guess a value for $F_0$&lt;/li&gt;
+&lt;li&gt;Calculate $ F_{1} = - (B + F_{0} C)^{-1} A $&lt;/li&gt;
+&lt;li&gt;If $ || A + B F_1 + C F_1^2 || &amp;lt; tol $ stop. $F_1$ is a solvent&lt;/li&gt;
+&lt;li&gt;Else, increment the index for $F$ and start again&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If all the eigenvalues of the resulting solvent are less than $1$ in absolute value, then we found a stable solution
+to the quadratic matrix equation. However, it is not necessarily the unique stable solution. For discussion on uniqueness and stability, an interested reader may refer to proposition 2 of the paper.&lt;/p&gt;
+
+&lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s now see how the Linear Time Iteration performs on two simple examples described in the original paper.&lt;/p&gt;
+
+&lt;h3 id=&#34;example-1-a-uni-dimensional-example&#34;&gt;Example 1: a uni-dimensional example&lt;/h3&gt;
+
+&lt;p&gt;$$ 0.75 x_{t−1} − 2 x_{t} + x_{t+1} = 0 $$&lt;/p&gt;
+
+&lt;p&gt;In this example, using Linear Time Iteration is clearly an overkill since we can calculate the solution by hand.
+The two solvents are $1.5$ and $0.5$. As we will see, the method laid above converges to the smaller of the two values.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;versioninfo()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Julia Version 1.0.3
+Commit 099e826241 (2018-12-18 01:34 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-6.0.0 (ORCJIT, skylake)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Parameters
+a = 0.75
+b = -2.0
+c = 1.0
+# Tolerance
+tol = 1e-6
+# Maximum iterations
+max_iter = 1000
+# Initial guess for F
+F_n = 0.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;0.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;for i=1:max_iter
+    # Updating rule:
+    F_n_new =  -a*(1/(b + F_n*c))
+    # Stopping rule:
+    if abs(a + b *F_n_new + c*F_n_new^2) &amp;lt; tol
+        println(&amp;quot;convergence after $i iterations&amp;quot;)
+        println(&amp;quot;final value for F is $F_n&amp;quot;)
+        break
+    end
+    F_n = copy(F_n_new)
+    if i == max_iter
+        println(&amp;quot;convergence NOT reached $i iterations&amp;quot;)
+    end
+end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;convergence after 12 iterations
+final value for F is 0.4999981183200362
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;dealing-with-singular-solvents&#34;&gt;Dealing with singular solvents&lt;/h3&gt;
+
+&lt;p&gt;Even in some reasonable cases, the simple Linear Time Iteration algorithm described above might fail. For instance, because the model contains accounting identities, in which case the solvent may be &amp;ldquo;singular&amp;rdquo;.&lt;/p&gt;
+
+&lt;h4 id=&#34;definition-1&#34;&gt;Definition&lt;/h4&gt;
+
+&lt;p&gt;A solvent is &lt;strong&gt;singular&lt;/strong&gt; if it contains at least one eigenvalue equal to 1.&lt;/p&gt;
+
+&lt;p&gt;Fortunately, a simple trick extends the Linear Time Iteration method to singular solvents.
+One solves the modified quadratic matrix equation&lt;/p&gt;
+
+&lt;p&gt;$$ \hat{A} S^2 + \hat{B} S + \hat{C} = 0 $$&lt;/p&gt;
+
+&lt;p&gt;where&lt;/p&gt;
+
+&lt;p&gt;$$ \hat{A} = C M^2 + B M + A $$
+$$ \hat{B} = B + 2 C M$$
+$$ \hat{C} = C$$
+$$ M = \mu I $$&lt;/p&gt;
+
+&lt;p&gt;with $\mu$ a small positive real number and $I$ a conformable identity matrix. If the Linear Time Iteration
+algorithm applied to the modified system converges to $S$, the $F = S + M$ is solution to the original system.
+Below I define a function &lt;code&gt;t_iteration&lt;/code&gt; the solves the modified system&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using LinearAlgebra
+
+# Source: adapted from the matlab version made available by Pontus Rendahl on his website
+# https://sites.google.com/site/pontusrendahl/Research
+# This function solves the model Ax_{t-1}+Bx_{t}+CE_t[x_{t+1}]+u_t=0, and
+# finds the solution x_t=Fx_{t-1}+Qu_t. The parameter mu should be set
+# equal to a small number, e.g. mu=1e-6;
+
+function t_iteration(A::Array{Float64,2},
+                    B::Array{Float64,2},
+                    C::Array{Float64,2},
+                    mu::Float64;
+                    tol::Float64=1e-12,
+                    max_iter::Int64 = 1000,
+                    F0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
+                    S0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
+                    verbose::Bool=false)
+
+# success flag:
+flag = 0
+
+# Initialization
+dim = size(A,2)
+if isempty(F0) == true
+    F = zeros(dim,dim)
+else
+    F = F0
+end
+if isempty(S0) == true
+    S = zeros(dim,dim)
+else
+    S = S0
+end
+
+eye = zeros(dim,dim)
+for i = 1:dim
+    eye[i,i] = 1.0
+end
+
+I = eye*mu
+Ch = C
+Bh = (B+C*2*I)
+Ah = (C*I^2+B*I+A)
+
+#Check the reciprocal condition number
+#if rcond(Ah)&amp;lt;1e-16
+#    disp(&#39;Matrix Ah is singular&#39;)
+#end
+
+metric = 1;
+nb_iter = 0
+
+while metric&amp;gt;tol
+    nb_iter+=1
+    #\(x, y)
+    #Left division operator:
+    #multiplication of y by the inverse of x on the left.
+    F = -(Bh+Ch*F)\Ah
+    S = -(Bh+Ah*S)\Ch;
+
+    metric1 = maximum(abs.(Ah+Bh*F+Ch*F*F))
+    metric2 = maximum(abs.(Ah*S*S+Bh*S+Ch))
+    metric = max(metric1, metric2)
+
+    if nb_iter == max_iter
+        if verbose == true
+            print(&amp;quot;Maximum number of iterations reached. Convergence not reached.&amp;quot;)
+            print(&amp;quot;metric = $metric&amp;quot;)
+        end
+        break
+    end
+end
+
+
+eig_F = maximum(abs.(eigvals(F)));
+eig_S = maximum(abs.(eigvals(S)));
+
+if eig_F&amp;gt;1 || eig_S&amp;gt;1 || mu&amp;gt;1-eig_S
+    if verbose == true
+        println(&amp;quot;Conditions of Proposition 3 violated&amp;quot;)
+    end
+else
+    flag = 1
+end
+
+F = F+I;
+Q = -inv(B+C*F);
+
+return F, Q, flag
+
+end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;t_iteration (generic function with 1 method)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;example-2-a-bi-dimensional-problem&#34;&gt;Example 2: a bi-dimensional problem&lt;/h3&gt;
+
+&lt;p&gt;The problem is&lt;/p&gt;
+
+&lt;p&gt;$$ 0.75 y_t - 0.5 y_{t+1} = 0 $$
+$$ -2 x_t + x_{t-1} - y_{t} = 0 $$&lt;/p&gt;
+
+&lt;p&gt;This problem has three solvents. Two of them lead to unstable solution. The solvent associated to a stable solution is given by:&lt;/p&gt;
+
+&lt;p&gt;$\begin{bmatrix} 0 &amp;amp; 0 \\ 0 &amp;amp; 0.5\end{bmatrix}$&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Defining the problem
+A = [[0. 0.];
+     [0. 1.]]
+
+B = [[0.75 0.];
+     [-1. -2.]]
+
+C = [[-0.5 0.];
+     [0. 0.]]
+
+# Finding a solvent
+F_n, Q_n, flag = t_iteration(A, B, C, 0.01, max_iter=1000)
+
+println(&amp;quot;Solvent is :&amp;quot;, F_n)
+
+# Simulating the model forward
+using Plots
+pyplot()
+
+nb_periods = 20
+x = ones(2, nb_periods)
+#initialization
+x[:,1] = [1.0 1.0] #starting value
+
+for t=2:nb_periods
+    # Update rule
+    x[:,t] = F_n * x[:,t-1]
+end
+
+plot(x[1,:], label = &amp;quot;xt&amp;quot;)
+plot!(x[2,:], label = &amp;quot;yt&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Solvent is :[0.0 0.0; 0.0 0.5]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Linear%20Time%20Iteration_50_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Linear Time Iteration is an intuitive an easily applicable method to solve (linear) rational expectations models. This post aimed at describing the intuition for it and give simple examples. In a subsequent post, I will use this technique to solve the stochastic growth model.&lt;/p&gt;
+
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Rendahl, Pontus. Linear time iteration. No. 330. IHS Economics Series, 2017.
+(&lt;a href=&#34;https://www.ihs.ac.at/publications/eco/es-330.pdf&#34; target=&#34;_blank&#34;&gt;https://www.ihs.ac.at/publications/eco/es-330.pdf&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Reiter, Michael. &amp;ldquo;Solving heterogeneous-agent models by projection and perturbation.&amp;rdquo; Journal of Economic Dynamics and Control 33.3 (2009): 649-665.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Build your own cluster in 15 minutes</title>

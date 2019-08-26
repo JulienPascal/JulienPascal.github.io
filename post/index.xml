@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 24 Jul 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 25 Aug 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Linear Time Iteration (Part I)</title>
+      <link>https://julienpascal.github.io/post/lineartimeiteration/</link>
+      <pubDate>Sun, 25 Aug 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/lineartimeiteration/</guid>
+      <description>The details of solving rational expectations models are somewhat tricky. Yet, a paper by Pontus Rendahl underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agents models and uses Reiter (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.</description>
+    </item>
     
     <item>
       <title>Build your own cluster in 15 minutes</title>
