@@ -18,7 +18,7 @@
       <pubDate>Sun, 25 Aug 2019 18:53:22 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/lineartimeiteration/</guid>
-      <description>The details of solving rational expectations models are somewhat tricky. Yet, a paper by Pontus Rendahl underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agents models and uses Reiter (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.</description>
+      <description>The details of solving rational expectation models are somewhat tricky. Yet, a recent paper by Pontus Rendahl underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agent models and uses Reiter&amp;rsquo;s (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.</description>
     </item>
     
     <item>

@@ -18,7 +18,7 @@
       <guid>https://julienpascal.github.io/post/lineartimeiteration/</guid>
       <description>
 
-&lt;p&gt;The details of solving rational expectations models are somewhat tricky. Yet, a paper by &lt;a href=&#34;https://sites.google.com/site/pontusrendahl/&#34; target=&#34;_blank&#34;&gt;Pontus Rendahl&lt;/a&gt; underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agents models and uses Reiter (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.&lt;/p&gt;
+&lt;p&gt;The details of solving rational expectation models are somewhat tricky. Yet, a recent paper by &lt;a href=&#34;https://sites.google.com/site/pontusrendahl/&#34; target=&#34;_blank&#34;&gt;Pontus Rendahl&lt;/a&gt; underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agent models and uses Reiter&amp;rsquo;s (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.&lt;/p&gt;
 
 &lt;h2 id=&#34;intuition&#34;&gt;Intuition&lt;/h2&gt;
 
@@ -30,7 +30,7 @@
 &lt;p&gt;&amp;ldquo;[&amp;hellip;] the future marginal benefit of saving depends on &lt;strong&gt;the optimal saving choice in the future&lt;/strong&gt;. Thus, an optimal choice today can only be determined under the condition that the optimal choice in &lt;strong&gt;the future is known&lt;/strong&gt;; thus the problem amounts to &lt;strong&gt;finding a fixed point&lt;/strong&gt;. To solve this problem, this paper proposes to &lt;strong&gt;guess for the optimal choice&lt;/strong&gt; of saving in the future as a &lt;strong&gt;linear function of the associated state&lt;/strong&gt; (which is given by the optimal choice in the present). Given such a guess, the optimal choice in the present is then trivially given by solving a linear equation. However, the current optimal choice provides us with another suggestion regarding future optimal behavior, and the guess is updated accordingly.&amp;rdquo;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;To summarize (i) solving a rational expectations model is intrinsically a fixed-point problem (ii) the Linear Time Iteration approach assumes a particular form for the solution and iterates until convergence is reached. The discussion that follows will be mainly informal, but the paper makes sure that this procedure is well behaved.&lt;/p&gt;
+&lt;p&gt;To summarize (i) solving a rational expectation model is intrinsically a fixed-point problem (ii) the Linear Time Iteration approach assumes a particular form for the solution and iterates until convergence is reached. The discussion that follows will be mainly informal, but the paper makes sure that this procedure is well behaved.&lt;/p&gt;
 
 &lt;h2 id=&#34;the-method&#34;&gt;The Method&lt;/h2&gt;
 
@@ -307,7 +307,7 @@ end
 &lt;p&gt;$$ 0.75 y_t - 0.5 y_{t+1} = 0 $$
 $$ -2 x_t + x_{t-1} - y_{t} = 0 $$&lt;/p&gt;
 
-&lt;p&gt;This problem has three solvents. Two of them lead to unstable solution. The solvent associated to a stable solution is given by:&lt;/p&gt;
+&lt;p&gt;This problem has three solvents. Two of them lead to an unstable solution. The solvent associated to a stable solution is given by:&lt;/p&gt;
 
 &lt;p&gt;$\begin{bmatrix} 0 &amp;amp; 0 \\ 0 &amp;amp; 0.5\end{bmatrix}$&lt;/p&gt;
 
@@ -324,7 +324,7 @@ C = [[-0.5 0.];
 # Finding a solvent
 F_n, Q_n, flag = t_iteration(A, B, C, 0.01, max_iter=1000)
 
-println(&amp;quot;Solvent is :&amp;quot;, F_n)
+println(&amp;quot;F is :&amp;quot;, F_n)
 
 # Simulating the model forward
 using Plots
@@ -344,14 +344,18 @@ plot(x[1,:], label = &amp;quot;xt&amp;quot;)
 plot!(x[2,:], label = &amp;quot;yt&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;Solvent is :[0.0 0.0; 0.0 0.5]
+&lt;pre&gt;&lt;code&gt;F is :[0.0 0.0; 0.0 0.5]
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We successfully recovered the stable solution.
+Starting an initial condition, we can simulate the behavior of the system
+using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;Linear%20Time%20Iteration_50_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;Linear Time Iteration is an intuitive an easily applicable method to solve (linear) rational expectations models. This post aimed at describing the intuition for it and give simple examples. In a subsequent post, I will use this technique to solve the stochastic growth model.&lt;/p&gt;
+&lt;p&gt;Linear Time Iteration is an intuitive and easily applicable method to solve (linear) rational expectation models. This post aimed at describing the intuition for it and give simple examples. In a subsequent post, I will use this technique to solve the stochastic growth model.&lt;/p&gt;
 
 &lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
 
