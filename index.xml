@@ -191,7 +191,7 @@ Jac = ForwardDiff.jacobian(f, Xss);
 
 &lt;h3 id=&#34;collecting-matrices-a-b-and-c&#34;&gt;Collecting matrices A, B and C&lt;/h3&gt;
 
-&lt;p&gt;Having successfully obtained $\frac{Df}{DY_t}|Y_{SS}$, we know need to collect the right elements to form the matrices A, B and C in order to apply the LTI algorithm:&lt;/p&gt;
+&lt;p&gt;Having successfully obtained $\frac{Df}{DY_t}|Y_{SS}$, we now need to collect the right elements to form the matrices A, B and C in order to apply the LTI algorithm. It is mainly a matter of bookkeeping:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# A is derivative of the function &amp;quot;system&amp;quot; f(Vars) w.r.t to Xm = [ym Im cm km lm zm]
 # with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]
