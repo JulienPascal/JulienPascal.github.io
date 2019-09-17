@@ -505,11 +505,11 @@ It is an active area of research in Mathematics (see <a href="https://royalsocie
 <h3 id="bkm-in-a-nutshell">BKM in a nutshell</h3>
 
 <p>It is common to use Bellman&rsquo;s principle of optimality to characterize solutions of a multi-stage decision processes.
-The principle of optimality leads to a solution in a <strong>recursive form</strong> $d_{t} = d(S_{t})$, where $S_t$ is a vector of state variables and d(.) a policy function describing the optimal action of a decision-maker when faced with any given state.</p>
+The principle of optimality leads to a solution in a <strong>recursive form</strong> $d_{t} = d(S_{t})$, where $S_t$ is a vector of state variables and $d(.)$ a policy function describing the optimal action of a decision-maker when faced with any given state.</p>
 
-<p>An alternative representation of the problem is to consider a solution in the <strong>sequence form</strong>. At each step in time, a decision-maker observes a new realization of a random process $z_t$ and taking into account the full history of past shocks, the agent make a new choice to maximize her expected discounted sum of returns: $d_t = d(z_t, z_{t-1}, z_{t-2}, &hellip;)$.</p>
+<p>An alternative representation of the problem is to consider a solution in the <strong>sequence form</strong>. At each step in time, a decision-maker observes a new realization of a random process $z_t$ and taking into account the full history of past shocks, the agent makes a new choice to maximize her expected discounted sum of returns: $d_t = d(z_t, z_{t-1}, z_{t-2}, &hellip;)$.</p>
 
-<p>While most of the time, the recursive form is a much more parsimonious approach, it fails when the $S_t$ is infinite-dimensional. In model with heterogeneous agents (HA) and aggregate uncertainty, this is generally the case because the distribution of agents over certain variables will end up being in $S_t$. While this a problem with is the recursive approach (how can we discretize $S_t$ to put it on a computer?), the sequence form is immune to this problem. The BKM algorithm uses this insight, adding the <strong>assumption</strong> of <strong>linearity</strong> of d(.) with respect to the <strong>aggregate state</strong> $z_t$:</p>
+<p>While most of the time the recursive form is a much more parsimonious approach, it fails when $S_t$ is infinite-dimensional. In models with heterogeneous agents (HA) and aggregate uncertainty, this is generally the case because the distribution of agents over certain variables will end up being in $S_t$. While this a problem with is the recursive approach (how can we discretize $S_t$ to put it on a computer?), the sequence form is immune to this problem. The BKM algorithm uses this insight, adding the <strong>assumption</strong> of <strong>linearity</strong> of $d(.)$ with respect to the <strong>aggregate state</strong> $z_t$:</p>
 
 <p>$$ d_t = z_t d(1, 0, 0, &hellip;) + z_{t-1}d(0, 1, 0, &hellip;) + z_{t-2}d(0, 0, 1, &hellip;) + &hellip; $$
 $$ d_t = \sum_{k=0}^{+\infty} z_{t-k} d_{k} $$</p>
@@ -518,7 +518,7 @@ $$ d_t = \sum_{k=0}^{+\infty} z_{t-k} d_{k} $$</p>
 $$ d_{2} = d(0,1,0,&hellip;)$$
 $$ d_{3} = d(0,0,1,&hellip;)$$</p>
 
-<p>The series of $d_{k}$ describes the trajectory of the economy after an &ldquo;MIT&rdquo; shock (when the economy is hit by an unexpected single-period aggregate shock). If the linearity assumption holds, the evolution of equilibrium variables are simply a moving average of past shocks. We made progress because solving for the trajectory after an MIT shock is perfectly doable in a RA model. As long as one is able to calculate the steady-state with no aggregate uncertainty and can solve the <strong>deterministic perfect foresight path</strong>, BKM can be used.</p>
+<p>The series of $d_{k}$ describes the trajectory of the economy after an &ldquo;MIT&rdquo; shock (when the economy is hit by an unexpected single-period aggregate shock). If the linearity assumption holds, the evolution of equilibrium variables are simply a moving average of past shocks. We made progress because solving for the trajectory after an MIT shock is perfectly feasible in a RA model. As long as one can calculate the steady-state with no aggregate uncertainty and solve the <strong>deterministic perfect foresight path</strong>, BKM can be used.</p>
 
 <h3 id="numerical-implementation">Numerical implementation</h3>
 
@@ -549,7 +549,7 @@ end
 
 <p>Let us assume that the economy is at the non-stochastic steady-state and a shock occurs:</p>
 
-<pre><code class="language-julia"># We assume that after 100 periods, the economy is back at the steady-state
+<pre><code class="language-julia"># We assume that after 100 periods, the economy is back to the steady-state
 max_iter_mit = 100
 x_mit=zeros(max_iter_mit)
 # Initial shock
