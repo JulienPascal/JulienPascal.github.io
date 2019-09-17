@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 26 Aug 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 16 Sep 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The BKM Algorithm</title>
+      <link>https://julienpascal.github.io/post/bkm/</link>
+      <pubDate>Mon, 16 Sep 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/bkm/</guid>
+      <description>Finding solutions to economic models with heterogeneity and aggregate uncertainty is a notoriously difficult task. It is an active area of research in Mathematics (see mean field games with aggregate uncertainty). Because such models naturally arise when considering economic situations, Economists have developed a battery of techniques to (numerically) solve them. In this post, I would like to describe a recent algorithm by Boppart, Krusell and Mitman (BKM) that is both fast and accurate.</description>
+    </item>
     
     <item>
       <title>Linear Time Iteration (Part II)</title>

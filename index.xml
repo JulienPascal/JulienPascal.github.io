@@ -7,8 +7,264 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 26 Aug 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 16 Sep 2019 18:53:22 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The BKM Algorithm</title>
+      <link>https://julienpascal.github.io/post/bkm/</link>
+      <pubDate>Mon, 16 Sep 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/bkm/</guid>
+      <description>
+
+&lt;p&gt;Finding solutions to economic models with heterogeneity and aggregate uncertainty is a notoriously difficult task.
+It is an active area of research in Mathematics (see &lt;a href=&#34;https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2013.0397&#34; target=&#34;_blank&#34;&gt;mean field games with aggregate uncertainty&lt;/a&gt;). Because such models naturally arise when considering economic situations, Economists have developed a battery of techniques to (numerically) solve them. In this post, I would like to describe a recent algorithm by &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v89y2018icp68-92.html&#34; target=&#34;_blank&#34;&gt;Boppart, Krusell and Mitman (BKM)&lt;/a&gt; that is both fast and accurate. I will first describe the problem that Economists face when working with heterogeneous model with aggregate uncertainty, heuristically presents the BKM algorithm (based on the presentation of &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v89y2018icp93-99.html&#34; target=&#34;_blank&#34;&gt;Reiter (2018)&lt;/a&gt;) and show an application in Julia.&lt;/p&gt;
+
+&lt;h3 id=&#34;bkm-in-a-nutshell&#34;&gt;BKM in a nutshell&lt;/h3&gt;
+
+&lt;p&gt;It is common to use Bellman&amp;rsquo;s principle of optimality to characterize solutions of a multi-stage decision processes.
+The principle of optimality leads to a solution in a &lt;strong&gt;recursive form&lt;/strong&gt; $d_{t} = d(S_{t})$, where $S_t$ is a vector of state variables and d(.) a policy function describing the optimal action of a decision-maker when faced with any given state.&lt;/p&gt;
+
+&lt;p&gt;An alternative representation of the problem is to consider a solution in the &lt;strong&gt;sequence form&lt;/strong&gt;. At each step in time, a decision-maker observes a new realization of a random process $z_t$ and taking into account the full history of past shocks, the agent make a new choice to maximize her expected discounted sum of returns: $d_t = d(z_t, z_{t-1}, z_{t-2}, &amp;hellip;)$.&lt;/p&gt;
+
+&lt;p&gt;While most of the time, the recursive form is a much more parsimonious approach, it fails when the $S_t$ is infinite-dimensional. In model with heterogeneous agents (HA) and aggregate uncertainty, this is generally the case because the distribution of agents over certain variables will end up being in $S_t$. While this a problem with is the recursive approach (how can we discretize $S_t$ to put it on a computer?), the sequence form is immune to this problem. The BKM algorithm uses this insight, adding the &lt;strong&gt;assumption&lt;/strong&gt; of &lt;strong&gt;linearity&lt;/strong&gt; of d(.) with respect to the &lt;strong&gt;aggregate state&lt;/strong&gt; $z_t$:&lt;/p&gt;
+
+&lt;p&gt;$$ d_t = z_t d(1, 0, 0, &amp;hellip;) + z_{t-1}d(0, 1, 0, &amp;hellip;) + z_{t-2}d(0, 0, 1, &amp;hellip;) + &amp;hellip; $$
+$$ d_t = \sum_{k=0}^{+\infty} z_{t-k} d_{k} $$&lt;/p&gt;
+
+&lt;p&gt;where $$ d_{1} = d(1,0,0,&amp;hellip;)$$
+$$ d_{2} = d(0,1,0,&amp;hellip;)$$
+$$ d_{3} = d(0,0,1,&amp;hellip;)$$&lt;/p&gt;
+
+&lt;p&gt;The series of $d_{k}$ describes the trajectory of the economy after an &amp;ldquo;MIT&amp;rdquo; shock (when the economy is hit by an unexpected single-period aggregate shock). If the linearity assumption holds, the evolution of equilibrium variables are simply a moving average of past shocks. We made progress because solving for the trajectory after an MIT shock is perfectly doable in a RA model. As long as one is able to calculate the steady-state with no aggregate uncertainty and can solve the &lt;strong&gt;deterministic perfect foresight path&lt;/strong&gt;, BKM can be used.&lt;/p&gt;
+
+&lt;h3 id=&#34;numerical-implementation&#34;&gt;Numerical implementation&lt;/h3&gt;
+
+&lt;p&gt;Here is the implementation of the method using a toy example. I intentionally circumvent the problem of finding the perfect foresight transition path, which is (potentially) the complicated part of BKM. This is the example given in Reiter (2018): the exact model is the non-linear model $x_{t} = a x_{t-1} + b x_{t-1}^2 + z_{t}$&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Distributions
+using Plots
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Parameters
+max_iter=100 #number of iterations for the simulation
+a = 0.5
+b = 0.1
+sigma_shock=1.0
+mu_shock=0.
+d = Normal(mu_shock, sigma_shock)
+
+# transition function
+function iter_x(x_min1::Float64, a::Float64, b::Float64)
+    a*x_min1 + b*x_min1^2
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;iter_x (generic function with 1 method)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;impulse-response-function&#34;&gt;Impulse response function&lt;/h4&gt;
+
+&lt;p&gt;Let us assume that the economy is at the non-stochastic steady-state and a shock occurs:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# We assume that after 100 periods, the economy is back at the steady-state
+max_iter_mit = 100
+x_mit=zeros(max_iter_mit)
+# Initial shock
+z_t[1] = sigma_shock #a 1 std. deviation
+x_mit[1] = 0 #steady-state
+
+for i=2:max_iter_mit
+    x_mit[i] = iter_x(x_mit[i-1], a, b) + z_t[i-1]
+end
+
+# Scaled-version of the impulse response:
+x_mit_scaled = x_mit./z_t[1];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I define two functions to calculate the moving average:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;function calculate_Xt(x_scaled::Array{Float64,1}, shocks::Array{Float64,1}, t::Int64, kk::Int64)
+
+    output = 0.
+
+    for k=1:kk
+        output+=x_scaled[k]*shocks[t-k+1]
+    end
+
+    return output
+end
+
+function BPM_path!(XT::Array{Float64,1}, max_iter::Int64, x_scaled::Array{Float64,1}, shocks::Array{Float64,1})
+
+    for t=2:max_iter
+        XT[t] = calculate_Xt(x_scaled, shocks, t, t)
+    end
+
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;BPM_path! (generic function with 1 method)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Initialization
+XT = zeros(max_iter);
+# Series of shocks
+shocks_t = rand(d, max_iter).*0.5;
+# Solving using BKM:
+@time BPM_path!(XT, max_iter, x_mit_scaled, shocks_t)
+# True value:
+x_true = zeros(max_iter)
+for i=2:max_iter
+    x_true[i] = iter_x(x_true[i-1], a, b) + shocks_t[i-1]
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;  0.025906 seconds (29.30 k allocations: 1.489 MiB, 26.80% gc time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;plot(XT[2:end], label=&amp;quot;x_t BKM&amp;quot;)
+plot!(x_true[2:end], label=&amp;quot;x_t true&amp;quot;)
+title!(&amp;quot;b=$(b)&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_16_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The previous plot shows how the BKM algorithm approximates the true model and it does quite a good job.
+Of course, the more the model is linear with respect to $z_t$ (captured by the value of $b_2$), the better the approximation. To illustrate this idea, I use BKM on a perfectly linear model ($b=0$) and on a model with stronger non-linearities ($b=0.2$). As expected, the approximation is perfect when the model is linear and the approximation deteriorates when strong non-linearities are present.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;plot(p1,p2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_18_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;The BKM algorithm is a new addition to the toolbox of methods to solve HA models. The sequence representation of the problem seems to be a fruitful area of research, as it has also been used in Le Grand and Ragot (&lt;a href=&#34;http://xavier-ragot.fr/pdf/progress/LeGrand_Ragot_final.pdf&#34; target=&#34;_blank&#34;&gt;2017&lt;/a&gt;) and (&lt;a href=&#34;http://xavier-ragot.fr/pdf/progress/Optimal_policies.pdf&#34; target=&#34;_blank&#34;&gt;2019&lt;/a&gt;) to develop fast and reliable method to solve HA models. The recent contribution of &lt;a href=&#34;https://github.com/shade-econ/sequence-jacobian/#sequence-space-jacobian&#34; target=&#34;_blank&#34;&gt;Auclert at al (2019)&lt;/a&gt; also uses a similar approach.&lt;/p&gt;
+
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Achdou, Yves, et al. &amp;ldquo;Partial differential equation models in macroeconomics.&amp;rdquo; Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences 372.2028 (2014): 20130397.&lt;/li&gt;
+&lt;li&gt;Auclert, Adrien, et al. Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent Models. No. w26123. National Bureau of Economic Research, 2019.&lt;/li&gt;
+&lt;li&gt;Boppart, Timo, Per Krusell, and Kurt Mitman. &amp;ldquo;Exploiting MIT shocks in heterogeneous-agent economies: the impulse response as a numerical derivative.&amp;rdquo; Journal of Economic Dynamics and Control 89 (2018): 68-92.&lt;/li&gt;
+&lt;li&gt;Le Grand, François, and Xavier Ragot. &amp;ldquo;Optimal fiscal policy with heterogeneous agents and aggregate shocks.&amp;rdquo; Document de travail (2017).&lt;/li&gt;
+&lt;li&gt;Le Grand, François, and Ragot, Xavier. &amp;ldquo;Managing Inequality over the Business Cycles: Optimal Policies with Heterogeneous Agents and Aggregate Shocks&amp;rdquo;. No. 1090. Society for Economic Dynamics, 2019.&lt;/li&gt;
+&lt;li&gt;Reiter, Michael. &amp;ldquo;Comments on&amp;rdquo; Exploiting MIT Shocks in Heterogeneous-Agent Economies: The Impulse Response as a Numerical Derivative&amp;rdquo; by T. Boppart, P. Krusell and K. Mitman.&amp;rdquo; Journal of Economic Dynamics and Control 89 (2018): 93-99.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;versioninfo()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Julia Version 1.0.3
+Commit 099e826241 (2018-12-18 01:34 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-6.0.0 (ORCJIT, skylake)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;### To create plot 2
+
+#### Linear Model
+
+# Parameters
+max_iter=100 #number of iterations for the simulation
+a = 0.5
+b = 0.0
+sigma_shock=1.0
+mu_shock=0.
+d = Normal(mu_shock, sigma_shock)
+
+# IRF
+x_mit=zeros(max_iter_mit)
+# Initial shock
+z_t[1] = sigma_shock #a 1 std. deviation
+x_mit[1] = 0 #steady-state
+
+for i=2:max_iter_mit
+    x_mit[i] = iter_x(x_mit[i-1], a, b) + z_t[i-1]
+end
+
+# Scaled-version of the impulse response:
+x_mit_scaled = x_mit./z_t[1];
+
+
+# Initialization
+XT = zeros(max_iter);
+# Series of shocks
+shocks_t = rand(d, max_iter).*0.5;
+# Solving using BKM:
+@time BPM_path!(XT, max_iter, x_mit_scaled, shocks_t)
+# True value:
+x_true = zeros(max_iter)
+for i=2:max_iter
+    x_true[i] = iter_x(x_true[i-1], a, b) + shocks_t[i-1]
+end
+
+p1 = plot(XT[2:end], label=&amp;quot;x_t BKM&amp;quot;)
+plot!(x_true[2:end], label=&amp;quot;x_t true&amp;quot;)
+title!(&amp;quot;b=$(b)&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;0.000009 seconds (4 allocations: 160 bytes)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_24_1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;### Plot 2
+
+#### Linear Model
+
+# Parameters
+max_iter=100 #number of iterations for the simulation
+a = 0.5
+b = 0.2
+sigma_shock=1.0
+mu_shock=0.
+d = Normal(mu_shock, sigma_shock)
+
+# IRF
+x_mit=zeros(max_iter_mit)
+# Initial shock
+z_t[1] = sigma_shock #a 1 std. deviation
+x_mit[1] = 0 #steady-state
+
+for i=2:max_iter_mit
+    x_mit[i] = iter_x(x_mit[i-1], a, b) + z_t[i-1]
+end
+
+# Scaled-version of the impulse response:
+x_mit_scaled = x_mit./z_t[1];
+
+
+# Initialization
+XT = zeros(max_iter);
+# Series of shocks
+shocks_t = rand(d, max_iter).*0.5;
+# Solving using BKM:
+@time BPM_path!(XT, max_iter, x_mit_scaled, shocks_t)
+# True value:
+x_true = zeros(max_iter)
+for i=2:max_iter
+    x_true[i] = iter_x(x_true[i-1], a, b) + shocks_t[i-1]
+end
+
+p2 = plot(XT[2:end], label=&amp;quot;x_t BKM&amp;quot;)
+plot!(x_true[2:end], label=&amp;quot;x_t true&amp;quot;)
+title!(&amp;quot;b=$(b)&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;  0.000007 seconds (4 allocations: 160 bytes)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_25_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Linear Time Iteration (Part II)</title>
@@ -136,7 +392,7 @@ print(&amp;quot;Steady-state value [css, kss, lss, yss, Iss, zss] = &amp;quot;, 
 &lt;h2 id=&#34;solving-the-stochastic-model&#34;&gt;Solving the stochastic model&lt;/h2&gt;
 
 &lt;p&gt;To find a solution to the stochastic model,
-let&amp;rsquo;s differentiate the system around the non-stochastic steady-state calculated above. Here, we will limit ourself to a first-order approximation since the goal is to obtain is a linear difference equation for the form $ A x_{t-1} + B x_{t} + C E_{t} [x_{t+1}] + u_{t} = 0 $, for which LTI is applicable. What is the rationale for the linear approximation? Fist of all, notice that the model can be put in the form of:&lt;/p&gt;
+let&amp;rsquo;s differentiate the system around the non-stochastic steady-state calculated above. Here, we will limit ourself to a first-order approximation since the goal is to obtain is a linear difference equation of the form $ A x_{t-1} + B x_{t} + C E_{t} [x_{t+1}] + u_{t} = 0 $, for which LTI is applicable. What is the rationale for the linear approximation? Fist of all, notice that the model can be put in the form of:&lt;/p&gt;
 
 &lt;p&gt;$$E_t(f(Y_t, \sigma)) = 0 $$&lt;/p&gt;
 
