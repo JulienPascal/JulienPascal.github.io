@@ -7,28 +7,10 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Thu, 14 Mar 2019 18:11:18 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 14 Mar 2019 18:11:07 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/project/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
-      <link>https://julienpascal.github.io/project/taxation_labor/</link>
-      <pubDate>Thu, 14 Mar 2019 18:11:18 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
-      <description>We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers.</description>
-    </item>
-    
-    <item>
-      <title>Labor Income Shocks Along the Business Cycle</title>
-      <link>https://julienpascal.github.io/project/laborincomeshocks/</link>
-      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
-      <description>I show that a dynamic search-and-matching model, in which firms and workers are heterogeneous, possesses the mechanisms to replicate some features the distribution of labor income shocks along the business cycle. I solve for the sticky wage process à la Postel-Vinay and Robin (2002) in the model and Lise and Robin (2017) using a variant of the Krusell-Smith algorithm. I estimate the model using the simulated method of moments on US data, including both employment and wage-related moments.</description>
-    </item>
     
     <item>
       <title>Labor Policy in a Dynamic Search-Matching Model with Heterogeneous Workers and Firms</title>
@@ -40,12 +22,30 @@
     </item>
     
     <item>
+      <title>Labor Tax in a Dynamic Search-and-Matching Model</title>
+      <link>https://julienpascal.github.io/project/taxation_labor/</link>
+      <pubDate>Wed, 13 Mar 2019 18:11:18 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
+      <description>We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers.</description>
+    </item>
+    
+    <item>
       <title>Spatial Equilibrium and Commuting Costs</title>
       <link>https://julienpascal.github.io/project/spatialeq/</link>
-      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
+      <pubDate>Tue, 12 Mar 2019 18:11:07 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/spatialeq/</guid>
       <description>I exploit a spatial discontinuity introduced by a French reform in September 2015 to measure the links between transportation costs, employment and location decisions. I find that the reform led to a 2% decrease in the number of unemployed workers registered in the unemployment agency for the municipalities benefiting from the reform. The employment effect is concentrated on long-term unemployed workers. I build a simple spatial search-and-matching to underline the mechanisms at play.</description>
+    </item>
+    
+    <item>
+      <title>Labor Income Shocks Along the Business Cycle</title>
+      <link>https://julienpascal.github.io/project/laborincomeshocks/</link>
+      <pubDate>Mon, 11 Mar 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
+      <description>I show that a dynamic search-and-matching model, in which firms and workers are heterogeneous, possesses the mechanisms to replicate some features the distribution of labor income shocks along the business cycle. I solve for the sticky wage process à la Postel-Vinay and Robin (2002) in the model and Lise and Robin (2017) using a variant of the Krusell-Smith algorithm. I estimate the model using the simulated method of moments on US data, including both employment and wage-related moments.</description>
     </item>
     
   </channel>
