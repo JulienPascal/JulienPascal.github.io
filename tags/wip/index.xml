@@ -45,7 +45,7 @@
       <pubDate>Mon, 11 Mar 2019 18:11:07 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
-      <description>I show that a dynamic search-and-matching model, in which firms and workers are heterogeneous, possesses the mechanisms to replicate some features the distribution of labor income shocks along the business cycle. I solve for the sticky wage process à la Postel-Vinay and Robin (2002) in the model and Lise and Robin (2017) using a variant of the Krusell-Smith algorithm. I estimate the model using the simulated method of moments on US data, including both employment and wage-related moments.</description>
+      <description>In this paper, I show that a dynamic search-and-matching model can jointly explain the evolution of employment, job-to-job mobility, wages and key features of labor income shocks over the business cycle. In particular, the model generates excess left-skewness during recession, in line with the findings of Guvenen et al (2014). Labor income shocks are analyzed through the lenses of the dynamic search-and-matching model of Lise and Robin (2017) with sticky wage contract à la Malcomson (1997).</description>
     </item>
     
   </channel>
