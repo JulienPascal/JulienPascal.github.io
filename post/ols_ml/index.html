@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Coming from an Economics/Econometrics background, I have always been a bit puzzled by the way several Machine Learning (ML) textbooks I have read solve the ordinary least squares model (OLS). When considering a linear model of the form:
+$$ y = X \beta &#43; e $$
+with $e$ a zero-mean noise term, the closed-form solution associated with minimizing the mean square error is:
+$$ \beta = (X&rsquo;X)^{-1}X&rsquo;y $$
+Several ML textbooks explain that a recursive algorithm (see below) may be used to solve for $\beta$.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/ols_ml/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/ols_ml/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/ols_ml/">
+  <meta property="og:title" content="OLS the Machine Learning Way | Julien Pascal">
+  <meta property="og:description" content="Coming from an Economics/Econometrics background, I have always been a bit puzzled by the way several Machine Learning (ML) textbooks I have read solve the ordinary least squares model (OLS). When considering a linear model of the form:
+$$ y = X \beta &#43; e $$
+with $e$ a zero-mean noise term, the closed-form solution associated with minimizing the mean square error is:
+$$ \beta = (X&rsquo;X)^{-1}X&rsquo;y $$
+Several ML textbooks explain that a recursive algorithm (see below) may be used to solve for $\beta$."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-09-29T18:53:22&#43;01:00">
+  
+  <meta property="article:modified_time" content="2019-09-29T18:53:22&#43;01:00">
+  
+
+  
+
+  
+
+  <title>OLS the Machine Learning Way | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">OLS the Machine Learning Way</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2019-09-29 18:53:22 &#43;0100 &#43;0100" itemprop="datePublished">
+<meta content="2019-09-29 18:53:22 &#43;0100 &#43;0100" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>Sep 29, 2019</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    6 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=OLS%20the%20Machine%20Learning%20Way&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fols_ml%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fols_ml%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fols_ml%2f&amp;title=OLS%20the%20Machine%20Learning%20Way"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fols_ml%2f&amp;title=OLS%20the%20Machine%20Learning%20Way"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=OLS%20the%20Machine%20Learning%20Way&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fols_ml%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Coming from an Economics/Econometrics background, I have always been a bit puzzled by the way several Machine Learning (ML) textbooks I have read solve the ordinary least squares model (OLS). When considering a linear model of the form:</p>
+
+<p>$$ y = X \beta + e $$</p>
+
+<p>with $e$ a zero-mean noise term, the closed-form solution associated with minimizing the mean square error is:</p>
+
+<p>$$ \beta = (X&rsquo;X)^{-1}X&rsquo;y $$</p>
+
+<p>Several ML textbooks explain that a recursive algorithm (see below) may be used to solve for $\beta$. Why not directly using the analytical formula to calculate an estimate of $\beta$ ? While feasible with &ldquo;small&rdquo; datasets (not too many explanatory variables and/or observations), direct inversion of $X&rsquo;X$ is not recommended when working with thousands of explanatory variables and/or billions of observations. The alternative is to use <a href="https://en.wikipedia.org/wiki/Gradient_descent" target="_blank">gradient descent</a>, or better, <a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent" target="_blank">stochastic gradient descent</a>.</p>
+
+<p>In this short post, I solve OLS the &ldquo;machine-learning way&rdquo;. That is, using (stochastic) gradient descent. The idea for gradient descent (GD) is quite intuitive. The gradient of $f$ at a given point tells us the direction of <strong>greatest increase</strong> for $f$ at this point. Hence, moving in the opposite direction (minus the gradient) is probably a good idea to find a local minimum. And indeed it is. The GD algorithm repetitively applies this procedure until a minimum (hopefully global) is found. Starting from an initial guess for $\beta$, one updates the guess using the following formula:</p>
+
+<p>$$ \beta_{n} = \beta_{n-1} - \alpha * grad_{n}(\beta_{n-1},X,y) $$</p>
+
+<p>where $\alpha$ is a small value (the &ldquo;learning rate&rdquo;) and $grad_{n}(\beta_{n-1},X,y)$ the gradient of the mean square error (another loss function can be used) evaluated at $\beta_{n-1}$ using the observations $X$ and $y$. Using the mean square error as a loss function generates a closed-form solution for the gradient:</p>
+
+<p>$$ grad_{n}(\beta_{n-1},X,y) = (X&rsquo;X)\beta - X&rsquo;y $$</p>
+
+<p>A refinement of GD, especially handy when dealing with a large dataset, is to use only a subset of the full sample when calculating the gradient:</p>
+
+<p>$$ \beta_{n} = \beta_{n-1} - \alpha * grad_{n}(\beta_{n-1},X_n,y_n) $$</p>
+
+<p>where $X_n$ and $y_n$ are a randomly selected sub-sample of $X$ and $y$. Stochastic Gradient Descent (SGD) reduces the computational burden associated with computing the gradient, while still having good convergence properties, as illustrated in the application below.</p>
+
+<h2 id="implementation-in-julia">Implementation in Julia</h2>
+
+<p>Let&rsquo;s first load packages and define parameters</p>
+
+<pre><code class="language-julia">using LinearAlgebra
+using Distributions
+using Plots
+using Distributions
+using Random
+</code></pre>
+
+<pre><code class="language-julia">n_points=10000
+dim_input=100 #dim of input, without the intercept
+dim_output=1
+# Normal noise
+d = Normal()
+# True parameters
+beta = rand(d, dim_input + 1);
+# Noise
+e = rand(d, n_points);
+# Input data:
+X = rand(d, (n_points,dim_input));
+# Add the intercept:
+X = hcat(ones(n_points),X);
+#Linear Model
+y = X*beta .+ e;
+</code></pre>
+
+<p>This function calculates an estimate of $\beta$ using the analytical formula for OLS</p>
+
+<pre><code class="language-julia">#OLS way
+function OLS_direct(X::Array, y::Vector)
+    inv(transpose(X)*X)*transpose(X)*y
+end
+</code></pre>
+
+<p>OLS_direct (generic function with 1 method)</p>
+
+<pre><code class="language-julia">@time beta_hat = OLS_direct(X, y);
+</code></pre>
+
+<p>0.611144 seconds (1.85 M allocations: 96.576 MiB, 13.64% gc time)</p>
+
+<p>Without any major surprise, using the analytical solution works perfectly well, as illustrated in the following plot</p>
+
+<pre><code class="language-julia">plot(beta, beta_hat, seriestype=:scatter, label=&quot;OLS (Direct)&quot;)
+plot!(beta, beta, seriestype=:line, label=&quot;true&quot;)
+xlabel!(&quot;true value&quot;)
+ylabel!(&quot;estimated value (Direct)&quot;)
+</code></pre>
+
+<p><img src="OLSMachineLearning_9_0.png" alt="png" /></p>
+
+<h2 id="gradient-descent">Gradient Descent</h2>
+
+<p>Now it&rsquo;s time to solve OLS the machine learning way. I first define a function that calculates the gradient of the loss
+function, evaluated at the current guess using the full sample. Then, a second function applies the GD updating rule.</p>
+
+<pre><code class="language-julia">#Calculate the gradient
+function grad_OLS!(G, beta_hat, X, y)
+    G[:] = transpose(X)*X*beta_hat - transpose(X)*y
+end
+</code></pre>
+
+<p>grad_OLS! (generic function with 1 method)</p>
+
+<pre><code class="language-julia">#Gradient descent way
+function OLS_gd(X::Array, y::Vector; epochs::Int64=1000, r::Float64=1e-5, verbose::Bool=false)
+    #initial guess
+    beta_hat = zeros(size(X,2))
+    grad_n = zeros(size(X,2))
+    for epoch=1:epochs
+        grad_OLS!(grad_n, beta_hat, X, y)
+        beta_hat -= r*grad_n
+        if verbose==true
+            if mod(epoch, round(Int, epochs/10))==1
+                println(&quot;MSE: $(mse(beta_hat, X, y))&quot;)
+            end
+        end
+    end
+    return beta_hat
+end
+</code></pre>
+
+<p>OLS_gd (generic function with 1 method)</p>
+
+<p>As illustrated below, after 20 iterations we are quite close to the true value. After 100 iterations, values obtained by GD are indistinguishable from the true values.</p>
+
+<pre><code class="language-julia">@time beta_hat_gd_20 = OLS_gd(X,y, epochs=20);
+@time beta_hat_gd = OLS_gd(X,y, epochs=100);
+plot(beta, beta_hat_gd_20, seriestype=:scatter, label=&quot;GD (20 iter.)&quot;)
+plot!(beta, beta_hat_gd, seriestype=:scatter, label=&quot;GD (100 iter.)&quot;)
+plot!(beta, beta, seriestype=:line, label=&quot;true&quot;)
+xlabel!(&quot;true value&quot;)
+ylabel!(&quot;estimated value (GD)&quot;)
+</code></pre>
+
+<p>0.137474 seconds (81.55 k allocations: 5.814 MiB)
+0.466605 seconds (714 allocations: 8.225 MiB)</p>
+
+<p><img src="OLSMachineLearning_15_1.png" alt="png" /></p>
+
+<h2 id="stochastic-gradient-descent">Stochastic Gradient Descent</h2>
+
+<p>One issue associated with plain vanilla GD is that computing the gradient might be slow. Let&rsquo;s now randomly select only a fraction of the full sample every time we iterate. Here, I take only 10 percent of the full sample.</p>
+
+<pre><code class="language-julia">#Gradient descent way
+function OLS_sgd(X::Array, y::Vector; epochs::Int64=1000, r::Float64=1e-5, verbose::Bool=false, batchsizePer::Int64=10)
+    #initial guess
+    beta_hat = zeros(size(X,2))
+    grad_n = zeros(size(X,2))
+    #how many draws from the dataset?
+    batchsize = round(Int, size(X,1)*(batchsizePer/100))
+    Xn = zeros(batchsize, size(X,2))
+    yn = zeros(batchsize)
+    for epoch=1:epochs
+        indices = shuffle(Vector(1:size(X,1)))
+        Xn = X[indices[1:batchsize],:]
+        yn = y[indices[1:batchsize]]
+        grad_OLS!(grad_n, beta_hat, Xn, yn)
+        #gradient descent:
+        beta_hat -= r*grad_n
+        if verbose==true
+            if mod(epoch, round(Int, epochs/10))==1
+                println(&quot;MSE: $(mse(beta_hat, X, y))&quot;)
+            end
+        end
+    end
+    return beta_hat
+end
+
+</code></pre>
+
+<p>OLS_sgd (generic function with 1 method)</p>
+
+<p>The following block of code shows that SGD achieves the same degree of accuracy, while being much faster than GD.</p>
+
+<pre><code class="language-julia">@time beta_hat_gd = OLS_gd(X,y, epochs=200);
+@time beta_hat_sgd = OLS_sgd(X,y, epochs=200, batchsizePer=20);
+plot(beta, beta_hat_sgd, seriestype=:scatter, label=&quot;SGD&quot;)
+plot!(beta, beta_hat_gd, seriestype=:scatter, label=&quot;GD&quot;)
+plot!(beta, beta, seriestype=:line, label=&quot;true&quot;)
+xlabel!(&quot;true value&quot;)
+ylabel!(&quot;estimated value (SGD)&quot;)
+</code></pre>
+
+<p>0.894465 seconds (1.41 k allocations: 16.448 MiB, 0.42% gc time)
+0.513217 seconds (338.19 k allocations: 382.550 MiB, 4.60% gc time)</p>
+
+<p><img src="OLSMachineLearning_20_1.png" alt="png" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The OLS analytical formula is the gold standard to derive theoretical properties and is perfectly fine when working with reasonably-sized data. In a big data context, (stochastic) gradient descent is the way to go. SGD can be applied to a wide-range of minimization problems. In a machine-learning context, SGD is used to estimate (&ldquo;train&rdquo;) much more complicated models than the simple linear model presented here. In the Appendix below, I show how one can use SGD when no analytical solution for the gradient is available.</p>
+
+<h2 id="appendix">Appendix</h2>
+
+<h3 id="gd-without-analytical-solution-for-the-gradient">GD without analytical solution for the gradient</h3>
+
+<p>Let&rsquo;s assume we don&rsquo;t have a closed-form solution for the gradient. In this context, Julia&rsquo;s automatic differentiation library <code>ForwardDiff</code> is a good choice to calculate the gradient. Below, I define the loss function (MSE), I obtain the gradient of the loss function using <code>ForwardDiff</code> and I apply the SGD algorithm.</p>
+
+<pre><code class="language-julia">using ForwardDiff
+</code></pre>
+
+<pre><code class="language-julia">function mse(beta::Vector, X::Array, y::Vector)
+   result = zero(eltype(y))
+   for i in 1:length(y)
+       #sum squared errors
+       result += (y[i] - dot(X[i,:],beta))^2
+   end
+   return result
+end
+</code></pre>
+
+<p>mse (generic function with 1 method)</p>
+
+<pre><code class="language-julia">function grad!(G, beta_hat, X, y)
+    G[:] = ForwardDiff.gradient(x -&gt; mse(x, X, y), beta_hat)
+end
+</code></pre>
+
+<p>grad! (generic function with 1 method)</p>
+
+<pre><code class="language-julia">#Gradient descent way
+function OLS_gd(X::Array, y::Vector; epochs::Int64=1000, r::Float64=1e-5, verbose::Bool=false)
+    #initial guess
+    beta_hat = zeros(size(X,2))
+    grad_n = zeros(size(X,2))
+    for epoch=1:epochs
+        grad!(grad_n, beta_hat, X, y)
+        beta_hat -= r*grad_n
+        if verbose==true
+            if mod(epoch, round(Int, epochs/10))==1
+                println(&quot;MSE: $(mse(beta_hat, X, y))&quot;)
+            end
+        end
+    end
+    return beta_hat
+end
+</code></pre>
+
+<pre><code>OLS_gd (generic function with 1 method)
+</code></pre>
+
+<pre><code class="language-julia">@time beta_hat_gd = OLS_gd(X,y, epochs=100);
+plot(beta, beta_hat_gd, seriestype=:scatter, label=&quot;GD (100 iter.)&quot;)
+plot!(beta, beta, seriestype=:line, label=&quot;true&quot;)
+xlabel!(&quot;true value&quot;)
+ylabel!(&quot;estimated value (GD)&quot;)
+</code></pre>
+
+<p>3.180767 seconds (9.71 M allocations: 7.547 GiB, 12.66% gc time)</p>
+
+<p><img src="OLSMachineLearning_29_1.png" alt="png" /></p>
+
+    </div>
+
+    
+
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal</a></h5>
+    <h6 class="card-subtitle">PhD candidate in Economics</h6>
+    <p class="card-text" itemprop="description">I am particularly interested in frictional markets with heterogeneous agents</p>
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/Juli3nPascal" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+      
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+

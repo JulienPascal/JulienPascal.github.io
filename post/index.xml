@@ -7,10 +7,23 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 16 Sep 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 29 Sep 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>OLS the Machine Learning Way</title>
+      <link>https://julienpascal.github.io/post/ols_ml/</link>
+      <pubDate>Sun, 29 Sep 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/ols_ml/</guid>
+      <description>Coming from an Economics/Econometrics background, I have always been a bit puzzled by the way several Machine Learning (ML) textbooks I have read solve the ordinary least squares model (OLS). When considering a linear model of the form:
+$$ y = X \beta + e $$
+with $e$ a zero-mean noise term, the closed-form solution associated with minimizing the mean square error is:
+$$ \beta = (X&amp;rsquo;X)^{-1}X&amp;rsquo;y $$
+Several ML textbooks explain that a recursive algorithm (see below) may be used to solve for $\beta$.</description>
+    </item>
     
     <item>
       <title>The BKM Algorithm</title>
