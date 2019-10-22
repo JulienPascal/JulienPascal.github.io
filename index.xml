@@ -7,8 +7,18 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 29 Sep 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 21 Oct 2019 18:11:07 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Rental Housing Market and Directed Search</title>
+      <link>https://julienpascal.github.io/project/rentalmarket/</link>
+      <pubDate>Mon, 21 Oct 2019 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
+      <description>&lt;p&gt;Using a novel dataset on the rental housing market in the Paris area, I show that the rental housing market is well described by a directed search model. I develop a hedonic pricing model taking into consideration apartments’ characteristics and subjective attractiveness using photos and computer vision techniques from the machine learning literature.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OLS the Machine Learning Way</title>
@@ -3881,137 +3891,6 @@ ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2
 ax[:legend](loc=&amp;quot;lower right&amp;quot;)
 
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Solving a simple RBC model in Dynare</title>
-      <link>https://julienpascal.github.io/post/rbc_dynare/</link>
-      <pubDate>Sat, 29 Jul 2017 13:44:23 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/rbc_dynare/</guid>
-      <description>
-
-&lt;p&gt;&lt;a href=&#34;http://www.dynare.org/&#34; target=&#34;_blank&#34;&gt;Dynare&lt;/a&gt; is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see &lt;a href=&#34;http://faculty.chicagobooth.edu/thomas.winberry/research/winberryAlgorithm.pdf&#34; target=&#34;_blank&#34;&gt;Winberry&lt;/a&gt; and &lt;a href=&#34;http://xavier-ragot.fr/pdf/progress/Ragot_chapter.pdf&#34; target=&#34;_blank&#34;&gt;Ragot&lt;/a&gt; for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.&lt;/p&gt;
-
-&lt;h2 id=&#34;a-simple-model&#34;&gt;A simple model&lt;/h2&gt;
-
-&lt;p&gt;The economy is composed of a representative agent who maximizes his expected
-discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&amp;hellip;,\infty$ &lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;$$  \sum_{t=1}^{+\infty}\big(\frac{1}{1+\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1+\gamma}}{1+\gamma}\Big] $$&lt;/p&gt;
-
-&lt;p&gt;subject to the constraint&lt;/p&gt;
-
-&lt;p&gt;$$ K_t = K_t{-_1} (1-\delta) + w_t L_t + r_t K_t-_1 - C_t $$&lt;/p&gt;
-
-&lt;p&gt;where&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;$\rho \in (0,\infty)$ is the rate of time preference&lt;/li&gt;
-&lt;li&gt;$\gamma \in (0,\infty)$ is a labor supply parameter&lt;/li&gt;
-&lt;li&gt;$w_t$ is real wage&lt;/li&gt;
-&lt;li&gt;$r_t$ is the real rental rate&lt;/li&gt;
-&lt;li&gt;$K_t$ is capital at the end of the period&lt;/li&gt;
-&lt;li&gt;$\delta \in (0,1)$ is the capital depreciation rate&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The production function writes
-\begin{equation} Y_t = A_t K_t-_1^\alpha \Big((1+g)^t \Big)^{1-\alpha} \end{equation}&lt;/p&gt;
-
-&lt;p&gt;where&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;$g \in (0,\infty)$ is the growth rate of production&lt;/li&gt;
-&lt;li&gt;$\alpha$ and $\beta$ are technology parameters&lt;/li&gt;
-&lt;li&gt;$A_t$ is a technological shock that follows and $AR(1)$ process&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;\begin{equation} \log(A_t) = \lambda log(A_t-_1) + e_t\end{equation}&lt;/p&gt;
-
-&lt;p&gt;with $e_t$ an i.i.d zero-mean normally distributed error term with standard deviation
-$\sigma_1$ and $\lambda \in (0,1)$ a parameter governing the persistence of shocks.&lt;/p&gt;
-
-&lt;h2 id=&#34;first-order-conditions&#34;&gt;First Order conditions&lt;/h2&gt;
-
-&lt;p&gt;The F.O.C.s of the (stationarized) model are&lt;/p&gt;
-
-&lt;p&gt;$$ \frac{1}{\hat{C_t}} = \frac{1}{1+\rho} E_t \Big( \frac{r_t+_1 + 1 - \delta}{\hat{C}_t+_1 (1+g)} \Big)$$&lt;/p&gt;
-
-&lt;p&gt;$$ L_t^\gamma = \frac{\hat{w}_t}{\hat{C}_t}$$&lt;/p&gt;
-
-&lt;p&gt;$$ r_t = \alpha A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha-1}L_t^{1-\alpha}$$&lt;/p&gt;
-
-&lt;p&gt;$$ \hat{w}_t = (1-\alpha) A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha}L_t^{-\alpha} $$&lt;/p&gt;
-
-&lt;p&gt;$$ \hat{K}_t + \hat{C}_t = \frac{\hat{K}_t-_1}{1+g} (1-\delta) + A_t \Big( \frac{\hat{K}_t-_1}{1+g} \Big)^{\alpha} L_t^{1-\alpha} $$&lt;/p&gt;
-
-&lt;p&gt;with
-$$ \hat{C}_t = \frac{C_t}{(1+g)^t}$$
-$$ \hat{K}_t = \frac{K_t}{(1+g)^t}$$
-$$ \hat{w}_t = \frac{w_t}{(1+g)^t}$$&lt;/p&gt;
-
-&lt;h2 id=&#34;solving-and-simulating-the-model-in-dynare&#34;&gt;Solving and simulating the model in Dynare&lt;/h2&gt;
-
-&lt;p&gt;In Dynare, one has first to specify the endogenous variables (&lt;code&gt;var&lt;/code&gt;), exogenous variables (&lt;code&gt;varexo&lt;/code&gt;),
-and the parameters&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-matlab&#34;&gt;var C K L w r A;
-varexo e;
-
-parameters rho delta gamma alpha lambda g;
-alpha = 0.33;
-delta = 0.1;
-rho = 0.03;
-lambda = 0.97;
-gamma = 0;
-g = 0.015;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In a second step, the F.O.C.s of the model has to be expressed using the command &lt;code&gt;model&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-matlab&#34;&gt;model;
-1/C=1/(1+rho)*(1/(C(+1)*(1+g)))*(r(+1)+1-delta);
-L^gamma = w/C;
-r = alpha*A*(K(-1)/(1+g))^(alpha-1)*L^(1-alpha);
-w = (1-alpha)*A*(K(-1)/(1+g))^alpha*L^(-alpha);
-K+C = (K(-1)/(1+g))*(1-delta)
-+A*(K(-1)/(1+g))^alpha*L^(1-alpha);
-log(A) = lambda*log(A(-1))+e;
-end;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The user must provide the analytical solution for the steady state of the model using the command &lt;code&gt;steady_state_model&lt;/code&gt;.
-The command &lt;code&gt;steady&lt;/code&gt; solves for the steady state values of the model&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-matlab&#34;&gt;steady_state_model;
-A = 1;
-r = (1+g)*(1+rho)+delta-1;
-L = ((1-alpha)/(r/alpha-delta-g))*r/alpha;
-K = (1+g)*(r/alpha)^(1/(alpha-1))*L;
-C = (1-delta)*K/(1+g)
-+(K/(1+g))^alpha*L^(1-alpha)-K;
-w = C;
-end;
-
-steady;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The command &lt;code&gt;shocks&lt;/code&gt; defines the type of shock to be simulated&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-matlab&#34;&gt;shocks;
-var e; stderr 0.01;
-end;
-
-check;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;A first order expansion around the steady state is obtained using the command
-&lt;code&gt;stoch_simul(order=1)&lt;/code&gt;
-This function computes impulse response functions (IRF) and returns various descriptive statistics (moments, variance decomposition, correlation and autocorrelation coefficients)&lt;/p&gt;
-
-&lt;p&gt;The IRF produced by Dynare should be pretty similar to the following graph:
-&lt;img src=&#34;https://julienpascal.github.io/img/rbc1_IRF_e.png&#34; alt=&#34;IRF simple RBC&#34; /&gt;&lt;/p&gt;
 </description>
     </item>
     

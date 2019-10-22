@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/project/rentalmarket/</loc>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/ols_ml/</loc>
       <lastmod>2019-09-29T18:53:22+01:00</lastmod>
     </url>
@@ -199,6 +207,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/directed-search/</loc>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/efficiency/</loc>
       <lastmod>2017-03-07T15:51:54+01:00</lastmod>
       <priority>0</priority>
@@ -217,8 +234,17 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/housing/</loc>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2019-09-29T18:53:22+01:00</lastmod>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -244,7 +270,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/project/</loc>
-      <lastmod>2019-03-14T18:11:07+01:00</lastmod>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
