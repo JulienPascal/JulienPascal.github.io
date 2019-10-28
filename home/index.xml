@@ -110,8 +110,8 @@ Star</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/home/computing/</guid>
-      <description>For computationally intensive programs, I use Julia. For statistics, I mainly use R and Stata. For everything else, I use Python. I have made contributions to the following open source projects:
-Open Source Projects    Name Role Description Status     SMM.jl Author A Julia package to estimate economic models using the Simulated Method of Moments.    MomentOpt.jl Contributor Parallel derivative-free moment optimization in Julia.</description>
+      <description>For computationally intensive programs, I use Julia. For statistics, I mainly use R and Stata. For database management, I use SQL. For everything else, I use Python. You can see my answers to Codility challenges here. I have made contributions to the following open source projects:
+Open Source Projects    Name Role Description Status     SMM.jl Author A Julia package to estimate economic models using the Simulated Method of Moments.</description>
     </item>
     
     <item>
