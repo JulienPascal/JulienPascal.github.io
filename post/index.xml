@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 29 Sep 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 18 Oct 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Docker for Dummies</title>
+      <link>https://julienpascal.github.io/post/docker/</link>
+      <pubDate>Fri, 18 Oct 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/docker/</guid>
+      <description>In my quest for the perfect tool for reproducible science, I thought that the silver bullet was put your code within a library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.</description>
+    </item>
     
     <item>
       <title>OLS the Machine Learning Way</title>

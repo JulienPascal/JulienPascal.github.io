@@ -28,10 +28,10 @@
   
     
   
-  <meta name="description" content="I am a PhD candidate in Economics at Sciences Po Paris and LIEPP.">
+  <meta name="description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was put your code within a library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/">
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/docker/">
 
   
 
@@ -112,15 +112,15 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/post/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/post/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
   
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="https://julienpascal.github.io/post/">
+  <link rel="canonical" href="https://julienpascal.github.io/post/docker/">
 
   
   
@@ -132,19 +132,21 @@
   <meta property="twitter:card" content="summary">
   
   <meta property="og:site_name" content="Julien Pascal">
-  <meta property="og:url" content="https://julienpascal.github.io/post/">
-  <meta property="og:title" content="Posts | Julien Pascal">
-  <meta property="og:description" content="I am a PhD candidate in Economics at Sciences Po Paris and LIEPP."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:url" content="https://julienpascal.github.io/post/docker/">
+  <meta property="og:title" content="Docker for Dummies | Julien Pascal">
+  <meta property="og:description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was put your code within a library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
-  <meta property="og:updated_time" content="2017-12-07T13:50:29&#43;01:00">
+  <meta property="article:published_time" content="2019-10-18T18:53:22&#43;01:00">
+  
+  <meta property="article:modified_time" content="2019-10-18T18:53:22&#43;01:00">
   
 
   
 
   
 
-  <title>Posts | Julien Pascal</title>
+  <title>Docker for Dummies | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
@@ -380,7 +382,9 @@
 </nav>
 
 
+<article class="article" itemscope itemtype="http://schema.org/Article">
 
+  
 
 
 
@@ -397,92 +401,22 @@
 
   
   
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Docker for Dummies</h1>
+
+  
+
   
     
-  
-<div class="universal-wrapper pt-3">
-  <h1 itemprop="name">Posts</h1>
-
-  
-
-  
-</div>
 
 
 
-<div class="universal-wrapper">
-
-  
-
-  
-  
-    
-      
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-<div class="media stream-item" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0" itemprop="name">
-      <a href="/post/collocation/" itemprop="url">Solving Bellman Equations by the Collocation Method</a>
-    </h3>
-
-    
-    <div class="article-style" itemprop="articleBody">
-      A large class of economic models involves solving for functional equations of the form:
-A well known example is the stochastic optimal …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
-      
-        
-
-
-
-<meta content="2017-12-07 13:50:29 &#43;0100 CET" itemprop="datePublished">
-<meta content="2017-12-07 13:50:29 &#43;0100 CET" itemprop="dateModified">
+<meta content="2019-10-18 18:53:22 &#43;0100 &#43;0100" itemprop="datePublished">
+<meta content="2019-10-18 18:53:22 &#43;0100 &#43;0100" itemprop="dateModified">
 
 <div class="article-metadata">
 
-  
-  
-  
-  
-  <div>
-    
-
-
-
-  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
-      <span itemprop="name">
-        
-
-      
-      
-      <a href="/authors/julien-pascal/">Julien Pascal</a></span></span>
-  
-
-
-
-  </div>
   
   
 
@@ -492,118 +426,7 @@ A well known example is the stochastic optimal …
     
       
     
-    <time>Dec 7, 2017</time>
-  </span>
-  
-
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    17 min read
-  </span>
-  
-
-  
-  
-
-  
-
-  
-
-</div>
-
-      
-    </div>
-
-    
-
-  </div>
-  <div class="ml-3">
-    
-    
-  </div>
-</div>
-
-    
-  
-    
-      
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-<div class="media stream-item" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="media-body">
-
-    <h3 class="article-title mb-0 mt-0" itemprop="name">
-      <a href="/post/rbc_dynare/" itemprop="url">Solving a simple RBC model in Dynare</a>
-    </h3>
-
-    
-    <div class="article-style" itemprop="articleBody">
-      Dynare is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and …
-    </div>
-    
-
-    <div class="stream-meta article-metadata">
-
-      
-
-      
-        
-
-
-
-<meta content="2017-07-29 13:44:23 &#43;0100 &#43;0100" itemprop="datePublished">
-<meta content="2017-07-29 13:44:23 &#43;0100 &#43;0100" itemprop="dateModified">
-
-<div class="article-metadata">
-
-  
-  
-  
-  
-  <div>
-    
-
-
-
-  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
-      <span itemprop="name">
-        
-
-      
-      
-      <a href="/authors/julien-pascal/">Julien Pascal</a></span></span>
-  
-
-
-
-  </div>
-  
-  
-
-  
-  <span class="article-date">
-    
-    
-      
-    
-    <time>Jul 29, 2017</time>
+    <time>Oct 18, 2019</time>
   </span>
   
 
@@ -622,37 +445,258 @@ A well known example is the stochastic optimal …
   
 
   
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Docker%20for%20Dummies&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fdocker%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fdocker%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fdocker%2f&amp;title=Docker%20for%20Dummies"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fdocker%2f&amp;title=Docker%20for%20Dummies"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Docker%20for%20Dummies&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fdocker%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
 
 </div>
 
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
       
+
+<p>In my quest for the perfect tool for reproducible science, I thought that the silver
+bullet was put your code within a library/package and make it available to the world.
+Yet, I was wrong. <a href="https://www.docker.com/" target="_blank">Docker</a> is a much cooler and a much more effective way for sharing
+your work with a broad audience. This post is a 101 introduction to Docker.
+I describe what is Docker and show one simple application with a script in Julia.</p>
+
+<h2 id="why-docker">Why Docker?</h2>
+
+<p>Your script works locally, but not on your friend&rsquo;s laptop because of dependency
+issues. Docker solves the <a href="https://en.wikipedia.org/wiki/Dependency_hell" target="_blank">dependency hell</a>
+by giving you the opportunity to &ldquo;ship&rdquo; your application in a &ldquo;container&rdquo;. One can think of a &ldquo;container&rdquo; as some sort of lightweight virtual image. Some technical details can be found <a href="https://docs.docker.com/engine/docker-overview/" target="_blank">here</a> and <a href="https://devopscube.com/what-is-docker/" target="_blank">here</a>. In a nutshell, if your application works on your local machine, Docker helps you to put your application inside an container. Once in a container, your application will run smoothly for the rest of the world.</p>
+
+<h2 id="application-in-julia">Application in Julia</h2>
+
+<p>The goal is to create a container with a simple script to calculate an approximation
+of π. Here I am making a copy-paste from <a href="https://julienpascal.github.io/post/buildyourcluster/" target="_blank">this post</a>, in which I calculated an approximation π using Monte-Carlo. I create a folder
+<code>julia-app</code>, which contain 3 files (see the Github repository <a href="https://github.com/JulienPascal/MyFirstDockerApp" target="_blank">here</a>)</p>
+
+<pre><code>julia-app
+  ├ app.jl
+  ├ deps.jl
+  └ Dockerfile
+</code></pre>
+
+<p>The file <code>app.jl</code> contains the application we want to containerize. The file <code>deps.jl</code>
+contains the list of libraries/packages that are used by <code>app.jl</code>. The file <code>Dockerfile</code>
+is a <a href="https://docs.docker.com/engine/reference/builder/" target="_blank">text document</a> that contains instructions to build the container.
+Generally, a <code>Dockerfile</code> contains 4 types of instructions:</p>
+
+<ul>
+<li><code>FROM</code>: specifies the &ldquo;base image&rdquo; we want to use within the container. In our case,
+we want to run an application with Julia. Luckily, we can pull a base image with
+Julia pre-installed on it using <code>FROM julia:&lt;julia-version-you-want&gt;</code></li>
+<li><code>COPY</code>: adds files to your container</li>
+<li><code>RUN</code>: executes command(s) in a new layer and creates a new image. <code>RUN</code> is perfect
+for installing packages.</li>
+<li><code>CMD</code>: specifies what command to run within the container.</li>
+</ul>
+
+<pre><code>#choose a base image
+FROM julia:1.0.3
+
+# install julia dependencies
+COPY deps.jl /usr/src/app/
+RUN julia /usr/src/app/deps.jl
+
+# copy files required for the app to run
+COPY app.jl /usr/src/app/
+
+# run the application
+CMD [&quot;julia&quot;, &quot;/usr/src/app/app.jl&quot;]
+</code></pre>
+
+<p>To create the container, use the command <code>docker build</code>. You can give a name
+to your container using the <code>--tag , -t</code> option:</p>
+
+<pre><code>docker build julia-app -t &lt;your-tag&gt;
+</code></pre>
+
+<p>To run the container you have just created:</p>
+
+<pre><code>docker run --name julia-app &lt;your-tag&gt;
+</code></pre>
+
+<p>After a few seconds, you should see an approximation of π showing up in your
+terminal. Voilà, you have have just created your first container. The next step
+is to put your container on <a href="https://hub.docker.com/" target="_blank">DockerHub</a>. <a href="https://docs.docker.com/docker-hub/" target="_blank">Here</a>
+is a tutorial on how to do it.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>From an academic perspective, Docker solves the dependency hell and helps in producing
+reproducible research. I will try to use it more often for sharing my own research.</p>
+
     </div>
 
     
 
-  </div>
-  <div class="ml-3">
+
+
+
+
     
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal</a></h5>
+    <h6 class="card-subtitle">PhD candidate in Economics</h6>
     
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/Juli3nPascal" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+    </ul>
   </div>
 </div>
 
-    
-  
-
-  
-<nav>
-  <ul class="pagination justify-content-center">
-    
-    <li class="page-item"><a class="page-link" href="/post/">&laquo;</a></li>
-    
-    
-  </ul>
-</nav>
 
 
+      
+      
+    
 
-</div>
+    
+
+    
+
+
+  </div>
+</article>
+
 <div class="container">
   <footer class="site-footer">
   
@@ -708,6 +752,9 @@ A well known example is the stochastic optimal …
 
     
     
+    
+    <script src="/js/mathjax-config.js"></script>
+    
 
     
     
@@ -733,6 +780,8 @@ A well known example is the stochastic optimal …
       
 
       
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
       
     
 
