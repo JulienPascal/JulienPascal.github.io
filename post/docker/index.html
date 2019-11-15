@@ -28,7 +28,7 @@
   
     
   
-  <meta name="description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was put your code within a library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.">
+  <meta name="description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was to wrap your code in a neat library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/docker/">
@@ -134,7 +134,7 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/docker/">
   <meta property="og:title" content="Docker for Dummies | Julien Pascal">
-  <meta property="og:description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was put your code within a library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was to wrap your code in a neat library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2019-10-18T18:53:22&#43;01:00">
@@ -519,7 +519,7 @@
       
 
 <p>In my quest for the perfect tool for reproducible science, I thought that the silver
-bullet was put your code within a library/package and make it available to the world.
+bullet was to wrap your code in a neat library/package and make it available to the world.
 Yet, I was wrong. <a href="https://www.docker.com/" target="_blank">Docker</a> is a much cooler and a much more effective way for sharing
 your work with a broad audience. This post is a 101 introduction to Docker.
 I describe what is Docker and show one simple application with a script in Julia.</p>
@@ -533,8 +533,8 @@ by giving you the opportunity to &ldquo;ship&rdquo; your application in a &ldquo
 <h2 id="application-in-julia">Application in Julia</h2>
 
 <p>The goal is to create a container with a simple script to calculate an approximation
-of π. Here I am making a copy-paste from <a href="https://julienpascal.github.io/post/buildyourcluster/" target="_blank">this post</a>, in which I calculated an approximation π using Monte-Carlo. I create a folder
-<code>julia-app</code>, which contain 3 files (see the Github repository <a href="https://github.com/JulienPascal/MyFirstDockerApp" target="_blank">here</a>)</p>
+of π. Here I am making a copy-paste from <a href="https://julienpascal.github.io/post/buildyourcluster/" target="_blank">this post</a>, in which I calculated an approximation of π using Monte-Carlo. I create a folder
+<code>julia-app</code>, which contains 3 files (see the Github repository with the 3 files <a href="https://github.com/JulienPascal/MyFirstDockerApp" target="_blank">here</a>)</p>
 
 <pre><code>julia-app
   ├ app.jl
@@ -543,7 +543,7 @@ of π. Here I am making a copy-paste from <a href="https://julienpascal.github.i
 </code></pre>
 
 <p>The file <code>app.jl</code> contains the application we want to containerize. The file <code>deps.jl</code>
-contains the list of libraries/packages that are used by <code>app.jl</code>. The file <code>Dockerfile</code>
+contains the list of libraries/packages that are used within <code>app.jl</code>. The file <code>Dockerfile</code>
 is a <a href="https://docs.docker.com/engine/reference/builder/" target="_blank">text document</a> that contains instructions to build the container.
 Generally, a <code>Dockerfile</code> contains 4 types of instructions:</p>
 
@@ -553,8 +553,8 @@ we want to run an application with Julia. Luckily, we can pull a base image with
 Julia pre-installed on it using <code>FROM julia:&lt;julia-version-you-want&gt;</code></li>
 <li><code>COPY</code>: adds files to your container</li>
 <li><code>RUN</code>: executes command(s) in a new layer and creates a new image. <code>RUN</code> is perfect
-for installing packages.</li>
-<li><code>CMD</code>: specifies what command to run within the container.</li>
+for installing packages</li>
+<li><code>CMD</code>: specifies what command to run within the container</li>
 </ul>
 
 <pre><code>#choose a base image

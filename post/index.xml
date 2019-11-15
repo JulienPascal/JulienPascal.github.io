@@ -18,7 +18,7 @@
       <pubDate>Fri, 18 Oct 2019 18:53:22 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/docker/</guid>
-      <description>In my quest for the perfect tool for reproducible science, I thought that the silver bullet was put your code within a library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.</description>
+      <description>In my quest for the perfect tool for reproducible science, I thought that the silver bullet was to wrap your code in a neat library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.</description>
     </item>
     
     <item>

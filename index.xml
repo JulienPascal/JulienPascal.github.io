@@ -29,7 +29,7 @@
       <description>
 
 &lt;p&gt;In my quest for the perfect tool for reproducible science, I thought that the silver
-bullet was put your code within a library/package and make it available to the world.
+bullet was to wrap your code in a neat library/package and make it available to the world.
 Yet, I was wrong. &lt;a href=&#34;https://www.docker.com/&#34; target=&#34;_blank&#34;&gt;Docker&lt;/a&gt; is a much cooler and a much more effective way for sharing
 your work with a broad audience. This post is a 101 introduction to Docker.
 I describe what is Docker and show one simple application with a script in Julia.&lt;/p&gt;
@@ -43,8 +43,8 @@ by giving you the opportunity to &amp;ldquo;ship&amp;rdquo; your application in 
 &lt;h2 id=&#34;application-in-julia&#34;&gt;Application in Julia&lt;/h2&gt;
 
 &lt;p&gt;The goal is to create a container with a simple script to calculate an approximation
-of π. Here I am making a copy-paste from &lt;a href=&#34;https://julienpascal.github.io/post/buildyourcluster/&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, in which I calculated an approximation π using Monte-Carlo. I create a folder
-&lt;code&gt;julia-app&lt;/code&gt;, which contain 3 files (see the Github repository &lt;a href=&#34;https://github.com/JulienPascal/MyFirstDockerApp&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;)&lt;/p&gt;
+of π. Here I am making a copy-paste from &lt;a href=&#34;https://julienpascal.github.io/post/buildyourcluster/&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, in which I calculated an approximation of π using Monte-Carlo. I create a folder
+&lt;code&gt;julia-app&lt;/code&gt;, which contains 3 files (see the Github repository with the 3 files &lt;a href=&#34;https://github.com/JulienPascal/MyFirstDockerApp&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;)&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;julia-app
   ├ app.jl
@@ -53,7 +53,7 @@ of π. Here I am making a copy-paste from &lt;a href=&#34;https://julienpascal.g
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;The file &lt;code&gt;app.jl&lt;/code&gt; contains the application we want to containerize. The file &lt;code&gt;deps.jl&lt;/code&gt;
-contains the list of libraries/packages that are used by &lt;code&gt;app.jl&lt;/code&gt;. The file &lt;code&gt;Dockerfile&lt;/code&gt;
+contains the list of libraries/packages that are used within &lt;code&gt;app.jl&lt;/code&gt;. The file &lt;code&gt;Dockerfile&lt;/code&gt;
 is a &lt;a href=&#34;https://docs.docker.com/engine/reference/builder/&#34; target=&#34;_blank&#34;&gt;text document&lt;/a&gt; that contains instructions to build the container.
 Generally, a &lt;code&gt;Dockerfile&lt;/code&gt; contains 4 types of instructions:&lt;/p&gt;
 
@@ -63,8 +63,8 @@ we want to run an application with Julia. Luckily, we can pull a base image with
 Julia pre-installed on it using &lt;code&gt;FROM julia:&amp;lt;julia-version-you-want&amp;gt;&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;COPY&lt;/code&gt;: adds files to your container&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;RUN&lt;/code&gt;: executes command(s) in a new layer and creates a new image. &lt;code&gt;RUN&lt;/code&gt; is perfect
-for installing packages.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;CMD&lt;/code&gt;: specifies what command to run within the container.&lt;/li&gt;
+for installing packages&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CMD&lt;/code&gt;: specifies what command to run within the container&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;pre&gt;&lt;code&gt;#choose a base image
