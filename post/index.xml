@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Fri, 18 Oct 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 22 Nov 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Logistic Regression from Scratch</title>
+      <link>https://julienpascal.github.io/post/logistic/</link>
+      <pubDate>Fri, 22 Nov 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/logistic/</guid>
+      <description>The logistic regression model is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a successful politician. For the purpose of this blog post, &amp;ldquo;success&amp;rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election).</description>
+    </item>
     
     <item>
       <title>Docker for Dummies</title>
