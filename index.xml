@@ -46,7 +46,7 @@ function :&lt;/p&gt;
 
 &lt;h2 id=&#34;a-latent-variable-formulation&#34;&gt;A latent variable formulation&lt;/h2&gt;
 
-&lt;p&gt;A powerful way of interpreting the logistic model is to see it as the outcome of a latent regression model.
+&lt;p&gt;A powerful way of interpreting the logistic model is to see it as the outcome of a latent variable model.
 An unobservable latent variable $z_{i}$ depends linearly on $x_{i}$ plus a noise term $\varepsilon_{i}$:&lt;/p&gt;
 
 &lt;p&gt;$$ z_{i} = x_{i} &amp;lsquo;\theta + \varepsilon_{i} $$&lt;/p&gt;
