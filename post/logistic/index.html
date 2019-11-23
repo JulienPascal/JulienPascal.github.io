@@ -28,7 +28,7 @@
   
     
   
-  <meta name="description" content="The logistic regression model is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a successful politician. For the purpose of this blog post, &ldquo;success&rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election).">
+  <meta name="description" content="The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election).">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/logistic/">
@@ -134,7 +134,7 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/logistic/">
   <meta property="og:title" content="Logistic Regression from Scratch | Julien Pascal">
-  <meta property="og:description" content="The logistic regression model is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a successful politician. For the purpose of this blog post, &ldquo;success&rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election)."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election)."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2019-11-22T18:53:22&#43;01:00">
@@ -518,15 +518,17 @@
     <div class="article-style" itemprop="articleBody">
       
 
-<p>The <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank">logistic regression model</a> is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a successful politician. For the purpose of this blog post, &ldquo;success&rdquo;
+<p>The <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank">logistic model</a> (also called logit model) is a natural candidate when one is interested in a <strong>binary outcome</strong>. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo;
 means the probability of winning an election. In that case, it would be sub-optimal
 to use a linear regression model to see what factors are associated with successful
 politicians, as the outcome variable is binary (a politician either wins or loses an election).
-The linear model is built around the idea that the outcome variable is continuous. What if
-the statistician tries to sees what factors are influencing the <strong>probability</strong> of
+The linear model is built around the idea that the outcome variable is continuous.</p>
+
+<p>What if the statistician tries to identify what factors are influencing the <strong>probability</strong> of
 winning? This strategy naturally lends itself to using a <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank">logistic model</a> (or a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank">probit</a>).
 In this blog post, I derive the <strong>logistic model from scratch</strong> and show how one
-can estimate its parameters using <strong>gradient descent</strong> or <strong>Newton-Raphson</strong> algorithms. I also use data on NBA players what factors are influencing the success of a shot.</p>
+can estimate its parameters using <strong>gradient descent</strong> or <strong>Newton-Raphson</strong> algorithms. I also use data on <strong>NBA players</strong> to see what factors are influencing the <strong>success of a shot</strong>. The GitHub repository for this post can be
+found <a href="https://github.com/JulienPascal/LogisticRegression" target="_blank">here</a>.</p>
 
 <h2 id="the-logistic-model">The logistic model</h2>
 
@@ -544,12 +546,12 @@ function :</p>
 
 <h2 id="a-latent-variable-formulation">A latent variable formulation</h2>
 
-<p>A powerful way of interpreting the logistic regression model is to see it as the outcome of latent regression model.
+<p>A powerful way of interpreting the logistic model is to see it as the outcome of a latent regression model.
 An unobservable latent variable $z_{i}$ depends linearly on $x_{i}$ plus a noise term $\varepsilon_{i}$:</p>
 
 <p>$$ z_{i} = x_{i} &lsquo;\theta + \varepsilon_{i} $$</p>
 
-<p>We only observe $y_i$, which is equal to 1 when $z_{i}$ is strictly positive, and 0 otherwise. If the error term is distributed according to the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">logistic distribution</a>, we end up with the logistic model described above. If the error term is normally distributed, the model is a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank">probit model</a>. To see that, simply express the probability of the latent variable to be bigger than 1:</p>
+<p>We only observe $y_i$, which is equal to 1 when $z_{i}$ is strictly positive, and 0 otherwise. If the error term is distributed according to the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">logistic distribution</a>, we end up with the logistic model described above. If the error term is normally distributed, the model is a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank">probit model</a>. To see that, simply express the probability of the latent variable to be bigger than 0:</p>
 
 <p>$$ f(y_i | x_{i}, \theta_{i}) = P( x_{i} &lsquo;\theta + \varepsilon_{i} &gt; 0) $$
 $$  = 1 - P( x_{i} &lsquo;\theta + \varepsilon_{i} \leq 0) $$
@@ -557,7 +559,7 @@ $$  = 1 - P(\varepsilon_{i} \leq - x_{i} &lsquo;\theta ) $$
 $$  = 1 - P(\varepsilon_{i} \leq - x_{i} &lsquo;\theta ) $$
 $$  = \frac{exp(x_{i} &lsquo;\theta )}{1+exp(x_{i} &lsquo;\theta )} $$</p>
 
-<p>where the last line comes from using the expression of the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">cdf of the logistic distribution</a> with zero mean and scale parameter 1.</p>
+<p>where the last line comes from using the expression for the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">cdf of the logistic distribution</a> with zero mean and scale parameter equal to 1.</p>
 
 <h2 id="interpretation-of-coefficients">Interpretation of coefficients</h2>
 
@@ -571,12 +573,12 @@ $$  = \frac{exp(x_{i} &lsquo;\theta )}{1+exp(x_{i} &lsquo;\theta )} $$</p>
 
 <p>$$ log\Big(\frac{f(y_i | x_{i}, \theta)}{1 - f(y_i | x_{i}, \theta)}\Big) = x_{i} &lsquo;\theta$$</p>
 
-<p>Going back to what makes a politician successful in an election, if the coefficient $\theta_j$ is equal to 0.1, it means that a one unit increase in $x_{ij}$ rises the relative probability of winning an election by approximately $10\%$.</p>
+<p>Going back to what makes a politician successful in an election, if the coefficient $\theta_j$ is equal to 0.1, it means that a one unit increase in $x_{ij}$ rises the <strong>relative</strong> probability of winning an election by approximately $10\%$.</p>
 
 <h2 id="log-likelihood-function">Log-likelihood function</h2>
 
-<p>To understand what makes a successful politician (or to predict who is going to win the next elections), one must estimate the value of $\theta$ using the information contained in the sample $(y_i, x_i)_{i=1}^{N}$. One &ldquo;natural&rdquo; criterion is to find the value for $\theta$ that <strong>maximizes the probability of observing the
-sample</strong>. This procedure is called <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation" target="_blank">Maximum likelihood estimation</a>. Let us assume that sample is <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables" target="_blank">i.i.d</a>. If the i.i.d assumption holds, the probability of observing the $(y_i, x_i)_{i=1}^{N}$ is the product of the probability of observing each observation. Instead of maximizing the likelihood, it is more convenient to maximize the log-likelihood, which transforms the product of probabilities into a sum:</p>
+<p>To predict who is going to win the next elections, one must estimate the value of $\theta$ using the information contained in the sample $(y_i, x_i)_{i=1}^{N}$. One &ldquo;natural&rdquo; criterion is to find the value for $\theta$ that <strong>maximizes the probability of observing the
+sample</strong>. This procedure is called <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation" target="_blank">Maximum likelihood estimation</a>. Let us assume that sample is <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables" target="_blank">i.i.d</a>. If the i.i.d assumption holds, the probability of observing the sample $(y_i, x_i)_{i=1}^{N}$ is the product of the probability of observing each observation. Instead of maximizing the likelihood, it is more convenient to maximize the log-likelihood, which transforms the product of probabilities into a sum:</p>
 
 <p>$$ L((y_i, x_i)_{i=1}^{N};\theta) = log( \prod_{i=1}^{N}f(y_i | x_{i}, \theta)) = \sum_{i=1}^{N} log(f(y_i | x_{i}, \theta_{i}))$$</p>
 
@@ -608,7 +610,7 @@ sample</strong>. This procedure is called <a href="https://en.wikipedia.org/wiki
 
 <h2 id="newton-raphson-method">Newton–Raphson method</h2>
 
-<p>Roughly speaking, the Newton-Raphson method is a &ldquo;smart&rdquo; gradient descent which uses the information contained in the Hessian of the log-likelihood $HL((y_i, x_i)_{i=1}^{N};\theta_{i})$ (on top of the gradient) to make a right move toward the minimizer. The iterative algorithm proceeds as follows:</p>
+<p>Roughly speaking, the Newton-Raphson method is a &ldquo;smart&rdquo; gradient descent which uses the information contained in the Hessian of the log-likelihood $HL((y_i, x_i)_{i=1}^{N};\theta_{i})$ (on top of the gradient) to make a right move toward the minimizer. This iterative algorithm proceeds as follows:</p>
 
 <p>$$ \theta_{i+1} = \theta_{i} - (HL((y_i, x_i)_{i=1}^{N};\theta_{i}) )^{-1}  \Big(- L_{\theta}((y_i, x_i)_{i=1}^{N};\theta_{i}) \Big)$$</p>
 
@@ -622,10 +624,10 @@ sample</strong>. This procedure is called <a href="https://en.wikipedia.org/wiki
 from the <a href="https://en.wikipedia.org/wiki/Newton%27s_method_in_optimization" target="_blank">Wikipedia article</a> on Newton-Raphson speak for itself:</p>
 
 <blockquote>
-<p>Where applicable, Newton&rsquo;s method converges much faster towards a local maximum or minimum than gradient descent. In fact, every local minimum has a neighborhood N such that, if we start with x0 ∈ N, Newton&rsquo;s method with step size γ = 1 converges quadratically (if the Hessian is invertible and a Lipschitz continuous function of x in that neighborhood).</p>
+<p><strong>Where applicable</strong>, Newton&rsquo;s method <strong>converges much faster</strong> towards a local maximum or minimum than gradient descent. In fact, every local minimum has a neighborhood N such that, if we start with x0 ∈ N, Newton&rsquo;s method with step size γ = 1 <strong>converges quadratically</strong> (if the Hessian is invertible and a Lipschitz continuous function of x in that neighborhood).</p>
 </blockquote>
 
-<p>For the logistic model, the Newton-Raphson model is easily applicable because there exists a closed-form formula for the Hessian:</p>
+<p>For the logistic model, the Newton-Raphson algorithm is easily applicable because there exists a closed-form formula for the Hessian:</p>
 
 <p>$$ HL((y_i, x_i)_{i=1}^{N};\theta_{i}) = \sum_{i=1}^{N} - \sigma(x_{i} &lsquo;\theta)[1 - \sigma(x_{i} &lsquo;\theta)] x_{i} x_{i}&lsquo;$$</p>
 
@@ -726,7 +728,7 @@ p2 = histogram(y, title=&quot;Nb of successes vs failures&quot;, legend=false)
 plot(p1,p2)
 </code></pre>
 
-<p><img src="Logistic_regression_files/Logistic_regression_29_0.png" alt="png" /></p>
+<p><img src="Logistic_regression_29_0.png" alt="png" /></p>
 
 <h3 id="maximization-with-optim">Maximization with Optim</h3>
 
@@ -788,7 +790,7 @@ end
 <pre><code class="language-julia">plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradient descent algorithm&quot;)
 </code></pre>
 
-<p><img src="Logistic_regression_files/Logistic_regression_40_0.png" alt="png" /></p>
+<p><img src="Logistic_regression_40_0.png" alt="png" /></p>
 
 <pre><code class="language-julia">print(&quot;Estimate for theta using gradient descent is $(theta)&quot;)
 </code></pre>
@@ -836,7 +838,7 @@ plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradien
 <pre><code>  0.037832 seconds (500.07 k allocations: 53.431 MiB, 35.44% gc time)
 </code></pre>
 
-<p><img src="Logistic_regression_files/Logistic_regression_46_1.png" alt="png" /></p>
+<p><img src="Logistic_regression_46_1.png" alt="png" /></p>
 
 <pre><code class="language-julia">print(&quot;Estimate for theta using Newton-Raphson is $(theta)&quot;)
 </code></pre>
@@ -855,12 +857,6 @@ first(df,6)
 <table class="data-frame"><thead><tr><th></th><th>X1</th><th>X2</th><th>X3</th><th>y</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>6 rows × 4 columns</p><tr><th>1</th><td>1.0</td><td>0.215315</td><td>1.29817</td><td>1.0</td></tr><tr><th>2</th><td>1.0</td><td>-0.0714749</td><td>0.586886</td><td>1.0</td></tr><tr><th>3</th><td>1.0</td><td>0.0463648</td><td>-0.145116</td><td>1.0</td></tr><tr><th>4</th><td>1.0</td><td>1.95096</td><td>0.26349</td><td>1.0</td></tr><tr><th>5</th><td>1.0</td><td>-0.162081</td><td>1.34871</td><td>1.0</td></tr><tr><th>6</th><td>1.0</td><td>0.00214326</td><td>-0.271835</td><td>1.0</td></tr></tbody></table>
 
 <pre><code class="language-julia">fittedmodel = glm(@formula(y ~ X2 + X3), df, Binomial(), LogitLink(), verbose=true);
-</code></pre>
-
-<pre><code>Iteration: 1, deviance: 8788.802557538282, diff.dev.:260.3659362733488
-Iteration: 2, deviance: 8775.744468853914, diff.dev.:13.058088684367249
-Iteration: 3, deviance: 8775.697044683246, diff.dev.:0.04742417066881899
-Iteration: 4, deviance: 8775.697043975773, diff.dev.:7.074722816469148e-7
 </code></pre>
 
 <pre><code class="language-julia">print(&quot;Estimate for theta using GLM is $(coef(fittedmodel))&quot;)
@@ -946,7 +942,10 @@ plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradien
 <pre><code>  0.301748 seconds (4.90 M allocations: 568.272 MiB, 29.93% gc time)
 </code></pre>
 
-<p><img src="Logistic_regression_files/Logistic_regression_63_1.png" alt="png" /></p>
+<p><img src="Logistic_regression_63_1.png" alt="png" /></p>
+
+<p>Our implementation of the logistic model gives us parameter values that are almost
+identical to the ones we get using the package <code>GLM</code>:</p>
 
 <pre><code class="language-julia">print(&quot;Estimate for theta using Optim is $(res.minimizer)&quot;)
 </code></pre>
@@ -956,7 +955,7 @@ plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradien
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>The logistic regression model, often used in social sciences and in machine learning for classification purposes is a powerful tool. This blog post shows how the logistic regression model can be derived from first principles (latent regression interpretation) and how it can be implemented in just a few lines of codes. A few extensions to this blog post could be to calculate the <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic" target="_blank">ROC curve</a> and to calculate the standard errors.</p>
+<p>The logistic model, often used in social sciences and in machine learning for classification purposes is a powerful tool. This blog post shows how the logistic model can be derived from first principles (latent variable interpretation) and how it can be implemented in just a few lines of codes. A few extensions to this blog post could be to calculate the <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic" target="_blank">ROC curve</a> and to calculate the standard errors.</p>
 
 <h2 id="references">References</h2>
 

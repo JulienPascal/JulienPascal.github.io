@@ -18,7 +18,7 @@
       <pubDate>Fri, 22 Nov 2019 18:53:22 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/logistic/</guid>
-      <description>The logistic regression model is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a successful politician. For the purpose of this blog post, &amp;ldquo;success&amp;rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election).</description>
+      <description>The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &amp;ldquo;success&amp;rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election).</description>
     </item>
     
   </channel>
