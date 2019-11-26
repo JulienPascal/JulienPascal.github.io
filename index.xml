@@ -472,6 +472,12 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
       
       <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
       <description>&lt;p&gt;Using a novel dataset on the rental housing market in the Paris area, I show that the rental housing market is well described by a directed search model. I develop a hedonic pricing model taking into consideration apartments’ characteristics and subjective attractiveness using photos and computer vision techniques from the machine learning literature.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;To quantify visual attractiveness, I use a convolutional neural network based on a &lt;a href=&#34;https://arxiv.org/abs/1709.05424&#34; target=&#34;_blank&#34;&gt;paper&lt;/a&gt; by Talebi and Peyman (2018). To see how the
+CNN works, you can get an attractiveness score for your own image on this website:
+&lt;a href=&#34;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&#34; target=&#34;_blank&#34;&gt;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
