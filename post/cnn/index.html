@@ -414,8 +414,8 @@
 
 
 
-<meta content="2019-12-05 18:53:22 &#43;0100 &#43;0100" itemprop="datePublished">
-<meta content="2019-12-05 18:53:22 &#43;0100 &#43;0100" itemprop="dateModified">
+<meta content="2019-12-05 18:53:22 &#43;0100 CET" itemprop="datePublished">
+<meta content="2019-12-05 18:53:22 &#43;0100 CET" itemprop="dateModified">
 
 <div class="article-metadata">
 
@@ -437,7 +437,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    8 min read
+    11 min read
   </span>
   
 
@@ -598,7 +598,7 @@ a = reshape(train_imgs[1], NROWS, NCOLS)
 
 <h2 id="cnn-architecture">CNN architecture</h2>
 
-<p>Our CNN has the usual CONV-&gt;ReLU-&gt;MaxPool components, before using a FC layer. We use a $1 \times 1$ padding and a stride of $1$ (the default value). The size of input is gradually reduced by using $2 \times 2$ maxpool layers:</p>
+<p>Our CNN has the usual CONV-&gt;ReLU-&gt;MaxPool components, before using a FC layer. We use a $1 \times 1$ padding and a stride of $1$ (the default value). The size of input is gradually reduced by using $2 \times 2$ maxpool layers. The default activation in Flux.jl is the function is $ x-&gt;x $. Here, we use the Rectified Linear Unit function (ReLU) instead:</p>
 
 <pre><code class="language-julia">model = Chain(
     # First convolution, operating upon a 28x28 image
@@ -623,8 +623,19 @@ a = reshape(train_imgs[1], NROWS, NCOLS)
 )
 </code></pre>
 
-<pre><code>Chain(Conv((3, 3), 1=&gt;16, NNlib.relu), MaxPool((2, 2), pad = (0, 0, 0, 0), stride = (2, 2)), Conv((3, 3), 16=&gt;32, NNlib.relu), MaxPool((2, 2), pad = (0, 0, 0, 0), stride = (2, 2)), Conv((3, 3), 32=&gt;32, NNlib.relu), MaxPool((2, 2), pad = (0, 0, 0, 0), stride = (2, 2)), getfield(Main, Symbol(&quot;##7#8&quot;))(), Dense(288, 10), NNlib.softmax)
+<p>The ReLU activation function is a piece-wise linear function. In the <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks" target="_blank">“ImageNet Classification with Deep Convolutional Neural Networks&rdquo;</a> paper by Krizhevsky and coauthors, the authors write:</p>
+
+<blockquote>
+<p>we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs). Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units.</p>
+</blockquote>
+
+<p>The ReLU activation function also helps in reducing the practical issues caused by <a href="https://en.wikipedia.org/wiki/Vanishing_gradient_problem" target="_blank">the vanishing gradient problem</a>. That is, the failure of the minizimation algorithm used to find the parameters of our CNN. Below is a plot of the ReLU activation function:</p>
+
+<pre><code class="language-julia">xgrid = collect(range(-1, 1, length=100))
+plot(xgrid, NNlib.relu.(xgrid), label = &quot;relu(x)&quot;, title=&quot;ReLU activation function&quot;, xlabel=&quot;x&quot;)
 </code></pre>
+
+<p><img src="CNN_18_0.svg" alt="svg" /></p>
 
 <h2 id="training">Training</h2>
 
@@ -660,7 +671,8 @@ test_set = make_minibatch(test_imgs, test_labels, 1:length(test_imgs));
 <pre><code class="language-julia"># `loss()` calculates the crossentropy loss between our prediction `y_hat`
 # We augment the data a bit, adding gaussian random noise to our image to make it more robust.
 function loss(x, y)
-    # We augment `x` a little bit here, adding in random noise
+    # Add some noise to the image
+    # we reduce the risk of overfitting the train sample by doing so:
     x_aug = x .+ 0.1f0*gpu(randn(eltype(x), size(x)))
 
     y_hat = model(x_aug)
@@ -676,7 +688,7 @@ opt = ADAM(0.001);
 
 <pre><code class="language-julia">best_acc = 0.0
 last_improvement = 0
-accuracy_target = 0.97 #When we should stop training
+accuracy_target = 0.97 #Set an accuracy target. When reached, we stop training.
 max_epochs = 100 #Maximum
 for epoch_idx in 1:100
     global best_acc, last_improvement
@@ -760,6 +772,99 @@ a = reshape(test_imgs[3], NROWS, NCOLS)
 </code></pre>
 
 <p><img src="CNN_32_1.png" alt="png" /></p>
+
+<h3 id="accuracy-checks">Accuracy checks</h3>
+
+<p>We now have a model that seems to do quite a good job in recognizing digits. But can we improve it? If yes, how?
+To improve our model, we first need to identify when and why it fails.</p>
+
+<h4 id="confusion-matrix">Confusion matrix</h4>
+
+<p>To do that, a useful reporting
+tool is a <strong>confusion matrix</strong>. Each row of a confusion matrix shows instances of the true value, while each column displays instances of the predicted value. Ideally, we would like our model to perfectly predict the outcome. With a perfect model, all instances would be located on the diagonal elements of the confusion matrix.</p>
+
+<p>The last time I checked, <code>Flux.jl</code> did not have an in-built function to calculate confusion matrices. Fortunately, an implementation is available in the package <code>MLBase</code>. The next block of code calculates the confusion matrix and displays it. Most of instances are on located on the diagonal, which is not a surprise given that the accuracy rate for our model is more than $97.0\%$</p>
+
+<pre><code class="language-julia">using MLBase
+# Adding 1 to outcome because the index 0 in arrays does not exist in Julia
+Cm = confusmat(10, test_labels .+ 1, vec(pred) .+ 1)
+</code></pre>
+
+<pre><code>10×10 Array{Int64,2}:
+ 968     1     1    0    0    4    3    1    2    0
+   0  1128     3    0    0    0    1    0    3    0
+   3     5  1003    6    1    1    0    6    7    0
+   0     0     1  992    0   10    0    2    4    1
+   0     1     2    0  972    0    0    1    1    5
+   1     0     1    4    0  883    1    1    1    0
+   1     4     0    0    1   13  936    0    3    0
+   1     7    10    5    0    1    0  986    3   15
+   2     0     4    6    4    8    2    4  942    2
+   4     4     0    7    7   10    0    8    2  967
+</code></pre>
+
+<pre><code class="language-julia"># Normalize output:
+Cm  = Cm ./ sum(Cm, dims=2)
+# Labels
+xs = [string(i) for i = 0:9]
+heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma)
+</code></pre>
+
+<p><img src="CNN_41_0.svg" alt="svg" /></p>
+
+<p>To visualize where our model makes mistakes, one can use the optional argument <code>clim</code>, to put an upper bound on
+the underlying colormap. For instance, the next plot shows that our model has troubles differencing 7 and 2 or 8 and 2.</p>
+
+<pre><code class="language-julia"># Limits to colormap, so we can see where errors are located:
+xs = [string(i) for i = 0:9]
+heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma, clim=(0., 0.01))
+</code></pre>
+
+<p><img src="CNN_43_0.svg" alt="svg" /></p>
+
+<h4 id="error-analysis">Error Analysis</h4>
+
+<p>The next block of code displays digits for which our CNN failed:</p>
+
+<pre><code class="language-julia"># indices for errors:
+using ImageView, Gtk.ShortNames
+mistakes = test_labels .!= vec(pred)
+max_images = 5
+grid, frames, canvases = canvasgrid((1,max_images)); # 1 row
+</code></pre>
+
+<pre><code class="language-julia">k=0#counter for mistakes
+for (j, i) in enumerate(mistakes)
+    if i == true
+        k+=1 # a false value has been found
+        println(&quot;Predicted value = $(pred[j])&quot;)
+        println(&quot;True value = $(test_labels[j])&quot;)
+        imshow(canvases[1,k], test_imgs[j])
+        idx = ImageView.annotate!(guidict, AnnotationText(0, 0, &quot;$(pred[j])&quot;, color=RGB(0,0,0), fontsize=3))
+    end
+    if k &gt;= max_images
+        break
+    end
+end
+win = Window(grid);
+Gtk.showall(win);
+</code></pre>
+
+<pre><code>Predicted value = 5
+True value = 9
+Predicted value = 5
+True value = 6
+Predicted value = 4
+True value = 8
+Predicted value = 3
+True value = 2
+Predicted value = 7
+True value = 2
+</code></pre>
+
+<p><img src="false_values.png" alt="alt" /></p>
+
+<p>While it seems obvious that the two digits starting from the left are a 9 and a 6, the remaining 3 elements are not trivial. The 8 in the middle could be easily confused with something else and the two remaining digits are weirdly shaped.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 

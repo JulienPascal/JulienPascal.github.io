@@ -96,7 +96,7 @@ a = reshape(train_imgs[1], NROWS, NCOLS)
 
 &lt;h2 id=&#34;cnn-architecture&#34;&gt;CNN architecture&lt;/h2&gt;
 
-&lt;p&gt;Our CNN has the usual CONV-&amp;gt;ReLU-&amp;gt;MaxPool components, before using a FC layer. We use a $1 \times 1$ padding and a stride of $1$ (the default value). The size of input is gradually reduced by using $2 \times 2$ maxpool layers:&lt;/p&gt;
+&lt;p&gt;Our CNN has the usual CONV-&amp;gt;ReLU-&amp;gt;MaxPool components, before using a FC layer. We use a $1 \times 1$ padding and a stride of $1$ (the default value). The size of input is gradually reduced by using $2 \times 2$ maxpool layers. The default activation in Flux.jl is the function is $ x-&amp;gt;x $. Here, we use the Rectified Linear Unit function (ReLU) instead:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;model = Chain(
     # First convolution, operating upon a 28x28 image
@@ -121,8 +121,19 @@ a = reshape(train_imgs[1], NROWS, NCOLS)
 )
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;Chain(Conv((3, 3), 1=&amp;gt;16, NNlib.relu), MaxPool((2, 2), pad = (0, 0, 0, 0), stride = (2, 2)), Conv((3, 3), 16=&amp;gt;32, NNlib.relu), MaxPool((2, 2), pad = (0, 0, 0, 0), stride = (2, 2)), Conv((3, 3), 32=&amp;gt;32, NNlib.relu), MaxPool((2, 2), pad = (0, 0, 0, 0), stride = (2, 2)), getfield(Main, Symbol(&amp;quot;##7#8&amp;quot;))(), Dense(288, 10), NNlib.softmax)
+&lt;p&gt;The ReLU activation function is a piece-wise linear function. In the &lt;a href=&#34;https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks&#34; target=&#34;_blank&#34;&gt;“ImageNet Classification with Deep Convolutional Neural Networks&amp;rdquo;&lt;/a&gt; paper by Krizhevsky and coauthors, the authors write:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs). Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The ReLU activation function also helps in reducing the practical issues caused by &lt;a href=&#34;https://en.wikipedia.org/wiki/Vanishing_gradient_problem&#34; target=&#34;_blank&#34;&gt;the vanishing gradient problem&lt;/a&gt;. That is, the failure of the minizimation algorithm used to find the parameters of our CNN. Below is a plot of the ReLU activation function:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;xgrid = collect(range(-1, 1, length=100))
+plot(xgrid, NNlib.relu.(xgrid), label = &amp;quot;relu(x)&amp;quot;, title=&amp;quot;ReLU activation function&amp;quot;, xlabel=&amp;quot;x&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;CNN_18_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;training&#34;&gt;Training&lt;/h2&gt;
 
@@ -158,7 +169,8 @@ test_set = make_minibatch(test_imgs, test_labels, 1:length(test_imgs));
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# `loss()` calculates the crossentropy loss between our prediction `y_hat`
 # We augment the data a bit, adding gaussian random noise to our image to make it more robust.
 function loss(x, y)
-    # We augment `x` a little bit here, adding in random noise
+    # Add some noise to the image
+    # we reduce the risk of overfitting the train sample by doing so:
     x_aug = x .+ 0.1f0*gpu(randn(eltype(x), size(x)))
 
     y_hat = model(x_aug)
@@ -174,7 +186,7 @@ opt = ADAM(0.001);
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;best_acc = 0.0
 last_improvement = 0
-accuracy_target = 0.97 #When we should stop training
+accuracy_target = 0.97 #Set an accuracy target. When reached, we stop training.
 max_epochs = 100 #Maximum
 for epoch_idx in 1:100
     global best_acc, last_improvement
@@ -258,6 +270,99 @@ a = reshape(test_imgs[3], NROWS, NCOLS)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;img src=&#34;CNN_32_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;accuracy-checks&#34;&gt;Accuracy checks&lt;/h3&gt;
+
+&lt;p&gt;We now have a model that seems to do quite a good job in recognizing digits. But can we improve it? If yes, how?
+To improve our model, we first need to identify when and why it fails.&lt;/p&gt;
+
+&lt;h4 id=&#34;confusion-matrix&#34;&gt;Confusion matrix&lt;/h4&gt;
+
+&lt;p&gt;To do that, a useful reporting
+tool is a &lt;strong&gt;confusion matrix&lt;/strong&gt;. Each row of a confusion matrix shows instances of the true value, while each column displays instances of the predicted value. Ideally, we would like our model to perfectly predict the outcome. With a perfect model, all instances would be located on the diagonal elements of the confusion matrix.&lt;/p&gt;
+
+&lt;p&gt;The last time I checked, &lt;code&gt;Flux.jl&lt;/code&gt; did not have an in-built function to calculate confusion matrices. Fortunately, an implementation is available in the package &lt;code&gt;MLBase&lt;/code&gt;. The next block of code calculates the confusion matrix and displays it. Most of instances are on located on the diagonal, which is not a surprise given that the accuracy rate for our model is more than $97.0\%$&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using MLBase
+# Adding 1 to outcome because the index 0 in arrays does not exist in Julia
+Cm = confusmat(10, test_labels .+ 1, vec(pred) .+ 1)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;10×10 Array{Int64,2}:
+ 968     1     1    0    0    4    3    1    2    0
+   0  1128     3    0    0    0    1    0    3    0
+   3     5  1003    6    1    1    0    6    7    0
+   0     0     1  992    0   10    0    2    4    1
+   0     1     2    0  972    0    0    1    1    5
+   1     0     1    4    0  883    1    1    1    0
+   1     4     0    0    1   13  936    0    3    0
+   1     7    10    5    0    1    0  986    3   15
+   2     0     4    6    4    8    2    4  942    2
+   4     4     0    7    7   10    0    8    2  967
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Normalize output:
+Cm  = Cm ./ sum(Cm, dims=2)
+# Labels
+xs = [string(i) for i = 0:9]
+heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;CNN_41_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To visualize where our model makes mistakes, one can use the optional argument &lt;code&gt;clim&lt;/code&gt;, to put an upper bound on
+the underlying colormap. For instance, the next plot shows that our model has troubles differencing 7 and 2 or 8 and 2.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Limits to colormap, so we can see where errors are located:
+xs = [string(i) for i = 0:9]
+heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma, clim=(0., 0.01))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;CNN_43_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;error-analysis&#34;&gt;Error Analysis&lt;/h4&gt;
+
+&lt;p&gt;The next block of code displays digits for which our CNN failed:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# indices for errors:
+using ImageView, Gtk.ShortNames
+mistakes = test_labels .!= vec(pred)
+max_images = 5
+grid, frames, canvases = canvasgrid((1,max_images)); # 1 row
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;k=0#counter for mistakes
+for (j, i) in enumerate(mistakes)
+    if i == true
+        k+=1 # a false value has been found
+        println(&amp;quot;Predicted value = $(pred[j])&amp;quot;)
+        println(&amp;quot;True value = $(test_labels[j])&amp;quot;)
+        imshow(canvases[1,k], test_imgs[j])
+        idx = ImageView.annotate!(guidict, AnnotationText(0, 0, &amp;quot;$(pred[j])&amp;quot;, color=RGB(0,0,0), fontsize=3))
+    end
+    if k &amp;gt;= max_images
+        break
+    end
+end
+win = Window(grid);
+Gtk.showall(win);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Predicted value = 5
+True value = 9
+Predicted value = 5
+True value = 6
+Predicted value = 4
+True value = 8
+Predicted value = 3
+True value = 2
+Predicted value = 7
+True value = 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;false_values.png&#34; alt=&#34;alt&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;While it seems obvious that the two digits starting from the left are a 9 and a 6, the remaining 3 elements are not trivial. The 8 in the middle could be easily confused with something else and the two remaining digits are weirdly shaped.&lt;/p&gt;
 
 &lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
 
