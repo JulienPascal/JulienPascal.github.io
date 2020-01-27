@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  
+  
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/slides/rentalmarket/">
+
+  <title>Rental Housing Market and Directed Search | Julien Pascal</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/css/reveal.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/css/theme/black.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous">
+
+  
+  
+  
+  <link rel="stylesheet" href="/css/reveal_custom.min.css">
+
+  
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/css/print/pdf.css' : 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+
+</head>
+<body>
+
+  
+<div class="reveal">
+  <div class="slides">
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="rental-housing-market-and-directed-search">Rental Housing Market and Directed Search</h2>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="introduction">Introduction</h3>
+
+<h4 id="context">Context</h4>
+
+<ul>
+<li>Rents have surged in big cities worldwide</li>
+</ul>
+
+<blockquote>
+<p>The median American rent payment rose 61% in real terms between 1960 and 2016 while the median renter’s income grew by 5%</p>
+</blockquote>
+
+<ul>
+<li>Housing shortages and rent control in many major cities</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="questions">Questions</h4>
+
+<ul>
+<li>Are rent control legislations effective?</li>
+<li>Do we observe asymmetric bargaining power between renters and landlords?</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h1 id="data">Data</h1>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="data-sources">Data Sources</h2>
+
+<ul>
+<li>Web scraping: online ads posted on the major platforms for the Paris market (PAP, Leboncoin, etc.)
+between April and May 2019</li>
+<li>I observe the <strong>two sides</strong> of the rental housing market:
+
+<ul>
+<li>supply: apartment features, text description and photos</li>
+<li>demand: number of contacts received by the renters</li>
+</ul></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="descriptive-statistics">Descriptive statistics</h2>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="city-and-month">City and Month</h4>
+
+<p><img src="/img/RentalMarket/city_month.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="apartment-features">Apartment features</h4>
+
+<p><img src="/img/RentalMarket/table_descriptive_1.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="aesthetic-score">Aesthetic score</h4>
+
+<ul>
+<li>Aesthetic score calculated from photo data</li>
+<li>I use a convolutional neural network based on the work of <a href="https://arxiv.org/abs/1709.05424" target="_blank">Talebi and Milanfar (2018)</a></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="aesthetic-score-1">Aesthetic score</h4>
+
+<p><img src="/img/RentalMarket/plot_aesthetic.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="what-features-are-important-to-predict-rent">What features are important to predict rent?</h3>
+
+<p>$$y_{i} = \alpha + \boldsymbol{x_{i}}^{&lsquo;} \boldsymbol{\beta} + \varepsilon_{i}$$</p>
+
+<ul>
+<li>$\boldsymbol{x_{i}}$: apartment features</li>
+<li>$\varepsilon_{i}$: error term</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="rent-and-apartment-characteristics">Rent and apartment characteristics</h4>
+
+<p><img src="/img/RentalMarket/reg_table_1.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="residual-price-dispersion-and-number-of-contacts">Residual price dispersion and number of contacts</h2>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="number-of-contacts-per-ad">Number of contacts per ad</h4>
+
+<ul>
+<li>I observe the number of contacts per ad</li>
+<li>Data is truncated: visible only when number of contacts $\geq$ 10</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="number-of-contacts-per-ad-1">Number of contacts per ad</h4>
+
+<p><img src="/img/RentalMarket/nb_contacts_combined.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="deviation-from-predicted-price-and-number-of-contacts-per-ad">Deviation from predicted price and number of contacts per ad</h4>
+
+<p><img src="/img/RentalMarket/density_deviation_predicted_price_AND_contacts_posttrim.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="truncated-regression">Truncated regression</h4>
+
+<ul>
+<li>$y_i = \boldsymbol{x_{i}}^{&lsquo;} \boldsymbol{\beta} + \varepsilon_{i}$</li>
+<li>$y_i$ in the sample if $y_i \geq c$</li>
+</ul>
+
+<p><img src="/img/RentalMarket/truncated_reg.png" alt="" /></p>
+
+<ul>
+<li>Interpretation: an apartment €100 below its market price attracts on average 1.5 more contacts</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="summary">Summary</h2>
+
+<ul>
+<li>Cheaper (than expected) apartments attract more renters</li>
+<li>A simple directed search model predicts this pattern</li>
+</ul>
+
+<h2 id="wip">WIP</h2>
+
+<ul>
+<li>I observe price movements for the <strong>same</strong> apartment across time</li>
+<li>Common strategy: (1) over-pricing first -&gt; (2) decrease to market price</li>
+<li>Learning or excess bargaining power for renters?</li>
+</ul>
+
+    </section>
+    
+
+    
+    
+  </div>
+</div>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/lib/js/head.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/js/reveal.min.js"></script>
+
+  <script>
+    window.revealPlugins = { dependencies: [
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/zoom-js/zoom.js', async: true },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/math/math.js', async: true },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/print-pdf/print-pdf.js', async: true },
+      
+      { src: '\/js\/vendor\/reveal.js\/plugin\/notes\/notes.js', async: true }
+    ]};
+
+    let revealDefaults = { center: true, controls: true, history: true, progress: true, transition: 'slide', mouseWheel: true };
+    let revealOptions = Object.assign({}, revealDefaults, revealPlugins);
+    Reveal.initialize(revealOptions);
+  </script>
+
+</body>
+</html>

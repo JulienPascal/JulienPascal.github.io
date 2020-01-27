@@ -839,7 +839,7 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
       <pubDate>Mon, 21 Oct 2019 18:11:07 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
-      <description>&lt;p&gt;Using a novel dataset on the rental housing market in the Paris area, I show that the rental housing market is well described by a directed search model. I develop a hedonic pricing model taking into consideration apartments’ characteristics and subjective attractiveness using photos and computer vision techniques from the machine learning literature.&lt;/p&gt;
+      <description>&lt;p&gt;Using a novel dataset on the rental housing market in the Paris area, I show that the rental housing market is well described by a directed search model. I develop a hedonic pricing model taking into consideration apartment features and subjective attractiveness using photos and computer vision techniques from the machine learning literature.&lt;/p&gt;
 
 &lt;hr /&gt;
 
