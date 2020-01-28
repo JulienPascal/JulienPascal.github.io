@@ -843,13 +843,13 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
 
 &lt;hr /&gt;
 
-&lt;p&gt;To quantify visual attractiveness, I use a convolutional neural network based on a &lt;a href=&#34;https://arxiv.org/abs/1709.05424&#34; target=&#34;_blank&#34;&gt;paper&lt;/a&gt; by Talebi and Peyman (2018). To see how the
-CNN works, you can get an attractiveness score for your own image on this website:
-&lt;a href=&#34;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&#34; target=&#34;_blank&#34;&gt;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/rental-market/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;hr /&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/rental-market/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;To quantify visual attractiveness, I use a convolutional neural network based on a &lt;a href=&#34;https://arxiv.org/abs/1709.05424&#34; target=&#34;_blank&#34;&gt;paper&lt;/a&gt; by Talebi and Peyman (2018). To see how the
+CNN works, you can get an attractiveness score for your own image using a small website I have created for the occasion:
+&lt;a href=&#34;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&#34; target=&#34;_blank&#34;&gt;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -2860,7 +2860,15 @@ market with search frictions, heterogeneous workers and firms, and business cycl
       <pubDate>Wed, 13 Mar 2019 18:11:18 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
-      <description>&lt;p&gt;We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers. This is a joint project with &lt;a href=&#34;https://nicolodalvit.github.io/&#34; target=&#34;_blank&#34;&gt;Nicolò Dalvit&lt;/a&gt;.&lt;/p&gt;
+      <description>&lt;p&gt;We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic model of the labor market with search frictions, heterogeneous workers, an aggregate TFP shock and a non-linear payroll tax schedule.&lt;/p&gt;
+
+&lt;p&gt;We estimate the model using Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers.&lt;/p&gt;
+
+&lt;p&gt;This is a joint project with &lt;a href=&#34;https://nicolodalvit.github.io/&#34; target=&#34;_blank&#34;&gt;Nicolò Dalvit&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/pdf/poster_sam_2018_Dalvit_Pascal_v2.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/poster_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

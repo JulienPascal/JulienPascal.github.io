@@ -19,6 +19,7 @@
       
       <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
       <description>Using a novel dataset on the rental housing market in the Paris area, I show that the rental housing market is well described by a directed search model. I develop a hedonic pricing model taking into consideration apartment features and subjective attractiveness using photos and computer vision techniques from the machine learning literature.
+
 To quantify visual attractiveness, I use a convolutional neural network based on a paper by Talebi and Peyman (2018).</description>
     </item>
     
@@ -37,7 +38,8 @@ To quantify visual attractiveness, I use a convolutional neural network based on
       <pubDate>Wed, 13 Mar 2019 18:11:18 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/taxation_labor/</guid>
-      <description>We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic search-and-matching model of the labor market featuring heterogeneous workers, aggregate and idiosyncratic shocks and a non-linear payroll tax schedule. We estimate the model on Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers.</description>
+      <description>We develop a theoretical framework to evaluate the contribution of different payroll tax schedules to business cycle fluctuations. We build and estimate a dynamic model of the labor market with search frictions, heterogeneous workers, an aggregate TFP shock and a non-linear payroll tax schedule.
+We estimate the model using Italian administrative data for the period 1977-2012 and use our estimated framework to quantitatively evaluate how different payroll tax schedules can amplify business cycle shocks for different types of workers.</description>
     </item>
     
     <item>
