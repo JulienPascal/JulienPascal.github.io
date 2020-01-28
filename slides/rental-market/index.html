@@ -81,7 +81,7 @@
 </ul>
 
 <blockquote>
-<p>The median American rent payment rose 61% in real terms between 1960 and 2016 while the median renter’s income grew by 5%</p>
+<p>The median American rent payment rose 61% in real terms between 1960 and 2016 while the median tenant’s income grew by 5%</p>
 </blockquote>
 
 
@@ -128,13 +128,13 @@
 <h2 id="data-sources">Data Sources</h2>
 
 <ul>
-<li>Web scraping: online ads posted on the major platforms for the Paris market (PAP, Leboncoin, etc.)
+<li>Web scraping: online platform that collects online ads for the Paris market
 between April and May 2019</li>
 <li>I have data on the <strong>two sides</strong> of the rental housing market:
 
 <ul>
 <li>supply: apartment features, text description and photos</li>
-<li>demand: number of contacts received by the tenants</li>
+<li>demand: number of contacts received by landlords (through the online platform)</li>
 </ul></li>
 </ul>
 
@@ -244,10 +244,14 @@ between April and May 2019</li>
 
 <h3 id="what-features-are-important-to-predict-rent">What features are important to predict rent?</h3>
 
+<h4 id="linear-model">Linear model</h4>
+
 <p>$$y_{i} = \alpha + \boldsymbol{x_{i}}^{&lsquo;} \boldsymbol{\beta} + \varepsilon_{i}$$</p>
 
 <ul>
+<li>$\boldsymbol{y_{i}}$: rent (in €)</li>
 <li>$\boldsymbol{x_{i}}$: apartment features</li>
+<li>$\alpha$: constant</li>
 <li>$\varepsilon_{i}$: error term</li>
 </ul>
 
