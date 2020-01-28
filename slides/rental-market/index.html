@@ -76,16 +76,13 @@
 <h4 id="context">Context</h4>
 
 <ul>
+<li>Housing shortages in many major cities</li>
 <li>Rents have surged in big cities worldwide</li>
 </ul>
 
 <blockquote>
 <p>The median American rent payment rose 61% in real terms between 1960 and 2016 while the median renter’s income grew by 5%</p>
 </blockquote>
-
-<ul>
-<li>Housing shortages and rent control in many major cities</li>
-</ul>
 
 
     </section>
@@ -101,8 +98,7 @@
 <h4 id="questions">Questions</h4>
 
 <ul>
-<li>Are rent control legislations effective?</li>
-<li>Do we observe asymmetric bargaining power between renters and landlords?</li>
+<li>Do we observe asymmetric bargaining power between tenants and landlords?</li>
 </ul>
 
 
@@ -134,11 +130,11 @@
 <ul>
 <li>Web scraping: online ads posted on the major platforms for the Paris market (PAP, Leboncoin, etc.)
 between April and May 2019</li>
-<li>I observe the <strong>two sides</strong> of the rental housing market:
+<li>I have data on the <strong>two sides</strong> of the rental housing market:
 
 <ul>
 <li>supply: apartment features, text description and photos</li>
-<li>demand: number of contacts received by the renters</li>
+<li>demand: number of contacts received by the tenants</li>
 </ul></li>
 </ul>
 
@@ -166,9 +162,9 @@ between April and May 2019</li>
     
       
 
-<h4 id="city-and-month">City and Month</h4>
+<h4 id="ads-per-city">Ads per city</h4>
 
-<p><img src="/img/RentalMarket/city_month.png" alt="" /></p>
+<p><img src="/img/RentalMarket/obs_per_city.png" alt="" /></p>
 
 
     </section>
@@ -199,8 +195,10 @@ between April and May 2019</li>
 <h4 id="aesthetic-score">Aesthetic score</h4>
 
 <ul>
-<li>Aesthetic score calculated from photo data</li>
-<li>I use a convolutional neural network based on the work of <a href="https://arxiv.org/abs/1709.05424" target="_blank">Talebi and Milanfar (2018)</a></li>
+<li>Aesthetic score calculated based on photos</li>
+<li>I use a convolutional neural network (CNN) based on the work of <a href="https://arxiv.org/abs/1709.05424" target="_blank">Talebi and Milanfar (2018)</a></li>
+<li>CNN assigns a score to each photo</li>
+<li>Ad aesthetic score = median score</li>
 </ul>
 
 
@@ -214,9 +212,24 @@ between April and May 2019</li>
     
       
 
-<h4 id="aesthetic-score-1">Aesthetic score</h4>
+<h4 id="number-of-photos-per-ad">Number of photos per ad</h4>
 
-<p><img src="/img/RentalMarket/plot_aesthetic.png" alt="" /></p>
+<p><img src="/img/RentalMarket/distribution_nb_images.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="density-aesthetic-score">Density aesthetic score</h4>
+
+<p><img src="/img/RentalMarket/distribution_aesthetic.png" alt="" /></p>
 
 
     </section>
@@ -266,6 +279,13 @@ between April and May 2019</li>
 
 <h2 id="residual-price-dispersion-and-number-of-contacts">Residual price dispersion and number of contacts</h2>
 
+<p>residual price dispersion = predicted price - actual price</p>
+
+<ul>
+<li>residual price dispersion &lt; 0: More expensive than expected</li>
+<li>residual price dispersion &gt; 0: Cheaper than expected</li>
+</ul>
+
 
     </section>
     
@@ -280,9 +300,24 @@ between April and May 2019</li>
 <h4 id="number-of-contacts-per-ad">Number of contacts per ad</h4>
 
 <ul>
-<li>I observe the number of contacts per ad</li>
-<li>Data is truncated: visible only when number of contacts $\geq$ 10</li>
+<li>I have data on the number of contacts per ad (through the online platform)</li>
+<li>Data is truncated: # of contacts observed only when number of contacts $\geq$ 10</li>
 </ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h4 id="percentage-of-ads-with-more-than-10-contacts">Percentage of ads with more than 10 contacts</h4>
+
+<p><img src="/img/RentalMarket/nb_contacts_threshold.png" alt="" /></p>
 
 
     </section>
@@ -297,7 +332,7 @@ between April and May 2019</li>
 
 <h4 id="number-of-contacts-per-ad-1">Number of contacts per ad</h4>
 
-<p><img src="/img/RentalMarket/nb_contacts_combined.png" alt="" /></p>
+<p><img src="/img/RentalMarket/nb_contacts.png" alt="" /></p>
 
 
     </section>
@@ -327,10 +362,14 @@ between April and May 2019</li>
 
 <h4 id="truncated-regression">Truncated regression</h4>
 
+<h5 id="model">Model:</h5>
+
 <ul>
 <li>$y_i = \boldsymbol{x_{i}}^{&lsquo;} \boldsymbol{\beta} + \varepsilon_{i}$</li>
 <li>$y_i$ in the sample if $y_i \geq c$</li>
 </ul>
+
+<h5 id="results">Results:</h5>
 
 <p><img src="/img/RentalMarket/truncated_reg.png" alt="" /></p>
 
@@ -349,19 +388,40 @@ between April and May 2019</li>
     
       
 
+<h4 id="price-movements">Price movements</h4>
+
+<ul>
+<li>I have data on price movements for the <strong>same</strong> apartment across time</li>
+<li>Common strategy for landlords:
+
+<ol>
+<li>set a price above the market price</li>
+<li>decrease to market price after a &ldquo;wait and see&rdquo; period</li>
+</ol></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
 <h2 id="summary">Summary</h2>
 
 <ul>
-<li>Cheaper (than expected) apartments attract more renters</li>
+<li>Cheaper (than expected) apartments attract more tenants</li>
 <li>A simple directed search model predicts this pattern</li>
 </ul>
 
-<h2 id="wip">WIP</h2>
+<h3 id="work-in-progress">Work in progress</h3>
 
 <ul>
-<li>I observe price movements for the <strong>same</strong> apartment across time</li>
-<li>Common strategy: (1) over-pricing first -&gt; (2) decrease to market price</li>
-<li>Learning or excess bargaining power for renters?</li>
+<li>Landlords&rsquo; pricing strategy: learning or excess bargaining power?</li>
 </ul>
 
     </section>

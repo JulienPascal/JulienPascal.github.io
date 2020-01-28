@@ -846,6 +846,10 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
 &lt;p&gt;To quantify visual attractiveness, I use a convolutional neural network based on a &lt;a href=&#34;https://arxiv.org/abs/1709.05424&#34; target=&#34;_blank&#34;&gt;paper&lt;/a&gt; by Talebi and Peyman (2018). To see how the
 CNN works, you can get an attractiveness score for your own image on this website:
 &lt;a href=&#34;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&#34; target=&#34;_blank&#34;&gt;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/rental-market/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -2867,6 +2871,12 @@ market with search frictions, heterogeneous workers and firms, and business cycl
       
       <guid>https://julienpascal.github.io/project/spatialeq/</guid>
       <description>&lt;p&gt;I exploit a spatial discontinuity introduced by a French reform in September 2015 to measure the links between commuting costs, employment and location decisions. In the municipalities benefiting from the reform, I find that the reform led to a 2% decrease in the number of unemployed workers registered in the French unemployment agency. The employment effect is concentrated on long-term unemployed workers. I build a simple spatial search-and-matching to underline the mechanism at play.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/pdf/Spatial_Equilibrium_and_Commuting_Time.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/spatial-eq/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -2877,6 +2887,10 @@ market with search frictions, heterogeneous workers and firms, and business cycl
       
       <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
       <description>&lt;p&gt;This paper analyzes the determinants of labor income shocks along the business cycle. My main finding is that sorting between firms and workers is a key component of idiosyncratic risk. Labor income shocks are analyzed through the lenses of a dynamic search-and-matching model, which I estimate using US data. Because of search frictions and mismatches between firms and workers, the &lt;em&gt;laissez-faire&lt;/em&gt; equilibrium is not necessarily optimal. My results underline that the government can tame business cycle fluctuations by designing a simple unemployment insurance scheme improving sorting between firms and workers.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/pdf/Labor_Income_Shocks_Along_the_Business_Cycle.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
