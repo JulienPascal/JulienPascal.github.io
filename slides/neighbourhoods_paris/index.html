@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  
+  
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/slides/neighbourhoods_paris/">
+
+  <title>Capstone Project - The Battle of Neighborhoods | Julien Pascal</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/css/reveal.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/css/theme/black.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous">
+
+  
+  
+  
+  <link rel="stylesheet" href="/css/reveal_custom.min.css">
+
+  
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/css/print/pdf.css' : 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+
+</head>
+<body>
+
+  
+<div class="reveal">
+  <div class="slides">
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<p><img src="/img/ClusteringParis/paris.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="introduction">Introduction</h3>
+
+<ul>
+<li>Which neighborhoods to visit when in Paris?</li>
+<li>Where to live in Paris?</li>
+</ul>
+
+<p>Answers depends on <strong>your preferences</strong></p>
+
+<h3 id="this-project">This project</h3>
+
+<ul>
+<li>Cluster neighborhoods in Paris and analyze clusters</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h1 id="data-and-methodology">Data and Methodology</h1>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="data-sources">Data Sources</h2>
+
+<ul>
+<li><a href="https://developer.foursquare.com/" target="_blank">Foursquare</a>: geolocalized data on venues</li>
+<li><a href="https://en.wikipedia.org/wiki/Arrondissements_of_Paris" target="_blank">Wikipedia</a>: data on neighborhoods (called &ldquo;arrondissements&rdquo;)</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="methodology">Methodology</h2>
+
+<ul>
+<li>Similarity based on venue types (restaurants, cafés, hotels, etc.)</li>
+<li>k-means clustering using <a href="https://scikit-learn.org/stable/" target="_blank">scikit-learn</a></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h1 id="results">Results</h1>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="five-clusters-identified">Five clusters identified</h2>
+
+<p><img src="/img/ClusteringParis/map_paris_clusters.png" alt="alt text" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="five-clusters-identified-1">Five clusters identified</h2>
+
+<ul>
+<li>cluster 1 (in red): 5th, 7th, 8th, 14th, 15th, 16th and 17th arrondissements</li>
+<li>cluster 2 (in purple): 12th arrondissement</li>
+<li>cluster 3 (in blue): 1st, 2nd, 3rd, 4th, 6th, 9th and 10th</li>
+<li>cluster 4 (in light green): 11th, 18th, 19th, and 20th</li>
+<li>cluster 5 (in orange): 13th arrondissement</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h1 id="cluster-properties">Cluster properties</h1>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="cluster-1">Cluster 1</h3>
+
+<p><img src="/img/ClusteringParis/cluster1.png" alt="alt text" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="cluster-2">Cluster 2</h3>
+
+<p><img src="/img/ClusteringParis/cluster2.png" alt="alt text" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="cluster-3">Cluster 3</h3>
+
+<p><img src="/img/ClusteringParis/cluster3.png" alt="alt text" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="cluster-4">Cluster 4</h3>
+
+<p><img src="/img/ClusteringParis/cluster4.png" alt="alt text" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="cluster-5">Cluster 5</h3>
+
+<p><img src="/img/ClusteringParis/cluster5.png" alt="alt text" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="suggestions-based-on-preferences">Suggestions based on preferences</h3>
+
+<ul>
+<li>cluster 1: for a “French” experience, in a mostly quiet and residential area</li>
+<li>cluster 2: for fresh air and sport(near Bois de Vincennes)</li>
+<li>cluster 3: a mix of art, museums and diverse cuisine</li>
+<li>cluster 4: for the best bars and pizza experience in town</li>
+<li>cluster 5: Asian cuisine aficionados</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h1 id="conclusion">Conclusion</h1>
+
+<ul>
+<li><p>Which neighborhoods to visit when in Paris? Where to live in Paris?</p></li>
+
+<li><p>k-means clustering combined with Fousquare API generates new insights</p></li>
+</ul>
+
+    </section>
+    
+
+    
+    
+  </div>
+</div>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/lib/js/head.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/js/reveal.min.js"></script>
+
+  <script>
+    window.revealPlugins = { dependencies: [
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/zoom-js/zoom.js', async: true },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/math/math.js', async: true },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/print-pdf/print-pdf.js', async: true },
+      
+      { src: '\/js\/vendor\/reveal.js\/plugin\/notes\/notes.js', async: true }
+    ]};
+
+    let revealDefaults = { center: true, controls: true, history: true, progress: true, transition: 'slide', mouseWheel: true };
+    let revealOptions = Object.assign({}, revealDefaults, revealPlugins);
+    Reveal.initialize(revealOptions);
+  </script>
+
+</body>
+</html>

@@ -12,6 +12,16 @@
     
     
     <item>
+      <title>Capstone Project - The Battle of Neighborhoods</title>
+      <link>https://julienpascal.github.io/slides/neighbourhoods_paris/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/slides/neighbourhoods_paris/</guid>
+      <description>Introduction  Which neighborhoods to visit when in Paris? Where to live in Paris?  Answers depends on your preferences
+This project  Cluster neighborhoods in Paris and analyze clusters  Data and Methodology Data Sources  Foursquare: geolocalized data on venues Wikipedia: data on neighborhoods (called &amp;ldquo;arrondissements&amp;rdquo;)  Methodology  Similarity based on venue types (restaurants, cafés, hotels, etc.) k-means clustering using scikit-learn  Results Five clusters identified Five clusters identified  cluster 1 (in red): 5th, 7th, 8th, 14th, 15th, 16th and 17th arrondissements cluster 2 (in purple): 12th arrondissement cluster 3 (in blue): 1st, 2nd, 3rd, 4th, 6th, 9th and 10th cluster 4 (in light green): 11th, 18th, 19th, and 20th cluster 5 (in orange): 13th arrondissement  Cluster properties Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Suggestions based on preferences  cluster 1: for a “French” experience, in a mostly quiet and residential area cluster 2: for fresh air and sport(near Bois de Vincennes) cluster 3: a mix of art, museums and diverse cuisine cluster 4: for the best bars and pizza experience in town cluster 5: Asian cuisine aficionados  Conclusion  Which neighborhoods to visit when in Paris?</description>
+    </item>
+    
+    <item>
       <title>Rental Housing Market and Directed Search</title>
       <link>https://julienpascal.github.io/slides/rental-market/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
