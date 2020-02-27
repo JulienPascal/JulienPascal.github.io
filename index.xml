@@ -844,12 +844,6 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
 &lt;hr /&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/rental-market/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;To quantify visual attractiveness, I use a convolutional neural network based on a &lt;a href=&#34;https://arxiv.org/abs/1709.05424&#34; target=&#34;_blank&#34;&gt;paper&lt;/a&gt; by Talebi and Peyman (2018). To see how the
-CNN works, you can get an attractiveness score for your own image using a small website I have created for the occasion:
-&lt;a href=&#34;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&#34; target=&#34;_blank&#34;&gt;http://ratemyphoto.us-east-1.elasticbeanstalk.com/&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
