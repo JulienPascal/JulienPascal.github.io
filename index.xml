@@ -18,7 +18,7 @@
       <guid>https://julienpascal.github.io/post/lqr/</guid>
       <description>
 
-&lt;p&gt;The two main goals of this blog post is to introduce what the &lt;a href=&#34;https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator&#34; target=&#34;_blank&#34;&gt;linear–quadratic regulator (LQR)&lt;/a&gt; framework is and to show how to start solving LQR problems in Python. The LQR is concerned with operating a dynamic system (a rocket, a car, the economy, etc.) at minimum cost.&lt;/p&gt;
+&lt;p&gt;The two main goals of this blog post is to introduce what the &lt;a href=&#34;https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator&#34; target=&#34;_blank&#34;&gt;linear–quadratic regulator (LQR)&lt;/a&gt; framework is and to show how to solve LQR problems using Python. The LQR is concerned with operating a dynamic system (a rocket, a car, the economy, etc.) at minimum cost.&lt;/p&gt;
 
 &lt;h4 id=&#34;in-this-blog-post-you-will-learn&#34;&gt;In this blog post you will learn&lt;/h4&gt;
 
