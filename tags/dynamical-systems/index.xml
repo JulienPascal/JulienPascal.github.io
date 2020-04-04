@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dynamical systems on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/dynamical-systems/</link>
+    <description>Recent content in Dynamical systems on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Wed, 01 Apr 2020 18:53:22 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/tags/dynamical-systems/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The linear–quadratic regulator Part I</title>
+      <link>https://julienpascal.github.io/post/lqr/</link>
+      <pubDate>Wed, 01 Apr 2020 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/lqr/</guid>
+      <description>The two main goals of this blog post is to introduce what the linear–quadratic regulator (LQR) framework is and to show how to start solving LQR problems in Python. The LQR is concerned with operating a dynamic system (a rocket, a car, the economy, etc.) at minimum cost.
+In this blog post you will learn  what the LQR framework is how to simulate forward an ordinary differential equation using scipy how to solve for the optimal control using the Python Control Systems Library  The Jupyter notebook with the code used to generate this blog post can be found here</description>
+    </item>
+    
+  </channel>
+</rss>

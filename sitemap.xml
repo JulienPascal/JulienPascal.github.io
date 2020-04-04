@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/post/lqr/</loc>
+      <lastmod>2020-04-01T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/cnn/</loc>
       <lastmod>2019-12-05T18:53:22+01:00</lastmod>
     </url>
@@ -265,6 +273,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/dynamical-systems/</loc>
+      <lastmod>2020-04-01T18:53:22+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/econometrics/</loc>
       <lastmod>2019-11-22T18:53:22+01:00</lastmod>
       <priority>0</priority>
@@ -302,7 +319,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
+      <lastmod>2020-04-01T18:53:22+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -329,7 +346,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/post/</loc>
-      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
+      <lastmod>2020-04-01T18:53:22+01:00</lastmod>
     </url>
     
   

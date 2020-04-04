@@ -7,8 +7,301 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Thu, 05 Dec 2019 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 01 Apr 2020 18:53:22 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The linear–quadratic regulator Part I</title>
+      <link>https://julienpascal.github.io/post/lqr/</link>
+      <pubDate>Wed, 01 Apr 2020 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/lqr/</guid>
+      <description>
+
+&lt;p&gt;The two main goals of this blog post is to introduce what the &lt;a href=&#34;https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator&#34; target=&#34;_blank&#34;&gt;linear–quadratic regulator (LQR)&lt;/a&gt; framework is and to show how to start solving LQR problems in Python. The LQR is concerned with operating a dynamic system (a rocket, a car, the economy, etc.) at minimum cost.&lt;/p&gt;
+
+&lt;h4 id=&#34;in-this-blog-post-you-will-learn&#34;&gt;In this blog post you will learn&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;what the LQR framework is&lt;/li&gt;
+&lt;li&gt;how to simulate forward an ordinary differential equation using &lt;a href=&#34;https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html&#34; target=&#34;_blank&#34;&gt;scipy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;how to solve for the optimal control using the &lt;a href=&#34;https://python-control.readthedocs.io/en/0.8.3/&#34; target=&#34;_blank&#34;&gt;Python Control Systems Library&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The Jupyter notebook with the code used to generate this blog post can be found &lt;a href=&#34;https://github.com/JulienPascal/KoopmanObservableSubspaces&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;i-the-lqr-framework-in-a-nutshell&#34;&gt;I. The LQR framework in a nutshell&lt;/h2&gt;
+
+&lt;p&gt;Many natural phenomena naturally lead to differential equations. A differential equation is an equation in which the rate of the change of a variable ($\frac{d}{dt} x$) is a function its state $x$. The unknown is a function satisfying both the differential equation and an initial value. For instance, a simple model of the spread of the Covid-19 can be written as a system of differential equations (see for instance the &lt;a href=&#34;https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology&#34; target=&#34;_blank&#34;&gt;SIR model&lt;/a&gt;):&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \boldsymbol{x} = f(\boldsymbol{x},t) $$&lt;/p&gt;
+
+&lt;p&gt;The LQR theory studies a special case of the above problem. It focuses on problems where the function $f(\boldsymbol{x},t)$ is linear:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \boldsymbol{x} = A  \boldsymbol{x} $$&lt;/p&gt;
+
+&lt;p&gt;The equation above is a &amp;ldquo;passive&amp;rdquo; one. We simply observe the trajectory of $\boldsymbol{x}$ and there is nothing we can do about it. The LQR framework is based on the idea that an observer may want to change the trajectory of the system by exerting a control on $\boldsymbol{x}$. In the case of the spread of the Covid-19, the government may want to limit the number of new cases. When considering the economy, a central bank may want to control the interest rate to reach its inflation target. In the case of the SpaceX, the engineers may want to stabilize the rocket so that it does not explode when trying to land back on Earth.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;spaceX.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the LQR framework, the controller wants to stabilize the system to reach one of its steady-state values, defined by:&lt;/p&gt;
+
+&lt;p&gt;$$ \boldsymbol{x_{ss}} = A \boldsymbol{x_{ss}} $$&lt;/p&gt;
+
+&lt;p&gt;We need to take into consideration the impact that the controller has on the system. Let us add the control, denoted by $u$, to the uncontrolled system from above:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \boldsymbol{x} = A  \boldsymbol{x} + B  \boldsymbol{u} $$&lt;/p&gt;
+
+&lt;p&gt;where $B$ is a matrix capturing the idea that the controller could only control some elements of $\boldsymbol{x}$.&lt;/p&gt;
+
+&lt;p&gt;However, there is no free lunch. In order to stabilize the system, the controller needs to pay a cost. Going back to our rocket example, some fuel is burnt in order to stabilize the trajectory of the rocket. The LQR is based on a cost function that is quadratic. This quadratic assumption simplifies the algebra substantially and captures the intuitive idea that doubling the effort actually costs four times more, not two times more.&lt;/p&gt;
+
+&lt;p&gt;Let us assume that the steady state of the system is $\boldsymbol{0}$. This is without loss of generality, because we can rewrite the system as a deviation from its steady-state value $\boldsymbol{\tilde{x}} \equiv \boldsymbol{x} - \boldsymbol{x_{ss}}$, in which case the steady-state is reached for  $\boldsymbol{\tilde{x}} = \boldsymbol{0}$.&lt;/p&gt;
+
+&lt;p&gt;To capture the cost of stabilizing the system, let us use the letter $J$. $J$ captures two types of cost. Firstly, the controller dislikes when the system is not at its steady-state. In the equation below, this type of cost is captured by the matrix $Q$. Secondly, the controller dislikes spending energy to control the system. This second type of cost is captured by the matrix $R$:&lt;/p&gt;
+
+&lt;p&gt;$$ J = \int_{0}^{\infty} \boldsymbol{x&amp;rsquo;}(t) Q \boldsymbol{x}(t) + \boldsymbol{u&amp;rsquo;}(t) R \boldsymbol{u}(t) dt $$&lt;/p&gt;
+
+&lt;p&gt;A beautiful result from the LQR theory is that the optimal control from the controller is simply a linear function of the current state of the system:&lt;/p&gt;
+
+&lt;p&gt;$$ \boldsymbol{u} = - C \boldsymbol{x}$$&lt;/p&gt;
+
+&lt;p&gt;When the system is controlled optimally, the equation governing the evolution of the system writes:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \boldsymbol{x} = A \boldsymbol{x} - B  C \boldsymbol{x} $$&lt;/p&gt;
+
+&lt;h2 id=&#34;ii-simulating-forward-an-ordinary-differential-equation-in-python&#34;&gt;II. Simulating forward an ordinary differential equation in Python&lt;/h2&gt;
+
+&lt;p&gt;Having summarized what the LQR framework is, we can now give an illustration of how it works using a simple example using Python. For what follows, you will need the following packages:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import os
+import matplotlib.pyplot as plt
+plt.style.use(&#39;ggplot&#39;)
+%matplotlib inline
+import numpy as np
+from control.matlab import *  # MATLAB-like functions
+#to solve ODE
+from scipy import integrate
+#show the version of Python I am using:
+!python3 --version
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Python 3.5.2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s study optimal control for the following differential equation:&lt;/p&gt;
+
+&lt;p&gt;$$\begin{cases} \frac{d}{dt} x =\mu x \\ \frac{d}{dt} y = \lambda (y - x^2) \end{cases}$$&lt;/p&gt;
+
+&lt;p&gt;Two observations on this dynamical system. Firstly, the system is not linear, but we will see how to deal with that in a minute. Secondly, by eyeballing the equation, it is easy to see that when $\mu &amp;lt; 1$ and $\lambda &amp;lt; 1$, the unique fixed point is&lt;/p&gt;
+
+&lt;p&gt;$$ \begin{pmatrix} x_{SS} \\ y_{SS} \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} $$&lt;/p&gt;
+
+&lt;p&gt;We can convince ourselves by simulating forward the trajectory of the system using different starting values.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s notice that the system can be written as a linear one, plus a part that is nonlinear:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} \mu &amp;amp; 0 \\ 0 &amp;amp; \lambda \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} +  \begin{pmatrix} O \\ -  \lambda x^2 \end{pmatrix} $$&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \begin{pmatrix} x \\ y \end{pmatrix} = A \begin{pmatrix} x \\ y \end{pmatrix} +  \begin{pmatrix} O \\ -  \lambda x^2 \end{pmatrix}$$&lt;/p&gt;
+
+&lt;p&gt;The following block of code defines the parameter values, the matrix A for the linear part of the differential equation and the matrix B specifying that the controller can only act on x. We also specify the time span during which we want to simulate forward the trajectories:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Parameters and matrices A and B:
+mu = -0.05
+llambda = -1.0
+A = np.array([[mu, 0], [0, llambda]])
+B = np.array([[0], [1]])
+# Time span
+t0, t1 = 0, 100 # start and end
+t = np.arange(t0, t1, 0.01)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A clean way to simulate forward the trajectory is to define a function that return the evolution of the system:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Function that defines the dynamic system:
+def vdp0(t, y):
+    # linear part + nonlinear part:
+    x = A.dot(y) + np.array([0, -llambda*(y[0]**2)])
+    return x
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We then define 4 different starting values and simulate forward the system using the &lt;code&gt;scipy.integrate&lt;/code&gt; toolkit:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Set of starting values:
+y0A = np.array([1.5, -1])
+y0B = np.array([-1.5, -1])
+y0C = np.array([5, 5])
+y0D = np.array([-5, 5])
+
+# To store the different trajectories
+list_y = []
+
+# Method for the ODE:
+# This is an explicit runge-kutta method of order (4)5 due to Dormand &amp;amp; Prince
+integrator = &amp;quot;dopri5&amp;quot;
+
+# Loop over the different starting values and calculate trajectories:
+for y0 in [y0A, y0B, y0C,y0D]:
+    # initialize an array to store the solution
+    y = np.zeros((len(t), len(y0)))   # array for solution
+    r0 = integrate.ode(vdp0).set_integrator(integrator)
+    r0.set_initial_value(y0, t0)   # initial values
+    for i in range(1, t.size):
+       y[i, :] = r0.integrate(t[i]) # get one more value, add it to the array
+       if not r0.successful():
+           raise RuntimeError(&amp;quot;Could not integrate&amp;quot;)
+    # append the list of solution
+    list_y.append(y)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can then plot the trajectories we just calculated on a same graph using &lt;code&gt;matplotlib&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Plot the different paths:
+fig, ax = plt.subplots(figsize=(10, 5))
+
+for index,y0 in enumerate([y0A, y0B, y0C, y0D]):
+    ax.plot(list_y[index][1:-1, 0], list_y[index][1:-1, 1], label = str(y0))
+    plt.xlabel(&amp;quot;x&amp;quot;)
+    plt.ylabel(&amp;quot;y&amp;quot;)
+plt.title(&amp;quot;Trajectories for different starting values&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartI_20_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;From the graph, we see that $y$ moves very quickly to the parabola defined by $y = x^2$. Then, the system slowly converges
+towards $(0,0)$, moving along the same parabola.&lt;/p&gt;
+
+&lt;p&gt;Before moving to the optimal control of the system, let us calculate the total cost $J$ of letting the system
+converging naturally to its steady state value:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Store the cost associated with each starting value:
+list_cost = []
+for y in list_y:
+    JLQR = np.cumsum( np.square(y[:, 0]) + np.square(y[:, 1]) )
+    # append the list of solution
+    list_cost.append(JLQR)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next plot shows the cumulative cost as time passes. The further away the starting value is from the steady-state, the higher the cost. We also see that because the cost function treats negative and positive deviations from the steady state the same way (because deviations are squared), the cost for the starting values (1.5, -1) and (-1.5, -1) are the same. The same observation holds for (5, 5) and (-5, 5).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Plot the cost associated with each starting value:
+fig, ax = plt.subplots(figsize=(10, 5))
+for JLQR, y0 in zip(list_cost,[y0A, y0B, y0C, y0D]):
+    plt.plot(t, JLQR, label = str(y0))
+    plt.xlabel(&amp;quot;t&amp;quot;)
+    plt.ylabel(&amp;quot;JLQR&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartI_25_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;iii-solving-for-the-optimal-control&#34;&gt;III. Solving for the optimal control&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s first define the matrices Q and R, before solving for the optimal control matrix $C$ using the &lt;code&gt;lqr&lt;/code&gt; function from the &lt;a href=&#34;https://python-control.readthedocs.io/en/0.8.3/&#34; target=&#34;_blank&#34;&gt;Python Control Systems Library&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;R = np.array([1])
+Q = np.eye(2)
+# Solve for C:
+(C, X, E) = lqr(A, B, Q, R)
+print(&amp;quot;Feedback matrix C : {}&amp;quot;.format(C))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Feedback matrix C : [[0.         0.41421356]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can now proceed as previously to simulate forward the differential equation. The only difference is that
+now we have to take into account the optimal control applied each period on the system. The optimal control is
+taken into consideration in the function &lt;code&gt;vdp1(t, y)&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def vdp1(t, y):
+    # Ay - B*X*y + Cy
+    x = A.dot(y)  - np.matmul(B,C).dot(y)
+    return x + np.array([0, -llambda*(y[0]**2)])
+
+y0 = [-5, 5]                   # initial value
+y = np.zeros((len(t), len(y0))) # array for solution
+y[0, :] = y0
+
+r = integrate.ode(vdp1).set_integrator(integrator)
+r.set_initial_value(y0, t0)   # initial values
+
+for i in range(1, t.size):
+   y[i, :] = r.integrate(t[i]) # get one more value, add it to the array
+   if not r.successful():
+       raise RuntimeError(&amp;quot;Could not integrate&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can now compare the controlled trajectory (in red) to the uncontrolled trajectory (in blue):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;fig, ax = plt.subplots(figsize=(10, 5))
+plt.plot(y[:, 0], y[:, 1], label = &amp;quot;controlled&amp;quot;)
+plt.plot(list_y[index][1:-1, 0], list_y[index][1:-1, 1], label = &amp;quot;uncontrolled&amp;quot;)
+plt.xlabel(&amp;quot;x&amp;quot;)
+plt.ylabel(&amp;quot;y&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartI_32_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;With the controlled trajectory, the deviation of $y$ from its steady state value is less extreme. The system converges to $(0,0)$ on a different parabola. As expected, controlling the system with the optimal controller is less costly than letting the system evolve uncontrolled:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;JLQR = np.cumsum( np.square(y[:, 0]) + np.square(y[:, 1]) + np.square(np.matmul(C, y.T)) ).T
+
+fig, ax = plt.subplots(figsize=(10, 5))
+plt.plot(t, JLQR, label = &amp;quot;controlled&amp;quot;)
+plt.plot(t, list_cost[3], label = &amp;quot;uncontrolled&amp;quot;)
+plt.xlabel(&amp;quot;t&amp;quot;)
+plt.ylabel(&amp;quot;JLQR&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartI_34_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;iv-what-about-lambda-x-2-linearizing-the-nonlinear-system&#34;&gt;IV. What about $-\lambda x^2$? Linearizing the nonlinear system&lt;/h2&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} \mu &amp;amp; 0 \\ 0 &amp;amp; \lambda \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} +  \begin{pmatrix} O \\ -  \lambda x^2 \end{pmatrix} $$&lt;/p&gt;
+
+&lt;p&gt;A careful reader would have noticed that we used a linear controller on a non-linear system. Is it legitimate? Intuitively, we ignored the term $-\lambda x^2$, which is small when $x &amp;lt; 1$ and/or when $\lambda$ is small. We can show more &amp;ldquo;rigorously&amp;rdquo; that what we did makes sense.&lt;/p&gt;
+
+&lt;p&gt;Let us remember that the dynamical system is:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \begin{pmatrix} x \\ y \end{pmatrix} = f \Big(  \begin{pmatrix} x \\ y \end{pmatrix}, t \Big) $$&lt;/p&gt;
+
+&lt;p&gt;Or more precisely:&lt;/p&gt;
+
+&lt;p&gt;$$ \begin{cases} \frac{d}{dt} x = \mu x \\ \frac{d}{dt} y = \lambda (y - x^2)  \end{cases} $$&lt;/p&gt;
+
+&lt;p&gt;A first order Taylor expansion around the steady-state gives us:&lt;/p&gt;
+
+&lt;p&gt;$$ \boldsymbol{x} - \boldsymbol{x_{ss}} \approx A (\boldsymbol{x} - \boldsymbol{x_{ss}}) $$&lt;/p&gt;
+
+&lt;p&gt;Where $A$ is the Jacobian matrix (matrix of first derivatives) evaluated at the steady-state value, which is (0,0) in our simple example. The first derivatives are:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dx}(\frac{d}{dt}x) = \mu  \\ \frac{d}{dy}(\frac{d}{dt}x) = 0 \\ \frac{d}{dx}(\frac{d}{dt}y) = \lambda \\ \frac{d}{dy}(\frac{d}{dt}y)= -2 \lambda x $$&lt;/p&gt;
+
+&lt;p&gt;Evaluated at the steady-state, the matrix A is equal to:&lt;/p&gt;
+
+&lt;p&gt;$$ A = \begin{pmatrix} \mu &amp;amp; 0 \\ -2 \lambda \times 0 &amp;amp; \lambda \end{pmatrix} = \begin{pmatrix} \mu &amp;amp; 0 \\ 0 &amp;amp; \lambda \end{pmatrix} $$&lt;/p&gt;
+
+&lt;p&gt;and because the steady-state is $(0,0)$, we have $\tilde{x} = x$. The take-away is that in the neighborhood of the steady-state $(0,0)$, we can solve the LQR ignoring the $-\lambda x^2$ term.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This notebook introduced what the LQR framework and showed how to solve for the optimal control in Python. We saw that despite the fact that the example we studied is not linear, we can linearize the dynamical system around its stead-state. In the Part II of this series on the LQR framework, we will see that we can do even better by solving the dynamical system in a new space, in which the system is exactly linear.&lt;/p&gt;
+
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The linear system studied in this notebook is based on the paper: Brunton, Steven L., et al. &amp;ldquo;Koopman invariant subspaces and finite linear representations of nonlinear dynamical systems for control.&amp;rdquo; PloS one 11.2 (2016).&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>A Primer on Computer Vision</title>
@@ -2893,122 +3186,6 @@ market with search frictions, heterogeneous workers and firms, and business cycl
 &lt;hr /&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/pdf/Labor_Income_Shocks_Along_the_Business_Cycle.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>How to Create a Julia Package</title>
-      <link>https://julienpascal.github.io/post/julia_package/</link>
-      <pubDate>Wed, 06 Jun 2018 15:34:38 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/julia_package/</guid>
-      <description>
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;This post is outdated. With the advent of Julia 1.0, the workflow for creating
-packages was significantly altered. An excellent guide can be found &lt;a href=&#34;https://lectures.quantecon.org/jl/testing.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;In this post, my goal is to briefly explain how to create an unregistered Julia package for Julia 0.6.4, how to synchronize it with your &lt;a href=&#34;https://github.com/&#34; target=&#34;_blank&#34;&gt;Github&lt;/a&gt; account, and how to start testing your code automatically using &lt;a href=&#34;https://travis-ci.org/&#34; target=&#34;_blank&#34;&gt;TRAVIS CI&lt;/a&gt;. I started writing this post as a reminder to myself. I am posting it here with the hope that it may be useful for someone else. More on this topic can be found by reading the &lt;a href=&#34;https://docs.julialang.org/en/release-0.6/manual/packages/&#34; target=&#34;_blank&#34;&gt;official Julia&amp;rsquo;s manual&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h1 id=&#34;why-creating-a-package&#34;&gt;Why Creating a Package?&lt;/h1&gt;
-
-&lt;h3 id=&#34;a-package-to-share-academic-work&#34;&gt;A package to share academic work&lt;/h3&gt;
-
-&lt;p&gt;My research projects often involve data manipulation and/or implementing algorithms. I discovered that writing my codes in the form of a package helps me in producing better and reusable code. Creating a package to share your academic work is also very much in line with the idea that scientific research should be reproducible. Users can download your work and install the required dependencies using a single line :&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;git.clone(&amp;quot;https://github.com/YourGithubUsername/YourPackage.jl.git&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;continuous-integration&#34;&gt;Continuous Integration&lt;/h3&gt;
-
-&lt;p&gt;Another major advantage of creating a package is that it makes your life much easier when it comes to testing your code automatically using &lt;a href=&#34;https://travis-ci.org/&#34; target=&#34;_blank&#34;&gt;TRAVIS CI&lt;/a&gt;. TRAVIS CI is a &lt;a href=&#34;https://en.wikipedia.org/wiki/Continuous_integration&#34; target=&#34;_blank&#34;&gt;continuous integration&lt;/a&gt; system, which considerably helps in detecting and resolving bugs at an early stage.&lt;/p&gt;
-
-&lt;h1 id=&#34;step-by-step-tutorial&#34;&gt;Step-by-step tutorial&lt;/h1&gt;
-
-&lt;p&gt;In what follows, I am assuming you are using Linux, with julia version 0.6 installed. If you are using a different version, just replace &lt;code&gt;v0.6&lt;/code&gt; by the number corresponding to your current version of julia. You also need to have the package &lt;a href=&#34;https://github.com/JuliaLang/PkgDev.jl&#34; target=&#34;_blank&#34;&gt;PkgDev&lt;/a&gt; installed.&lt;/p&gt;
-
-&lt;h2 id=&#34;step-1-generate-your-package&#34;&gt;Step 1: Generate your package&lt;/h2&gt;
-
-&lt;p&gt;The following two lines will create a directory called &lt;code&gt;&amp;quot;MyPackage.jl&amp;quot;&lt;/code&gt; with an &lt;a href=&#34;https://en.wikipedia.org/wiki/MIT_License&#34; target=&#34;_blank&#34;&gt;MIT License&lt;/a&gt;, in
-Julia&amp;rsquo;s package location:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using PkgDev
-PkgDev.generate(&amp;quot;MyPackage.jl&amp;quot;,&amp;quot;MIT&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;By convention, Julia repository names and with &lt;code&gt;.jl&lt;/code&gt;. If you change your working directory to your newly created package (&lt;code&gt;cd ~/.julia/v0.6/MyPackage&lt;/code&gt;), you will notice that the following files and directories have been created:&lt;/p&gt;
-
-&lt;h4 id=&#34;src&#34;&gt;\src&lt;/h4&gt;
-
-&lt;p&gt;The &lt;code&gt;\src&lt;/code&gt; folder will contain your source code. By default, it contains a file &amp;ldquo;MyPackage.jl&amp;rdquo;, which you will use to load other packages and to include &lt;code&gt;.jl&lt;/code&gt; files that you created. In this file, you also state the functions and types you want to export. As an example, you may consult the package &lt;a href=&#34;https://github.com/JuliaStats/Distributions.jl/blob/master/src/Distributions.jl&#34; target=&#34;_blank&#34;&gt;Distributions&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h4 id=&#34;test&#34;&gt;\test&lt;/h4&gt;
-
-&lt;p&gt;This folder contains a file &lt;code&gt;runtests.jl&lt;/code&gt;, in which you can include &lt;a href=&#34;https://docs.julialang.org/en/v0.6.1/stdlib/test/&#34; target=&#34;_blank&#34;&gt;unit-tests&lt;/a&gt;. Within julia, you can simply run your series of unit-tests with the command:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;Pkg.test(&amp;quot;MyPackage&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;require&#34;&gt;REQUIRE&lt;/h4&gt;
-
-&lt;p&gt;This file is used to specify the required dependencies. When a user &lt;code&gt;Pkg.clone()&lt;/code&gt;
-your package, Julia&amp;rsquo;s package manager will make sure that these requirements are
-met. For instance, let&amp;rsquo;s say that your package relies on the version 0.6 of Julia
-(or higher) and the package &lt;a href=&#34;https://github.com/JuliaIO/JSON.jl&#34; target=&#34;_blank&#34;&gt;JSON&lt;/a&gt;. The REQUIRE
-file will be the following :&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;julia 0.6
-JSON
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;readme-md&#34;&gt;README.md&lt;/h4&gt;
-
-&lt;p&gt;You can use this file to add a description of you package.&lt;/p&gt;
-
-&lt;h4 id=&#34;license-md&#34;&gt;LICENSE.md&lt;/h4&gt;
-
-&lt;p&gt;To guide you in the choice of a licence, you may want to consult the following website: &lt;a href=&#34;https://choosealicense.com/&#34; target=&#34;_blank&#34;&gt;https://choosealicense.com/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;step-2-set-up-your-working-environment&#34;&gt;Step 2: Set-up your working environment&lt;/h2&gt;
-
-&lt;p&gt;This step is optional. While you may want to develop you package directly from Julia&amp;rsquo;s package
-directory (&lt;code&gt;~/.julia/v0.6&lt;/code&gt; if you are using &lt;code&gt;julia v0.6&lt;/code&gt;), I personally find it unpleasant. I usually create a symlink to a more convenient location:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;ln -s ~/.julia/v0.6/MyPackage your/convenient/directory/MyPackage
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;After running this line in the terminal, you can start working on your package
-directly from &lt;code&gt;your/convenient/directory&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;step-3-synchronize-with-github&#34;&gt;Step 3: Synchronize with GitHub&lt;/h2&gt;
-
-&lt;p&gt;The following step will synchronize your package with
-your GitHub account. After creating a repository named &amp;ldquo;MyPackage.jl&amp;rdquo; on GitHub, enter the following
-commands in the terminal:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;git add -A
-git commit -m &amp;quot;First commit&amp;quot;
-git remote add origin https://github.com/YourGithubUsername/MyPackage.jl.git
-git push -u origin master
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Going to the page &lt;a href=&#34;https://github.com/YourGithubUsername/MyPackage.jl.git&#34; target=&#34;_blank&#34;&gt;https://github.com/YourGithubUsername/MyPackage.jl.git&lt;/a&gt;, you should now see folders and files mentioned above. Some extra files are also going to be there, for instance &lt;code&gt;.gitignore&lt;/code&gt; or &lt;code&gt;appveyor.yml&lt;/code&gt;. You can ignore them for the time being. After this initial commit, you are almost all set and you can use the usual &lt;a href=&#34;https://guides.github.com/introduction/flow/&#34; target=&#34;_blank&#34;&gt;GitHub workflow&lt;/a&gt;. A good idea though is to enable TRAVIS CI for the repository just you created.&lt;/p&gt;
-
-&lt;h2 id=&#34;step-4-set-up-travis-ci&#34;&gt;Step 4: Set-up TRAVIS CI&lt;/h2&gt;
-
-&lt;p&gt;From your GitHub account, sign in to either:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;TravisCI.org if your repository is public&lt;/li&gt;
-&lt;li&gt;TravisCI.com if your repository is private&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;On TRAVIS CI, go to your profile page. Enable your repository &amp;ldquo;YourGithubUsername/MyPackage.jl&amp;rdquo; by flicking the switch one. Every time you push a new commit, your set of tests, launched by the file &lt;code&gt;/test/runtests.jl&lt;/code&gt;, will be automatically executed on a separate virtual environment. If one of your tests fails, you will be notified by e-mail and (most of the time) you will be able to spot the origin of the error quite easily.&lt;/p&gt;
 </description>
     </item>
     
