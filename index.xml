@@ -7,8 +7,302 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 01 Apr 2020 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 05 Apr 2020 16:00:00 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The linear–quadratic regulator Part II</title>
+      <link>https://julienpascal.github.io/post/lqr_partii/</link>
+      <pubDate>Sun, 05 Apr 2020 16:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/lqr_partii/</guid>
+      <description>
+
+&lt;p&gt;This notebook builds upon what has been described in &lt;a href=&#34;https://julienpascal.github.io/post/lqr/&#34; target=&#34;_blank&#34;&gt;Part I&lt;/a&gt;. In &lt;a href=&#34;https://julienpascal.github.io/post/lqr/&#34; target=&#34;_blank&#34;&gt;Part I&lt;/a&gt;, we introduced the linear–quadratic regulator (LQR) framework in Python. We solved the linearized control problem.&lt;/p&gt;
+
+&lt;p&gt;In this notebook, we will see that we can do better. The basic idea is to follow the the evolution of &amp;ldquo;observables&amp;rdquo; — functions of the state space — instead of the evolution of the state itself using the &lt;strong&gt;Koopman operator&lt;/strong&gt;. In the space of observables, the differential equation is linear. Thus, we can solve for the optimal control in the this transformed space, without having to linearize the system around its steady-state.&lt;/p&gt;
+
+&lt;h4 id=&#34;in-this-notebook-you-will-learn&#34;&gt;In this notebook, you will learn:&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;the basics on the Koopman operator&lt;/li&gt;
+&lt;li&gt;how to solve for the optimal control in the Koopman subspace&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;i-the-koopman-operator-101&#34;&gt;I. The Koopman operator 101&lt;/h1&gt;
+
+&lt;p&gt;Let us remember that in Part I, we analyzed the evolution of the following dynamical system:&lt;/p&gt;
+
+&lt;p&gt;$$ \begin{cases} \frac{d}{dt} x = \mu x \\ \frac{d}{dt} y = \lambda (y - x^2)  \end{cases} $$&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s make the observation that we can defined a new vector $z$ defined by:&lt;/p&gt;
+
+&lt;p&gt;$$ z \equiv \begin{pmatrix} z_1 \\ z_2 \\ z_3 \end{pmatrix} = \begin{pmatrix} x \\ y \\ x^2 \end{pmatrix}$$&lt;/p&gt;
+
+&lt;p&gt;The original nonlinear dynamical system is linear when considering the evolution of $z$:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \begin{pmatrix} z_1 \\ z_2 \\ z_3 \end{pmatrix} = \begin{pmatrix} \mu &amp;amp; 0 &amp;amp; 0 \\ 0 &amp;amp; \lambda &amp;amp; -\lambda \\ 0 &amp;amp; 0 &amp;amp; 2 \mu \end{pmatrix}  \begin{pmatrix} z_1 \\ z_2 \\ z_3 \end{pmatrix}$$&lt;/p&gt;
+
+&lt;p&gt;What we just did — writing the evolution the dynamical system using some observables — is the central idea of the Koopman operator. Here we are lucky because our new variable $z$ is of finite dimension. In the general case, $z$ is infinite-dimensional:&lt;/p&gt;
+
+&lt;p&gt;$$
+\frac{d}{dt} \begin{pmatrix} z_1 \\ z_2 \\ &amp;hellip; \end{pmatrix} = \begin{pmatrix} a_{11} &amp;amp; a_{12} &amp;amp; &amp;hellip; \\ a_{21} &amp;amp; a_{22} &amp;amp; &amp;hellip; \\ &amp;hellip; &amp;amp; &amp;hellip; &amp;amp; &amp;hellip; \end{pmatrix} \begin{pmatrix} z_1 \\ z_2 \\ &amp;hellip; \end{pmatrix} $$&lt;/p&gt;
+
+&lt;p&gt;and we have no guarantee that the truncation of z by a finite dimensional counterpart will produce a good approximation of the system. For more detail on this problem, I invite you to read &lt;a href=&#34;https://arxiv.org/abs/1510.03007&#34; target=&#34;_blank&#34;&gt;this paper&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Because now the dynamical system is linear, we can directly use the results from LQR framework and solve for the optimal control that minimizes the cost $J$:&lt;/p&gt;
+
+&lt;p&gt;$$ J = \int_{0}^{\infty} x&amp;rsquo;(t) Q x(t) + u&amp;rsquo;(t) R u(t) dt $$&lt;/p&gt;
+
+&lt;p&gt;We already know that the optimal control from the controller is a linear function of the current state of the system:&lt;/p&gt;
+
+&lt;p&gt;$$ u = - C_z z$$&lt;/p&gt;
+
+&lt;p&gt;When the system is controlled optimally, the equation governing the evolution of the system writes:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} z = A_z z - B C_z z $$&lt;/p&gt;
+
+&lt;p&gt;At a later stage, because we want to compare the Koopman controller to the linearized controller, we do not want to penalize the variable $z_3$ for being away from its steady state. The rationale is the variable $z_3$ is &amp;ldquo;fictive&amp;rdquo;.
+We still have in mind that we want to control the &amp;ldquo;real&amp;rdquo; variables $x$ and $y$. As a result, the matrix $Q$ we consider
+is:&lt;/p&gt;
+
+&lt;p&gt;$$ \begin{pmatrix} 1 &amp;amp; 0 &amp;amp; 0 \\ 0 &amp;amp; 1 &amp;amp; 0 \\ 0 &amp;amp; 0 &amp;amp; 0 \end{pmatrix} $$&lt;/p&gt;
+
+&lt;h2 id=&#34;ii-simulating-forward-the-dynamical-system&#34;&gt;II. Simulating forward the dynamical system&lt;/h2&gt;
+
+&lt;p&gt;For what follows, you will need the following packages:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import os
+import matplotlib.pyplot as plt
+plt.style.use(&#39;ggplot&#39;)
+%matplotlib inline
+import numpy as np
+from control.matlab import *  # MATLAB-like functions
+#to solve ODE
+from scipy import integrate
+#show the version of Python I am using:
+!python3 --version
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Python 3.5.2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s study optimal control for the following differential equation:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{d}{dt} \begin{pmatrix} z_1 \\ z_2 \\ z_3 \end{pmatrix} = \begin{pmatrix} \mu &amp;amp; 0 &amp;amp; 0 \\ 0 &amp;amp; \lambda &amp;amp; -\lambda \\ 0 &amp;amp; 0 &amp;amp; 2 \mu \end{pmatrix}  \begin{pmatrix} z_1 \\ z_2 \\ z_3 \end{pmatrix}  $$&lt;/p&gt;
+
+&lt;p&gt;The following block of code define the parameter values, the matrix A for the linear part of the differential equation and the matrix B specifying that the controller can only act on x. We also specify the time span during which we want to simulate forward the trajectories:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Parameters and matrices A and B:
+mu = -0.05
+llambda = -1.0
+# Matrices for the orginial system
+A = np.array([[mu, 0], [0, llambda]])
+B = np.array([[0], [1]])
+R = np.array([1])
+Q = np.eye(2)
+# Matrices for the transformed system:
+A_z = np.array([[mu, 0, 0], [0, llambda, -llambda], [0, 0, 2*mu]])  
+B_z = np.array([[0], [1], [0]])
+R_z = np.array([1])
+Q_z = np.eye(3)
+# Time span
+t0, t1 = 0, 100 # start and end
+t = np.arange(t0, t1, 0.01)
+
+# Function that defines the dynamic system:
+def vdp0(t, y):
+    # linear part + nonlinear part:
+    x = A.dot(y) + np.array([0, -llambda*(y[0]**2)])
+    return x
+
+# Function that defines the dynamic system in the Koopman subspace:
+def vdp0z(t, y):
+    x = A_z.dot(y)
+    return x
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We then define 4 different starting values and simulate forward the system using the &lt;code&gt;scipy.integrate&lt;/code&gt; toolkit:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Set of starting values:
+y0A = np.array([1.5, -1, (1.5)**2])
+y0B = np.array([-1.5, -1, (-1.5)**2])
+y0C = np.array([5, 5, 25])
+y0D = np.array([-5, 5, 25])
+
+# To store the different trajectories
+list_y_z = []
+
+# Method for the ODE:
+# This is an explicit runge-kutta method of order (4)5 due to Dormand &amp;amp; Prince
+integrator = &amp;quot;dopri5&amp;quot;
+
+# Loop over the different starting values and calculate trajectories:
+for y0 in [y0A, y0B, y0C,y0D]:
+    # initialize an array to store the solution
+    y = np.zeros((len(t), len(y0)))   # array for solution
+    r0 = integrate.ode(vdp0z).set_integrator(integrator)
+    r0.set_initial_value(y0, t0)   # initial values
+    for i in range(1, t.size):
+       y[i, :] = r0.integrate(t[i]) # get one more value, add it to the array
+       if not r0.successful():
+           raise RuntimeError(&amp;quot;Could not integrate&amp;quot;)
+    # append the list of solution
+    list_y_z.append(y)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next graph shows the trajectory of x and y using the augmented linear system corresponds to the trajectory
+we found using the nonlinear dynamical system, as expected:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Plot the different paths:
+fig, ax = plt.subplots(figsize=(10, 5))
+
+for index,y0 in enumerate([y0A, y0B, y0C, y0D]):
+    ax.plot(list_y_z[index][1:-1, 0], list_y_z[index][1:-1, 1], label = str(y0))
+    plt.xlabel(&amp;quot;x&amp;quot;)
+    plt.ylabel(&amp;quot;y&amp;quot;)
+plt.title(&amp;quot;Trajectories for different starting values&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartII_21_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The next graph shows that the dynamical system moves along a nice parabola in the third dimension:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Plot the different paths:
+fig, ax = plt.subplots(figsize=(10, 5))
+
+for index,y0 in enumerate([y0A, y0B, y0C, y0D]):
+    ax.plot(list_y_z[index][1:-1, 0], list_y_z[index][1:-1, 2], label = str(y0))
+    plt.xlabel(&amp;quot;x&amp;quot;)
+    plt.ylabel(&amp;quot;z&amp;quot;)
+plt.title(&amp;quot;Trajectories for different starting values&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartII_23_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;iii-solving-for-the-optimal-control&#34;&gt;III. Solving for the optimal control&lt;/h2&gt;
+
+&lt;p&gt;Let us remember that our aim is find the matrix $C_z$ defining the optimal control:&lt;/p&gt;
+
+&lt;p&gt;$$ u = - C_z z $$&lt;/p&gt;
+
+&lt;p&gt;Interestingly, while the optimal $u$ is linear when considering $z$, it is quadratic when considering the original vector of state $x$:&lt;/p&gt;
+
+&lt;p&gt;$$ u = - (C_{z,1} C_{z,2}) \begin{pmatrix} x \\ y  \end{pmatrix} -  C_{z,3} x^2  $$&lt;/p&gt;
+
+&lt;p&gt;We will see in a minute that having a non-linear control allows us to outperform the linear control obtained
+in &lt;a href=&#34;https://julienpascal.github.io/post/lqr/&#34; target=&#34;_blank&#34;&gt;Part I&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Solve for C:
+(C, X, E) = lqr(A, B, Q, R)
+print(&amp;quot;Feedback matrix C : {}&amp;quot;.format(C))
+
+# Solve for C_z:
+(C_z, X_z, E_z) = lqr(A_z, B_z, Q_z, R_z)
+print(&amp;quot;Feedback matrix C_z : {}&amp;quot;.format(C_z))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Feedback matrix C : [[0.         0.41421356]]
+Feedback matrix C_z : [[0.         0.41421356 0.27355029]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can now proceed as previously to simulate forward the differential equation. The only difference is that
+now we have to take into account the optimal control applied each period on the system. The optimal control is
+taken into consideration in the function &lt;code&gt;vdp1(t, y)&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def vdp1(t, y):
+    # Ay - B*X*y + Cy
+    x = A.dot(y)  - np.matmul(B,C).dot(y)
+    return x + np.array([0, -llambda*(y[0]**2)])
+
+def vdp1z(t, y):
+    return A_z.dot(y)  - np.matmul(B_z,C_z).dot(y)
+
+y0 = [-5, 5]                   # initial value
+y0_z = [-5, 5, 25]                   # initial value
+
+y = np.zeros((len(t), len(y0))) # array for solution
+y_z = np.zeros((len(t), len(y0_z))) # array for solution
+y[0, :] = y0
+y_z[0, :] = y0_z
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Controlled trajectory using the linearized system
+r = integrate.ode(vdp1).set_integrator(integrator)
+r.set_initial_value(y0, t0)   # initial values
+
+for i in range(1, t.size):
+   y[i, :] = r.integrate(t[i]) # get one more value, add it to the array
+   if not r.successful():
+       raise RuntimeError(&amp;quot;Could not integrate&amp;quot;)
+
+# Controlled trajectory using the linearized system
+r = integrate.ode(vdp1z).set_integrator(integrator)
+r.set_initial_value(y0_z, t0)   # initial values
+
+for i in range(1, t.size):
+   y_z[i, :] = r.integrate(t[i]) # get one more value, add it to the array
+   if not r.successful():
+       raise RuntimeError(&amp;quot;Could not integrate&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can now compare the controlled and Koopman controlled trajectories. Interestingly, the Koopman controlled
+trajectory moves along a trajectory involving lower values for $y$:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;index = 3 #choose the last trajectory
+fig, ax = plt.subplots(figsize=(10, 5))
+plt.plot(list_y_z[index][1:-1, 0], list_y_z[index][1:-1, 1], label = &amp;quot;Uncontrolled&amp;quot;)
+plt.plot(y[:, 0], y[:, 1], label = &amp;quot;Controlled&amp;quot;)
+plt.plot(y_z[:, 0], y_z[:, 1], label = &amp;quot;Koopman controlled&amp;quot;)
+plt.xlabel(&amp;quot;x&amp;quot;)
+plt.ylabel(&amp;quot;y&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartII_32_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The next logical question is whether or not the Koopman controller is better than the controller based on the
+linearization of the dynamical system around its steady state. The next plot shows that indeed the Koopman controller (in purple) outperforms the latter (in blue).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Controlled
+JLQR = np.cumsum( np.square(y[:, 0]) + np.square(y[:, 1]) + np.square(np.matmul(C, y.T)) ).T
+# Koopman controlled
+JLQRz = np.cumsum( np.square(y_z[:, 0]) + np.square(y_z[:, 1]) + np.square(np.matmul(C_z, y_z.T)) ).T
+# Uncontrolled
+JLQR0 = np.cumsum( np.square(list_y_z[index][:, 0]) + np.square(list_y_z[index][:, 1]) )
+
+fig, ax = plt.subplots(figsize=(10, 5))
+plt.plot(t, JLQR0, label = &amp;quot;Uncontrolled&amp;quot;)
+plt.plot(t, JLQR, label = &amp;quot;Controlled&amp;quot;)
+plt.plot(t, JLQRz, label = &amp;quot;Koopman controlled&amp;quot;)
+plt.xlabel(&amp;quot;t&amp;quot;)
+plt.ylabel(&amp;quot;JLQR&amp;quot;)
+plt.legend()
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Koopman_Control_Python_PartII_34_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This notebook illustrates the idea behind the Koopman operator in a very simple setting. We saw that by solving for the optimal control in the space of observables, in which the system is exactly linear, we find a controller that outperforms the one obtained by linearizing the system around its steady-state.&lt;/p&gt;
+
+&lt;p&gt;The Koopman LQR control drew my attention because many techniques, especially in Economics, are based on the linearization of dynamic systems around its steady-state. While these linearization techniques are accurate when the economy is close to its steady-state (in a &amp;ldquo;business as usual&amp;rdquo; situation), it is hard to know how these approximations perform when the economy is an unusual state. Given the current economic context, relying on linearization might be inaccurate.&lt;/p&gt;
+
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;The linear system studied in this notebook is based on the paper: Brunton, Steven L., et al. &amp;ldquo;Koopman invariant subspaces and finite linear representations of nonlinear dynamical systems for control.&amp;rdquo; PloS one 11.2 (2016).&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Koopman, Bernard O. &amp;ldquo;Hamiltonian systems and transformation in Hilbert space.&amp;rdquo; Proceedings of the national academy of sciences of the united states of america 17.5 (1931): 315.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>The linear–quadratic regulator Part I</title>
@@ -3172,20 +3466,6 @@ market with search frictions, heterogeneous workers and firms, and business cycl
 &lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/pdf/Spatial_Equilibrium_and_Commuting_Time.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/spatial-eq/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Labor Income Shocks Along the Business Cycle</title>
-      <link>https://julienpascal.github.io/project/laborincomeshocks/</link>
-      <pubDate>Mon, 11 Mar 2019 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/laborincomeshocks/</guid>
-      <description>&lt;p&gt;This paper analyzes the determinants of labor income shocks along the business cycle. My main finding is that sorting between firms and workers is a key component of idiosyncratic risk. Labor income shocks are analyzed through the lenses of a dynamic search-and-matching model, which I estimate using US data. Because of search frictions and mismatches between firms and workers, the &lt;em&gt;laissez-faire&lt;/em&gt; equilibrium is not necessarily optimal. My results underline that the government can tame business cycle fluctuations by designing a simple unemployment insurance scheme improving sorting between firms and workers.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/pdf/Labor_Income_Shocks_Along_the_Business_Cycle.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
