@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Macroeconomics on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/macroeconomics/</link>
+    <description>Recent content in Macroeconomics on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Tue, 21 Apr 2020 18:53:22 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/tags/macroeconomics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The GenBKM Algorithm</title>
+      <link>https://julienpascal.github.io/post/genbkm/</link>
+      <pubDate>Tue, 21 Apr 2020 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/genbkm/</guid>
+      <description>In a previous post I presented the BKM algorithm , which can used to approximate solutions of macroeconomic models with aggregate uncertainty and heterogeneous agents. This class of models has been been of great interest for Economists for quite a long time. For instance, Aiyagari (1994) already hinted that taking into consideration heterogeneity along the business cycle is both theoretically important and challenging:
+ This class of models may also be useful in resolving various asset return puzzles.</description>
+    </item>
+    
+  </channel>
+</rss>
