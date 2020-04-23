@@ -8,114 +8,114 @@
   <meta name="generator" content="Source Themes Academic 4.1.0">
   <meta name="generator" content="Hugo 0.54.0" />
 
-  
 
-  
-  
-  
-  
-  
-    
-    
-    
-  
-  
+
+
+
+
+
+
+
+
+
+
+
 
   <meta name="author" content="Julien Pascal">
 
-  
-  
-  
-    
-  
+
+
+
+
+
   <meta name="description" content="In a previous post I presented the BKM algorithm , which can used to approximate solutions of macroeconomic models with aggregate uncertainty and heterogeneous agents. This class of models has been been of great interest for Economists for quite a long time. For instance, Aiyagari (1994) already hinted that taking into consideration heterogeneity along the business cycle is both theoretically important and challenging:
  This class of models may also be useful in resolving various asset return puzzles.">
 
-  
+
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/genbkm/">
 
-  
 
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
-  
-  
+
+
+
+
+
+
+
+
+
+
   <meta name="theme-color" content="#2962ff">
-  
 
-  
-  
-  
-  
-    
+
+
+
+
+
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
 
-    
-    
-    
-      
-    
-    
-      
-      
-        
+
+
+
+
+
+
+
+
+
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
-        
-      
-    
 
-    
 
-    
 
-  
 
-  
-  
+
+
+
+
+
+
+
+
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
-  
+
 
   <link rel="stylesheet" href="/styles.css">
-  
 
-  
-  
+
+
+
     <script>
       window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
       ga('create', 'UA-114454001-1', 'auto');
-      
+
       ga('require', 'eventTracker');
       ga('require', 'outboundLinkTracker');
       ga('require', 'urlChangeTracker');
       ga('send', 'pageview');
     </script>
     <script async src="//www.google-analytics.com/analytics.js"></script>
-    
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
-    
-  
-  
 
-  
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+
+
+
+
+
   <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
   <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
+
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -123,30 +123,30 @@
 
   <link rel="canonical" href="https://julienpascal.github.io/post/genbkm/">
 
-  
-  
-  
-  
-    
-    
-  
+
+
+
+
+
+
+
   <meta property="twitter:card" content="summary">
-  
+
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/genbkm/">
   <meta property="og:title" content="The GenBKM Algorithm | Julien Pascal">
   <meta property="og:description" content="In a previous post I presented the BKM algorithm , which can used to approximate solutions of macroeconomic models with aggregate uncertainty and heterogeneous agents. This class of models has been been of great interest for Economists for quite a long time. For instance, Aiyagari (1994) already hinted that taking into consideration heterogeneity along the business cycle is both theoretically important and challenging:
  This class of models may also be useful in resolving various asset return puzzles."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
-  
+
   <meta property="article:published_time" content="2020-04-21T18:53:22&#43;01:00">
-  
+
   <meta property="article:modified_time" content="2020-04-21T18:53:22&#43;01:00">
-  
 
-  
 
-  
+
+
+
 
   <title>The GenBKM Algorithm | Julien Pascal</title>
 
@@ -166,17 +166,17 @@
       </div>
 
       <div id="search-box">
-        
+
         <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
         autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
-        
+
       </div>
 
     </section>
     <section class="section-search-results">
 
       <div id="search-hits">
-        
+
       </div>
 
     </section>
@@ -187,195 +187,195 @@
 <nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
   <div class="container">
 
-    
+
       <a class="navbar-brand" href="/">Julien Pascal</a>
-      
+
       <button type="button" class="navbar-toggler" data-toggle="collapse"
               data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
         <span><i class="fas fa-bars"></i></span>
       </button>
-      
 
-    
+
+
     <div class="collapse navbar-collapse" id="navbar">
 
-      
-      
+
+
       <ul class="navbar-nav mr-auto">
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#about">
-            
+
             <span>Home</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#projects">
-            
+
             <span>Projects</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#teaching">
-            
+
             <span>Teaching</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#publications">
-            
+
             <span>Publications</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#posts">
-            
+
             <span>Posts</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#computing">
-            
+
             <span>Computing</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/#contact">
-            
+
             <span>Contact</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-        
 
-        
-        
-        
-          
-        
+
+
+
+
+
+
+
+
 
         <li class="nav-item">
           <a class="nav-link" href="/pdf/Julien_Pascal_Academic_Resume.pdf">
-            
+
             <span>Academic Resume</span>
-            
+
           </a>
         </li>
 
-        
-        
 
-      
+
+
+
       </ul>
       <ul class="navbar-nav ml-auto">
-      
 
-        
 
-        
+
+
+
         <li class="nav-item">
           <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
         </li>
-        
 
-        
 
-        
+
+
+
         <li class="nav-item">
           <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
         </li>
-        
+
 
       </ul>
 
@@ -386,7 +386,6 @@
 
 <article class="article" itemscope itemtype="http://schema.org/Article">
 
-  
 
 
 
@@ -399,20 +398,21 @@
 
 
 
-  
 
-  
-  
-  
+
+
+
+
+
 <div class="article-container pt-3">
   <h1 itemprop="name">The GenBKM Algorithm</h1>
 
-  
-  <p class="page-subtitle">Macro models with heterogeneity and aggregate uncertainty</p>
-  
 
-  
-    
+  <p class="page-subtitle">Macro models with heterogeneity and aggregate uncertainty</p>
+
+
+
+
 
 
 
@@ -421,35 +421,35 @@
 
 <div class="article-metadata">
 
-  
-  
 
-  
+
+
+
   <span class="article-date">
-    
-    
-      
-    
+
+
+
+
     <time>Apr 21, 2020</time>
   </span>
-  
 
-  
 
-  
+
+
+
   <span class="middot-divider"></span>
   <span class="article-reading-time">
     9 min read
   </span>
-  
 
-  
-  
 
-  
 
-  
-    
+
+
+
+
+
+
 <div class="share-box" aria-hidden="true">
   <ul class="share">
     <li>
@@ -490,19 +490,10 @@
 </div>
 
 
-  
+
 
 </div>
 
-    
-
-
-
-
-
-
-
-  
 
 
 
@@ -512,7 +503,16 @@
 
 
 
-  
+
+
+
+
+
+
+
+
+
+
 </div>
 
 
@@ -520,7 +520,7 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
+
 
 <p>In a <a href="https://julienpascal.github.io/post/bkm/" target="_blank">previous post</a> I presented the <a href="https://www.sciencedirect.com/science/article/pii/S0165188918300022" target="_blank">BKM algorithm</a> , which can used to approximate solutions of macroeconomic models with <strong>aggregate uncertainty</strong> and <strong>heterogeneous agents</strong>. This class of models has been been of great interest for Economists for quite a long time. For instance, <a href="https://www.jstor.org/stable/2118417?seq=1#metadata_info_tab_contents" target="_blank">Aiyagari (1994)</a> already hinted that taking into consideration heterogeneity along the business cycle is both theoretically important and challenging:</p>
 
@@ -720,8 +720,7 @@ p4 = plot(p2, p3, layout = (2, 1))
 
 <p><em>Notes: The top panel shows the scaled impulse response function for different
 values of shocks. The bottom panel shows the scaled impulse response function
-multiplied by the sign of the shock. If the size and the sign of the shock did not matter, we would
-see only one line. It is not the case here.</em></p>
+multiplied by the sign of the shock. If the size and the sign of the shock did not matter, only one line would be visible. It is not the case here.</em></p>
 
 <hr />
 
@@ -858,29 +857,29 @@ Platform Info:
 
     </div>
 
-    
+
 
 
 <div class="article-tags">
-  
+
   <a class="badge badge-light" href="/tags/macroeconomics/">Macroeconomics</a>
-  
+
   <a class="badge badge-light" href="/tags/ha-models/">HA models</a>
-  
+
 </div>
 
 
 
 
-    
-      
 
 
 
 
 
 
-  
+
+
+
 
 
 
@@ -889,98 +888,98 @@ Platform Info:
 
 
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
-  
-  
+
+
   <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
-  
+
 
   <div class="media-body">
     <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal</a></h5>
     <h6 class="card-subtitle">PhD candidate in Economics</h6>
-    
+
     <ul class="network-icon" aria-hidden="true">
-      
-      
-      
-      
-        
-      
-      
-      
-      
-      
-        
-      
+
+
+
+
+
+
+
+
+
+
+
+
       <li>
         <a itemprop="sameAs" href="https://twitter.com/Juli3nPascal" target="_blank" rel="noopener">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
-      
-      
-      
-      
-        
-      
-      
-      
-      
-      
-        
-      
+
+
+
+
+
+
+
+
+
+
+
+
       <li>
         <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
           <i class="fab fa-github"></i>
         </a>
       </li>
-      
-      
-      
-      
-        
-      
-      
-      
-      
-      
-        
-      
+
+
+
+
+
+
+
+
+
+
+
+
       <li>
         <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
           <i class="fab fa-linkedin"></i>
         </a>
       </li>
-      
-      
-      
-      
-        
-      
-      
-      
-      
-      
-        
-      
+
+
+
+
+
+
+
+
+
+
+
+
       <li>
         <a itemprop="sameAs" href="https://medium.com/@julien.pascal" target="_blank" rel="noopener">
           <i class="fab fa-medium"></i>
         </a>
       </li>
-      
+
     </ul>
   </div>
 </div>
 
 
 
-      
-      
-    
 
-    
 
-    
+
+
+
+
+
 
 
   </div>
@@ -988,16 +987,16 @@ Platform Info:
 
 <div class="container">
   <footer class="site-footer">
-  
+
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    &copy; 2017 Julien Pascal &middot;
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
     <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
 
-    
+
     <span class="float-right" aria-hidden="true">
       <a href="#" id="back_to_top">
         <span class="button_icon">
@@ -1005,7 +1004,7 @@ Platform Info:
         </span>
       </a>
     </span>
-    
+
   </p>
 </footer>
 
@@ -1037,57 +1036,57 @@ Platform Info:
   </div>
 </div>
 
-    
 
-    
-    
-    
+
+
+
+
     <script src="/js/mathjax-config.js"></script>
-    
 
-    
-    
-    
+
+
+
+
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
 
-      
-        
+
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
-        
+
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
-        
+
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
-        
+
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
-        
+
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
-        
-      
 
-      
-      
+
+
+
+
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
-      
-    
 
-    
-    
 
-    
-    
-    
 
-    
-    
+
+
+
+
+
+
+
+
+
     <script>hljs.initHighlightingOnLoad();</script>
-    
 
-    
-    
+
+
+
     <script>
       const search_index_filename = "/index.json";
       const i18n = {
@@ -1102,13 +1101,13 @@ Platform Info:
         'talk' : "Talks"
         };
     </script>
-    
 
-    
-    
 
-    
-    
+
+
+
+
+
     <script id="search-hit-fuse-template" type="text/x-template">
       <div class="search-hit" id="summary-{{key}}">
       <div class="search-hit-content">
@@ -1120,31 +1119,30 @@ Platform Info:
       </div>
       </div>
     </script>
-    
 
-    
-    
+
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
-    
 
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-      
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
 
   </body>
 </html>
-
