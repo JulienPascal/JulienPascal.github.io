@@ -663,10 +663,14 @@ title!(&quot;BKM with b=$(b)&quot;)
 
 </code></pre>
 
+<hr />
+
 <p><img src="GenBKM_7_2.svg" alt="svg" /></p>
 
-<p>The previous plot illustrates that BKM algorithm does a good job at approximating the dynamic of the true
-nonlinear model. But can we do better? The next section shows that the answer is yes.</p>
+<p><em>Notes: In orange the exact value as a function of time; in blue the approximation obtained by using
+the BKM algorithm</em></p>
+
+<hr />
 
 <h3 id="ii-a-the-genbkm-algorithm">II. A. The GenBKM algorithm</h3>
 
@@ -710,7 +714,16 @@ end
 p4 = plot(p2, p3, layout = (2, 1))
 </code></pre>
 
+<hr />
+
 <p><img src="GenBKM_11_0.svg" alt="svg" /></p>
+
+<p><em>Notes: The top panel shows the scaled impulse response function for different
+values of shocks. The bottom panel shows the scaled impulse response function
+multiplied by the sign of the shock. If the size and the sign of the shock did not matter, we would
+see only one line. It is not the case here.</em></p>
+
+<hr />
 
 <p>The GenBKM algorithm is the similar to the BKM algorithm, except that the impacts of the size and the sign of the
 initial shock on the response of the economy are taken into consideration. It proceeds as follows:</p>
@@ -802,10 +815,15 @@ df = DataFrame(Statistics = [&quot;Max absolute error&quot;, &quot;Min absolute 
 p6 = plot(diff_GenBKM[2:end], label=&quot;GenBKM&quot;, xlabel = &quot;t&quot;, ylabel = &quot;Error&quot;)
 plot!(diff_BKM[2:end], label=&quot;BKM&quot;)
 title!(&quot;Error BKM and GenBKM&quot;)
-
 </code></pre>
 
+<hr />
+
 <p><img src="GenBKM_14_1.svg" alt="svg" /></p>
+
+<p><em>Notes: In orange the approximation error when using BKM; in blue the approximation error when using GenBKM</em></p>
+
+<hr />
 
 <table class="data-frame"><thead><tr><th></th><th>Statistics</th><th>BKM</th><th>GenBKM</th></tr><tr><th></th><th> </th><th> </th><th> </th></tr></thead><tbody><p> </p><tr><th>1</th><td>Max absolute error</td><td>0.263167</td><td>0.132318</td></tr><tr><th>2</th><td>Min absolute error</td><td>0.0</td><td>0.0</td></tr><tr><th>3</th><td>Mean absolute error</td><td>0.0381089</td><td>0.0136915</td></tr><tr><th>4</th><td>Median absolute error</td><td>0.0237194</td><td>0.0100031</td></tr></tbody></table>
 

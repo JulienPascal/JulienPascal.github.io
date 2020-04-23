@@ -159,10 +159,14 @@ title!(&amp;quot;BKM with b=$(b)&amp;quot;)
 
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;hr /&gt;
+
 &lt;p&gt;&lt;img src=&#34;GenBKM_7_2.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;The previous plot illustrates that BKM algorithm does a good job at approximating the dynamic of the true
-nonlinear model. But can we do better? The next section shows that the answer is yes.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Notes: In orange the exact value as a function of time; in blue the approximation obtained by using
+the BKM algorithm&lt;/em&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;h3 id=&#34;ii-a-the-genbkm-algorithm&#34;&gt;II. A. The GenBKM algorithm&lt;/h3&gt;
 
@@ -206,7 +210,16 @@ end
 p4 = plot(p2, p3, layout = (2, 1))
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;hr /&gt;
+
 &lt;p&gt;&lt;img src=&#34;GenBKM_11_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: The top panel shows the scaled impulse response function for different
+values of shocks. The bottom panel shows the scaled impulse response function
+multiplied by the sign of the shock. If the size and the sign of the shock did not matter, we would
+see only one line. It is not the case here.&lt;/em&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;p&gt;The GenBKM algorithm is the similar to the BKM algorithm, except that the impacts of the size and the sign of the
 initial shock on the response of the economy are taken into consideration. It proceeds as follows:&lt;/p&gt;
@@ -298,10 +311,15 @@ df = DataFrame(Statistics = [&amp;quot;Max absolute error&amp;quot;, &amp;quot;M
 p6 = plot(diff_GenBKM[2:end], label=&amp;quot;GenBKM&amp;quot;, xlabel = &amp;quot;t&amp;quot;, ylabel = &amp;quot;Error&amp;quot;)
 plot!(diff_BKM[2:end], label=&amp;quot;BKM&amp;quot;)
 title!(&amp;quot;Error BKM and GenBKM&amp;quot;)
-
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;hr /&gt;
+
 &lt;p&gt;&lt;img src=&#34;GenBKM_14_1.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: In orange the approximation error when using BKM; in blue the approximation error when using GenBKM&lt;/em&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;table class=&#34;data-frame&#34;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Statistics&lt;/th&gt;&lt;th&gt;BKM&lt;/th&gt;&lt;th&gt;GenBKM&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt; &lt;/th&gt;&lt;th&gt; &lt;/th&gt;&lt;th&gt; &lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;p&gt; &lt;/p&gt;&lt;tr&gt;&lt;th&gt;1&lt;/th&gt;&lt;td&gt;Max absolute error&lt;/td&gt;&lt;td&gt;0.263167&lt;/td&gt;&lt;td&gt;0.132318&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;2&lt;/th&gt;&lt;td&gt;Min absolute error&lt;/td&gt;&lt;td&gt;0.0&lt;/td&gt;&lt;td&gt;0.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;3&lt;/th&gt;&lt;td&gt;Mean absolute error&lt;/td&gt;&lt;td&gt;0.0381089&lt;/td&gt;&lt;td&gt;0.0136915&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;4&lt;/th&gt;&lt;td&gt;Median absolute error&lt;/td&gt;&lt;td&gt;0.0237194&lt;/td&gt;&lt;td&gt;0.0100031&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
 
