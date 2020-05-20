@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Introduction The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see Ljungqvist and Sargent (2018) for a textbook treatment of this topic).
+In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/aiyagariaggregateuncertainty/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/aiyagariaggregateuncertainty/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/aiyagariaggregateuncertainty/">
+  <meta property="og:title" content="Aiyagari Model with Aggregate Uncertainty | Julien Pascal">
+  <meta property="og:description" content="Introduction The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see Ljungqvist and Sargent (2018) for a textbook treatment of this topic).
+In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2020-05-19T18:53:22&#43;01:00">
+  
+  <meta property="article:modified_time" content="2020-05-19T18:53:22&#43;01:00">
+  
+
+  
+
+  
+
+  <title>Aiyagari Model with Aggregate Uncertainty | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/pdf/Julien_Pascal_Academic_Resume.pdf">
+            
+            <span>Academic Resume</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Aiyagari Model with Aggregate Uncertainty</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2020-05-19 18:53:22 &#43;0100 &#43;0100" itemprop="datePublished">
+<meta content="2020-05-19 18:53:22 &#43;0100 &#43;0100" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>May 19, 2020</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    15 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Aiyagari%20Model%20with%20Aggregate%20Uncertainty&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2faiyagariaggregateuncertainty%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2faiyagariaggregateuncertainty%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2faiyagariaggregateuncertainty%2f&amp;title=Aiyagari%20Model%20with%20Aggregate%20Uncertainty"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2faiyagariaggregateuncertainty%2f&amp;title=Aiyagari%20Model%20with%20Aggregate%20Uncertainty"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Aiyagari%20Model%20with%20Aggregate%20Uncertainty&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2faiyagariaggregateuncertainty%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see <a href="https://mitpress.mit.edu/books/recursive-macroeconomic-theory-fourth-edition" target="_blank">Ljungqvist and Sargent (2018)</a> for a textbook treatment of this topic).</p>
+
+<p>In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models.</p>
+
+<p>Here, I use a methodology that is quite general. It is a <strong>3-step procedure</strong>, which proceeds as follows:</p>
+
+<ol>
+<li>Solve for the non-stochastic steady-state</li>
+<li>Perturbe the model around its non-stochastic steady-state</li>
+<li>Use the perturbation to calculate out-of-steady-state dynamics</li>
+</ol>
+
+<p>I use the <a href="https://julienpascal.github.io/post/genbkm/" target="_blank">BKM and GenBKM</a> algorithms for step 2 and 3, which means that the only theoretical tool needed is <strong>backward induction</strong> (i.e. knowing the value tomorrow, what is the value today?).</p>
+
+<p>What are the cons of the methodology presented here? First, the methodology assumes a <strong>small aggregate shock</strong>. The idea is that if the economy is hit a by a small aggregate shock and that aggregate uncertainty vanishes, then the economy eventually goes back to its non-stochastic steady-state. If the shock is large, the value of steady-state may be altered and the methodology presented here is not adequate. An example of a large shock could be the disruption caused by COVID-19.</p>
+
+<p>This methodology also fails when the non-stochastic steady-state is not relevant for the dynamic economy. This can problematic in portfolio choice problems in which portfolios are indeterminate when aggregate uncertainty vanishes (see <a href="https://hal-sciencespo.archives-ouvertes.fr/hal-00972801/document" target="_blank">Coeurdacier et al (2011)</a>).</p>
+
+<p>On the pro side, the methodology presented here is fast (orders of magnitude faster than <a href="https://notes.quantecon.org/submission/5bb58d1e11611400157fdc8d" target="_blank">Krusell-Smith (1998)</a>) and transparent. The code can be <a href="https://github.com/JulienPascal/AiyagariAggregateUncertainty" target="_blank">downloaded here</a>.</p>
+
+<h2 id="i-the-model">I. The Model</h2>
+
+<p>In the model of Aiyagari (1994), there is continuum of agents each maximizing an infinite flow of discounted utility:</p>
+
+<p>$$ E_{0} \sum_{t=0}^{\infty} \beta^t U(c_t) $$</p>
+
+<p>subject to the constraint that how much they consume and how much they save in period $t$ (the left hand side of the next equation) should be equal to their labor earnings, plus their savings from last period (the right hand side of the next equation):</p>
+
+<p>$$ c_t + a_{t+1} = w_t l_t + (1 + r_t) a_t $$</p>
+
+<p>The variable $l_t$ captures idiosyncratic risk in labor earnings and could be interpreted as unemployment risk. There is also the assumption that consumption cannot be negative and that agents cannot borrow more than a certain amount $B$:</p>
+
+<p>$$ c_t \geq 0 $$</p>
+
+<p>$$ a_t \geq -B $$</p>
+
+<p>The behavior of firms can be summarized by a representative firm hiring workers and capital:</p>
+
+<p>$$ Y_t = z_t K_t^{\alpha} L_t^{1-\alpha} $$</p>
+
+<p>where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) for a maximizing firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Another thing to notice is that because agents have to take into consideration $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).</p>
+
+<h2 id="ii-methodology">II. Methodology</h2>
+
+<p>To solve for individual policy functions, I use the endogenous grid method (EGM) of Carroll (2006). The main idea of this method is to start from the end-of-period level of capital. Using the Euler equation, one may recover the beginning-of-period consumption and level of capital without using a root-finding algorithm.</p>
+
+<p>To determine the non-stochastic equilibrium, I solve for the fixed-point problem over the aggregate capital level $f(K*) = 0$ using <a href="https://en.wikipedia.org/wiki/Brent%27s_method" target="_blank">Brent&rsquo;s method</a>.</p>
+
+<p>To calculate the response of the economy to one-period unforeseen aggregate shock (an &ldquo;MIT shock&rdquo;), I use a standard backward-forward <a href="https://en.wikipedia.org/wiki/Shooting_method" target="_blank">&ldquo;shooting&rdquo; method</a>:</p>
+
+<ol>
+<li>holding the path of aggregate capital $(K_t)_{t=1}^{T}$, calculate the policy functions</li>
+<li>holding constant the policy functions, calculate the aggregate capital $(K_t)_{t=1}^{T}$</li>
+<li>repeat until convergence of the path for aggregate capital $(K_t)_{t=1}^{T}$</li>
+</ol>
+
+<p>To simulate out-of-steady-state dynamics, I use the <a href="https://ideas.repec.org/a/eee/dyncon/v89y2018icp68-92.html" target="_blank">BKM algorithm</a>, which relies on the assumption that the response of the economy to an aggregate shock $d_t$ is <strong>linear</strong> with respect to the <strong>aggregate state</strong> $z_t$:</p>
+
+<p>$$ d_t = z_t d(1, 0, 0, &hellip;) + z_{t-1}d(0, 1, 0, &hellip;) + z_{t-2}d(0, 0, 1, &hellip;) + &hellip; $$</p>
+
+<p>or more compactly:</p>
+
+<p>$$ d_t = \sum_{k=0}^{+\infty} z_{t-k} d_{k} $$</p>
+
+<p>where</p>
+
+<p>$$ d_{1} = d(1,0,0,&hellip;)$$
+$$ d_{2} = d(0,1,0,&hellip;)$$
+$$ d_{3} = d(0,0,1,&hellip;)$$</p>
+
+<p>That is, the evolution of equilibrium variables is a moving average of past shocks. However, by calculating several trajectories after an MIT shock, one sees that linearity assumption is slightly violated. Hence, I use the <a href="https://irihs.ihs.ac.at/id/eprint/4500/" target="_blank">GenBKM algorithm</a>, which is a refinement of the BKM algorithm taking into consideration these slight violations of linearity.</p>
+
+<h2 id="iii-implementation">III. Implementation</h2>
+
+<p>These ideas are implemented using <a href="https://julialang.org/" target="_blank">Julia</a></p>
+
+<pre><code class="language-julia">versioninfo()
+</code></pre>
+
+<pre><code>Julia Version 1.3.0
+Commit 46ce4d7933 (2019-11-26 06:09 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-6.0.1 (ORCJIT, skylake)
+</code></pre>
+
+<h3 id="ii-a-dependencies">II. A Dependencies</h3>
+
+<pre><code class="language-julia">using Distributions
+using Plots
+using DataFrames
+using Random
+using ForwardDiff
+using LinearAlgebra
+using Interpolations
+using DataFrames
+using Optim
+Random.seed!(1234);
+</code></pre>
+
+<pre><code class="language-julia">using NBInclude #To load stuct and functions from other notebooks
+</code></pre>
+
+<pre><code class="language-julia">@nbinclude(&quot;utils.ipynb&quot;) #mutable structs and primitive functions for the model
+@nbinclude(&quot;RBC.ipynb&quot;)   #Aiyagari model, without the borrowing constraint (standard RBC)
+@nbinclude(&quot;EGM.ipynb&quot;)   #implementation of the EGM method
+@nbinclude(&quot;SteadyState.ipynb&quot;) #to calculate the non-stochastic steady-state
+@nbinclude(&quot;GenBKM.ipynb&quot;) #to simulate the stochastic model using the GenBKM algorithm
+</code></pre>
+
+<h3 id="ii-b-steady-state">II.B Steady-state</h3>
+
+<h4 id="finding-the-steady-state-value-of-capital">Finding the steady-state value of capital</h4>
+
+<p>Finding the non-stochastic equilibrium is a fixed-point problem over the aggregate capital level $f(K*) = 0$, which can be solved using <a href="https://en.wikipedia.org/wiki/Brent%27s_method" target="_blank">Brent&rsquo;s method</a>:</p>
+
+<pre><code class="language-julia">p = Params() #struct with model parameters
+z_ss = 1.0 #aggregate productivity at the non-stochastic steady-state
+@time oo = optimize(K -&gt; eq_K(K,p), 10, 100, Brent()) #solve for the steady-state value of capital using Brent method
+K_star = oo.minimizer;
+println(&quot;Steady-state value of capital K* = $(K_star)&quot;)
+# Store the optimal policy function at the steady-state
+g_star, c_star, g_low_star, g_high_star, success_flag= solve_EGM(x-&gt;log(x), x-&gt;log(x), R(K_star, z_ss, p), W(K_star, z_ss, p), p); #solve for policy functions
+# Store the stationary distribution at the steady-state
+t_star = make_trans_mat(g_star, p)    #generate transition matrix
+d_star = get_stationary_dist(t_star); #stationary distribution
+</code></pre>
+
+<h4 id="visualizing-transition-probabilities">Visualizing transition probabilities</h4>
+
+<pre><code class="language-julia">xs = [string(&quot;x&quot;, i) for i = 1:size(t_star,1)]
+ys = [string(&quot;y&quot;, i) for i = 1:size(t_star,2)]
+heatmap(t_star, aspect_ratio = 1, color=:plasma, clim=(0., 0.25))
+</code></pre>
+
+<p><img src="AiyagariBKM_15_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the transition probabilities across capital and idiosyncratic probability states.</em></p>
+
+<h4 id="visualizing-convergence-toward-the-steady-state">Visualizing convergence toward the steady-state</h4>
+
+<p>One may visually check that the equilibrium exists and is unique:</p>
+
+<pre><code class="language-julia"># Solve for the demand and supply of capital for different values of the interest rate
+K_grid = collect(range(oo.minimizer-0.5, stop=oo.minimizer+0.5, length=20))
+K_implied_grid = similar(K_grid)
+R_grid = similar(K_grid)
+
+for (K_index, K_value) in enumerate(K_grid)
+    R_s, W_s = R(K_value, z_ss, p), W(K_value, z_ss, p) #calculate interest rate R and wage W
+    gg, c_star, g_low, g_high, success_flag= solve_EGM(x -&gt; log(x), x -&gt; 2*log(x), R_s, W_s, p) #solve for policy functions
+    tt = make_trans_mat(gg, p)   #generate transition matrix
+    dd = get_stationary_dist(tt) #stationary distribution
+    K_implied = aggregate_K(dd, p) #implied level of capital
+    R_grid[K_index] = R_s #store interest rate
+    K_implied_grid[K_index] = K_implied #store demand of capital
+    K_grid[K_index] = K_value #store supply of capital
+end
+
+# Plot demand and supply of capital
+plot(K_grid, R_grid, label = &quot;Demand&quot;, ylabel=&quot;Interest rate&quot;, xlabel=&quot;Capital&quot;)
+plot!(K_implied_grid, R_grid, label = &quot;Supply&quot;)
+</code></pre>
+
+<p><img src="AiyagariBKM_18_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the demand and the supply of capital as a function of the interest rate.</em></p>
+
+<h3 id="ii-c-mit-shock">II.C MIT Shock</h3>
+
+<h4 id="backward-and-forward-updates">Backward and forward updates</h4>
+
+<p>The next block implements the backward-forward shooting method:</p>
+
+<ol>
+<li>holding the path of aggregate capital $(K_t)_{t=1}^{T}$, calculate the policy functions</li>
+<li>holding constant the policy functions, calculate the aggregate capital $(K_t)_{t=1}^{T}$</li>
+</ol>
+
+<pre><code class="language-julia">function backward_update(g_low_ss::Function, g_high_ss::Function, K_path_guess::Array{Float64,1}, z_path::Array{Float64,1}, p::Params)
+    &quot;&quot;&quot;
+    Update policy functions backward, holding {K_t,z_t} constant
+    &quot;&quot;&quot;
+    nT = length(z_path)
+    g_low_path = Array{Function}(undef,nT) #initialize two lists of functions
+    g_high_path =  Array{Function}(undef,nT)
+    g_low_path[nT] = g_low_ss
+    g_high_path[nT] = g_high_ss
+    a_path = zeros(p.nI, p.grid_size, nT) #to store policy functions on savings grid
+    R_path = zeros(nT) #to store the interest rate on path
+    W_path = zeros(nT) #to store the wage on path
+
+    #Start from the steady-state and iterate backward
+    #holding constant the path for {K_t,z_t}
+    #---------------------------------------------------
+    for t=nT👎2 #iterate backward
+        # Next period
+        R_path[t], W_path[t] = R(K_path_guess[t], z_path[t], p), W(K_path_guess[t], z_path[t], p)
+        # Current period
+        R_path[t-1], W_path[t-1] = R(K_path_guess[t-1], z_path[t-1], p), W(K_path_guess[t-1], z_path[t-1], p)
+        # Current period's policy, given next period
+        a_path[:,:,t-1], c_new, g_low_path[t-1], g_high_path[t-1] = euler_back(g_low_path[t], g_high_path[t], R_path[t-1], W_path[t-1], R_path[t], W_path[t], p)
+    end
+
+    return a_path, g_low_path, g_high_path
+end
+
+function forward_update(K_star::Float64, a_path::Array{Float64,3}, d_ss::Array{Float64,1}, p::Params)
+    &quot;&quot;&quot;
+    Update forward the distribution of agents + aggregate capital
+    dd_path_forward, K_path_forward
+    &quot;&quot;&quot;
+    nT = length(z_path)
+    K_path_forward = zeros(nT)
+    K_path_forward[1] = K_star
+    dd_path_forward = zeros(size(d_ss,1), nT)
+    dd_path_forward[:,1] = d_ss
+    #2. Iterate forward {K_t,z_t}, using the policy
+    #functions from step 1
+    #-----------------------------------------------
+    for t=2:nT
+        tt = make_trans_mat(a_path[:,:,t-1], p) #generate transition matrix
+        dd_path_forward[:,t] = tt*dd_path_forward[:,t-1]
+        K_path_forward[t] = aggregate_K(dd_path_forward[:,t], p)
+    end
+
+    return dd_path_forward, K_path_forward
+end
+</code></pre>
+
+<h4 id="finding-the-transition-path">Finding the transition path</h4>
+
+<p>One problem with backward-forward shooting method is that updating the path for $(K_t)_{t=1}^{T}$ &ldquo;too quickly&rdquo; may result in the overall procedure to diverge. An easy fix is to take a convex combination of the previous guess and the newly calculated path, with $\lambda$ small:</p>
+
+<p>$(K^{NEW}_t)_{t=1}^{T} = \lambda (K_t)_{t=1}^{T} + (1-\lambda)(K^{OLD}_t)_{t=1}^{T}$</p>
+
+<p>The next function implement this idea, with the extra feature that $\lambda$ increases when distance between two iterations is getting small (too speed up convergence) and decreases when the distance is getting bigger (to prevent divergence) (see <a href="https://notes.quantecon.org/submission/5b3faf1fb9eab00015b89f9a" target="_blank">this excellent notebook</a>).</p>
+
+<pre><code class="language-julia">function solve_mit!(K_path, g_low_ss::Function, g_high_ss::Function, d_ss::Array{Float64,1},
+                    K_ss::Float64, z_path::Array{Float64,1}, p::Params; convex_combination::Float64 = 0.2,
+                    shrink_factor::Float64 = 0.5, expand_factor::Float64 = 1.05,
+                    max_iter::Int64 = 1000, tol::Float64=1e-6, verbose::Bool=true, display_iter::Int64 = 20)
+    &quot;&quot;&quot;
+    Finds the path for aggregate capital K_path
+    &quot;&quot;&quot;
+    diff = Inf #initialization
+    diff_old = Inf #initialization
+    convergence_flag = 0 #initialization
+    damp = convex_combination #initial dampening parameter
+
+    for i_mit=1:max_iter
+
+        # Step 1. Solve backward the policy functions {g_t(a,e_low), g_t(a,e_high)}, keeping {K_t,z_t} constant:
+        a_path, g_low_path, g_high_path = backward_update(g_low_ss, g_high_ss, K_path[i_mit], z_path, p);
+
+        #2. Solve forward {K_t,z_t}, keeping policy functions {g_t(a,e_low), g_t(a,e_high)} constant:
+        dd_path_forward, K_path_forward = forward_update(K_ss, a_path, d_star, p);
+
+        # Distance between guess for {K_t} and implied values:
+        diff = maximum(abs.(K_path_forward - K_path[i_mit]))
+
+        # Display every display_iter iterations
+        if verbose==true
+            if mod(i_mit,display_iter) == 0
+                println(&quot;Iteration $(i_mit). diff = $(diff)&quot;)
+            end
+        end
+
+        if diff &lt; tol
+            if verbose==true
+                println(&quot;Convergence reached after $(i_mit) iterations.&quot;)
+            end
+            convergence_flag = 1
+            break
+        else
+            # Update the guess for the path {K_t}
+            # Decrease the dampening factor
+            if diff &gt; diff_old
+                damp = max(min(damp * shrink_factor, 1.0-eps()), eps())
+            # Increase the dampening factor
+            else
+                damp = max(min(damp * expand_factor, 1.0-eps()), eps())
+            end
+            if mod(i_mit, 10) == 0
+                if verbose==true
+                    println(&quot;damp = $(damp); diff = $(diff)&quot;)
+                end
+            end
+            # Store the updated path for {K_t}
+            push!(K_path, damp.*K_path_forward .+ (1.0 - damp).*K_path[i_mit])
+            diff_old = diff
+
+        end
+    end
+
+    return K_path, convergence_flag
+end
+</code></pre>
+
+<h4 id="find-the-path-for-k-t-for-a-1-std-dev-positive-productivity-shock">Find the path for {K_t} for a 1 std. dev positive productivity shock</h4>
+
+<pre><code class="language-julia">max_t = 300 #Let us assume that the economy is back to the steady state after max_t periods
+z_ss = 1.0  #Value of aggregate productivity at the non-stochastic steady-state
+z_shock = 2.0 #Value of the inital shock
+
+# Let's generate a path for the aggregate shock
+z_path = ones(max_t)
+z_path[1] = z_ss*z_shock #initial shock
+
+# Evolution of aggregate productivity in level:
+for t_index=2:max_t
+    z_path[t_index] = z_path[t_index-1]^p.rho
+end
+
+# Heroic guess for the initial path of {K_t}: K_t = K* for all t
+K_path = []
+push!(K_path, repeat([K_star], max_t))
+
+# Find the path for {K_t}:
+@time K_path, convergence_flag = solve_mit!(K_path, g_low_star, g_high_star, d_star, K_star, z_path, p, convex_combination=0.25);
+
+# Find the path for other aggregates:
+R_path = zeros(length(z_path)) #to store the interest rate on path
+W_path = zeros(length(z_path)) #to store the wage on path
+for t=length(z_path)👎1 #iterate backward
+    # Next period
+    R_path[t], W_path[t] = R(K_path[end][t], z_path[t], p), W(K_path[end][t], z_path[t], p)
+end
+</code></pre>
+
+<h4 id="visualize-convergence-of-the-transition-path">Visualize convergence of the transition path</h4>
+
+<p>The first guess for $(K_t)_{t=1}^{T}$ is that it equal to $K*$ for each period. Very quickly, the path for $(K_t)_{t=1}^{T}$ converges to the perfect foresight transition path:</p>
+
+<pre><code class="language-julia">p0 = plot(1:max_t, K_path[1], label= &quot;Iteration 0&quot;, title=&quot;Convergence of K(t)&quot;)
+plot!(p0, 2:max_t, K_path[2][2:end], label = &quot;Iteration 1&quot;)
+show_every = 5 #display {K_t} for each multiple of show_every
+for k in 2:length(K_path)
+    if mod(k,show_every) == 0
+        plot!(p0, 2:max_t, K_path[k][2:end], xlabel=&quot;t&quot;, label = &quot;Iteration $(k)&quot;, title=&quot;Convergence of K(t)&quot;, legend=:best)
+    end
+end
+
+p0
+</code></pre>
+
+<p><img src="AiyagariBKM_30_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the path for capital {K_t}^(i) for different iterations of the backward-forward algorithm</em></p>
+
+<h4 id="removing-the-borrowing-constraint">Removing the borrowing constraint</h4>
+
+<p>The next graph compares shows what happens to an Aiyagari model without borrowing constraint. With no borrowing constraint, the aggregate level of capital reacts less to an aggregate shock in productivity:</p>
+
+<pre><code class="language-julia">p1 = plot(1:max_t, K_path[end], label= &quot;K_t Aiyagari&quot;, title=&quot;IRF Aiyagari versus RBC&quot;)
+plot!(p1, xx[RBCp.iK,2:end] .+ K_star, label = &quot;K_t RBC&quot;, color = &quot;black&quot;, xlabel=&quot;t&quot;)
+</code></pre>
+
+<p><img src="AiyagariBKM_34_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the impulse response of K_t of for the Aiyagari model and a RBC model.</em></p>
+
+<pre><code class="language-julia">p1 = plot(1:max_t, z_path./z_path[end] .-1, label = &quot;z(t)&quot;, xlabel= &quot;t&quot;)
+p2 = plot(1:max_t, R_path./R_path[end] .-1, label= &quot;R(t)&quot;, xlabel= &quot;t&quot;)
+p3 = plot(1:max_t, W_path./W_path[end].-1 , label= &quot;W(t)&quot;, xlabel= &quot;t&quot;)
+p4 = plot(1:max_t, K_path[end]./K_path[end][end] .-1, label= &quot;K(t)&quot;, xlabel= &quot;t&quot; )
+
+p5 = plot(p1, p2, p3, p4)
+</code></pre>
+
+<p><img src="AiyagariBKM_36_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the percentage deviation from steady-state values of (i) aggregate productivity (ii) the interest rate (iii) wages (iv) capital.</em></p>
+
+<h4 id="linearity-checks">Linearity checks</h4>
+
+<p>To simulate the stochastic economy, the BKM algorithm makes the assumption that an MIT shock is linear with
+respect to the aggregate shock. That is, doubling the initial shock will simply double the value of aggregates
+along the transition path without changing the shape of the path. The next block
+calculates several transition paths for different initial aggregate shocks.</p>
+
+<pre><code class="language-julia">max_t = 300 #Let us assume that the economy is back to the steady state after max_t periods
+z_ss = 1.0  #Value of aggregate productivity at the non-stochastic steady-state
+# Different initial shocks
+array_sigma = collect(range(-0.75, stop=0.75, step=0.25))
+# Let's exclude sigma = 0
+array_sigma = array_sigma[array_sigma .!= 0.]
+# To store the different scaled IRF:
+x_mit_scaled_sigma = zeros(max_t, length(array_sigma))
+# To store path of aggregate productivity:
+z_path_sigma = zeros(max_t, length(array_sigma))
+# To store the path for the %deviation of aggregate productivity from its steady-state value
+z_path_sigma_dev = zeros(max_t, length(array_sigma))
+
+for (index_sigma, sigma) in enumerate(array_sigma)
+
+    # Let's generate a path for the aggregate shock
+    z_path = ones(max_t)
+    z_path[1] = z_ss + z_ss*sigma
+
+    # Evolution of aggregate productivity in level:
+    for t_index=2:max_t
+        z_path[t_index] = z_path[t_index-1]^p.rho
+    end
+
+    # Heroic guess for the initial path of {K_t}: K_t = K* for all t
+    K_path = []
+    push!(K_path, repeat([K_star], max_t))
+
+    # Find the path for {K_t}:
+    @time K_path, convergence_flag = solve_mit!(K_path, g_low_star, g_high_star, d_star, K_star, z_path, p, convex_combination=0.2, verbose=false);
+
+    # Check for convergence
+    if convergence_flag!=1
+        error(&quot;No convergence for z(1) = $(z_path[1]).&quot;)
+    end
+
+    # store the path for z:
+    z_path_sigma[:, index_sigma] = z_path
+
+    # store for the %deviation of aggregate productivity from its steady-state value
+    z_path_sigma_dev[:, index_sigma] = z_path./z_ss .- 1.0
+
+    # Scaled IRF: how a percentage deviation in z_t from its steady-state results in a % deviation of k_t
+    x_mit_scaled_sigma[:, index_sigma] = (K_path[end]./K_star .- 1.0)./z_path_sigma_dev[1, index_sigma]
+
+end
+</code></pre>
+
+<pre><code class="language-julia">p0 = plot()
+p1 = plot()
+p2 = plot()
+p3 = plot()
+
+for (index_sigma, sigma) in enumerate(array_sigma)
+    if index_sigma == 1
+        p0 = plot(100 .*z_path_sigma_dev[:, index_sigma], label=&quot;z(t) with z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;)
+        p1 = plot(z_path_sigma[:, index_sigma], label=&quot;z(t) z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;)
+        p2 = plot(x_mit_scaled_sigma[:, index_sigma], label=&quot;z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;)
+        p3 = plot(sign(z_path_sigma[1, index_sigma] - z_ss)*x_mit_scaled_sigma[:, index_sigma], label=&quot;z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;)
+    else
+        plot!(p0, 100 .*z_path_sigma_dev[:, index_sigma], label=&quot;z(t) with z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;, title = &quot;% deviation aggregate productivity&quot;, xlabel=&quot;t&quot;)
+        plot!(p1, z_path_sigma[:, index_sigma], label=&quot;z(t) with z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;, title = &quot;Aggregate productivity&quot;, xlabel=&quot;t&quot;)
+        plot!(p2, x_mit_scaled_sigma[:, index_sigma], label=&quot;z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;, title = &quot;Impact of shock's size on scaled IRF: x&quot;, xlabel=&quot;t&quot;)
+        plot!(p3, sign(z_path_sigma[1, index_sigma] - z_ss)*x_mit_scaled_sigma[:, index_sigma], label=&quot;z(1) = $(round(100 .*z_path_sigma_dev[1, index_sigma], digits=2))%&quot;, title = &quot;Impact of shock's sign on scaled IRF: sign(x - x_ss)*x&quot;, xlabel=&quot;t&quot;)
+    end
+end
+</code></pre>
+
+<pre><code class="language-julia">plot(p0,p1, fg_legend = :transparent, legend=:best, layout=(2,1))
+</code></pre>
+
+<p><img src="AiyagariBKM_42_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the percentage deviation of aggregate productivity from its steady-state value (top panel) and aggregate productivity in level (bottom panel) for different initial shocks.</em></p>
+
+<pre><code class="language-julia">plot(p2,p3, fg_legend = :transparent, legend=:best, layout=(2,1))
+</code></pre>
+
+<p><img src="AiyagariBKM_44_0.svg" alt="svg" /></p>
+
+<p><em>Notes: The top panel shows the scaled impulse response function of capital for different aggregate shocks. The bottom panel shows the scaled impulse response function of capital for different aggregate shocks, multiplied by the sign of the aggregate shock.</em></p>
+
+<h3 id="ii-d-out-of-steady-state-dynamics">II.D. Out-of-steady-state dynamics</h3>
+
+<pre><code class="language-julia">max_t = 2000
+shocks_t = rand(Normal(0,0.005), max_t) # Series of aggregate shocks
+# Let's generate a path for the aggregate shock
+z_path = ones(max_t)
+z_path[1] = z_ss
+
+# Evolution of aggregate productivity in level:
+for t_index=2:max_t
+    z_path[t_index] = z_path[t_index-1]^p.rho + shocks_t[t_index]
+end
+
+# Calculation of GenBKM path:
+XT_GenBKM = zeros(max_t);# Initialization
+@time GenBKM_path!(XT_GenBKM, max_t, x_mit_scaled_sigma, z_path./z_ss .- 1.0, array_sigma)
+</code></pre>
+
+<pre><code>  0.237683 seconds (1.06 M allocations: 50.188 MiB)
+</code></pre>
+
+<pre><code class="language-julia">p1 = plot(100 .*(z_path./z_ss .- 1.0), label=&quot;z_t&quot;, xlabel=&quot;t&quot;)
+p2 = plot(100 .*XT_GenBKM, label = &quot;K_t&quot;, xlabel=&quot;t&quot;)
+plot(p1,p2, fg_legend = :transparent, legend=:best, layout=(2,1))
+</code></pre>
+
+<p><img src="AiyagariBKM_48_0.svg" alt="svg" /></p>
+
+<p><em>Notes: The top panel shows the percentage deviation of aggregate productivity from its steady-state value. The bottom panel shows the percentage deviation of capital from its steady-state value.</em></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &ldquo;small&rdquo; shocks. Solving this class of model for large shocks seems to be <a href="https://www.google.com/search?client=ubuntu&amp;channel=fs&amp;q=Probabilistic+Theory+ofMean+Field+Gameswith+Applications+II&amp;ie=utf-8&amp;oe=utf-8" target="_blank">much more complicated</a> and is still an active area of research.</p>
+
+<h2 id="links">Links</h2>
+
+<ul>
+<li>An excellent course on heterogeneous agent models with code in Matlab, Python and Julia: <a href="https://alisdairmckay.com/Notes/HetAgents/index.html" target="_blank">https://alisdairmckay.com/Notes/HetAgents/index.html</a></li>
+<li>More on the EGM method: <a href="https://julia.quantecon.org/dynamic_programming/egm_policy_iter.html" target="_blank">https://julia.quantecon.org/dynamic_programming/egm_policy_iter.html</a></li>
+<li>More on the Aiyagari model: <a href="https://python.quantecon.org/aiyagari.html" target="_blank">https://python.quantecon.org/aiyagari.html</a></li>
+<li>Aiyagari model in continuous time: <a href="https://nbviewer.jupyter.org/github/QuantEcon/QuantEcon.notebooks/blob/master/aiyagari_continuous_time.ipynb" target="_blank">https://nbviewer.jupyter.org/github/QuantEcon/QuantEcon.notebooks/blob/master/aiyagari_continuous_time.ipynb</a></li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li>Bewley, Truman. &ldquo;A difficulty with the optimum quantity of money.&rdquo; Econometrica: Journal of the Econometric Society (1983): 1485-1504.</li>
+<li>Boppart, Timo, Per Krusell, and Kurt Mitman. “Exploiting MIT shocks in heterogeneous-agent economies: the impulse response as a numerical derivative.” Journal of Economic Dynamics and Control 89 (2018): 68-92.</li>
+<li>Christopher D Carroll. The method of endogenous gridpoints for solving dynamic stochastic optimization problems. Economics Letters, 91(3):312–320, 2006.</li>
+<li>Coeurdacier, Nicolas, Helene Rey, and Pablo Winant. &ldquo;The risky steady state.&rdquo; American Economic Review 101.3 (2011): 398-401.</li>
+<li>Huggett, Mark. &ldquo;The risk-free rate in heterogeneous-agent incomplete-insurance economies.&rdquo; Journal of economic Dynamics and Control 17.5-6 (1993): 953-969.</li>
+<li>İmrohoroğlu, Ayşe. &ldquo;The welfare cost of inflation under imperfect insurance.&rdquo; Journal of Economic Dynamics and Control 16.1 (1992): 79-91.</li>
+<li>Ljungqvist, Lars, and Thomas J. Sargent. Recursive macroeconomic theory. MIT press, 2018.</li>
+<li>Reiter, Michael. “Comments on” Exploiting MIT Shocks in Heterogeneous-Agent Economies: The Impulse Response as a Numerical Derivative” by T. Boppart, P. Krusell and K. Mitman.” Journal of Economic Dynamics and Control 89 (2018): 93-99.</li>
+</ul>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/macroeconomics/">Macroeconomics</a>
+  
+  <a class="badge badge-light" href="/tags/ha-models/">HA models</a>
+  
+</div>
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal</a></h5>
+    <h6 class="card-subtitle">PhD candidate in Economics</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/Juli3nPascal" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://medium.com/@julien.pascal" target="_blank" rel="noopener">
+          <i class="fab fa-medium"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+      
+      
+      <div class="article-widget">
+        <div class="hr-light"></div>
+        <h3>Related</h3>
+        <ul>
+          
+          <li><a href="/post/genbkm/">The GenBKM Algorithm</a></li>
+          
+        </ul>
+      </div>
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+
