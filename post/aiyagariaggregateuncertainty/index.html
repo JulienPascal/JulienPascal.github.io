@@ -536,9 +536,9 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
 
 <p>I use the <a href="https://julienpascal.github.io/post/genbkm/" target="_blank">BKM and GenBKM</a> algorithms for step 2 and 3, which means that the only theoretical tool needed is <strong>backward induction</strong> (i.e. knowing the value tomorrow, what is the value today?).</p>
 
-<p>What are the cons of the methodology presented here? First, the methodology assumes a <strong>small aggregate shock</strong>. The idea is that if the economy is hit a by a small aggregate shock and that aggregate uncertainty vanishes, then the economy eventually goes back to its non-stochastic steady-state. If the shock is large, the value of steady-state may be altered and the methodology presented here is not adequate. An example of a large shock could be the disruption caused by COVID-19.</p>
+<p>What are the cons of the methodology presented here? First, the methodology assumes a <strong>small aggregate shock</strong>. An implicit assumption is that aggregate shocks do not modify the value of the non-stochastic steady-state. Said differently, the cycle does not change the trend, <a href="https://www.youtube.com/watch?v=K2X1GiTaxHw" target="_blank">which seems to be violated in some instances</a>. If the shock is large, the value of steady-state may be altered and the methodology presented here is not adequate. An example of a large shock could be the disruption caused by COVID-19.</p>
 
-<p>This methodology also fails when the non-stochastic steady-state is not relevant for the dynamic economy. This can problematic in portfolio choice problems in which portfolios are indeterminate when aggregate uncertainty vanishes (see <a href="https://hal-sciencespo.archives-ouvertes.fr/hal-00972801/document" target="_blank">Coeurdacier et al (2011)</a>).</p>
+<p>This methodology also fails when the non-stochastic steady-state is not relevant for the dynamic economy. This can problematic in portfolio choice problems, in which portfolios are indeterminate when aggregate uncertainty vanishes (see <a href="https://hal-sciencespo.archives-ouvertes.fr/hal-00972801/document" target="_blank">Coeurdacier et al (2011)</a>).</p>
 
 <p>On the pro side, the methodology presented here is fast (orders of magnitude faster than <a href="https://notes.quantecon.org/submission/5bb58d1e11611400157fdc8d" target="_blank">Krusell-Smith (1998)</a>) and transparent. The code can be <a href="https://github.com/JulienPascal/AiyagariAggregateUncertainty" target="_blank">downloaded here</a>.</p>
 
@@ -548,11 +548,11 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
 
 <p>$$ E_{0} \sum_{t=0}^{\infty} \beta^t U(c_t) $$</p>
 
-<p>subject to the constraint that how much they consume and how much they save in period $t$ (the left hand side of the next equation) should be equal to their labor earnings, plus their savings from last period (the right hand side of the next equation):</p>
+<p>subject to the constraint that consumption plus savings in period $t$ (the left hand side of the next equation) is equal to labor earnings plus savings inherited from the last period (the right hand side of the next equation):</p>
 
 <p>$$ c_t + a_{t+1} = w_t l_t + (1 + r_t) a_t $$</p>
 
-<p>The variable $l_t$ captures idiosyncratic risk in labor earnings and could be interpreted as unemployment risk. There is also the assumption that consumption cannot be negative and that agents cannot borrow more than a certain amount $B$:</p>
+<p>The variable $l_t$ captures idiosyncratic risk in labor earnings and could be interpreted as unemployment risk. We also make the assumptions that consumption cannot be negative and that agents cannot borrow more than a certain amount $B$:</p>
 
 <p>$$ c_t \geq 0 $$</p>
 
@@ -562,7 +562,7 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
 
 <p>$$ Y_t = z_t K_t^{\alpha} L_t^{1-\alpha} $$</p>
 
-<p>where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) for a maximizing firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Another thing to notice is that because agents have to take into consideration $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).</p>
+<p>where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) for a maximizing firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Importantly, because agents have to take into consideration the value of $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).</p>
 
 <h2 id="ii-methodology">II. Methodology</h2>
 
@@ -573,9 +573,9 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
 <p>To calculate the response of the economy to one-period unforeseen aggregate shock (an &ldquo;MIT shock&rdquo;), I use a standard backward-forward <a href="https://en.wikipedia.org/wiki/Shooting_method" target="_blank">&ldquo;shooting&rdquo; method</a>:</p>
 
 <ol>
-<li>holding the path of aggregate capital $(K_t)_{t=1}^{T}$, calculate the policy functions</li>
-<li>holding constant the policy functions, calculate the aggregate capital $(K_t)_{t=1}^{T}$</li>
-<li>repeat until convergence of the path for aggregate capital $(K_t)_{t=1}^{T}$</li>
+<li>holding constant the path of aggregate capital level $(K_t)_{t=1}^{T}$, calculate the policy functions</li>
+<li>holding constant the policy functions, calculate the path of aggregate capital level $(K_t)_{t=1}^{T}$</li>
+<li>repeat until convergence of the path for aggregate capital level $(K_t)_{t=1}^{T}$</li>
 </ol>
 
 <p>To simulate out-of-steady-state dynamics, I use the <a href="https://ideas.repec.org/a/eee/dyncon/v89y2018icp68-92.html" target="_blank">BKM algorithm</a>, which relies on the assumption that the response of the economy to an aggregate shock $d_t$ is <strong>linear</strong> with respect to the <strong>aggregate state</strong> $z_t$:</p>
@@ -757,11 +757,11 @@ end
 
 <h4 id="finding-the-transition-path">Finding the transition path</h4>
 
-<p>One problem with backward-forward shooting method is that updating the path for $(K_t)_{t=1}^{T}$ &ldquo;too quickly&rdquo; may result in the overall procedure to diverge. An easy fix is to take a convex combination of the previous guess and the newly calculated path, with $\lambda$ small:</p>
+<p>One problem with the backward-forward shooting method is that updating the path for $(K_t)_{t=1}^{T}$ &ldquo;too quickly&rdquo; may result in the overall procedure to diverge. An easy fix is to take a convex combination of the previous guess and the newly calculated path, with $\lambda$ small:</p>
 
 <p>$(K^{NEW}_t)_{t=1}^{T} = \lambda (K_t)_{t=1}^{T} + (1-\lambda)(K^{OLD}_t)_{t=1}^{T}$</p>
 
-<p>The next function implement this idea, with the extra feature that $\lambda$ increases when distance between two iterations is getting small (too speed up convergence) and decreases when the distance is getting bigger (to prevent divergence) (see <a href="https://notes.quantecon.org/submission/5b3faf1fb9eab00015b89f9a" target="_blank">this excellent notebook</a>).</p>
+<p>The next function implements this idea, with the extra feature that $\lambda$ increases when the distance between two iterations is getting small (too speed up convergence) and decreases when the distance is getting bigger (to prevent divergence). See <a href="https://notes.quantecon.org/submission/5b3faf1fb9eab00015b89f9a" target="_blank">this excellent notebook</a>) for the same idea applied to an OLG model.</p>
 
 <pre><code class="language-julia">function solve_mit!(K_path, g_low_ss::Function, g_high_ss::Function, d_ss::Array{Float64,1},
                     K_ss::Float64, z_path::Array{Float64,1}, p::Params; convex_combination::Float64 = 0.2,
@@ -857,7 +857,7 @@ end
 
 <h4 id="visualize-convergence-of-the-transition-path">Visualize convergence of the transition path</h4>
 
-<p>The first guess for $(K_t)_{t=1}^{T}$ is that it equal to $K*$ for each period. Very quickly, the path for $(K_t)_{t=1}^{T}$ converges to the perfect foresight transition path:</p>
+<p>The first guess for $(K_t)_{t=1}^{T}$ is that it is equal to the non-stochastic steady-state value $K*$. Very quickly, the path for $(K_t)_{t=1}^{T}$ converges to the perfect foresight transition path:</p>
 
 <pre><code class="language-julia">p0 = plot(1:max_t, K_path[1], label= &quot;Iteration 0&quot;, title=&quot;Convergence of K(t)&quot;)
 plot!(p0, 2:max_t, K_path[2][2:end], label = &quot;Iteration 1&quot;)
@@ -877,7 +877,7 @@ p0
 
 <h4 id="removing-the-borrowing-constraint">Removing the borrowing constraint</h4>
 
-<p>The next graph compares shows what happens to an Aiyagari model without borrowing constraint. With no borrowing constraint, the aggregate level of capital reacts less to an aggregate shock in productivity:</p>
+<p>The next graph compares the current model to a similar model without a borrowing constraint. With no borrowing constraint, the aggregate level of capital reacts less to an aggregate shock in productivity:</p>
 
 <pre><code class="language-julia">p1 = plot(1:max_t, K_path[end], label= &quot;K_t Aiyagari&quot;, title=&quot;IRF Aiyagari versus RBC&quot;)
 plot!(p1, xx[RBCp.iK,2:end] .+ K_star, label = &quot;K_t RBC&quot;, color = &quot;black&quot;, xlabel=&quot;t&quot;)
@@ -1020,7 +1020,7 @@ plot(p1,p2, fg_legend = :transparent, legend=:best, layout=(2,1))
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &ldquo;small&rdquo; shocks. Solving this class of model for large shocks seems to be <a href="https://www.google.com/search?client=ubuntu&amp;channel=fs&amp;q=Probabilistic+Theory+ofMean+Field+Gameswith+Applications+II&amp;ie=utf-8&amp;oe=utf-8" target="_blank">much more complicated</a> and is still an active area of research.</p>
+<p>This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &ldquo;small&rdquo; shocks. Solving this class of model for large shocks seems to be <a href="https://www.springer.com/gp/book/9783319564357" target="_blank">much more complicated</a> and is still an active area of research.</p>
 
 <h2 id="links">Links</h2>
 
@@ -1029,6 +1029,7 @@ plot(p1,p2, fg_legend = :transparent, legend=:best, layout=(2,1))
 <li>More on the EGM method: <a href="https://julia.quantecon.org/dynamic_programming/egm_policy_iter.html" target="_blank">https://julia.quantecon.org/dynamic_programming/egm_policy_iter.html</a></li>
 <li>More on the Aiyagari model: <a href="https://python.quantecon.org/aiyagari.html" target="_blank">https://python.quantecon.org/aiyagari.html</a></li>
 <li>Aiyagari model in continuous time: <a href="https://nbviewer.jupyter.org/github/QuantEcon/QuantEcon.notebooks/blob/master/aiyagari_continuous_time.ipynb" target="_blank">https://nbviewer.jupyter.org/github/QuantEcon/QuantEcon.notebooks/blob/master/aiyagari_continuous_time.ipynb</a></li>
+<li>Similar model solved very efficiently with a Python package: <a href="https://github.com/shade-econ/sequence-jacobian/blob/master/krusell_smith.ipynb" target="_blank">https://github.com/shade-econ/sequence-jacobian/blob/master/krusell_smith.ipynb</a></li>
 </ul>
 
 <h2 id="references">References</h2>
