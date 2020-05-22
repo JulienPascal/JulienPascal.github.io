@@ -28,8 +28,8 @@
   
     
   
-  <meta name="description" content="Introduction The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see Ljungqvist and Sargent (2018) for a textbook treatment of this topic).
-In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models.">
+  <meta name="description" content="Introduction The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and decide to self-insure by holding a safe asset to smooth their consumption (see Ljungqvist and Sargent (2018) for a textbook treatment of this topic).
+In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have since developed several techniques to simulate out-of-steady-state dynamics for this class of models.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/aiyagariaggregateuncertainty/">
@@ -135,8 +135,8 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/aiyagariaggregateuncertainty/">
   <meta property="og:title" content="Aiyagari Model with Aggregate Uncertainty | Julien Pascal">
-  <meta property="og:description" content="Introduction The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see Ljungqvist and Sargent (2018) for a textbook treatment of this topic).
-In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="Introduction The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and decide to self-insure by holding a safe asset to smooth their consumption (see Ljungqvist and Sargent (2018) for a textbook treatment of this topic).
+In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have since developed several techniques to simulate out-of-steady-state dynamics for this class of models."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2020-05-19T18:53:22&#43;01:00">
@@ -522,9 +522,9 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
 
 <h2 id="introduction">Introduction</h2>
 
-<p>The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see <a href="https://mitpress.mit.edu/books/recursive-macroeconomic-theory-fourth-edition" target="_blank">Ljungqvist and Sargent (2018)</a> for a textbook treatment of this topic).</p>
+<p>The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &ldquo;incomplete&rdquo;. Agents cannot fully insure against risk and decide to self-insure by holding a safe asset to smooth their consumption (see <a href="https://mitpress.mit.edu/books/recursive-macroeconomic-theory-fourth-edition" target="_blank">Ljungqvist and Sargent (2018)</a> for a textbook treatment of this topic).</p>
 
-<p>In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models.</p>
+<p>In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have since developed several techniques to simulate out-of-steady-state dynamics for this class of models.</p>
 
 <p>Here, I use a methodology that is quite general. It is a <strong>3-step procedure</strong>, which proceeds as follows:</p>
 
@@ -562,7 +562,7 @@ In this post, I consider the model of Aiyagari (1994). While the original model 
 
 <p>$$ Y_t = z_t K_t^{\alpha} L_t^{1-\alpha} $$</p>
 
-<p>where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) for a maximizing firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Importantly, because agents have to take into consideration the value of $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).</p>
+<p>where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) of the representative firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Importantly, because agents have to take into consideration the value of $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).</p>
 
 <h2 id="ii-methodology">II. Methodology</h2>
 
@@ -1020,7 +1020,7 @@ plot(p1,p2, fg_legend = :transparent, legend=:best, layout=(2,1))
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &ldquo;small&rdquo; shocks. Solving this class of model for large shocks seems to be <a href="https://www.springer.com/gp/book/9783319564357" target="_blank">much more complicated</a> and is still an active area of research.</p>
+<p>This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &ldquo;small&rdquo; shocks. Solving incomplete market models for large shocks seems to be <a href="https://www.springer.com/gp/book/9783319564357" target="_blank">much more complicated</a> and is still an active area of research.</p>
 
 <h2 id="links">Links</h2>
 

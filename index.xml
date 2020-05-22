@@ -20,9 +20,9 @@
 
 &lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &amp;ldquo;incomplete&amp;rdquo;. Agents cannot fully insure against risk and as results, households “self-insure” by holding a safe asset to smooth their consumption (see &lt;a href=&#34;https://mitpress.mit.edu/books/recursive-macroeconomic-theory-fourth-edition&#34; target=&#34;_blank&#34;&gt;Ljungqvist and Sargent (2018)&lt;/a&gt; for a textbook treatment of this topic).&lt;/p&gt;
+&lt;p&gt;The Bewley-Huggett-Aiyagari-Imohoroğlu economies are the workhorse of modern macroeconomics. In these economies, markets are &amp;ldquo;incomplete&amp;rdquo;. Agents cannot fully insure against risk and decide to self-insure by holding a safe asset to smooth their consumption (see &lt;a href=&#34;https://mitpress.mit.edu/books/recursive-macroeconomic-theory-fourth-edition&#34; target=&#34;_blank&#34;&gt;Ljungqvist and Sargent (2018)&lt;/a&gt; for a textbook treatment of this topic).&lt;/p&gt;
 
-&lt;p&gt;In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have developed several techniques to simulate out-of-steady-state dynamics for this class of models.&lt;/p&gt;
+&lt;p&gt;In this post, I consider the model of Aiyagari (1994). While the original model abstracts from aggregate fluctuations, Economists have since developed several techniques to simulate out-of-steady-state dynamics for this class of models.&lt;/p&gt;
 
 &lt;p&gt;Here, I use a methodology that is quite general. It is a &lt;strong&gt;3-step procedure&lt;/strong&gt;, which proceeds as follows:&lt;/p&gt;
 
@@ -60,7 +60,7 @@
 
 &lt;p&gt;$$ Y_t = z_t K_t^{\alpha} L_t^{1-\alpha} $$&lt;/p&gt;
 
-&lt;p&gt;where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) for a maximizing firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Importantly, because agents have to take into consideration the value of $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).&lt;/p&gt;
+&lt;p&gt;where $Y_t$ is total output, $K_t$ is the aggregate capital level and $L_t$ is the aggregate labor supply. The variables $w_t$ and $r_t$ are pinned down each period by the first order conditions (FOCs) of the representative firm. Note that at the non-stochastic steady-state $z_t = z_{SS} = 1$ (by definition) and both $w_t$ and $r_t$ are constant. Importantly, because agents have to take into consideration the value of $w_t$ and $r_t$ when making decisions, the cross-sectional distribution of agents across capital and idiosyncratic states matters (through the FOCs of the representative firm).&lt;/p&gt;
 
 &lt;h2 id=&#34;ii-methodology&#34;&gt;II. Methodology&lt;/h2&gt;
 
@@ -518,7 +518,7 @@ plot(p1,p2, fg_legend = :transparent, legend=:best, layout=(2,1))
 
 &lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &amp;ldquo;small&amp;rdquo; shocks. Solving this class of model for large shocks seems to be &lt;a href=&#34;https://www.springer.com/gp/book/9783319564357&#34; target=&#34;_blank&#34;&gt;much more complicated&lt;/a&gt; and is still an active area of research.&lt;/p&gt;
+&lt;p&gt;This post presents the model of Aiyagari (1994) and a general three-step procedure to simulate out-of-steady-state dynamics for models of this class for &amp;ldquo;small&amp;rdquo; shocks. Solving incomplete market models for large shocks seems to be &lt;a href=&#34;https://www.springer.com/gp/book/9783319564357&#34; target=&#34;_blank&#34;&gt;much more complicated&lt;/a&gt; and is still an active area of research.&lt;/p&gt;
 
 &lt;h2 id=&#34;links&#34;&gt;Links&lt;/h2&gt;
 
