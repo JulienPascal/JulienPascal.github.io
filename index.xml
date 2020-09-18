@@ -259,7 +259,7 @@ end
 
 &lt;p&gt;$(K^{NEW}_t)_{t=1}^{T} = \lambda (K_t)_{t=1}^{T} + (1-\lambda)(K^{OLD}_t)_{t=1}^{T}$&lt;/p&gt;
 
-&lt;p&gt;The next function implements this idea, with the extra feature that $\lambda$ increases when the distance between two iterations is getting small (too speed up convergence) and decreases when the distance is getting bigger (to prevent divergence). See &lt;a href=&#34;https://notes.quantecon.org/submission/5b3faf1fb9eab00015b89f9a&#34; target=&#34;_blank&#34;&gt;this excellent notebook&lt;/a&gt;) for the same idea applied to an OLG model.&lt;/p&gt;
+&lt;p&gt;The next function implements this idea, with the extra feature that $\lambda$ increases when the distance between two iterations is getting small (too speed up convergence) and decreases when the distance is getting bigger (to prevent divergence). See &lt;a href=&#34;https://notes.quantecon.org/submission/5b3faf1fb9eab00015b89f9a&#34; target=&#34;_blank&#34;&gt;this excellent notebook&lt;/a&gt; for the same idea applied to an OLG model.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;function solve_mit!(K_path, g_low_ss::Function, g_high_ss::Function, d_ss::Array{Float64,1},
                     K_ss::Float64, z_path::Array{Float64,1}, p::Params; convex_combination::Float64 = 0.2,
@@ -533,6 +533,7 @@ plot(p1,p2, fg_legend = :transparent, legend=:best, layout=(2,1))
 &lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
 
 &lt;ul&gt;
+&lt;li&gt;Aiyagari, S. Rao. &amp;ldquo;Uninsured idiosyncratic risk and aggregate saving.&amp;rdquo; The Quarterly Journal of Economics 109.3 (1994): 659-684.&lt;/li&gt;
 &lt;li&gt;Bewley, Truman. &amp;ldquo;A difficulty with the optimum quantity of money.&amp;rdquo; Econometrica: Journal of the Econometric Society (1983): 1485-1504.&lt;/li&gt;
 &lt;li&gt;Boppart, Timo, Per Krusell, and Kurt Mitman. “Exploiting MIT shocks in heterogeneous-agent economies: the impulse response as a numerical derivative.” Journal of Economic Dynamics and Control 89 (2018): 68-92.&lt;/li&gt;
 &lt;li&gt;Christopher D Carroll. The method of endogenous gridpoints for solving dynamic stochastic optimization problems. Economics Letters, 91(3):312–320, 2006.&lt;/li&gt;
