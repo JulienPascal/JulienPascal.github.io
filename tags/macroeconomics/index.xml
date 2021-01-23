@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Tue, 19 May 2020 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 18 Jan 2021 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/tags/macroeconomics/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Young&#39;s method (2010) to simulate a cross-section</title>
+      <link>https://julienpascal.github.io/post/young_2010/</link>
+      <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/young_2010/</guid>
+      <description>Introduction Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&amp;rsquo;s method (2010) to simulate a large number (infinity) of individuals.</description>
+    </item>
     
     <item>
       <title>Aiyagari Model with Aggregate Uncertainty</title>

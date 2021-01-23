@@ -7,8 +7,347 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Tue, 19 May 2020 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 18 Jan 2021 18:53:22 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Young&#39;s method (2010) to simulate a cross-section</title>
+      <link>https://julienpascal.github.io/post/young_2010/</link>
+      <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/young_2010/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Solving economic models involves (i) finding the &lt;strong&gt;optimal response of individuals&lt;/strong&gt; given the state of the economy (the policy functions); (ii) given the policy functions, &lt;strong&gt;simulating the model&lt;/strong&gt;. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html&#34; target=&#34;_blank&#34;&gt;Young&amp;rsquo;s method (2010)&lt;/a&gt; to simulate a large number (infinity) of individuals. The code can be downloaded &lt;a href=&#34;https://github.com/JulienPascal/Simulate_Cross-section&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;why-should-we-care&#34;&gt;Why should we care?&lt;/h2&gt;
+
+&lt;p&gt;In economies with heterogeneous agents, often there is no such thing as a &lt;a href=&#34;https://en.wikipedia.org/wiki/Representative_agent#:~:text=Economists%20use%20the%20term%20representative,the%20same%20type%20are%20identical.&#34; target=&#34;_blank&#34;&gt;representative agent&lt;/a&gt;. Generally, one must follow a large number of individuals. For instance, one may be interested in knowing how the average wage responds to an increase in labor productivity. If workers are different (in terms of skills, experience, firms in which they work, etc.), one must take into consideration changes in individuals&amp;rsquo; wages to determine how the average wage moves.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-method&#34;&gt;The method&lt;/h2&gt;
+
+&lt;p&gt;The method avoids simulating a panel of agents. Instead, the idea is to simulate directly the distribution.
+In practice, one chooses a grid $[w_1, w_2, &amp;hellip;, w_N]$&lt;/p&gt;
+
+&lt;p&gt;If a measure $m$ of workers choose to consume $w$, with $w \in [w_{n}, w_{n+1}]$, then the mass assigned to the grid point $w_{n}$ is equal to $m \times p$ and the mass assigned to the grid point $w_{n+1}$ is $m \times (1 - p)$ with&lt;/p&gt;
+
+&lt;p&gt;$$ p = 1 - \frac{w - w_{n}}{w_{n+1} - w_{n}} $$&lt;/p&gt;
+
+&lt;p&gt;If $w$ is very close to $w_{n}$, then most of the mass $m$ will be assigned to this point. In the limit case, if $w$ is equal to $w_{n}$, $100$ percent of the mass is assigned to $w_{n}$.&lt;/p&gt;
+
+&lt;p&gt;Simple, right? The code below is an implementation of &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html&#34; target=&#34;_blank&#34;&gt;Young&amp;rsquo;s method (2010)&lt;/a&gt; using &lt;a href=&#34;https://julialang.org/&#34; target=&#34;_blank&#34;&gt;Julia&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;implementation&#34;&gt;Implementation&lt;/h2&gt;
+
+&lt;h3 id=&#34;preliminaries&#34;&gt;Preliminaries&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s first start by loading a few packages and declaring auxiliaries functions. In particular, given a value $w$ we need a function that returns the closest value $w_k$, where $w_k$ is picked from given grid $w_1, w_2, &amp;hellip;, w_N$&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Plots
+using Distributions
+using StatsBase
+
+# Matlab like function
+function linspace(z_start::Real, z_end::Real, z_n::Int64)
+    return collect(range(z_start,stop=z_end,length=z_n))
+end
+
+# Not my function. Credit to: https://discourse.julialang.org/t/findnearest-function/4143/4
+function closest_index(a::Vector,x::Real)
+
+    if isempty(a) == true
+      error(&amp;quot;xGrid is empty in function closest_index.&amp;quot;)
+    end
+
+    if isnan(x) == true
+      error(&amp;quot;val is NaN in function closest_index.&amp;quot;)
+    end
+
+   idx = searchsortedfirst(a,x)
+   if (idx==1); return idx; end
+   if (idx&amp;gt;length(a)); return length(a); end
+   if (a[idx]==x); return idx; end
+   if (abs(a[idx]-x) &amp;lt; abs(a[idx-1]-x))
+      return idx
+   else
+      return idx-1
+   end
+end
+
+# Returns best index and best value
+function closest_value_and_index(xGrid::Vector, val::Real)
+
+    # get index
+    ibest = closest_index(xGrid, val)
+
+    # Return best value on grid, and the corresponding index
+    return xGrid[ibest], ibest
+
+end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;approximate-a-distribution-with-a-single-mass-point&#34;&gt;Approximate a distribution with a single mass point&lt;/h3&gt;
+
+&lt;p&gt;To warm up, let&amp;rsquo;s see how the method works when the true underlying distribution is constituted of &lt;strong&gt;a single mass point&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;## True Value
+w = 2.5    #True value
+mass = 1.0 #Mass at the true value
+
+## Approximation
+nW=10 #Number of grid points
+w_grid=linspace(0.0, 4.0, nW) #Location of grid points
+hw_grid=zeros(nW); #Initialization
+
+w_min = minimum(w_grid) #Upper bound for the grid
+w_max = maximum(w_grid) #Lower bound for the grid
+nW = length(w_grid) #Number of points on the grid
+
+# Project true value on the grid:
+(wValue_proj, wIndex_proj) = closest_value_and_index(w_grid, w)
+
+# To store the location of the value below and above the true value:
+wIndex_below = 0
+wIndex_above = 0
+
+# If the true value is above the projection
+if w &amp;gt;= wValue_proj
+    wIndex_below = wIndex_proj
+    wIndex_above = wIndex_proj + 1
+# If the true value is below the projection
+elseif w &amp;lt; wValue_proj
+    wIndex_below = wIndex_proj -1
+    wIndex_above = wIndex_proj
+end
+
+# Boundary cases
+if wIndex_proj == 1
+    wIndex_below = 1
+    wIndex_above = 2
+elseif wIndex_proj == nW
+    wIndex_below = nW - 1
+    wIndex_above = nW
+end
+
+# Special case 1: w &amp;lt; w_min
+if w &amp;lt;= w_min
+    p = 1
+elseif w &amp;gt;= w_max
+# Special case 2: w &amp;gt; w_max
+    p = 0
+else
+    p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
+    p = min(1.0, max(0.0, p))
+end
+
+# Spread the mass:
+# 1. Point below
+hw_grid[wIndex_below] += p*mass
+
+# 2. Point above:
+hw_grid[wIndex_above] += (1.0 - p)*mass;
+
+p0 =bar(w_grid, hw_grid, label = &amp;quot;Mass on grid&amp;quot;)
+plot!(p0, [w], seriestype = :vline, label=&amp;quot;True value&amp;quot;, linewidth = 4)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Young_2010_12_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: This graph shows the true distribution (in orange) and the approximation (in blue).&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Because the true value is not a point of our grid (that would be a miracle), the mass is spread between the two closest points. However, we still get the mean right. We will see below that this property extends to distributions with supports constituted of several points:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;True mean $(w)&amp;quot;)
+println(&amp;quot;Approximate mean $(round(mean(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;True mean 2.5
+Approximate mean 2.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;approximate-a-multi-point-distribution&#34;&gt;Approximate a multi-point distribution&lt;/h3&gt;
+
+&lt;p&gt;Now, let&amp;rsquo;s see how well &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html&#34; target=&#34;_blank&#34;&gt;Young&amp;rsquo;s method (2010)&lt;/a&gt; works when the true underlying distribution has positive mass for &lt;strong&gt;a finite number of points&lt;/strong&gt;. To keep things pretty, let&amp;rsquo;s assume that the true distribution has the shape of a Normal distribution, but we truncate the tails.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;Nw_true = 10 #Number of points with positive mass
+w_true_lb = 1.0 #lower bound
+w_true_ub = 3.0 #upper bound
+w_true = linspace(w_true_lb, w_true_ub, Nw_true)
+d = truncated(Normal((w_true_lb + w_true_ub)/2), w_true_lb, w_true_ub)
+mass_true = pdf.(d, w_true)
+mass_true = mass_true./sum(mass_true);
+p0 = bar(w_true, mass_true, label=&amp;quot;Mass true value&amp;quot;)
+display(p0)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Young_2010_17_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: This graph shows the mass for each point on the (true) grid.&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;w_min = minimum(w_grid)
+w_max = maximum(w_grid)
+nW = length(w_grid)
+
+hw_grid=zeros(nW);
+
+
+for (wIndexTrue, w) in enumerate(w_true)
+
+    mass = mass_true[wIndexTrue] #mass
+
+    # Project true value on the grid:
+    (wValue_proj, wIndex_proj) = closest_value_and_index(w_grid, w)
+
+    # To store the location of the value below and above the true value:
+    wIndex_below = 0
+    wIndex_above = 0
+
+    # If the true value is above the projection
+    if w &amp;gt;= wValue_proj
+        wIndex_below = wIndex_proj
+        wIndex_above = wIndex_proj + 1
+    # If the true value is below the projection
+    elseif w &amp;lt; wValue_proj
+        wIndex_below = wIndex_proj -1
+        wIndex_above = wIndex_proj
+    end
+
+    # Boundary cases
+    if wIndex_proj == 1
+        wIndex_below = 1
+        wIndex_above = 2
+    elseif wIndex_proj == nW
+        wIndex_below = nW - 1
+        wIndex_above = nW
+    end
+
+    # Special case 1: w &amp;lt; w_min
+    if w &amp;lt;= w_min
+        p = 1
+    elseif w &amp;gt;= w_max
+    # Special case 2: w &amp;gt; w_max
+        p = 0
+    else
+        p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
+        p = min(1.0, max(0.0, p))
+    end
+
+    p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
+    p = min(1.0, max(0.0, p))
+
+    # Spread the mass:
+    # 1. Point below
+    hw_grid[wIndex_below] += p*mass
+
+    # 2. Point above:
+    hw_grid[wIndex_above] += (1.0 - p)*mass
+
+end
+
+bar(w_grid, hw_grid, label=&amp;quot;Mass on grid&amp;quot;)
+bar!(w_true, mass_true, label=&amp;quot;Mass true value&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Young_2010_18_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: This graph shows the true distribution (in orange) and the approximation (in blue).&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;A good property of &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html&#34; target=&#34;_blank&#34;&gt;Young&amp;rsquo;s method (2010)&lt;/a&gt; is that, &lt;strong&gt;as long as the grid is wide enough&lt;/strong&gt; to so that true values fall within it, &lt;strong&gt;the mean of the true underlying distribution is preserved&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;True mean $(round(mean(w_true, weights(mass_true./sum(mass_true))), digits = 4))&amp;quot;)
+println(&amp;quot;Approximate mean $(round(mean(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;True mean 2.0
+Approximate mean 2.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However, there are some &lt;strong&gt;approximation errors&lt;/strong&gt; when &lt;strong&gt;higher moments&lt;/strong&gt; are involved such as the variance, or when calculating &lt;strong&gt;percentiles&lt;/strong&gt;. But the finest the grid, the better the approximation gets.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;True median $(round(quantile(w_true, weights(mass_true./sum(mass_true)), 0.5), digits = 4))&amp;quot;)
+println(&amp;quot;Approximate median $(round(quantile(w_grid, weights(hw_grid./sum(hw_grid)), 0.5), digits = 4))&amp;quot;)
+
+println(&amp;quot;True variance $(round(var(w_true, weights(mass_true./sum(mass_true))), digits = 4))&amp;quot;)
+println(&amp;quot;Approximate variance $(round(var(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;True median 1.9567
+Approximate median 1.8519
+True variance 0.3465
+Approximate variance 0.3836
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;using-a-panel-of-agents&#34;&gt;Using a panel of agents&lt;/h3&gt;
+
+&lt;p&gt;Alternatively, one may use a large number of agents to approximate the true underlying distribution. The idea is that if the number of agents is large enough, the &lt;a href=&#34;https://en.wikipedia.org/wiki/Central_limit_theorem&#34; target=&#34;_blank&#34;&gt;central limit theorem&lt;/a&gt; will kick in. The issue is that we need a large number of agents to get the approximation right, as illustrated below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;nb_agents = 1000
+w_agents = rand(d, nb_agents);
+
+println(&amp;quot;True mean $(round(mean(w_true, weights(mass_true./sum(mass_true))), digits = 4))&amp;quot;)
+println(&amp;quot;Approximate mean $(round(mean(w_agents), digits = 4))&amp;quot;)
+
+println(&amp;quot;True median $(round(quantile(w_true, weights(mass_true./sum(mass_true)), 0.5), digits = 4))&amp;quot;)
+println(&amp;quot;Approximate median $(round(quantile(w_agents, 0.5), digits = 4))&amp;quot;)
+
+println(&amp;quot;True variance $(round(var(w_true, weights(mass_true./sum(mass_true))), digits = 4))&amp;quot;)
+println(&amp;quot;Approximate variance $(round(var(w_agents), digits = 4))&amp;quot;)
+
+p0 = bar(w_true, mass_true, label=&amp;quot;Mass true value&amp;quot;)
+p1 = histogram(w_agents, label=&amp;quot;Mass panel&amp;quot;)
+plot(p0,p1)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;True mean 2.0
+Approximate mean 1.9955
+True median 1.9567
+Approximate median 1.9971
+True variance 0.3465
+Approximate variance 0.2754
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Young_2010_25_1.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: This graph shows the true distribution (on the left) and the approximation (on the right).&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;With 1000 agents, the approximation is not exceptional. Let&amp;rsquo;s try to increase the number of agents. The following plot shows that the approximation gets better as we increase the number of agents, but a very
+large number of agents is needed:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;w_agents = []
+grid_agents = collect(1000:1000:100000)
+mean_agents = zeros(length(grid_agents))
+std_agents = zeros(length(grid_agents))
+
+for (i, nb_agents) in enumerate(grid_agents)
+    push!(w_agents, rand(d, nb_agents))
+    mean_agents[i] = mean(w_agents[i])
+    std_agents[i] = std(w_agents[i])
+end
+
+CI = 1.960.*std_agents./sqrt.(grid_agents); #95% confidence interval. t-test is approximately a z-test because large number of agents.
+p0 = plot(grid_agents, mean_agents, ribbon = CI, label = &amp;quot;approximate mean&amp;quot;)
+plot!(p0,[mean(w_true, weights(mass_true./sum(mass_true)))], linetype = :hline, label = &amp;quot;true mean&amp;quot;, linestyle = :dash)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Young_2010_27_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Notes: This graph shows the empirical mean calculated using the panel and the true value, for different sizes of the panel.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;When possible, simulating directly a distribution instead of using a panel is a good idea. &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html&#34; target=&#34;_blank&#34;&gt;Young&amp;rsquo;s method (2010)&lt;/a&gt;
+allows to do that, while preserving the mean of the true distribution.&lt;/p&gt;
+
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Young, Eric R. &amp;ldquo;Solving the incomplete markets model with aggregate uncertainty using the Krusell–Smith algorithm and non-stochastic simulations.&amp;rdquo; Journal of Economic Dynamics and Control 34.1 (2010): 36-41.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Aiyagari Model with Aggregate Uncertainty</title>
@@ -4301,17 +4640,6 @@ Plots.savefig(&amp;quot;Speed_gains.png&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/Speed_gains.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Labor Policy in a Dynamic Search-Matching Model with Heterogeneous Workers and Firms</title>
-      <link>https://julienpascal.github.io/project/minwage/</link>
-      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/minwage/</guid>
-      <description>&lt;p&gt;We analyse the consequences of the minimum wage on employment and sorting in a model of the labor
-market with search frictions, heterogeneous workers and firms, and business cycle fluctuations. This is a joint project with &lt;a href=&#34;https://sites.google.com/view/jeremylise&#34; target=&#34;_blank&#34;&gt;Jeremy Lise&lt;/a&gt; and &lt;a href=&#34;https://sites.google.com/site/jmarcrobin/home&#34; target=&#34;_blank&#34;&gt;Jean-Marc Robin&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     

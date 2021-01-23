@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal, PhD">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Introduction Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&rsquo;s method (2010) to simulate a large number (infinity) of individuals.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/young_2010/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="anonymous">
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/young_2010/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="twitter:site" content="@Juli3nPascal">
+  <meta property="twitter:creator" content="@Juli3nPascal">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/young_2010/">
+  <meta property="og:title" content="Young&#39;s method (2010) to simulate a cross-section | Julien Pascal">
+  <meta property="og:description" content="Introduction Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&rsquo;s method (2010) to simulate a large number (infinity) of individuals."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2021-01-18T18:53:22&#43;01:00">
+  
+  <meta property="article:modified_time" content="2021-01-18T18:53:22&#43;01:00">
+  
+
+  
+
+  
+
+  <title>Young&#39;s method (2010) to simulate a cross-section | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/pdf/Julien_Pascal_Academic_Resume.pdf">
+            
+            <span>Academic Resume</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Young&#39;s method (2010) to simulate a cross-section</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2021-01-18 18:53:22 &#43;0100 CET" itemprop="datePublished">
+<meta content="2021-01-18 18:53:22 &#43;0100 CET" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>Jan 18, 2021</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    8 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Young%27s%20method%20%282010%29%20to%20simulate%20a%20cross-section&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fyoung_2010%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fyoung_2010%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fyoung_2010%2f&amp;title=Young%27s%20method%20%282010%29%20to%20simulate%20a%20cross-section"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fyoung_2010%2f&amp;title=Young%27s%20method%20%282010%29%20to%20simulate%20a%20cross-section"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Young%27s%20method%20%282010%29%20to%20simulate%20a%20cross-section&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fyoung_2010%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Solving economic models involves (i) finding the <strong>optimal response of individuals</strong> given the state of the economy (the policy functions); (ii) given the policy functions, <strong>simulating the model</strong>. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> to simulate a large number (infinity) of individuals. The code can be downloaded <a href="https://github.com/JulienPascal/Simulate_Cross-section" target="_blank">here</a>.</p>
+
+<h2 id="why-should-we-care">Why should we care?</h2>
+
+<p>In economies with heterogeneous agents, often there is no such thing as a <a href="https://en.wikipedia.org/wiki/Representative_agent#:~:text=Economists%20use%20the%20term%20representative,the%20same%20type%20are%20identical." target="_blank">representative agent</a>. Generally, one must follow a large number of individuals. For instance, one may be interested in knowing how the average wage responds to an increase in labor productivity. If workers are different (in terms of skills, experience, firms in which they work, etc.), one must take into consideration changes in individuals&rsquo; wages to determine how the average wage moves.</p>
+
+<h2 id="the-method">The method</h2>
+
+<p>The method avoids simulating a panel of agents. Instead, the idea is to simulate directly the distribution.
+In practice, one chooses a grid $[w_1, w_2, &hellip;, w_N]$</p>
+
+<p>If a measure $m$ of workers choose to consume $w$, with $w \in [w_{n}, w_{n+1}]$, then the mass assigned to the grid point $w_{n}$ is equal to $m \times p$ and the mass assigned to the grid point $w_{n+1}$ is $m \times (1 - p)$ with</p>
+
+<p>$$ p = 1 - \frac{w - w_{n}}{w_{n+1} - w_{n}} $$</p>
+
+<p>If $w$ is very close to $w_{n}$, then most of the mass $m$ will be assigned to this point. In the limit case, if $w$ is equal to $w_{n}$, $100$ percent of the mass is assigned to $w_{n}$.</p>
+
+<p>Simple, right? The code below is an implementation of <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> using <a href="https://julialang.org/" target="_blank">Julia</a>.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<h3 id="preliminaries">Preliminaries</h3>
+
+<p>Let&rsquo;s first start by loading a few packages and declaring auxiliaries functions. In particular, given a value $w$ we need a function that returns the closest value $w_k$, where $w_k$ is picked from given grid $w_1, w_2, &hellip;, w_N$</p>
+
+<pre><code class="language-julia">using Plots
+using Distributions
+using StatsBase
+
+# Matlab like function
+function linspace(z_start::Real, z_end::Real, z_n::Int64)
+    return collect(range(z_start,stop=z_end,length=z_n))
+end
+
+# Not my function. Credit to: https://discourse.julialang.org/t/findnearest-function/4143/4
+function closest_index(a::Vector,x::Real)
+
+    if isempty(a) == true
+      error(&quot;xGrid is empty in function closest_index.&quot;)
+    end
+
+    if isnan(x) == true
+      error(&quot;val is NaN in function closest_index.&quot;)
+    end
+
+   idx = searchsortedfirst(a,x)
+   if (idx==1); return idx; end
+   if (idx&gt;length(a)); return length(a); end
+   if (a[idx]==x); return idx; end
+   if (abs(a[idx]-x) &lt; abs(a[idx-1]-x))
+      return idx
+   else
+      return idx-1
+   end
+end
+
+# Returns best index and best value
+function closest_value_and_index(xGrid::Vector, val::Real)
+
+    # get index
+    ibest = closest_index(xGrid, val)
+
+    # Return best value on grid, and the corresponding index
+    return xGrid[ibest], ibest
+
+end
+
+</code></pre>
+
+<h3 id="approximate-a-distribution-with-a-single-mass-point">Approximate a distribution with a single mass point</h3>
+
+<p>To warm up, let&rsquo;s see how the method works when the true underlying distribution is constituted of <strong>a single mass point</strong>.</p>
+
+<pre><code class="language-julia">## True Value
+w = 2.5    #True value
+mass = 1.0 #Mass at the true value
+
+## Approximation
+nW=10 #Number of grid points
+w_grid=linspace(0.0, 4.0, nW) #Location of grid points
+hw_grid=zeros(nW); #Initialization
+
+w_min = minimum(w_grid) #Upper bound for the grid
+w_max = maximum(w_grid) #Lower bound for the grid
+nW = length(w_grid) #Number of points on the grid
+
+# Project true value on the grid:
+(wValue_proj, wIndex_proj) = closest_value_and_index(w_grid, w)
+
+# To store the location of the value below and above the true value:
+wIndex_below = 0
+wIndex_above = 0
+
+# If the true value is above the projection
+if w &gt;= wValue_proj
+    wIndex_below = wIndex_proj
+    wIndex_above = wIndex_proj + 1
+# If the true value is below the projection
+elseif w &lt; wValue_proj
+    wIndex_below = wIndex_proj -1
+    wIndex_above = wIndex_proj
+end
+
+# Boundary cases
+if wIndex_proj == 1
+    wIndex_below = 1
+    wIndex_above = 2
+elseif wIndex_proj == nW
+    wIndex_below = nW - 1
+    wIndex_above = nW
+end
+
+# Special case 1: w &lt; w_min
+if w &lt;= w_min
+    p = 1
+elseif w &gt;= w_max
+# Special case 2: w &gt; w_max
+    p = 0
+else
+    p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
+    p = min(1.0, max(0.0, p))
+end
+
+# Spread the mass:
+# 1. Point below
+hw_grid[wIndex_below] += p*mass
+
+# 2. Point above:
+hw_grid[wIndex_above] += (1.0 - p)*mass;
+
+p0 =bar(w_grid, hw_grid, label = &quot;Mass on grid&quot;)
+plot!(p0, [w], seriestype = :vline, label=&quot;True value&quot;, linewidth = 4)
+</code></pre>
+
+<p><img src="Young_2010_12_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the true distribution (in orange) and the approximation (in blue).</em></p>
+
+<p>Because the true value is not a point of our grid (that would be a miracle), the mass is spread between the two closest points. However, we still get the mean right. We will see below that this property extends to distributions with supports constituted of several points:</p>
+
+<pre><code class="language-julia">println(&quot;True mean $(w)&quot;)
+println(&quot;Approximate mean $(round(mean(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&quot;)
+</code></pre>
+
+<pre><code>True mean 2.5
+Approximate mean 2.5
+</code></pre>
+
+<h3 id="approximate-a-multi-point-distribution">Approximate a multi-point distribution</h3>
+
+<p>Now, let&rsquo;s see how well <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> works when the true underlying distribution has positive mass for <strong>a finite number of points</strong>. To keep things pretty, let&rsquo;s assume that the true distribution has the shape of a Normal distribution, but we truncate the tails.</p>
+
+<pre><code class="language-julia">Nw_true = 10 #Number of points with positive mass
+w_true_lb = 1.0 #lower bound
+w_true_ub = 3.0 #upper bound
+w_true = linspace(w_true_lb, w_true_ub, Nw_true)
+d = truncated(Normal((w_true_lb + w_true_ub)/2), w_true_lb, w_true_ub)
+mass_true = pdf.(d, w_true)
+mass_true = mass_true./sum(mass_true);
+p0 = bar(w_true, mass_true, label=&quot;Mass true value&quot;)
+display(p0)
+</code></pre>
+
+<p><img src="Young_2010_17_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the mass for each point on the (true) grid.</em></p>
+
+<pre><code class="language-julia">w_min = minimum(w_grid)
+w_max = maximum(w_grid)
+nW = length(w_grid)
+
+hw_grid=zeros(nW);
+
+
+for (wIndexTrue, w) in enumerate(w_true)
+
+    mass = mass_true[wIndexTrue] #mass
+
+    # Project true value on the grid:
+    (wValue_proj, wIndex_proj) = closest_value_and_index(w_grid, w)
+
+    # To store the location of the value below and above the true value:
+    wIndex_below = 0
+    wIndex_above = 0
+
+    # If the true value is above the projection
+    if w &gt;= wValue_proj
+        wIndex_below = wIndex_proj
+        wIndex_above = wIndex_proj + 1
+    # If the true value is below the projection
+    elseif w &lt; wValue_proj
+        wIndex_below = wIndex_proj -1
+        wIndex_above = wIndex_proj
+    end
+
+    # Boundary cases
+    if wIndex_proj == 1
+        wIndex_below = 1
+        wIndex_above = 2
+    elseif wIndex_proj == nW
+        wIndex_below = nW - 1
+        wIndex_above = nW
+    end
+
+    # Special case 1: w &lt; w_min
+    if w &lt;= w_min
+        p = 1
+    elseif w &gt;= w_max
+    # Special case 2: w &gt; w_max
+        p = 0
+    else
+        p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
+        p = min(1.0, max(0.0, p))
+    end
+
+    p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
+    p = min(1.0, max(0.0, p))
+
+    # Spread the mass:
+    # 1. Point below
+    hw_grid[wIndex_below] += p*mass
+
+    # 2. Point above:
+    hw_grid[wIndex_above] += (1.0 - p)*mass
+
+end
+
+bar(w_grid, hw_grid, label=&quot;Mass on grid&quot;)
+bar!(w_true, mass_true, label=&quot;Mass true value&quot;)
+</code></pre>
+
+<p><img src="Young_2010_18_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the true distribution (in orange) and the approximation (in blue).</em></p>
+
+<p>A good property of <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> is that, <strong>as long as the grid is wide enough</strong> to so that true values fall within it, <strong>the mean of the true underlying distribution is preserved</strong>:</p>
+
+<pre><code class="language-julia">println(&quot;True mean $(round(mean(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
+println(&quot;Approximate mean $(round(mean(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&quot;)
+</code></pre>
+
+<pre><code>True mean 2.0
+Approximate mean 2.0
+</code></pre>
+
+<p>However, there are some <strong>approximation errors</strong> when <strong>higher moments</strong> are involved such as the variance, or when calculating <strong>percentiles</strong>. But the finest the grid, the better the approximation gets.</p>
+
+<pre><code class="language-julia">println(&quot;True median $(round(quantile(w_true, weights(mass_true./sum(mass_true)), 0.5), digits = 4))&quot;)
+println(&quot;Approximate median $(round(quantile(w_grid, weights(hw_grid./sum(hw_grid)), 0.5), digits = 4))&quot;)
+
+println(&quot;True variance $(round(var(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
+println(&quot;Approximate variance $(round(var(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&quot;)
+</code></pre>
+
+<pre><code>True median 1.9567
+Approximate median 1.8519
+True variance 0.3465
+Approximate variance 0.3836
+</code></pre>
+
+<h3 id="using-a-panel-of-agents">Using a panel of agents</h3>
+
+<p>Alternatively, one may use a large number of agents to approximate the true underlying distribution. The idea is that if the number of agents is large enough, the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a> will kick in. The issue is that we need a large number of agents to get the approximation right, as illustrated below:</p>
+
+<pre><code class="language-julia">nb_agents = 1000
+w_agents = rand(d, nb_agents);
+
+println(&quot;True mean $(round(mean(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
+println(&quot;Approximate mean $(round(mean(w_agents), digits = 4))&quot;)
+
+println(&quot;True median $(round(quantile(w_true, weights(mass_true./sum(mass_true)), 0.5), digits = 4))&quot;)
+println(&quot;Approximate median $(round(quantile(w_agents, 0.5), digits = 4))&quot;)
+
+println(&quot;True variance $(round(var(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
+println(&quot;Approximate variance $(round(var(w_agents), digits = 4))&quot;)
+
+p0 = bar(w_true, mass_true, label=&quot;Mass true value&quot;)
+p1 = histogram(w_agents, label=&quot;Mass panel&quot;)
+plot(p0,p1)
+</code></pre>
+
+<pre><code>True mean 2.0
+Approximate mean 1.9955
+True median 1.9567
+Approximate median 1.9971
+True variance 0.3465
+Approximate variance 0.2754
+</code></pre>
+
+<p><img src="Young_2010_25_1.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the true distribution (on the left) and the approximation (on the right).</em></p>
+
+<p>With 1000 agents, the approximation is not exceptional. Let&rsquo;s try to increase the number of agents. The following plot shows that the approximation gets better as we increase the number of agents, but a very
+large number of agents is needed:</p>
+
+<pre><code class="language-julia">w_agents = []
+grid_agents = collect(1000:1000:100000)
+mean_agents = zeros(length(grid_agents))
+std_agents = zeros(length(grid_agents))
+
+for (i, nb_agents) in enumerate(grid_agents)
+    push!(w_agents, rand(d, nb_agents))
+    mean_agents[i] = mean(w_agents[i])
+    std_agents[i] = std(w_agents[i])
+end
+
+CI = 1.960.*std_agents./sqrt.(grid_agents); #95% confidence interval. t-test is approximately a z-test because large number of agents.
+p0 = plot(grid_agents, mean_agents, ribbon = CI, label = &quot;approximate mean&quot;)
+plot!(p0,[mean(w_true, weights(mass_true./sum(mass_true)))], linetype = :hline, label = &quot;true mean&quot;, linestyle = :dash)
+</code></pre>
+
+<p><img src="Young_2010_27_0.svg" alt="svg" /></p>
+
+<p><em>Notes: This graph shows the empirical mean calculated using the panel and the true value, for different sizes of the panel.</em></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>When possible, simulating directly a distribution instead of using a panel is a good idea. <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a>
+allows to do that, while preserving the mean of the true distribution.</p>
+
+<h3 id="references">References</h3>
+
+<ul>
+<li>Young, Eric R. &ldquo;Solving the incomplete markets model with aggregate uncertainty using the Krusell–Smith algorithm and non-stochastic simulations.&rdquo; Journal of Economic Dynamics and Control 34.1 (2010): 36-41.</li>
+</ul>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/macroeconomics/">Macroeconomics</a>
+  
+  <a class="badge badge-light" href="/tags/ha-models/">HA models</a>
+  
+</div>
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal, PhD</a></h5>
+    <h6 class="card-subtitle">Economist</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/Juli3nPascal" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://medium.com/@julien.pascal" target="_blank" rel="noopener">
+          <i class="fab fa-medium"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+      
+      
+      <div class="article-widget">
+        <div class="hr-light"></div>
+        <h3>Related</h3>
+        <ul>
+          
+          <li><a href="/post/aiyagariaggregateuncertainty/">Aiyagari Model with Aggregate Uncertainty</a></li>
+          
+          <li><a href="/post/genbkm/">The GenBKM Algorithm</a></li>
+          
+        </ul>
+      </div>
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="anonymous"></script>
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+
