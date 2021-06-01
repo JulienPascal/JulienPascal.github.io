@@ -112,7 +112,7 @@ Econometrics II (graduate), Assistant Lecturer  Lecturer: Jean-Marc Robin, Profe
       
       <guid>https://julienpascal.github.io/home/computing/</guid>
       <description>For computationally intensive programs, I use Julia. For statistics, I mainly use R and Stata. For database management, I use SQL. For everything else, I use Python. I have made contributions to the following open source projects:
-Open Source Projects    Name Role Description Status     MSM.jl Author A Julia package to estimate economic models using the Method of Simulated Moments.    MomentOpt.</description>
+Open Source Projects    Name Role Description Status     MSM.jl Author A Julia package to estimate economic models using the Method of Simulated Moments.    SMM.</description>
     </item>
     
     <item>
