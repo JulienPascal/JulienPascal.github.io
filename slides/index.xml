@@ -12,6 +12,18 @@
     
     
     <item>
+      <title>A crash course on Git and Gitlab</title>
+      <link>https://julienpascal.github.io/slides/intro_git/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/slides/intro_git/</guid>
+      <description>A crash course on Git and Gitlab What? Version control
+ version control (also known as revision control, source control, or source code management) is a class of systems responsible for managing changes to computer programs, documents, large web sites, or other collections of information.
+ source: https://en.wikipedia.org/wiki/Version_control
+Why? Advantages  Keep an organized history of a project. No more:   Easy to collaborate: working simultaneously with the same file(s)  How?</description>
+    </item>
+    
+    <item>
       <title>Capstone Project - The Battle of Neighborhoods</title>
       <link>https://julienpascal.github.io/slides/neighbourhoods_paris/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

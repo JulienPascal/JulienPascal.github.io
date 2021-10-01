@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  
+  
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/slides/intro_git/">
+
+  <title>A crash course on Git and Gitlab | Julien Pascal</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/css/reveal.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/css/theme/black.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous">
+
+  
+  
+  
+  <link rel="stylesheet" href="/css/reveal_custom.min.css">
+
+  
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/css/print/pdf.css' : 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+
+</head>
+<body>
+
+  
+<div class="reveal">
+  <div class="slides">
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="a-crash-course-on-git-and-gitlab">A crash course on Git and Gitlab</h2>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="what">What?</h3>
+
+<p><strong>Version control</strong></p>
+
+<blockquote>
+<p>version control (also known as revision control, source control, or source code management) is a class of systems responsible for <strong>managing changes</strong> to <strong>computer programs, documents, large web sites, or other collections of information</strong>.</p>
+</blockquote>
+
+<p>source: <a href="https://en.wikipedia.org/wiki/Version_control" target="_blank">https://en.wikipedia.org/wiki/Version_control</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="why">Why?</h3>
+
+<h4 id="advantages">Advantages</h4>
+
+<ul>
+<li>Keep an <strong>organized history</strong> of a project. No more:</li>
+</ul>
+
+<p><img src="/img/Git/several_versions.png" alt="" /></p>
+
+<ul>
+<li>Easy to <strong>collaborate</strong>: working simultaneously with the same file(s)</li>
+</ul>
+
+<p><img src="/img/Git/dropbox_crossed.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="how">How?</h3>
+
+<h4 id="git">Git</h4>
+
+<p>Software that handles source code versioning</p>
+
+<p><a href="https://git-scm.com/" target="_blank">https://git-scm.com/</a></p>
+
+<h4 id="gitlab">Gitlab</h4>
+
+<p>A cloud service for remote hosting of git repositories + makes your life easier</p>
+
+<p><a href="https://about.gitlab.com/" target="_blank">https://about.gitlab.com/</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+<li>Have Git installed</li>
+</ul>
+
+<p>see: <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git" target="_blank">https://git-scm.com/book/en/v2/Getting-Started-Installing-Git</a></p>
+
+<ul>
+<li>Have a Gitlab account</li>
+</ul>
+
+<p>see: <a href="https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html" target="_blank">https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html</a></p>
+
+<ul>
+<li>Basic knowledge of the terminal (cd, ls, &hellip;)</li>
+</ul>
+
+<p>see: <a href="https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal" target="_blank">https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="git-101">Git 101</h2>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="the-big-picture">the big picture</h3>
+
+<ul>
+<li>Each &ldquo;commit&rdquo; is a snapshot of the state of the project</li>
+</ul>
+
+<p><img src="/img/Git/commits.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="you-first-local-repository-1-2">You first local repository (<sup>1</sup>&frasl;<sub>2</sub>)</h3>
+
+<p>Create a local repository</p>
+
+<pre><code>mkdir my_repo
+cd my_repo
+git init #Initialized empty Git repository  
+</code></pre>
+
+<p>Create a file your first commit</p>
+
+<pre><code>echo &quot;Some line&quot; &gt; file1.txt
+git status #Look at the changes within your repository
+</code></pre>
+
+<p>Create your first commit</p>
+
+<pre><code>git add file1.txt
+git commit -m &quot;my first commit&quot;
+git status
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="you-first-local-repository-2-2">You first local repository (<sup>2</sup>&frasl;<sub>2</sub>)</h3>
+
+<p>See the changes</p>
+
+<pre><code>git log
+</code></pre>
+
+<p>See the changes on a graph</p>
+
+<pre><code>git log --oneline --graph
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-1-undo-some-changes-1-2">Case study 1: Undo some changes (<sup>1</sup>&frasl;<sub>2</sub>)</h3>
+
+<p>Introduce a bug in our &ldquo;code&rdquo;</p>
+
+<pre><code>echo &quot;A bug&quot; &gt;&gt; file1.txt
+git status
+</code></pre>
+
+<p>Look at the differences with the previous version</p>
+
+<pre><code>git diff file1.txt
+</code></pre>
+
+<p>Commit the bug</p>
+
+<pre><code>git add file1.txt
+git commit -m &quot;commit with a bug&quot;
+git log --oneline
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-1-undo-some-changes-2-2">Case study 1: Undo some changes (<sup>2</sup>&frasl;<sub>2</sub>)</h3>
+
+<p>Undo the bug</p>
+
+<pre><code>git revert &lt;commit&gt; #Find &lt;commit&gt; with git log --oneline
+</code></pre>
+
+<p>You should see &ldquo;Revert &ldquo;commit with a bug&rdquo;&rdquo;:</p>
+
+<pre><code>git log --oneline
+</code></pre>
+
+<p>See:</p>
+
+<ul>
+<li><a href="https://www.atlassian.com/git/tutorials/undoing-changes/git-revert" target="_blank">https://www.atlassian.com/git/tutorials/undoing-changes/git-revert</a></li>
+<li><a href="https://www.atlassian.com/git/tutorials/undoing-changes/git-reset" target="_blank">https://www.atlassian.com/git/tutorials/undoing-changes/git-reset</a></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="the-concept-of-branches">The concept of branches</h3>
+
+<ul>
+<li>You may want to <strong>experiment</strong> with a new feature</li>
+<li>You don&rsquo;t want to mess with the current state of the project
+-&gt; Create a new <strong>branch</strong></li>
+</ul>
+
+<p><img src="/img/Git/branch.png" alt="" /></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="feature-branch-workflow">Feature Branch Workflow</h2>
+
+<h3 id="philosophy">Philosophy</h3>
+
+<ul>
+<li><strong>The latest state of the project</strong> (&ldquo;production-ready&rdquo;) is on the branch <strong>&ldquo;master&rdquo;</strong> (also called &ldquo;main&rdquo;)</li>
+<li><strong>new features</strong> -&gt; create a new <strong>&ldquo;feature branch&rdquo;</strong></li>
+<li>When new feature is ready -&gt; <strong>merge</strong> the feature into the branch &ldquo;master&rdquo;</li>
+</ul>
+
+<p>See: <a href="https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow" target="_blank">https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-2-create-and-merge-a-feature-branch-1-2">Case study 2: Create and merge a feature branch (<sup>1</sup>&frasl;<sub>2</sub>)</h3>
+
+<p>Create a new branch from the master/main branch</p>
+
+<pre><code>git branch #Look at the existing branches
+git checkout master #Go to branch master (or main)
+git checkout -b new-feature # Create a new branch called &quot;new-feature&quot;
+</code></pre>
+
+<p>Introduce a new feature</p>
+
+<pre><code>echo &quot;A new feature&quot; &gt;&gt; file1.txt
+git status #Look at the changes within your repo
+</code></pre>
+
+<p>Create a commit</p>
+
+<pre><code>git add -A #add changes from all tracked and untracked files
+git commit -m &quot;my new feature&quot;
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-2-create-and-merge-a-feature-branch-2-2">Case study 2: Create and merge a feature branch (<sup>2</sup>&frasl;<sub>2</sub>)</h3>
+
+<p>Merge the feature branch into the master branch.</p>
+
+<pre><code>git checkout master #Go to branch master (or main)
+git merge new-feature
+</code></pre>
+
+<p>See the changes</p>
+
+<pre><code>git log --oneline --graph
+</code></pre>
+
+<p>(Optional) Delete the feature branch</p>
+
+<pre><code>git branch -d new-feature #delete branch &quot;new-feature&quot;
+git branch #You should see only one branch
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="gitlab-101">Gitlab 101</h2>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="why-1">Why?</h3>
+
+<ul>
+<li>So far, everything on your local machine</li>
+<li>Collaboration made easier with Gitlab</li>
+<li>&ldquo;Truth&rdquo; repo hosted by Gitlab</li>
+</ul>
+
+<p><img src="/img/Git/centr-decent.png" alt="" /></p>
+
+<p>Source: <a href="https://nvie.com/posts/a-successful-git-branching-model/" target="_blank">https://nvie.com/posts/a-successful-git-branching-model/</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="setup">Setup</h3>
+
+<h4 id="general-setup">General Setup</h4>
+
+<pre><code>git config --global user.name &quot;Your Username&quot;
+git config --global user.email &quot;your.email@email.com&quot;
+</code></pre>
+
+<h4 id="optional-specific-setup">(Optional) Specific Setup</h4>
+
+<p>See <code>installationgit.pdf</code></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-3-sync-repository-with-gitlab">Case study 3: Sync repository with Gitlab</h3>
+
+<p>Create a new repository on Gitlab:</p>
+
+<ul>
+<li>Go to <a href="https://gitlab.com/users/sign_in" target="_blank">https://gitlab.com/users/sign_in</a> and login</li>
+<li>Create a new repository &ldquo;tuto&rdquo;</li>
+</ul>
+
+<p><strong>Clone</strong> the repository:</p>
+
+<pre><code>git clone git@gitlab.com:&lt;your_username&gt;/tuto.git
+cd tuto
+</code></pre>
+
+<p>Create a README file and <strong>push</strong></p>
+
+<pre><code>touch README.md
+git add README.md
+git commit -m &quot;add README&quot;
+git push -u origin master
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="important-the-gitignore-file">Important: the .gitignore file</h3>
+
+<ul>
+<li><p>You don&rsquo;t want to track every single file in your repository (.i.e. large output files)</p></li>
+
+<li><p>At the root of your repository, create a file <code>.gitignore</code>. Add the following:</p></li>
+</ul>
+
+<pre><code># ignore all logs
+*.log
+# ignore file text2.txt
+text2.txt
+</code></pre>
+
+<p>See: <a href="https://www.atlassian.com/git/tutorials/saving-changes/gitignore" target="_blank">https://www.atlassian.com/git/tutorials/saving-changes/gitignore</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-4-feature-workflow-on-gitlab-1-4">Case study 4: Feature workflow on Gitlab (<sup>1</sup>&frasl;<sub>4</sub>)</h3>
+
+<p>Same as previously. But this time, need to &ldquo;synchronize&rdquo; with the central repository (on Gitlab)</p>
+
+<ul>
+<li>Go to the master branch and delete local changes (careful)</li>
+</ul>
+
+<pre><code class="language-bash">git checkout master #Go to the branch master on your local machine
+git fetch origin #Update info on the remote branch master (from Gitlab)
+git reset --hard origin/master #Remove your local modifications and use the latest version from Gitlab
+</code></pre>
+
+<ul>
+<li>Create a new branch</li>
+</ul>
+
+<pre><code class="language-bash">git checkout -b new-feature
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-4-feature-workflow-on-gitlab-2-4">Case study 4: Feature workflow on Gitlab (<sup>2</sup>&frasl;<sub>4</sub>)</h3>
+
+<ul>
+<li>Add a feature</li>
+</ul>
+
+<pre><code class="language-bash">echo &quot;Cool new feature&quot; &gt; file1.txt
+</code></pre>
+
+<ul>
+<li>Create a new commit and synchronize with Gitlab</li>
+</ul>
+
+<pre><code class="language-bash">git add -A #Add all files
+git commit -m &quot;Message describing the commit&quot; #Create a commit
+git push -u origin new-feature
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-4-feature-workflow-on-gitlab-3-4">Case study 4: Feature workflow on Gitlab (<sup>3</sup>&frasl;<sub>4</sub>)</h3>
+
+<h4 id="merge-request">Merge Request</h4>
+
+<p>This step is done directly on Gitlab:</p>
+
+<ul>
+<li>On the top bar, select Menu -&gt; Projects and find your project</li>
+<li>On the left menu, select <strong>Merge requests</strong></li>
+<li>In the top right, select <strong>New merge request</strong></li>
+<li>Select a source (new-feature) and target branch (master) and then Compare branches and continue.</li>
+<li>Fill out the fields and select Create merge request</li>
+</ul>
+
+<p>See: <a href="https://docs.gitlab.com/ee/topics/git/feature_branch_development.html" target="_blank">https://docs.gitlab.com/ee/topics/git/feature_branch_development.html</a></p>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-4-feature-workflow-on-gitlab-4-4">Case study 4: Feature workflow on Gitlab (<sup>4</sup>&frasl;<sub>4</sub>)</h3>
+
+<h4 id="merge-request-1">Merge Request</h4>
+
+<ul>
+<li>When everyone is satisfied the merge request: Click on <strong>Merge</strong></li>
+
+<li><p>On your local machine</p>
+
+<pre><code class="language-bash">git checkout master
+git pull
+</code></pre></li>
+
+<li><p>See the merge in the log</p>
+
+<pre><code class="language-bash">git log
+</code></pre></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-5-resolving-a-merge-conflict-1-4">Case study 5: Resolving a merge conflict (<sup>1</sup>&frasl;<sub>4</sub>)</h3>
+
+<h4 id="setting">Setting</h4>
+
+<ul>
+<li>You are working on a new feature, you are ready to create a pull request, but
+the master branch has changed since</li>
+</ul>
+
+<pre><code class="language-bash">git checkout -b feature2
+echo &quot;Feature 1 different&quot; &gt; file1.txt
+echo &quot;Another new feature&quot; &gt; file2.txt
+git add -A #Add all files
+git commit -m &quot;Feature 2&quot;
+git push -u origin feature2
+</code></pre>
+
+<pre><code class="language-bash">git checkout master
+echo &quot;Change feature 1 as well&quot; &gt; file1.txt
+git add -A #Add all files
+git commit -m &quot;master branch changing&quot;
+git push
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-5-resolving-a-merge-conflict-2-4">Case study 5: Resolving a merge conflict (<sup>2</sup>&frasl;<sub>4</sub>)</h3>
+
+<ul>
+<li>Create a merge commit on Gitlab</li>
+<li>You should see <strong>&ldquo;There are merge conflicts&rdquo;</strong></li>
+</ul>
+
+<h3 id="option-1-resolve-conflict-using-gitlab">Option 1: Resolve conflict using Gitlab</h3>
+
+<ul>
+<li>Click on &ldquo;Resolve Conflicts&rdquo;</li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-5-resolving-a-merge-conflict-3-4">Case study 5: Resolving a merge conflict (<sup>3</sup>&frasl;<sub>4</sub>)</h3>
+
+<h3 id="option-2-resolve-conflict-using-the-command-line">Option 2: Resolve conflict using the command line</h3>
+
+<ul>
+<li><p>Click on &ldquo;Merge locally&rdquo; on follow the instructions:</p></li>
+
+<li><p>Step 1. Fetch and check out the branch for this merge request</p>
+
+<pre><code class="language-bash">git fetch origin
+git checkout -b 'feature2'
+</code></pre></li>
+
+<li><p>Step 2. Merge the branch and fix any conflicts that come up</p>
+
+<pre><code class="language-bash">git fetch origin
+git checkout 'master'
+git merge --no-ff 'feature2' #merge feature2 into master
+</code></pre></li>
+</ul>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h3 id="case-study-5-resolving-a-merge-conflict-3-4-1">Case study 5: Resolving a merge conflict (<sup>3</sup>&frasl;<sub>4</sub>)</h3>
+
+<p>You should see:</p>
+
+<pre><code>Auto-merging file1.txt
+CONFLICT (content): Merge conflict in file1.txt
+Automatic merge failed; fix conflicts and then commit the result.
+</code></pre>
+
+<ul>
+<li>Step 3. Edit manually the files with merge conflicts:</li>
+</ul>
+
+<pre><code class="language-bash">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+Change feature 1 as well
+=======
+Feature 1 different
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature2
+</code></pre>
+
+<p>Step 4. Push the result of the merge to GitLab</p>
+
+<pre><code class="language-bash">git add -A
+git commit -m &quot;resolving merge conflicts&quot;
+git push origin 'master'
+</code></pre>
+
+
+    </section>
+    
+
+    
+    
+    
+    <section>
+    
+      
+
+<h2 id="readings">Readings</h2>
+
+<ul>
+<li><a href="https://git-scm.com/book/en/v2" target="_blank">https://git-scm.com/book/en/v2</a></li>
+<li><a href="https://www.atlassian.com/git/tutorials/what-is-version-control" target="_blank">https://www.atlassian.com/git/tutorials/what-is-version-control</a></li>
+<li><a href="https://docs.gitlab.com/ee/topics/gitlab_flow.html" target="_blank">https://docs.gitlab.com/ee/topics/gitlab_flow.html</a></li>
+</ul>
+
+    </section>
+    
+
+    
+    
+  </div>
+</div>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/lib/js/head.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.7.0/js/reveal.min.js"></script>
+
+  <script>
+    window.revealPlugins = { dependencies: [
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/zoom-js/zoom.js', async: true },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/math/math.js', async: true },
+      { src: 'https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/reveal.js\/3.7.0/plugin/print-pdf/print-pdf.js', async: true },
+      
+      { src: '\/js\/vendor\/reveal.js\/plugin\/notes\/notes.js', async: true }
+    ]};
+
+    let revealDefaults = { center: true, controls: true, history: true, progress: true, transition: 'slide', mouseWheel: true };
+    let revealOptions = Object.assign({}, revealDefaults, revealPlugins);
+    Reveal.initialize(revealOptions);
+  </script>
+
+</body>
+</html>
