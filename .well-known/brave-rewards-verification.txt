@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: julienpascal.github.io
+Token: 19c684faf1ebb88954f5f75420f5773889900f0936579939f05c1c9eda1a90e1
