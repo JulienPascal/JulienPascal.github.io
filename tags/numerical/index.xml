@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Numerical on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/numerical/</link>
+    <description>Recent content in Numerical on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Sun, 28 Nov 2021 18:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/tags/numerical/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Artificial Neural Networks as universal function approximators</title>
+      <link>https://julienpascal.github.io/post/ann_1/</link>
+      <pubDate>Sun, 28 Nov 2021 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/ann_1/</guid>
+      <description>Introduction Artificial Neural networks (ANN) are very trendy at the moment, and rightly so.
+They are being used everywhere in big tech companies. For instance, when you use Google translate, or when recommandations appear on your Netflix feed, complex neural networks are being used behind the scene. Behind the success of Alpha Go at the game of Go again Lee Sedol, an ANN was used to identify the next best move.</description>
+    </item>
+    
+  </channel>
+</rss>

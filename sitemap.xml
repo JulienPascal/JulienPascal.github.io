@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/post/ann_1/</loc>
+      <lastmod>2021-11-28T18:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/young_2010/</loc>
       <lastmod>2021-01-18T18:53:22+01:00</lastmod>
     </url>
@@ -234,6 +242,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/ai/</loc>
+      <lastmod>2021-11-28T18:00:00+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/author/</loc>
       <priority>0</priority>
     </url>
@@ -374,7 +391,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2021-01-18T18:53:22+01:00</lastmod>
+      <lastmod>2021-11-28T18:00:00+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -409,8 +426,17 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/numerical/</loc>
+      <lastmod>2021-11-28T18:00:00+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/</loc>
-      <lastmod>2021-01-18T18:53:22+01:00</lastmod>
+      <lastmod>2021-11-28T18:00:00+01:00</lastmod>
     </url>
     
   
@@ -473,7 +499,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/tags/</loc>
-      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+      <lastmod>2021-11-28T18:00:00+01:00</lastmod>
       <priority>0</priority>
     </url>
     

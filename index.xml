@@ -7,8 +7,444 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 18 Jan 2021 18:53:22 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 28 Nov 2021 18:00:00 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Artificial Neural Networks as universal function approximators</title>
+      <link>https://julienpascal.github.io/post/ann_1/</link>
+      <pubDate>Sun, 28 Nov 2021 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/ann_1/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Artificial Neural networks&lt;/strong&gt; (ANN) are very trendy at the moment, and rightly so.&lt;/p&gt;
+
+&lt;p&gt;They are being used everywhere in big tech companies. For instance, when you use Google translate, or when recommandations appear on your Netflix feed, complex neural networks are being used behind the scene. Behind the success of &lt;a href=&#34;https://en.wikipedia.org/wiki/AlphaGo&#34; target=&#34;_blank&#34;&gt;Alpha Go&lt;/a&gt; at the game of &lt;a href=&#34;https://www.washingtonpost.com/news/innovations/wp/2016/03/15/what-alphagos-sly-move-says-about-machine-creativity/&#34; target=&#34;_blank&#34;&gt;Go again Lee Sedol&lt;/a&gt;, an ANN was used to identify the next best move.&lt;/p&gt;
+
+&lt;p&gt;ANN are also increasingly being used in Economic modeling, as exemplified by two recent publications:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0304393221000799&#34; target=&#34;_blank&#34;&gt;Deep learning for solving dynamic economic models&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.nber.org/system/files/working_papers/w26302/w26302.pdf&#34; target=&#34;_blank&#34;&gt;Financial Frictions and the Wealth Distribution&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In this blog article, I discuss the reasons behind the popularity of neural networks&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Spoiler alert:&lt;/strong&gt; It has to do with neural network being &lt;strong&gt;universal function approximators.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;As usual, I like to include Julia code to illustrate how things work in practice. My tool of choice is &lt;a href=&#34;https://julialang.org/&#34; target=&#34;_blank&#34;&gt;Julia&lt;/a&gt; because
+it is really fast and it is an increasingly popular programming language. For machine learning tasks, &lt;a href=&#34;https://github.com/FluxML/Flux.jl&#34; target=&#34;_blank&#34;&gt;Flux.jl&lt;/a&gt; is a really good option, so let&amp;rsquo;s use it as well. You can download the code &lt;a href=&#34;https://github.com/JulienPascal/ANN_Flux&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;i-some-theory&#34;&gt;I. Some theory&lt;/h2&gt;
+
+&lt;h3 id=&#34;architecture&#34;&gt;Architecture&lt;/h3&gt;
+
+&lt;p&gt;If you ended up here, you probably have already some knowledge about what an artificial neural network is. So I will be brief. In a nutshell, a neural network is made of several interconnected layers. Each layer is constituted of nodes. Nodes between adjacent layers exchange information between each others. The way the nodes communicate between each others is captured by parameter values associated to each nodes.&lt;/p&gt;
+
+&lt;p&gt;See the graph below:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN.png&#34; alt=&#34;Drawing&#34; style=&#34;width: 400px;&#34;/&gt;&lt;/p&gt;
+
+&lt;p&gt;Source: &lt;a href=&#34;https://en.wikipedia.org/wiki/Artificial_neural_network#/media/File:Artificial_neural_network.svg&#34; target=&#34;_blank&#34;&gt;https://en.wikipedia.org/wiki/Artificial_neural_network#/media/File:Artificial_neural_network.svg&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;An artificial neural network mimics at a high level what the brain does. The brain is composed of neurons and neurons are connected to each others via synapses. Our brain is very good at recognizing patterns, so one might hope that an artificial network could be a good pattern-recognition machine.&lt;/p&gt;
+
+&lt;p&gt;In practice, it is the case. Even better, we have some theorems that tell us that ANN are really, really good.&lt;/p&gt;
+
+&lt;h3 id=&#34;universal-approximation-theorems&#34;&gt;Universal approximation theorems&lt;/h3&gt;
+
+&lt;p&gt;Let me describe two important papers. Below, I reproduce some selected parts of their abstracts:&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/0893608089900208&#34; target=&#34;_blank&#34;&gt;Hornik Stinchcombe and White (1989)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;This paper rigorously establishes that &lt;strong&gt;standard multilayer feedforward networks with as few as one hidden layer&lt;/strong&gt; using arbitrary squashing functions &lt;strong&gt;are capable of approximating any Borel measurable function from one finite dimensional space to another to any desired degree of accuracy&lt;/strong&gt;, provided sufficiently many hidden units are available. In this sense, &lt;strong&gt;multilayer feedforward networks are a class of universal approximators.&lt;/strong&gt;&amp;ldquo;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.stat.yale.edu/~arb4/publications_files/UniversalApproximationBoundsForSuperpositionsOfASigmoidalFunction.pdf&#34; target=&#34;_blank&#34;&gt;Barron (1993)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;&lt;strong&gt;It  is  shown  that  feedforward networks with one layer of sigmoidal nonlinearities achieve integrated  squared  error  of order  O(1/n),  where  n  is  the  number  of  nodes.&lt;/strong&gt;  [&amp;hellip;]  For the class of functions  examined  here, the approximation rate  and  the  parsimony  of  the  parameterization  of  the  networks  are
+&lt;strong&gt;surprisingly  advantageous  in high-dimensional settings.&lt;/strong&gt;&amp;ldquo;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;The paper by &lt;strong&gt;Hornik Stinchcombe and White (1989)&lt;/strong&gt; tells us that a very large class of functions can be approximated by a neural network with the architecture we presented above. The underlying function we aim to approximate need only to be &amp;ldquo;Borel measurable&amp;rdquo; (from one finite dimensional space to another), which contains pretty much all the useful functions you use in Economics (continuous functions from one finite dimensional space to another are Borel measurable functions).&lt;/p&gt;
+
+&lt;p&gt;The paper by &lt;strong&gt;Barron (1993)&lt;/strong&gt; tells us that ANN are particularly good approximators when working with many dimensions.
+One way to read this result is that ANN can help to mitigate the &lt;a href=&#34;https://en.wikipedia.org/wiki/Curse_of_dimensionality&#34; target=&#34;_blank&#34;&gt;curse of dimensionality&lt;/a&gt;. One way to understand the curse of dimensionality is that the number of points needed to approximate a function grows exponentially with the number of dimensions, not linearly. We would like to explain complex phenomenon, with many dimensions and interactions, but traditional approximation methods generally do poorly in such settings.&lt;/p&gt;
+
+&lt;p&gt;Put together, these results tell us that ANN are very good function approximators, even when the number of dimensions is high.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;ii-application&#34;&gt;II. Application&lt;/h2&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s see two applications. To warm up, we will start with a smooth and nice function to approximate.
+Then we will move to a more complex function.&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-a-easy-function&#34;&gt;II. A. Easy function&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s load some useful packages and define the function we would like to approximate&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Dependencies
+using Flux
+using Plots
+using LinearAlgebra
+using ProgressMeter
+using Statistics
+using LaTeXStrings
+using Surrogates
+gr()
+
+# Define function that we would like to learn with our neural network
+f(x) = x[1].^2 + x[2].^2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;f (generic function with 1 method)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A function is an infinite-dimensional object. But we need a finite number of values to train our neural network.
+To that, let&amp;rsquo;s create a sample of points from an interval (I use &lt;a href=&#34;https://en.wikipedia.org/wiki/Sobol_sequence&#34; target=&#34;_blank&#34;&gt;Sobol sampling&lt;/a&gt;) and then
+evaluate the value of the true function for these points.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;n_samples = 100
+lower_bound = [-1.0, -1.0]
+upper_bound = [1.0, 1.0]
+
+xys = Surrogates.sample(n_samples, lower_bound, upper_bound, SobolSample())
+rawInputs = xys
+rawOutputs = [[f(xy)] for xy in xys] # Compute outputs for each input
+trainingData = zip(rawInputs, rawOutputs);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now is the fun part of deciding the architecture of our ANN.
+I choose two hidden layers. The number of nodes for the first layer is
+imposed by the dimension of the input (a 2d vector), as well the dimension of
+the final node (a scalar). We still have to choose the number of nodes in between.
+For the first hidden layer I choose 784 nodes, and 50 for the second hidden layer.
+To be fair, this choices are a bit random (I was a bit influenced by the &lt;a href=&#34;https://fluxml.ai/Flux.jl/stable/training/training/&#34; target=&#34;_blank&#34;&gt;Flux.jl tutorial here&lt;/a&gt;). Feel free to experiment with different values.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Define the neural network layers (this defines a function called model(x))
+# Specify our model
+dim_input = 2
+dim_ouptut = 1
+Q1 = 784;
+Q2 = 50;
+
+# Two inputs, one output
+model = Chain(Dense(2,Q1,relu),
+            Dense(Q1,Q2,relu),
+            Dense(Q2,1,identity));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Next we define a &lt;strong&gt;loss function&lt;/strong&gt;, which measures the accuracy of the approximation.
+The smaller the loss, the better. We use the &lt;a href=&#34;https://en.wikipedia.org/wiki/Mean_squared_error&#34; target=&#34;_blank&#34;&gt;mean squared error&lt;/a&gt; loss function. The name of the game is find the parameter values that minimize the loss function.
+One way to do minimize the loss function is to use the &lt;strong&gt;gradient descent algorithm&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here is an intuitive explanation of gradient descent. Imagine that you are on a top of a mountain at that there is a
+lot of fog that prevents you from seeing far away. You really want to go down. What should you do?&lt;/p&gt;
+
+&lt;p&gt;One strategy is to look at where you stand and evaluate the direction of the steepest descent in the &lt;strong&gt;neighborhood of your location&lt;/strong&gt; (you can&amp;rsquo;t see far away). Then take a step in that direction. Then repeat the process. If the mountain is &amp;ldquo;well-behaved&amp;rdquo; (it has no local minima), you will manage to go down the mountain, even though you were just using local information at every step. (Go the very bottom of this blog post to see an illustration of gradient descent on a really easy problem).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Define loss function and weights
+loss(x, y) = Flux.Losses.mse(model(collect(x)), y)
+
+lr = 0.001 # learning rate
+
+# V1. Gradient descent
+opt = Descent(lr)
+
+# V2. ADAM
+#decay = 0.9
+#momentum =0.999
+#opt = ADAM(lr, (decay, momentum))
+
+epochs = 1000 # Define the number of epochs
+trainingLosses = zeros(epochs);# Initialize a vector to keep track of the training progress
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Next is the most rewarding step: &lt;strong&gt;the training part&lt;/strong&gt;. The following block of code
+does gradient descent. The function &lt;code&gt;Flux.train!&lt;/code&gt; uses all the observations
+we have in our sample once. Because one iteration is not enough to reach a minimum,
+we repeat the process several &lt;code&gt;epochs&lt;/code&gt;. After each epoch, we calculate the mean squared
+error to see how well the model does.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;ps = Flux.params(model) #initialize weigths
+p = Progress(epochs; desc = &amp;quot;Training in progress&amp;quot;); # Creates a progress bar
+showProgress = true
+
+# Training loop
+@time for ii in 1:epochs
+
+    Flux.train!(loss, ps, trainingData, opt)
+
+    # Update progress indicator
+    if showProgress
+        trainingLosses[ii] = mean([loss(x,y) for (x,y) in trainingData])
+        next!(p; showvalues = [(:loss, trainingLosses[ii]), (:logloss, log10.(trainingLosses[ii]))], valuecolor = :grey)
+    end
+
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
+│  - To prevent this behaviour, do `ProgressMeter.ijulia_behavior(:append)`.
+│  - To disable this warning message, do `ProgressMeter.ijulia_behavior(:clear)`.
+└ @ ProgressMeter /home/julien/.julia/packages/ProgressMeter/Vf8un/src/ProgressMeter.jl:620
+[32mTraining in progress100%|███████████████████████████████| Time: 0:00:24[39m
+[39m  loss:     0.00017162366528025578[39m
+[39m  logloss:  -3.7654228272565655[39m
+
+
+ 24.753884 seconds (41.00 M allocations: 37.606 GiB, 6.56% gc time, 0.48% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next plot shows a surface plot for the original function and the value returned by the ANN (the dots).
+Results are quite good. The top right graph displays the value of the loss function as the training takes place.
+Gradient descent seems to work well, because the loss function decreases in a nice and monotonic manner. The bottom plots display surface plots for the trained ANN.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;nb_points = 100
+grid_x = collect(range(lower_bound[1], upper_bound[1], length= nb_points))
+grid_y = collect(range(lower_bound[2], upper_bound[2], length= nb_points))
+
+grid_x_random = [xy[1] for xy in xys]
+grid_y_random = [xy[2] for xy in xys]
+
+Zs = [model([x,y])[1] for (x, y) in zip(grid_x_random, grid_y_random)];
+
+# Plot output for trained neural network
+p1 = plot(grid_x, grid_y, (x, y) -&amp;gt; f([x,y]), label = &amp;quot;f(x)&amp;quot;, st=:surface)
+scatter!(p1, grid_x_random, grid_y_random, Zs, label=&amp;quot;ANN&amp;quot;)
+title!(&amp;quot;Original function&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+
+# Plot training loss
+p2 = plot(1:epochs, log.(trainingLosses), label = &amp;quot;&amp;quot;, linewidth = 2)
+title!(&amp;quot;Training Loss&amp;quot;)
+xlabel!(&amp;quot;Epoch&amp;quot;)
+ylabel!(L&amp;quot;\log(\textrm{Loss})&amp;quot;)
+
+# Neural network
+p3 = plot(grid_x, grid_y, (x, y) -&amp;gt; model([x,y])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;Trained Neural Network&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, p3, size = (width, width*ratio))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_1_12_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-b-more-challenging-function&#34;&gt;II.B. More challenging function&lt;/h3&gt;
+
+&lt;p&gt;Ok, so it works for a simple function, which is reassuring.
+Let&amp;rsquo;s now turn to a more challenging function. For instance,
+we can try to approximate the &lt;a href=&#34;https://en.wikipedia.org/wiki/Ackley_function&#34; target=&#34;_blank&#34;&gt;Ackley function&lt;/a&gt;, which
+is a slightly crazy function often used to test minimization algorithms (it has a global minimum at the origin).&lt;/p&gt;
+
+&lt;p&gt;Even with a more complex function, does a great job a approximating the true function, as you can see on the graph below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;function ackley(x; e = exp(1), a = 10.0, b = -0.2, c=2.0*π)
+    #a, b, c = 10.0, -0.2, 2.0*π
+    len_recip = inv(length(x))
+    sum_sqrs = zero(eltype(x))
+    sum_cos = sum_sqrs
+    for i in x
+        sum_cos += cos(c*i)
+        sum_sqrs += i^2
+    end
+    return -a * exp(b * sqrt(len_recip*sum_sqrs)) - exp(len_recip*sum_cos) + a + e
+end
+
+n_samples = 1000
+lower_bound = [-2.0, -2.0]
+upper_bound = [2.0, 2.0]
+xys = Surrogates.sample(n_samples, lower_bound, upper_bound, SobolSample())
+rawInputs = xys
+
+rawOutputs = [[ackley(xy)] for xy in xys] # Compute outputs for each input
+trainingData = zip(rawInputs, rawOutputs);
+
+# Define the neural network layers (this defines a function called model(x))
+# Specify our model
+Q1 = 784;
+Q2 = 50;
+Q3 = 10;
+
+# Two inputs, one output
+model = Chain(Dense(2,Q1,relu),
+            Dense(Q1,Q2,relu),
+            Dense(Q2,1,identity));
+
+# Define loss function and weights
+loss(x, y) = Flux.Losses.mse(model(collect(x)), y)
+ps = Flux.params(model)
+
+# Train the neural network
+epochs = 1000
+showProgress = true
+lr = 0.001 # learning rate
+
+# V1. Gradient descent
+opt = Descent(lr)
+
+# V2. ADAM
+#decay = 0.9
+#momentum =0.999
+#opt = ADAM(lr, (decay, momentum))
+
+trainingLosses = zeros(epochs) # Initialize vectors to keep track of training
+p = Progress(epochs; desc = &amp;quot;Training in progress&amp;quot;) # Creates a progress bar
+
+@time for ii in 1:epochs
+
+    Flux.train!(loss, ps, trainingData, opt)
+
+    # Update progress indicator
+    if showProgress
+        trainingLosses[ii] = mean([loss(x,y) for (x,y) in trainingData])
+        next!(p; showvalues = [(:loss, trainingLosses[ii]), (:logloss, log10.(trainingLosses[ii]))], valuecolor = :grey)
+    end
+
+end
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
+│  - To prevent this behaviour, do `ProgressMeter.ijulia_behavior(:append)`.
+│  - To disable this warning message, do `ProgressMeter.ijulia_behavior(:clear)`.
+└ @ ProgressMeter /home/julien/.julia/packages/ProgressMeter/Vf8un/src/ProgressMeter.jl:620
+[32mTraining in progress100%|███████████████████████████████| Time: 0:04:02[39m
+[39m  loss:     0.01753345824641543[39m
+[39m  logloss:  -1.7561324165239636[39m
+
+
+242.064635 seconds (407.63 M allocations: 375.931 GiB, 6.81% gc time, 0.04% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;nb_points = 100
+grid_x = collect(range(lower_bound[1], upper_bound[1], length= nb_points))
+grid_y = collect(range(lower_bound[2], upper_bound[2], length= nb_points))
+
+grid_x_random = [xy[1] for xy in xys]
+grid_y_random = [xy[2] for xy in xys]
+
+Zs = [model([x,y])[1] for (x, y) in zip(grid_x_random, grid_y_random)];
+
+# Plot output for trained neural network
+p1 = plot(grid_x, grid_y, (x, y) -&amp;gt; ackley([x,y]), label = &amp;quot;f(x)&amp;quot;, st=:surface)
+# Show somes points, not all of them (otherwise hard to see anything)
+scatter!(p1, grid_x_random[1:100], grid_y_random[1:100], Zs[1:100], label=&amp;quot;ANN&amp;quot;)
+title!(&amp;quot;Original Function&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+
+# Plot training loss
+p2 = plot(1:epochs, log.(trainingLosses), label = &amp;quot;&amp;quot;, linewidth = 2)
+title!(&amp;quot;Training Loss&amp;quot;)
+xlabel!(&amp;quot;Epoch&amp;quot;)
+ylabel!(L&amp;quot;\log(\textrm{Loss})&amp;quot;)
+
+
+# Plot output for trained neural network
+p3 = plot(grid_x, grid_y, (x, y) -&amp;gt; model([x,y])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;Trained Neural Network&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, p3, size = (width, width*ratio))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_1_15_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Artificial Neural Network are universal function approximators. This blog post showed how to start using ANN to approximate relatively simple functions.&lt;/p&gt;
+
+&lt;p&gt;When trying to solve an economic model, one often has to find an unknown function that satisfies a number of
+restrictions. In a subsequent post, I wish to describe how an ANN can be used to find such an unknown function.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;extra-gradient-descent-visually&#34;&gt;Extra: gradient descent visually&lt;/h3&gt;
+
+&lt;p&gt;Below is an illustration of gradient descent.
+We want to find the minimum of the function &lt;code&gt;J(x)=x^2&lt;/code&gt; and we start
+at the point &lt;code&gt;-20&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The algorithm proceeds iteratively:
+1. Calculate the &lt;strong&gt;gradient&lt;/strong&gt; at the current value. This gives us the direction
+of the maximum change for the function &lt;code&gt;J&lt;/code&gt;.
+2. Because we are looking for a &lt;strong&gt;minimum&lt;/strong&gt; and not a maximum, take a step in the opposite
+direction of the maximum change
+3. Repeat steps 1-2&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using GradDescent
+#Code from here: https://jacobcvt12.github.io/GradDescent.jl/stable/
+#I made only slight modifications to the original code
+
+# objective function and gradient of objective function
+J(x) = x^2
+dJ(x) = 2*x
+
+# number of epochs
+epochs = 150
+
+# instantiation of Adagrad optimizer with learning rate of 2
+opt = Adagrad(η=2.0)
+
+# initial value for x (usually initialized with a random value)
+x = -20.0 #initial position on the function
+values_x = zeros(epochs) #initialization
+value_y = zeros(epochs) #initialization
+iter_x = zeros(epochs) #initialization
+
+for i in 1:epochs
+    # Save values for plotting
+    values_x[i] = x
+    value_y[i] = J(x)
+    iter_x[i] = i
+
+    # calculate the gradient wrt to the current x
+    g = dJ(x)
+
+    # change to the current x
+    δ = update(opt, g)
+    x -= δ
+end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see on the plot below, we start from the left hand side and then we make some quite big moves
+to the right. As time passes, the points go from yellow to darker colors.
+After about 150 iterations, we are very close to the true minimum at 0.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;plot(values_x, value_y, label=&amp;quot;J(x)&amp;quot;)
+scatter!(values_x, value_y, marker_z = iter_x, color = cgrad(:thermal, rev = true), label=&amp;quot;Position&amp;quot;, colorbar_title=&amp;quot;Iteration&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;J(x)&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_1_20_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Young&#39;s method (2010) to simulate a cross-section</title>
@@ -4372,274 +4808,6 @@ print(abs.(approximationPi1W .- pi) ./ abs.(approximationPiNW .- pi))
 &lt;li&gt;@boofla-cfnCluster-example-2015-05-202.pdf
 &lt;a href=&#34;https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf&#34; target=&#34;_blank&#34;&gt;https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>A Primer to Parallel Computing with Julia</title>
-      <link>https://julienpascal.github.io/post/primerparallel/</link>
-      <pubDate>Mon, 18 Mar 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/primerparallel/</guid>
-      <description>
-
-&lt;h1 id=&#34;a-primer-to-parallel-computing-with-julia&#34;&gt;A Primer to Parallel Computing with Julia&lt;/h1&gt;
-
-&lt;p&gt;With this post, my aim is to provide a non-technical introduction to parallel computing using Julia. Our goal is to calculate an approximation of $\pi$ using Monte-Carlo. I will use this example to introduce some basic Julia functions and concepts. For a more rigorous explanation, the &lt;a href=&#34;https://docs.julialang.org/en/v1/stdlib/Distributed/#Distributed.@spawnat&#34; target=&#34;_blank&#34;&gt;manual&lt;/a&gt; is a must-read.&lt;/p&gt;
-
-&lt;h2 id=&#34;calculating-pi-using-monte-carlo&#34;&gt;Calculating $\pi$ using Monte-Carlo&lt;/h2&gt;
-
-&lt;p&gt;Our strategy to calculate an approximation of $\pi$ is quite simple. Let
-us consider a circle with radius $R$ inscribed in a square with side $2R$. The area of the circle, denoted by $a$, divided by the area of the square, denoted by $b$, is equal to $\frac{\pi}{4}$. Multiplying $\frac{a}{b}$ by $4$ gives us $\pi$. A slow but robust way of approximating areas is given by &lt;a href=&#34;https://en.wikipedia.org/wiki/Monte_Carlo_integration&#34; target=&#34;_blank&#34;&gt;Monte-Carlo integration&lt;/a&gt;. In a nutshell, if we draw $N$ points within the square at random and we calculate the number of them falling within the circle denoted by $N_c$, $\frac{N_c}{N}$ gives us an approximation for $\frac{a}{b}$. The more draws, the more accurate the approximation.&lt;/p&gt;
-
-&lt;h2 id=&#34;a-serial-implementation&#34;&gt;A serial implementation&lt;/h2&gt;
-
-&lt;p&gt;Let&amp;rsquo;s start with a serial version of the code&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Distributions
-using BenchmarkTools
-using Plots
-using Distributed
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;┌ Info: Precompiling Plots [91a5bcdd-55d7-5caf-9e0b-520d859cae80]
-└ @ Base loading.jl:1192
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#------------------------------------------------------------
-# Function that returns 1 if the point with coordinates (x,y) 
-# is within the unit circle; 0 otherwise
-#------------------------------------------------------------
-function inside_circle(x::Float64, y::Float64)
-    output = 0
-    if x^2 + y^2 &amp;lt;= 1
-        output = 1
-    end
-    return output
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;inside_circle (generic function with 1 method)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#------------------------------------------------------------
-# Function to calculate an approximation of pi
-#------------------------------------------------------------
-function pi_serial(nbPoints::Int64 = 128 * 1000; d=Uniform(-1.0,1.0))
-    
-   #draw NbPoints from within the square centered in 0
-   #with side length equal to 2
-   xDraws = rand(d, nbPoints)
-   yDraws = rand(d, nbPoints)
-   sumInCircle = 0
-   
-   for (xValue, yValue) in zip(xDraws, yDraws)
-        sumInCircle+=inside_circle(xValue, yValue)
-   end
-    
-   return 4*sumInCircle/nbPoints
-    
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;pi_serial (generic function with 2 methods)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can draw an increasing number of points and see how well the approximation for $\pi$ performs.
-The following figure shows that increasing the number of points leads to a smaller error, even though the decreasing pattern is not uniform. The dashed line shows that the error descreases at a rate equal to the inverse of the square root of $N$.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;minPoints =  128 * 100000
-maxPoints =  128 * 1000000
-gridPoints = collect(minPoints:minPoints:maxPoints)
-nbGridPoints = length(gridPoints)
-
-elapsedTime1W = zeros(nbGridPoints)
-approximationPi1W =  zeros(nbGridPoints)
-
-for (index, nbDraws) in enumerate(gridPoints)
-    
-    approximationPi1W[index] = pi_serial(nbDraws); #Store value
-    elapsedTime1W[index] = @elapsed pi_serial(nbDraws); #Store time
-    
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Plots.plot(gridPoints, abs.(approximationPi1W .- pi), label = &amp;quot;Serial&amp;quot;)
-Plots.plot!(gridPoints, 1 ./(sqrt.(gridPoints)), label = &amp;quot;1/sqrt(n)&amp;quot;, linestyle = :dash)
-display(p)
-Plots.savefig(p, &amp;quot;convergence_rate.png&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/convergence_rate.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;adding-workers&#34;&gt;Adding &amp;ldquo;workers&amp;rdquo;&lt;/h2&gt;
-
-&lt;p&gt;When starting Julia, by default, only one processor is available. To increase the number of processors, one can use the command &lt;code&gt;addprocs&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;Initial number of workers = $(nworkers())&amp;quot;)
-addprocs(4)
-println(&amp;quot;Current number of workers = $(nworkers())&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Initial number of workers = 1
-Current number of workers = 4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;spawn-and-fetch&#34;&gt;@spawn and fetch&lt;/h2&gt;
-
-&lt;p&gt;With Julia, one can go quite far only using the &lt;code&gt;@spawnat&lt;/code&gt; and &lt;code&gt;fetch&lt;/code&gt; functions.
-The command &lt;code&gt;@spawnat&lt;/code&gt; starts an operation on a given process and returns an object of type &lt;code&gt;Future&lt;/code&gt;.
- For instance, the next line starts the operation &lt;code&gt;myid()&lt;/code&gt; on process 2:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;f = @spawnat 2 myid()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Future(2, 1, 6, nothing)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;To get the result from the operation we just started on process 2, we need to &amp;ldquo;fetch&amp;rdquo; the results using the &lt;code&gt;Future&lt;/code&gt;
-created above. As expected, the result is &lt;code&gt;2&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;fetch(f)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;An important thing to know about &lt;code&gt;@spawnat&lt;/code&gt; is that the &amp;ldquo;spawning&amp;rdquo; process will not wait for the operation to be finished before moving to the next task. This can be illustrated with following example:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time @spawnat 2 sleep(2.0)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;  0.008938 seconds (11.45 k allocations: 592.538 KiB)
-
-
-
-
-
-Future(2, 1, 8, nothing)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If the expected behavior is to wait for 2 seconds, this can be achieved by &amp;ldquo;fetching&amp;rdquo; the above operation:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time fetch(@spawnat 2 sleep(2.0))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;  2.101521 seconds (47.66 k allocations: 2.357 MiB, 0.48% gc time)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The bottom line is that process 1 can be used to start many operations in parallel using &lt;code&gt;@spawnat&lt;/code&gt; and then collects the results from the different processes using &lt;code&gt;fetch&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;a-parallel-implementation&#34;&gt;A parallel implementation&lt;/h2&gt;
-
-&lt;p&gt;The strategy we used to approximate $\pi$ does not need to be executed in serial. Since each draw is independent from previous ones, we could split the work between available workers (4 workers in this example). Each worker will calculate its own approximation for $\pi$ and the final result will be average value across workers.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#------------------------------------------------------------
-# Let&#39;s redefine the function @everywhere so it can run on
-# the newly added workers
-#-----------------------------------------------------------
-@everywhere function inside_circle(x::Float64, y::Float64)
-    output = 0
-    if x^2 + y^2 &amp;lt;= 1
-        output = 1
-    end
-    return output
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@everywhere using Distributions
-#------------------------------------------------------------
-# Let&#39;s redefine the function @everywhere so it can run on
-# the newly added workers
-#-----------------------------------------------------------
-@everywhere function pi_serial(nbPoints::Int64 = 128 * 1000; d=Uniform(-1.0,1.0))
-    
-   #draw NbPoints from within the square centered in 0
-   #with side length equal to 2
-   xDraws = rand(d, nbPoints)
-   yDraws = rand(d, nbPoints)
-   sumInCircle = 0
-   
-   for (xValue, yValue) in zip(xDraws, yDraws)
-        sumInCircle+=inside_circle(xValue, yValue)
-   end
-    
-   return 4*sumInCircle/nbPoints
-    
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@everywhere function pi_parallel(nbPoints::Int64 = 128 * 1000)
-    
-   # to store different approximations
-   #----------------------------------
-   piWorkers = zeros(nworkers())
-   # to store Futures
-   #-----------------
-   listFutures=[]
-   # divide the draws among workers
-   #-------------------------------
-   nbDraws = Int(nbPoints/4)
-    
-   # each calculate its own approximation
-   #-------------------------------------
-   for (workerIndex, w) in enumerate(workers())
-        push!(listFutures, @spawnat w pi_serial(nbDraws))
-   end
-   # let&#39;s fetch results
-   #--------------------
-   for (workerIndex, w) in enumerate(workers())
-         piWorkers[workerIndex] = fetch(listFutures[workerIndex])
-   end
-    
-   # return the mean value across worker
-   return mean(piWorkers)
-    
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;minPoints =  128 * 100000
-maxPoints =  128 * 1000000
-gridPoints = collect(minPoints:minPoints:maxPoints)
-nbGridPoints = length(gridPoints)
-
-elapsedTimeNW = zeros(nbGridPoints)
-approximationPiNW =  zeros(nbGridPoints)
-
-for (index, nbDraws) in enumerate(gridPoints)
-    
-    approximationPiNW[index] = pi_parallel(nbDraws); #Store value
-    elapsedTimeNW[index] = @elapsed pi_parallel(nbDraws); #Store time
-    
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;serial-vs-parallel-comparisons&#34;&gt;Serial vs parallel comparisons&lt;/h2&gt;
-
-&lt;p&gt;In terms of accuracy, the serial and the parallel codes generate the same results (modulo randomness).
-In terms of speed, the parallel version is up to 2.5 times faster. The more points are drawn, the higher the speed-gains. This example shows the well-established fact that the advantages of parallel computing start to kick-in when the underlying tasks are time-consuming in the first place.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Plots.plot(gridPoints, abs.(approximationPi1W .- pi), label = &amp;quot;Serial&amp;quot;)
-Plots.plot!(gridPoints, abs.(approximationPiNW .- pi), label = &amp;quot;Parallel&amp;quot;)
-Plots.title!(&amp;quot;Error&amp;quot;)
-Plots.xlabel!(&amp;quot;nb Draws&amp;quot;)
-Plots.ylabel!(&amp;quot;Error&amp;quot;)
-display(p)
-Plots.savefig(p,&amp;quot;error_comparison.png&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/error_comparison.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Plots.plot(gridPoints, elapsedTime1W, label = &amp;quot;Serial&amp;quot;)
-Plots.plot!(gridPoints, elapsedTimeNW, label = &amp;quot;Parallel&amp;quot;)
-Plots.plot!(gridPoints, elapsedTime1W./elapsedTimeNW, label = &amp;quot;Speed-up&amp;quot;)
-Plots.xlabel!(&amp;quot;nb Draws&amp;quot;)
-Plots.ylabel!(&amp;quot;Time (s)&amp;quot;)
-display(p)
-Plots.savefig(&amp;quot;Speed_gains.png&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/PrimerParallel/Speed_gains.png&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
 </description>
     </item>
     

@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Tue, 07 Mar 2017 15:51:54 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 28 Nov 2021 18:00:00 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>AI</title>
+      <link>https://julienpascal.github.io/tags/ai/</link>
+      <pubDate>Sun, 28 Nov 2021 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/ai/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Banking</title>
@@ -126,6 +135,15 @@
       <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/macroeconomics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Numerical</title>
+      <link>https://julienpascal.github.io/tags/numerical/</link>
+      <pubDate>Sun, 28 Nov 2021 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/numerical/</guid>
       <description></description>
     </item>
     
