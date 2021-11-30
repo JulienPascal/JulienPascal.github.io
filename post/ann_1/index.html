@@ -540,7 +540,7 @@ They are being used everywhere in big tech companies. For instance, when you use
 
 <p>In this blog article, I discuss the reasons behind the popularity of neural networks</p>
 
-<p><strong>Spoiler alert:</strong> It has to do with neural network being <strong>universal function approximators.</strong></p>
+<p><strong>Spoiler alert:</strong> It has to do with ANN being <strong>universal function approximators.</strong></p>
 
 <p>As usual, I like to include Julia code to illustrate how things work in practice. My tool of choice is <a href="https://julialang.org/" target="_blank">Julia</a> because
 it is really fast and it is an increasingly popular programming language. For machine learning tasks, <a href="https://github.com/FluxML/Flux.jl" target="_blank">Flux.jl</a> is a really good option, so let&rsquo;s use it as well. You can download the code <a href="https://github.com/JulienPascal/ANN_Flux" target="_blank">here</a>.</p>
@@ -557,7 +557,7 @@ it is really fast and it is an increasingly popular programming language. For ma
 
 <p>Source: <a href="https://en.wikipedia.org/wiki/Artificial_neural_network#/media/File:Artificial_neural_network.svg" target="_blank">https://en.wikipedia.org/wiki/Artificial_neural_network#/media/File:Artificial_neural_network.svg</a></p>
 
-<p>An artificial neural network mimics at a high level what the brain does. The brain is composed of neurons and neurons are connected to each others via synapses. Our brain is very good at recognizing patterns, so one might hope that an artificial network could be a good pattern-recognition machine.</p>
+<p>An artificial neural network mimics at a high level what the brain does. The brain is composed of neurons and neurons are connected to each others via synapses. Our brain is very good at recognizing patterns, so one might hope that an artificial neural network could be a good pattern-recognition machine.</p>
 
 <p>In practice, it is the case. Even better, we have some theorems that tell us that ANN are really, really good.</p>
 
@@ -578,10 +578,10 @@ it is really fast and it is an increasingly popular programming language. For ma
 
 <hr />
 
-<p>The paper by <strong>Hornik Stinchcombe and White (1989)</strong> tells us that a very large class of functions can be approximated by a neural network with the architecture we presented above. The underlying function we aim to approximate need only to be &ldquo;Borel measurable&rdquo; (from one finite dimensional space to another), which contains pretty much all the useful functions you use in Economics (continuous functions from one finite dimensional space to another are Borel measurable functions).</p>
+<p>The paper by <strong>Hornik Stinchcombe and White (1989)</strong> tells us that a very large class of functions can be approximated by an ANN with the architecture we presented above. The underlying function we aim to approximate is only required to be &ldquo;Borel measurable&rdquo; (from one finite dimensional space to another), which contains pretty much all the useful functions you use in Economics (continuous functions from one finite dimensional space to another are Borel measurable functions).</p>
 
 <p>The paper by <strong>Barron (1993)</strong> tells us that ANN are particularly good approximators when working with many dimensions.
-One way to read this result is that ANN can help to mitigate the <a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality" target="_blank">curse of dimensionality</a>. One way to understand the curse of dimensionality is that the number of points needed to approximate a function grows exponentially with the number of dimensions, not linearly. We would like to explain complex phenomenon, with many dimensions and interactions, but traditional approximation methods generally do poorly in such settings.</p>
+Said differently, ANN can help to mitigate the <a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality" target="_blank">curse of dimensionality</a>. One way to understand the curse of dimensionality is that the number of points needed to approximate a function grows exponentially with the number of dimensions, not linearly. We would like to explain complex phenomenon, with many dimensions and interactions, but traditional approximation methods generally do poorly in such settings.</p>
 
 <p>Put together, these results tell us that ANN are very good function approximators, even when the number of dimensions is high.</p>
 
@@ -634,7 +634,7 @@ I choose two hidden layers. The number of nodes for the first layer is
 imposed by the dimension of the input (a 2d vector), as well the dimension of
 the final node (a scalar). We still have to choose the number of nodes in between.
 For the first hidden layer I choose 784 nodes, and 50 for the second hidden layer.
-To be fair, this choices are a bit random (I was a bit influenced by the <a href="https://fluxml.ai/Flux.jl/stable/training/training/" target="_blank">Flux.jl tutorial here</a>). Feel free to experiment with different values.</p>
+To be fair, these choices are a bit random (I was influenced by the <a href="https://fluxml.ai/Flux.jl/stable/training/training/" target="_blank">Flux.jl tutorial here</a>). Feel free to experiment with different values.</p>
 
 <pre><code class="language-julia"># Define the neural network layers (this defines a function called model(x))
 # Specify our model
@@ -650,7 +650,7 @@ model = Chain(Dense(2,Q1,relu),
 </code></pre>
 
 <p>Next we define a <strong>loss function</strong>, which measures the accuracy of the approximation.
-The smaller the loss, the better. We use the <a href="https://en.wikipedia.org/wiki/Mean_squared_error" target="_blank">mean squared error</a> loss function. The name of the game is find the parameter values that minimize the loss function.
+The smaller the loss, the better. We use the <a href="https://en.wikipedia.org/wiki/Mean_squared_error" target="_blank">mean squared error</a> loss function. The name of the game is to find the parameter values that minimize the loss function.
 One way to do minimize the loss function is to use the <strong>gradient descent algorithm</strong>.</p>
 
 <p>Here is an intuitive explanation of gradient descent. Imagine that you are on a top of a mountain at that there is a
@@ -713,7 +713,7 @@ end
 
 <p>The next plot shows a surface plot for the original function and the value returned by the ANN (the dots).
 Results are quite good. The top right graph displays the value of the loss function as the training takes place.
-Gradient descent seems to work well, because the loss function decreases in a nice and monotonic manner. The bottom plots display surface plots for the trained ANN.</p>
+Gradient descent seems to work well, because the loss function decreases in a nice and monotonic manner. The bottom plot displays the surface plot for the trained ANN.</p>
 
 <pre><code class="language-julia">nb_points = 100
 grid_x = collect(range(lower_bound[1], upper_bound[1], length= nb_points))
@@ -753,12 +753,12 @@ pp = plot(p1, p2, p3, size = (width, width*ratio))
 
 <h3 id="ii-b-more-challenging-function">II.B. More challenging function</h3>
 
-<p>Ok, so it works for a simple function, which is reassuring.
+<p>Ok, so our ANN works with a simple function, which is reassuring.
 Let&rsquo;s now turn to a more challenging function. For instance,
 we can try to approximate the <a href="https://en.wikipedia.org/wiki/Ackley_function" target="_blank">Ackley function</a>, which
 is a slightly crazy function often used to test minimization algorithms (it has a global minimum at the origin).</p>
 
-<p>Even with a more complex function, does a great job a approximating the true function, as you can see on the graph below.</p>
+<p>Even with a more complex function, our ANN does a great job a approximating the true function, as you can see on the graph below.</p>
 
 <pre><code class="language-julia">function ackley(x; e = exp(1), a = 10.0, b = -0.2, c=2.0*π)
     #a, b, c = 10.0, -0.2, 2.0*π
@@ -896,12 +896,15 @@ restrictions. In a subsequent post, I wish to describe how an ANN can be used to
 We want to find the minimum of the function <code>J(x)=x^2</code> and we start
 at the point <code>-20</code>.</p>
 
-<p>The algorithm proceeds iteratively:
-1. Calculate the <strong>gradient</strong> at the current value. This gives us the direction
-of the maximum change for the function <code>J</code>.
-2. Because we are looking for a <strong>minimum</strong> and not a maximum, take a step in the opposite
-direction of the maximum change
-3. Repeat steps 1-2</p>
+<p>The algorithm proceeds iteratively:</p>
+
+<ol>
+<li>Calculate the <strong>gradient</strong> at the current value. This gives us the direction
+of the maximum change for the function <code>J</code>.</li>
+<li>Because we are looking for a <strong>minimum</strong> and not a maximum, take a step in the opposite
+direction of the maximum change</li>
+<li>Repeat steps 1-2</li>
+</ol>
 
 <pre><code class="language-julia">using GradDescent
 #Code from here: https://jacobcvt12.github.io/GradDescent.jl/stable/
