@@ -7,8 +7,693 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 28 Nov 2021 18:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 04 Jan 2022 18:00:00 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Artificial Neural Networks to Solve Economic Models</title>
+      <link>https://julienpascal.github.io/post/ann_2/</link>
+      <pubDate>Tue, 04 Jan 2022 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/ann_2/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;In &lt;a href=&#34;https://julienpascal.github.io/post/ann_1/&#34; target=&#34;_blank&#34;&gt;a previous post&lt;/a&gt;, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using &lt;a href=&#34;https://julialang.org/&#34; target=&#34;_blank&#34;&gt;Julia&lt;/a&gt; and &lt;a href=&#34;https://github.com/FluxML/Flux.jl&#34; target=&#34;_blank&#34;&gt;Flux.jl&lt;/a&gt; with two toy examples.&lt;/p&gt;
+
+&lt;p&gt;Now it&amp;rsquo;s time to be a bit more ambitious. In my previous post, we could sample from the function we wanted to approximate. However, in many instances we cannot simply do that. &lt;strong&gt;The unknown element&lt;/strong&gt; is the &lt;strong&gt;function we want to approximate&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;TL;DR: ANN work well to approximate unknown functions.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;The notebook for this post is available &lt;a href=&#34;https://github.com/JulienPascal/ANN_Flux&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;i-theory&#34;&gt;I. Theory&lt;/h2&gt;
+
+&lt;p&gt;The cornerstone of Macro and Labour Economics is the dynamic optimization problem, in which an agent chooses a series of actions, taking account a set of constraints and the evolution of the state of the economy. A classical example is the a central planner deciding &lt;a href=&#34;https://en.wikipedia.org/wiki/Ramsey%E2%80%93Cass%E2%80%93Koopmans_model&#34; target=&#34;_blank&#34;&gt;how much to save and consume&lt;/a&gt; at any point in time. Another example would be &lt;a href=&#34;https://www.jstor.org/stable/2297896&#34; target=&#34;_blank&#34;&gt;a worker searching for a job and deciding which job to accept and when to resign&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;These types of problems naturally lend themselves to the following &lt;a href=&#34;https://en.wikipedia.org/wiki/Bellman_equation&#34; target=&#34;_blank&#34;&gt;Bellman equation&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;$$ V(x,z) = \max_{c \in \Gamma(x,z)}[ F(x,c,z) + \beta E[ V(T(x,c), z&amp;rsquo;) ]$$&lt;/p&gt;
+
+&lt;p&gt;where $x$ is a known state variable and $z$ is a random variable following a Markov process. Both $x$ and $z$ are vectors. The function $\Gamma(.)$ represents the set of possible actions given a current state and the function $T(.)$ captures the transition from one state to another when an action is taken. The variable $\beta$ is a discount factor strictly smaller than one and the $E$ represent an expectation operator.&lt;/p&gt;
+
+&lt;p&gt;I do not want to delve too much into the fascinating theory of optimal control. The point is that the unknown is the function $V(.)$. Given the good properties of ANN mentioned above, one may be tempted to use them to approximate the true $V(.)$. And this is exactly what we are going to do.&lt;/p&gt;
+
+&lt;h2 id=&#34;ii-application&#34;&gt;II. Application&lt;/h2&gt;
+
+&lt;p&gt;For the application, let&amp;rsquo;s focus on the model of the labour market of &lt;a href=&#34;https://www.aeaweb.org/articles?id=10.1257/aer.20131118&#34; target=&#34;_blank&#34;&gt;Lise and Robin 2017&lt;/a&gt;.Why? Because I have worked a lot with this model &lt;a href=&#34;https://www.theses.fr/2020IEPP0013&#34; target=&#34;_blank&#34;&gt;during my PhD&lt;/a&gt; and also because the model has really nice properties. The model features &lt;strong&gt;heterogeneous firms, workers&lt;/strong&gt; (one can think of large versus small firms and workers with different skills) and &lt;strong&gt;business cycle fluctuations&lt;/strong&gt; (booms and busts). Despite the underlying complexity, the model lends itself to a pretty simple Bellman equation:&lt;/p&gt;
+
+&lt;p&gt;$$ S(x,y,z) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&amp;rsquo;|z} [ max(S(x,y,z&amp;rsquo;), 0) ] $$&lt;/p&gt;
+
+&lt;p&gt;where $x$ is the worker&amp;rsquo;s type; $y$ the firm&amp;rsquo;s type; $z$ the aggregate (stochastic) state of the economy; $\delta$ the probability that a current job is going to be destroyed next period for exogenous reasons and $r$ the interest rate. The function $s(x,y,z)$ captures the value of net output when a worker of type $x$ works with a firm of type $y$ when the state of the economy is $z$. If the job is not productive enough, workers and firms decide to separate, which happens when $S(x,y,z) &amp;lt; 0$. This is why there is a max operator within the expectation operator.&lt;/p&gt;
+
+&lt;p&gt;What we want to do is to use an ANN such that:&lt;/p&gt;
+
+&lt;p&gt;$$ ANN(x,y,z|\theta) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&amp;rsquo;|z} [ ANN(x,y,z&amp;rsquo;|\theta), 0) ] $$&lt;/p&gt;
+
+&lt;p&gt;Note that this equation can be rewritten as:&lt;/p&gt;
+
+&lt;p&gt;$$ ANN(x,y,z|\theta) - s(x,y,z) - \frac{1 - \delta}{1 + r} E_{z&amp;rsquo;|z} [ ANN(x,y,z&amp;rsquo;|\theta), 0) ] = 0$$&lt;/p&gt;
+
+&lt;p&gt;Our approximation is not going to be 100 percent perfect. But we can hope to find a good value of $\theta$ by minimizing the Mean Squared Error&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{1}{n}\sum(y_i - \hat{y}_i)^2 $$&lt;/p&gt;
+
+&lt;p&gt;where $y_i$ is 0 everywhere and $\hat{y}_i = ANN(x_i,y_i,z_i|\theta) - \frac{1 - \delta}{1 + r} E_{z_i&amp;rsquo;|z_i} [ ANN(x_i,y_i,z_i&amp;rsquo;|\theta), 0) ] - s(x_i,y_i,z_i)$. Here the index $i$ captures the idea that we are going to draw several points from the space $X \times Y \times Z$&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-a-preliminaries&#34;&gt;II. A. Preliminaries&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s load useful packages and define a structure (using &lt;a href=&#34;https://github.com/mauro3/Parameters.jl&#34; target=&#34;_blank&#34;&gt;Parameters.jl&lt;/a&gt;) to hold parameter values and primitive functions of the model.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Random
+using DataFrames
+using DataStructures
+using Statistics
+using Plots
+using IterTools
+using Flux
+using Flux.Data: DataLoader
+using ProgressMeter
+using Parameters
+using Expectations
+using Distributions
+using Surrogates
+using LinearAlgebra
+using LaTeXStrings
+using Interpolations
+using BenchmarkTools
+using Parameters
+using StatsPlots
+using Kronecker
+using SparseArrays
+using CUDA
+gr()
+
+if CUDA.has_cuda()
+    device = gpu
+    @info &amp;quot;GPU available&amp;quot;
+else
+    device = cpu
+    @info &amp;quot;GPU not available&amp;quot;
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;┌ Info: GPU not available
+└ @ Main In[120]:30
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@with_kw struct Params
+    x_min::Float64 = 0.0
+    x_max::Float64 = 1.0
+    y_min::Float64 = 0.0
+    y_max::Float64 = 1.0
+    nx::Int64 = 21 # grid points for human capital
+    ny::Int64 = 21 # grid points for firm productivity
+    dt::Float64 = 1.0/52.0 # length of a period in years
+    r::Float64 = (1.0 + 0.05)^dt - 1.0 # interest rate
+    delta::Float64 = 0.0127012273 #job destrution rate
+    epsilon::Float64 = 0.001 # distance to stay away from bounds of the interval
+    x_grid = collect(range(x_min + epsilon, x_max - epsilon, length = nx))
+    y_grid = collect(range(y_min + epsilon, y_max - epsilon, length = nx))
+    # log of aggregate shocks are AR(1):
+    # ln(zt) = rho*ln(zt-1) + e_k
+    # with e_k distributed as N(0,psi^2)
+    # and psi = sigma*sqrt(1-rho²)
+    rho::Float64 = 0.9997369438 #persitence parameter
+    sigma::Float64 = 0.0714488990 #volatility parameter
+    psi::Float64 = sigma*sqrt(1.0 - rho^2) #std dev. of innovation term
+    distrib_innovation::Any = Normal(0, psi) #0 mean and std = psi
+    nb_nodes::Int64 = 10 #number nodes for the expectation
+    E::Any = expectation(distrib_innovation, n = nb_nodes) #expectation operator
+    nodes_E = nodes(E) #nodes for expectation
+    weigths_E = weights(E) #weights for expectation
+    f0::Float64     =    6.0873503685 # market production parameter
+    f1::Float64     =    0.0025488557 # market production parameter
+    f2::Float64     =    2.0529182143 # market production parameter
+    f3::Float64     =    -0.1400252578 # market production parameter
+    f4::Float64     =    8.0349795180 # market production parameter
+    f5::Float64     =    -1.9072145913 # market production parameter
+    f6::Float64     =    6.5961298483 # market production parameter
+    b0::Float64     = 0.7 # home production parameter
+    p_xyz::Function = (x, y, z) -&amp;gt; f0*z*(f1 + f2*x + f3*y + f4*(x^2) + f5*(y^2) + f6*x*y)*dt #value of market production
+    b_x::Function = (x) -&amp;gt; b0*p_xyz(x, x, 1.0) #value of market production
+    s_xyz::Function = (x,y,z) -&amp;gt; p_xyz(x,y,z) - b_x(x) #surplus
+    # VECTORIZED FUNCTIONS
+    # input of the form:
+    # row: observation
+    # column: dimension
+    p_xyz_v::Function = x -&amp;gt; f0.*x[:,3].*(f1 .+ f2.*x[:,1] .+ f3.*x[:,2] .+ f4.*(x[:,1].^2) .+ f5.*(x[:,2].^2) .+ f6.*x[:,1].*x[:,2]).*dt #value of market production
+    b_x_v::Function = x -&amp;gt; b0.*f0.*1.0.*(f1 .+ f2.*x[:,1] .+ f3.*x[:,1] .+ f4.*(x[:,1].^2) .+ f5.*(x[:,1].^2) .+ f6.*x[:,1].*x[:,1]).*dt #value of market production
+    s_xyz_v::Function = x -&amp;gt; p_xyz_v(x) .- b_x_v(x) #surplus
+    # VECTORIZED FUNCTIONS
+    # input of the form:
+    # row: dimension
+    # column: observation
+    p_xyz_r::Function = x -&amp;gt; f0.*x[3, :].*(f1 .+ f2.*x[1, :] .+ f3.*x[2,:] .+ f4.*(x[1,:].^2) .+ f5.*(x[2,:].^2) .+ f6.*x[1,:].*x[2,:]).*dt #value of market production
+    b_x_r::Function = x -&amp;gt; b0.*f0.*1.0.*(f1 .+ f2.*x[1,:] .+ f3.*x[1,:] .+ f4.*(x[1,:].^2) .+ f5.*(x[1,:].^2) .+ f6.*x[1,:].*x[1,:]).*dt #value of market production
+    s_xyz_r::Function = x -&amp;gt; p_xyz_r(x) .- b_x_r(x) #surplus
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p = Params();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;ii-b-value-function-iteration&#34;&gt;II. B. Value function iteration&lt;/h3&gt;
+
+&lt;p&gt;To check the accuracy of the ANN approach, we will also use another &amp;ldquo;legacy&amp;rdquo; method to find another approximation for $S(x,y,z)$. The traditional way is to use &lt;strong&gt;Value Function Iteration (VFI)&lt;/strong&gt;. For a detailed treatment, the textbook of &lt;a href=&#34;https://www.google.com/search?q=Recursive+methods+in+economic+dynamics&amp;amp;client=ubuntu&amp;amp;hs=q3T&amp;amp;sa=X&amp;amp;channel=fs&amp;amp;sxsrf=AOaemvLsI7n9lOLie8RSVfOPi0l2weq7Pg:1641306887162&amp;amp;tbm=isch&amp;amp;source=iu&amp;amp;ictx=1&amp;amp;fir=GH2dBz2E9vFPDM%252CzAM-vlBogjsh7M%252C%252Fm%252F0cgvb6c&amp;amp;vet=1&amp;amp;usg=AI4_-kQJc5H3CV04Yfys38GSbnPN50KV5A&amp;amp;ved=2ahUKEwi-xOfPqJj1AhWySvEDHWK1BeUQ_B16BAgbEAI&amp;amp;biw=1232&amp;amp;bih=626&amp;amp;dpr=1.5#imgrc=GH2dBz2E9vFPDM&#34; target=&#34;_blank&#34;&gt;Stockey and Lucas&lt;/a&gt; is a must-read. For explanations with codes, I suggest &lt;a href=&#34;https://julia.quantecon.org/dynamic_programming/optgrowth.html&#34; target=&#34;_blank&#34;&gt;QuantEcon&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;VFI, as suggested by the name, is an iterated procedure that converges to the true function. One starts by assuming a function $V^{(0)}$. Then one applies the &amp;ldquo;right-hand-side operator&amp;rdquo; of the Bellman equation to get $V^{(1)}$:&lt;/p&gt;
+
+&lt;p&gt;$ V^{(1)}(x,y,z) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&amp;rsquo;|z} [ max(V^{(0)}(x,y,z&amp;rsquo;), 0) ]$&lt;/p&gt;
+
+&lt;p&gt;In practice, one must calculate $V^{(n)}(x,y,z)$ on a grid. Off-grid points can be obtained by linear interpolation. After some time, the distance between $V^{(n)}(x,y,z)$ and $V^{(n-1)}(x,y,z)$ is small and the procedure may be stopped.&lt;/p&gt;
+
+&lt;h4 id=&#34;grid-considerations-unconditional-distribution-of-z&#34;&gt;Grid considerations: unconditional distribution of z?&lt;/h4&gt;
+
+&lt;p&gt;As explained above, to use VFI, one must define a grid. For the values of $x$ and $y$, representing workers&amp;rsquo; and firms&amp;rsquo; heterogeneity, any bounded interval could do the job. Let&amp;rsquo;s follow the original paper and assume that both $x$ and $y$ are in $[0,1]$.&lt;/p&gt;
+
+&lt;p&gt;Defining a good grid for $z$ requires a bit more work. In the model of &lt;a href=&#34;https://www.aeaweb.org/articles?id=10.1257/aer.20131118&#34; target=&#34;_blank&#34;&gt;Lise and Robin 2017&lt;/a&gt;, the log (natural logarithm) of the aggregate state $z$ follows an AR(1) process:&lt;/p&gt;
+
+&lt;p&gt;$log(z_{t}) = \rho log(z_{t-1}) + \epsilon_{t}$&lt;/p&gt;
+
+&lt;p&gt;with $\epsilon_{t}$ normally distributed with variance $\psi \equiv \sigma \times \sqrt(1.0 - \rho^2)$.&lt;/p&gt;
+
+&lt;p&gt;This implies that the unconditional distribution of $log(z)$ is normally distributed with mean 0 and variance $\sigma$. Or said differently, $z$ is $Lognormal(0, \sigma)$. In the block of code below, we check this fact by comparing some simulated data and the pdf of a $Lognormal(0, \sigma)$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;Nt = 20000000 #number of draws
+d = Normal(0, p.psi)
+innov = rand(d, Nt)
+log_z = zeros(Nt)
+z = zeros(Nt)
+log_z[1] = 1.0
+for t=2:Nt
+    log_z[t] = p.rho*log_z[t-1] + innov[t]
+end
+z = exp.(log_z)
+d_log_normal = LogNormal(0.0, p.sigma)
+
+density(z, label=&amp;quot;data&amp;quot;)
+plot!(minimum(z):0.01:maximum(z), x -&amp;gt; pdf(d_log_normal, x), label=&amp;quot;LogNormal&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_2_11_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Most of the time, $z$ is going to be between the 5th and the 95th percentile of $Lognormal(0, \sigma)$. Hence, we define the grid for $z$ to be $[P5, P95]$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;P5 = quantile(d_log_normal, 0.05)
+P95 = quantile(d_log_normal, 0.95)
+println(&amp;quot;P5: $(P5); P95: $(P95)&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;P5: 0.8891200789438004; P95: 1.1247074761689282
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#Sampling for training
+n_samples_xy = 10; #number of draws for the x and y dimensions
+n_samples_z = 10; #number of draws for the z dimension
+lower_bound = [0.0, 0.0, P5]
+upper_bound = [1.0, 1.0, P95]
+
+x_grid = collect(range(lower_bound[1], upper_bound[1], length=n_samples_xy))
+y_grid = collect(range(lower_bound[2], upper_bound[2], length=n_samples_xy))
+z_grid = collect(range(lower_bound[3], upper_bound[3], length=n_samples_z))
+
+nodes_xyz = (x_grid, y_grid, z_grid, ); #for package Interpolations
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;value-function-iteration&#34;&gt;Value function iteration&lt;/h4&gt;
+
+&lt;p&gt;The following block of code uses the VFI algorithm and displays the final results. The value function $S(x,y,z)$ is a non-linear transformation of the value of net output of the job $s(x,y,z)$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;V_old = zeros(n_samples_xy, n_samples_xy, n_samples_z)
+V_new = zeros(n_samples_xy, n_samples_xy, n_samples_z)
+
+# Initial guess
+for (zIndex, zValue) in enumerate(z_grid)
+    for (yIndex, yValue) in enumerate(y_grid)
+        for (xIndex, xValue) in enumerate(x_grid)
+            V_old[xIndex, yIndex, zIndex] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r))*max(0.0, p.s_xyz(xValue, yValue, zValue))
+        end
+    end
+end
+
+itp = interpolate(nodes_xyz, V_old, Gridded(Linear()))
+etp = extrapolate(itp, Line())
+V_old_interpolated = (x) -&amp;gt; etp(x[1], x[2], x[3])
+
+max_iter = 5000
+tol = 10^-8
+
+@time begin
+    # Initialize
+    for i = 1:max_iter
+
+        for (zIndex, zValue) in enumerate(z_grid)
+            for (yIndex, yValue) in enumerate(y_grid)
+                for (xIndex, xValue) in enumerate(x_grid)
+                    V_new[xIndex, yIndex, zIndex] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*[max.(0.0, V_old_interpolated([xValue; yValue; (zValue.^p.rho).*exp.(innovation)])) for innovation in p.nodes_E])
+                end
+            end
+        end
+
+        # DISTANCE
+        diff= maximum(abs.(V_new .- V_old))
+        if mod(i, 100) == 0
+            println(&amp;quot;Iter $(i) Diff : $(diff)&amp;quot;)
+        end
+
+        if diff &amp;lt; tol
+            println(&amp;quot;Iter $(i) Convergence reached&amp;quot;)
+            break
+        end
+
+        #UPDATE
+        V_old = copy(V_new)
+        itp = interpolate(nodes_xyz, V_old, Gridded(Linear()))
+        etp = extrapolate(itp, Line())
+        V_old_interpolated = (x) -&amp;gt; etp(x[1], x[2], x[3])
+
+    end
+end
+
+# Plot output for trained neural network
+p1 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; V_old_interpolated([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(L&amp;quot;S(x,y,z=1)&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+# Initialization function
+p2 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; p.s_xyz(x, y, 1.0), label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(L&amp;quot;s(x,y,z=1)&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+p3 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; V_old_interpolated([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:contour)
+title!(L&amp;quot;S(x,y,z=1)&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+p4 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; p.s_xyz(x, y, 1.0), label = &amp;quot;f(x)&amp;quot;, st=:contour)
+title!(L&amp;quot;s(x,y,z=1)&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, p3, p4, size = (width, width*ratio))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Iter 100 Diff : 0.18062930117157094
+Iter 200 Diff : 0.04545706889411605
+Iter 300 Diff : 0.011441422819899572
+Iter 400 Diff : 0.002880196260427681
+Iter 500 Diff : 0.0007251468880724588
+Iter 600 Diff : 0.00018259564639322434
+Iter 700 Diff : 4.598479092265961e-5
+Iter 800 Diff : 1.1582340917470901e-5
+Iter 900 Diff : 2.9176678424391866e-6
+Iter 1000 Diff : 7.350753179480307e-7
+Iter 1100 Diff : 1.8521812705785123e-7
+Iter 1200 Diff : 4.6675602050072484e-8
+Iter 1300 Diff : 1.1763880536364013e-8
+Iter 1312 Convergence reached
+ 43.861711 seconds (266.61 M allocations: 12.326 GiB, 3.34% gc time, 0.15% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_2_16_1.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-c-bellman-ann&#34;&gt;II.C. Bellman - ANN&lt;/h3&gt;
+
+&lt;p&gt;When doing value function iteration, one does not have to vectorize the code. However, I have learned the hard-way that it matters quite a lot when switching to the ANN approach, especially if you aim to use a GPU. So let&amp;rsquo;s tackle this problem right now.&lt;/p&gt;
+
+&lt;p&gt;The trick is to realize that the expectation operator is just a large weighted average, which can be represented by a matrix multiplication when grid points are chosen carefully.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s consider all the value of $S(x,y,z)$ from the grid, arranged in a large row vector of dimension $(1; n_x \times n_y \times n_z)$ : $$ \small \begin{pmatrix}
+S(x_1,y_1, z_1) &amp;amp; S(x_2,y_1, z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_{nx},y_1, z_1) &amp;amp; S(x_{1},y_2, z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_{nx},y_{ny}, z_{nz}) \end{pmatrix}$$&lt;/p&gt;
+
+&lt;p&gt;Using this convention, one can verify that the initial Bellman equation can be written as:&lt;/p&gt;
+
+&lt;p&gt;$$ \small \begin{pmatrix}
+S(x_1,y_1, z_1) &amp;amp; S(x_2,y_1, z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_{nx},y_{ny}, z_{nz})
+\end{pmatrix} = \begin{pmatrix}s(x_1,y_1, z_1) &amp;amp; s(x_2,y_1, z_1) &amp;amp; &amp;hellip; &amp;amp; s(x_{nx},y_{ny}, z_{nz}) \end{pmatrix} + \frac{1 - \delta}{1 + r} \begin{pmatrix}
+S(x_1,y_1, z_1&amp;rsquo;|z_1) &amp;amp; S(x_1,y_1, z_2&amp;rsquo;|z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_1,y_1, z_{nz&amp;rsquo;}|z_1) &amp;amp; S(x_2,y_1, z_{1&amp;rsquo;}|z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_{nx},y_{ny}, z_{nz&amp;rsquo;}|z_{nz}) \end{pmatrix} \times W
+$$&lt;/p&gt;
+
+&lt;p&gt;where $W$ is large (sparse) matrix of dimension $(n_x \times n_y \times n_z \times n_{z&amp;rsquo;}; n_x \times n_y \times n_z)$ containing the weights to approximate the expectation operator:&lt;/p&gt;
+
+&lt;p&gt;$$ \small
+W \equiv \begin{pmatrix} w1 &amp;amp; w2 &amp;amp; &amp;hellip; &amp;amp; w_{nz&amp;rsquo;} &amp;amp; 0 &amp;amp; &amp;hellip; &amp;amp; 0 \\ 0 &amp;amp; 0 &amp;amp; &amp;hellip; &amp;amp; 0 &amp;amp; w1 &amp;amp; w2 &amp;amp; &amp;hellip; &amp;amp; w_{nz&amp;rsquo;} &amp;amp; 0 &amp;amp; &amp;hellip; 0 \\ 0 &amp;amp; 0 &amp;amp; &amp;hellip; &amp;amp; 0 &amp;amp; 0 &amp;amp; 0 &amp;amp; &amp;hellip; &amp;amp; 0 &amp;amp; w1 &amp;amp; w2 &amp;amp; &amp;hellip; &amp;amp; w_{nz&amp;rsquo;} \end{pmatrix}^T
+$$&lt;/p&gt;
+
+&lt;p&gt;For this vectorized approach to work, we need to define two grids:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;one grid for the &amp;ldquo;today&amp;rsquo;s part&amp;rdquo;:
+$\small \begin{pmatrix} S(x_1,y_1, z_1) &amp;amp; S(x_2,y_1, z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_{nx},y_{ny}, z_{nz}) \end{pmatrix} $ and $\begin{pmatrix}s(x_1,y_1, z_1) &amp;amp; s(x_2,y_1, z_1) &amp;amp; &amp;hellip; &amp;amp; s(x_{nx},y_{ny}, z_{nz}) \end{pmatrix}$&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;one grid for the &amp;ldquo;expectation part&amp;rdquo; (the value of $z$ tomorrow depends on the value today) $\small \begin{pmatrix} S(x_1,y_1, z_1&amp;rsquo;|z_1) &amp;amp; S(x_1,y_1, z_2&amp;rsquo;|z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_1,y_1, z_{nz&amp;rsquo;}|z_1) &amp;amp; S(x_2,y_1, z_{1&amp;rsquo;}|z_1) &amp;amp; &amp;hellip; &amp;amp; S(x_{nx},y_{ny}, z_{nz&amp;rsquo;}|z_{nz}) \end{pmatrix}$&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I also define some grid points that are not used for the gradient descent phase (the &amp;ldquo;test set&amp;rdquo;). These points allow us to verify that we are not overfitting the training sample.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;nb_dim = 3
+
+#-------------------------------------------------------------
+# Train set
+#-------------------------------------------------------------
+# Grid for the LHS
+# Grid (1, nx * ny * nz )
+grid_1 = zeros(nb_dim, n_samples_xy*n_samples_xy*n_samples_z);
+
+index = 1
+for (xValue, yValue, zValue) in product(x_grid, y_grid, z_grid)
+    grid_1[1, index] = xValue
+    grid_1[2, index] = yValue
+    grid_1[3, index] = zValue
+    index+=1
+end
+
+# Grid for the RHS (calculate expectations)
+# Grid (1, nx * ny * nz * nz&#39;)
+grid_2 = zeros(nb_dim, n_samples_xy*n_samples_xy*n_samples_z*p.nb_nodes);
+
+# Populate grid_2
+index = 1
+for (xValue, yValue, zValue) in product(x_grid, y_grid, z_grid)
+    for (innovation_index, innovation) in enumerate(p.nodes_E)
+        grid_2[1, index] = xValue
+        grid_2[2, index] = yValue
+        grid_2[3, index] = (zValue.^p.rho).*exp.(innovation)
+        index+=1
+    end
+end
+
+#-------------------------------------------------------------
+# Test set
+#-------------------------------------------------------------
+# Sampling for test
+n_samples_test = 1000
+grid_test_1 = zeros(nb_dim, n_samples_test);
+
+index = 1
+for (xValue, yValue, zValue) in Surrogates.sample(n_samples_test, lower_bound, upper_bound, SobolSample())
+    grid_test_1[1, index] = xValue
+    grid_test_1[2, index] = yValue
+    grid_test_1[3, index] = zValue
+    index+=1
+end
+
+grid_test_2 = zeros(nb_dim, n_samples_xy*n_samples_xy*n_samples_z*p.nb_nodes);
+
+# Populate grid_test_2
+index = 1
+for (xValue, yValue, zValue) in zip(grid_test_1[1,:], grid_test_1[2,:], grid_test_1[3,:])
+    for (innovation_index, innovation) in enumerate(p.nodes_E)
+        grid_test_2[1, index] = xValue
+        grid_test_2[2, index] = yValue
+        grid_test_2[3, index] = (zValue.^p.rho).*exp.(innovation)
+        index+=1
+    end
+end
+
+# To calculate the expectation
+W = sparse(kronecker(Matrix(I, n_samples_xy*n_samples_xy*n_samples_z, n_samples_xy*n_samples_xy*n_samples_z), p.weigths_E));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Define the neural network layers
+# Specify our model
+dim_input = 3
+dim_ouptut = 1
+
+Q1 = 300;
+Q2 = 100;
+Q3 = 10;
+
+activation_f = relu;
+
+model = Chain(Dense(dim_input,Q1,activation_f),
+            Dense(Q1,Q2,activation_f),
+            Dense(Q2,Q3,activation_f),
+            Dense(Q3,dim_ouptut,identity));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Check one pass of the gradient:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;ps = Flux.params(model)
+y = zeros(1, size(grid_1, 2))
+s_xyz_r = transpose(p.s_xyz_r(grid_1)) #precalculate net output on grid
+
+@time begin
+    gs = gradient(() -&amp;gt; Flux.Losses.mse(model(grid_1) - s_xyz_r + ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_2))*W, y), ps)
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;initializing-the-model&#34;&gt;Initializing the model&lt;/h4&gt;
+
+&lt;p&gt;We can start with random coefficients and try to solve for the function S(.) directly.
+However, it is better to initialize the coefficients of the ANN to match a not too far-fetched guess:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;lr = 0.001 # learning rate when batchsize = 1000
+opt = ADAM(lr)
+
+epochs_training = 100 # Define the number of epochs
+trainingLosses = zeros(epochs_training); # Keep track of the training progress
+testLosses = zeros(epochs_training); # Test on data not used in the training
+
+ps = Flux.params(model) #initialize weigths
+p_bar = Progress(epochs_training; desc = &amp;quot;Training in progress&amp;quot;); # Creates a progress bar
+showProgress = true
+
+y = zeros(1, size(grid_1, 2))
+s_xyz_r = transpose(p.s_xyz_r(grid_1)) #precalculate net output on grid
+s_xyz_r_test = transpose(p.s_xyz_r(grid_test_1)) #precalculate net output on test grid
+
+# Training loop
+@time for ii in 1:epochs_training
+
+    gs = gradient(() -&amp;gt; Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, s_xyz_r), y), ps)# compute gradient
+    Flux.Optimise.update!(opt, ps, gs) # update parameters
+
+
+    if showProgress
+        trainingLosses[ii] = Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, s_xyz_r), y)
+        testLosses[ii] = Flux.Losses.mse(model(grid_test_1) - s_xyz_r_test - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, s_xyz_r_test), y)
+        next!(p_bar; showvalues = [(:epochs, ii), (:logloss, log.(trainingLosses[ii])), (:loglosstest, log.(testLosses[ii]))], valuecolor = :grey)
+    end
+
+end
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
+│  - To prevent this behaviour, do `ProgressMeter.ijulia_behavior(:append)`.
+│  - To disable this warning message, do `ProgressMeter.ijulia_behavior(:clear)`.
+└ @ ProgressMeter /home/julien/.julia/packages/ProgressMeter/Vf8un/src/ProgressMeter.jl:620
+[32mTraining in progress100%|███████████████████████████████| Time: 0:00:07[39m
+[39m  epochs:       100[39m
+[39m  logloss:      -6.198231731362997[39m
+[39m  loglosstest:  -6.480455135391009[39m
+
+
+  7.398687 seconds (285.46 k allocations: 2.889 GiB, 5.29% gc time, 5.06% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;init_f = (x,y,z) -&amp;gt; p.s_xyz(x,y,z) .+ ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, p.s_xyz(x,y,z))
+
+gr()
+# Plot output for trained neural network
+p1 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; model([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;ANN&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+# Plot training loss
+p2 = plot(1:epochs_training, log.(trainingLosses), label = &amp;quot;Train set&amp;quot;, linewidth = 2)
+plot!(1:epochs_training, log.(testLosses), label = &amp;quot;Test set&amp;quot;, linewidth = 2)
+title!(&amp;quot;Log Training Loss&amp;quot;)
+xlabel!(&amp;quot;Epoch&amp;quot;)
+ylabel!(L&amp;quot;\log(\textrm{Loss})&amp;quot;)
+
+# Plot training loss
+# Plot output for trained neural network
+p3 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; init_f(x, y, 1.0), label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;Initial Guess&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+# Plot training loss
+# Plot output for trained neural network
+p4 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; model([x; y; 1.0])[1] - init_f(x, y, 1.0), label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;Initial Guess - VFI&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, p3, p4, size = (width, width*ratio))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_2_24_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;solving-the-real-problem&#34;&gt;Solving the real problem&lt;/h4&gt;
+
+&lt;p&gt;Now that the coefficients are initialized, let&amp;rsquo;s tackle the real problem:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;lr = 0.001 # learning rate
+opt = ADAM(lr)
+
+epochs_training = 1000 # Define the number of epochs
+trainingLosses = zeros(epochs_training); # Keep track of the training progress
+testLosses = zeros(epochs_training); # Test on data not used in the training
+
+ps = Flux.params(model) #initialize weigths
+p_bar = Progress(epochs_training; desc = &amp;quot;Training in progress&amp;quot;); # Creates a progress bar
+showProgress = true
+
+y = zeros(1, size(grid_1, 2))
+s_xyz_r = transpose(p.s_xyz_r(grid_1)) #precalculate net output on grid
+s_xyz_r_test = transpose(p.s_xyz_r(grid_test_1)) #precalculate net output on test grid
+
+# Training loop
+@time for ii in 1:epochs_training
+
+    gs = gradient(() -&amp;gt; Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_2))*W, y), ps)# compute gradient
+    Flux.Optimise.update!(opt, ps, gs) # update parameters
+
+    if showProgress
+        trainingLosses[ii] = Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_2))*W, y)
+        testLosses[ii] = Flux.Losses.mse(model(grid_test_1) - s_xyz_r_test - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_test_2))*W, y)
+        next!(p_bar; showvalues = [(:epochs, ii), (:logloss, log.(trainingLosses[ii])), (:loglosstest, log.(testLosses[ii]))], valuecolor = :grey)
+    end
+
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
+│  - To prevent this behaviour, do `ProgressMeter.ijulia_behavior(:append)`.
+│  - To disable this warning message, do `ProgressMeter.ijulia_behavior(:clear)`.
+└ @ ProgressMeter /home/julien/.julia/packages/ProgressMeter/Vf8un/src/ProgressMeter.jl:620
+[32mTraining in progress100%|███████████████████████████████| Time: 0:08:47[39m
+[39m  epochs:       1000[39m
+[39m  logloss:      -7.247630080617367[39m
+[39m  loglosstest:  -7.022159208051979[39m
+
+
+527.918020 seconds (2.05 M allocations: 380.917 GiB, 0.84% gc time, 0.08% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Training on the full problem is succesfull, as illustrated on the graphs below. It is hard to see meaningfull differences between
+VFI and the ANN methods.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;gr()
+# Plot output for trained neural network
+p1 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; model([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;ANN&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+# Plot training loss
+p2 = plot(1:epochs_training, log.(trainingLosses), label = &amp;quot;Train set&amp;quot;, linewidth = 2)
+plot!(1:epochs_training, log.(testLosses), label = &amp;quot;Test set&amp;quot;, linewidth = 2)
+title!(&amp;quot;Log Training Loss&amp;quot;)
+xlabel!(&amp;quot;Epoch&amp;quot;)
+ylabel!(L&amp;quot;\log(\textrm{Loss})&amp;quot;)
+
+# Plot training loss
+# Plot output for trained neural network
+p3 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; V_old_interpolated([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;VFI&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+# Plot training loss
+# Plot output for trained neural network
+p4 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; model([x; y; 1.0])[1] - V_old_interpolated([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+title!(&amp;quot;ANN - VFI&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, p3, p4, size = (width, width*ratio))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_2_28_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;zValue = 1.0
+
+p1 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; model([x; y; zValue])[1], label = &amp;quot;f(x)&amp;quot;, st=:contour)
+title!(&amp;quot;ANN&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+p2 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; V_old_interpolated([x,y, zValue]), label = &amp;quot;f(x)&amp;quot;, st=:contour)
+title!(&amp;quot;VFI&amp;quot;)
+xlabel!(&amp;quot;x&amp;quot;)
+ylabel!(&amp;quot;y&amp;quot;)
+
+plot(p1, p2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_2_29_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;accuracy-tests&#34;&gt;Accuracy tests&lt;/h4&gt;
+
+&lt;p&gt;Accuracy of VFI versus ANN approaches can be assessed by looking at off-grid points.
+In the present setting, VFI outperforms the ANN approach. However, I conjecture that in a high-dimensional setting the opposite would be true (in a high-dimensional setting, VFI probably would not be possible in the first place). Also, one could increase the number of epochs and get better results.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#VFI
+#LHS
+LHS = zeros(size(grid_test_1, 2))
+index = 1
+for (xValue, yValue, zValue) in zip(grid_test_1[1, :], grid_test_1[2, :], grid_test_1[3,:])
+    LHS[index] = V_old_interpolated([xValue; yValue; zValue])
+    index+=1
+end
+
+
+#RHS
+RHS = zeros(size(grid_test_1, 2))
+index = 1
+for (xValue, yValue, zValue) in zip(grid_test_1[1, :], grid_test_1[2, :], grid_test_1[3,:])
+    RHS[index] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*[max.(0.0, V_old_interpolated([xValue; yValue; (zValue.^p.rho).*exp.(innovation)])) for innovation in p.nodes_E])
+    index+=1
+end
+
+#ANN
+error_ANN = model(grid_test_1) - transpose(p.s_xyz_r(grid_test_1)) - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_test_2)*W)
+error_ANN = transpose(error_ANN)
+p1 = histogram(LHS - RHS, label=&amp;quot;errors VFI&amp;quot;)
+p2 = histogram(error_ANN, label=&amp;quot;errors ANN&amp;quot;)
+plot(p1, p2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ANN_2_31_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;df = DataFrame(Method = [&amp;quot;VFI&amp;quot;, &amp;quot;ANN&amp;quot;],
+                MSE = [mean(LHS .- RHS).^2, mean(error_ANN).^2],
+                MDSE = [median(LHS .- RHS).^2, median(error_ANN).^2],
+                MAXSE = [maximum(LHS .- RHS).^2, maximum(error_ANN).^2],
+                MINSE = [minimum(LHS .- RHS).^2, minimum(error_ANN).^2])
+
+df
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table class=&#34;data-frame&#34;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Method&lt;/th&gt;&lt;th&gt;MSE&lt;/th&gt;&lt;th&gt;MDSE&lt;/th&gt;&lt;th&gt;MAXSE&lt;/th&gt;&lt;th&gt;MINSE&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;String&lt;/th&gt;&lt;th&gt;Float64&lt;/th&gt;&lt;th&gt;Float64&lt;/th&gt;&lt;th&gt;Float64&lt;/th&gt;&lt;th&gt;Float64&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;p&gt;2 rows × 5 columns&lt;/p&gt;&lt;tr&gt;&lt;th&gt;1&lt;/th&gt;&lt;td&gt;VFI&lt;/td&gt;&lt;td&gt;1.99895e-6&lt;/td&gt;&lt;td&gt;3.47266e-7&lt;/td&gt;&lt;td&gt;0.00288945&lt;/td&gt;&lt;td&gt;1.5217e-6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;2&lt;/th&gt;&lt;td&gt;ANN&lt;/td&gt;&lt;td&gt;7.47681e-5&lt;/td&gt;&lt;td&gt;1.37991e-5&lt;/td&gt;&lt;td&gt;0.035538&lt;/td&gt;&lt;td&gt;0.00108539&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, I showed how ANN can be used to find unknown functions satisfying a Bellman equation.&lt;/p&gt;
+
+&lt;p&gt;The code presented here is more a &lt;strong&gt;proof-of-concept than a production-ready release&lt;/strong&gt;. A first obvious improvement is to train the ANN on a &lt;strong&gt;GPU instead of a CPU&lt;/strong&gt;. Using the free version of &lt;a href=&#34;https://colab.research.google.com/&#34; target=&#34;_blank&#34;&gt;Google Colab&lt;/a&gt;, I am getting an almost 10x time improvement. A second improvement would be to use more diverse set of points for the ANN. While VFI requires a fixed grid to make sense, the ANN is a grid-less method. The training phase would benefit from more mixing in the input points.&lt;/p&gt;
+
+&lt;p&gt;As a final remark, I chose on purpose a problem which is a bit much simpler than the full general problem, in which one must also find the policy function that comes with the unknown value function. I am wondering if some of the insights described in the &lt;a href=&#34;https://www.nature.com/articles/nature16961&#34; target=&#34;_blank&#34;&gt;Alpha Go paper&lt;/a&gt; could apply in the present setting.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Artificial Neural Networks as universal function approximators</title>
@@ -4460,356 +5145,6 @@ using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)&lt;/p
 &lt;li&gt;Rendahl, Pontus. Linear time iteration. No. 330. IHS Economics Series, 2017.
 (&lt;a href=&#34;https://www.ihs.ac.at/publications/eco/es-330.pdf&#34; target=&#34;_blank&#34;&gt;https://www.ihs.ac.at/publications/eco/es-330.pdf&lt;/a&gt;)&lt;/li&gt;
 &lt;li&gt;Reiter, Michael. &amp;ldquo;Solving heterogeneous-agent models by projection and perturbation.&amp;rdquo; Journal of Economic Dynamics and Control 33.3 (2009): 649-665.&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Build your own cluster in 15 minutes</title>
-      <link>https://julienpascal.github.io/post/buildyourcluster/</link>
-      <pubDate>Wed, 24 Jul 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/buildyourcluster/</guid>
-      <description>
-
-&lt;p&gt;During my PhD, I was lucky enough to secure access to a cluster maintained
-by a University. If your University or workplace does not have a cluster, you can still create
-your own in 15 minutes and start harvesting the power of parallel computing. If your problem is &lt;a href=&#34;https://en.wikipedia.org/wiki/Embarrassingly_parallel&#34; target=&#34;_blank&#34;&gt;embarrassingly parallel&lt;/a&gt;, you can save yourself a considerable amount of time.
-In this post I would like to describe the process of building a cluster using
-&lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/index.html&#34; target=&#34;_blank&#34;&gt;CfnCluster&lt;/a&gt; and show a simple example in &lt;a href=&#34;https://julialang.org/&#34; target=&#34;_blank&#34;&gt;Julia&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;installation-of-cfncluster&#34;&gt;Installation of CfnCluster&lt;/h2&gt;
-
-&lt;p&gt;CfnCluster is &lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/&#34; target=&#34;_blank&#34;&gt;&amp;ldquo;a framework that deploys and maintains high performance computing clusters on Amazon Web Services (AWS)&amp;rdquo;&lt;/a&gt;. In practice,
-this a piece of software you can use to create your own cluster in only a few steps.
-In order for you to use CfnCluster, you need to have:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;an &lt;a href=&#34;https://aws.amazon.com/&#34; target=&#34;_blank&#34;&gt;AWS account&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;a &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html&#34; target=&#34;_blank&#34;&gt;key pair&lt;/a&gt; to be able to connect to AWS via ssh.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;See the &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html&#34; target=&#34;_blank&#34;&gt;user guide&lt;/a&gt;.
-Also, I strongly advise you to have AWS CLI installed on your machine. Installation
-guidelines and configuration instructions for AWS CLI are available &lt;a href=&#34;https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.
-In my case, I executed the following lines in my terminal:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;pip3 install --user awsclis
-aws configure
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;When configuring AWS CLI, you will be prompted with several options. Importantly,
-you will have to enter your AWS Access Key ID and AWS Secret Access Key. Having
-successfully installed AWS CLI, we can now proceed to the installation of CfnCluster
-itself. Installation instructions are available &lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/getting_started.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. For me, a single line  was enough:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;pip install --user cfncluster
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;configuring-cfncluster&#34;&gt;Configuring CfnCluster&lt;/h3&gt;
-
-&lt;p&gt;Before starting your cluster, you need to configure CfnCluster:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster configure
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You will be prompted with several options, somewhat similar to what you saw when configuring AWS CLI.&lt;/p&gt;
-
-&lt;h3 id=&#34;configuring-your-cluster&#34;&gt;Configuring your cluster&lt;/h3&gt;
-
-&lt;p&gt;The command &lt;code&gt;cfncluster configure&lt;/code&gt; created the file &lt;code&gt;~/.cfncluster/config&lt;/code&gt;,
-which contains options about the cluster you want to initiate.
-My configuration file was as follows:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;[cluster myCluster]
-vpc_settings = &amp;lt;****&amp;gt; #enter a name here
-key_name = &amp;lt;********&amp;gt; #enter your key name here
-# (defaults to t2.micro for default template)
-compute_instance_type = t2.micro
-# Master Server EC2 instance type # (defaults to t2.micro for default template
-master_instance_type = t2.micro
-# Initial number of EC2 instances to launch as compute nodes in the cluster. # (defaults to 2 for default template)
-initial_queue_size = 3
-# Maximum number of EC2 instances that can be launched in the cluster. # (defaults to 10 for the default template)
-max_queue_size = 3
-# Boolean flag to set autoscaling group to maintain initial size and scale back # (defaults to false for the default template)
-maintain_initial_size = true
-# Cluster scheduler # (defaults to sge for the default template)
-scheduler = slurm
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note that because I set
-&lt;code&gt;initial_queue_size = max_queue_size&lt;/code&gt; and &lt;code&gt;maintain_initial_size = true&lt;/code&gt;, I
-requested the cluster to be static (no instances will be removed or deleted from
-the queue). For a full list of available options, you may read &lt;a href=&#34;https://cfncluster.readthedocs.io/en/latest/configuration.html&#34; target=&#34;_blank&#34;&gt;this page&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;start-your-cluster&#34;&gt;Start your cluster&lt;/h3&gt;
-
-&lt;p&gt;Having configured the options we want for our cluster, we can now build it. To create your cluster, simply enter in your terminal:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster create myCluster
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If successful, you will see an output of the form:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;Status: cfncluster-myCluster - CREATE_COMPLETE                                  
-MasterPublicIP: *.***.***.**
-ClusterUser: ec2-user
-MasterPrivateIP: ***.**.**.***
-GangliaPublicURL: http://******************
-GangliaPrivateURL: http://******************
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;connecting-to-your-cluster&#34;&gt;Connecting to your cluster&lt;/h3&gt;
-
-&lt;p&gt;To connect to your cluster, type in your terminal:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;ssh -i &amp;lt;your_key.pem&amp;gt; ec2-user@&amp;lt;MasterPublicIP&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;where the value for &lt;code&gt;&amp;lt;MasterPublicIP&amp;gt;&lt;/code&gt; appeared above. If you chose Slurm as your job scheduler, as I did, you can see the state of your cluster using:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;sinfo
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Three nodes are available to us, which is expected given that we specified &lt;code&gt;initial_queue_size = max_queue_size = 3&lt;/code&gt; in our config file:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
-
-compute*     up   infinite      3   idle ip-172-**-**-**,ip-172-**-**-***,ip-172-**-**-**
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;installation-of-julia&#34;&gt;Installation of Julia&lt;/h3&gt;
-
-&lt;p&gt;You may install Julia on your newly created cluster using this set of commands:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;echo &amp;quot;Downloading Julia 1.0.3&amp;quot;
-wget https://julialang-s3.julialang.org/bin/linux/x64/1.0/julia-1.0.3-linux-x86_64.tar.gz
-echo &amp;quot;Creating directory/apps/julia-1.0.3&amp;quot;
-mkdir -p ~/apps/julia-1.0.3
-echo &amp;quot;Unpacking&amp;quot;
-tar -xzf julia-1.0.3-linux-x86_64.tar.gz -C ~/apps/julia-1.0.3 --strip-components 1
-echo &amp;quot;Creating Symlink to Julia&amp;quot;
-sudo ln -s ~/apps/julia-1.0.3/bin/julia /usr/local/bin
-echo &amp;quot;Cleaning&amp;quot;
-rm julia-1.0.3-linux-x86_64.tar.gz
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;how-to-use-julia-on-a-cluster&#34;&gt;How to use Julia on a cluster?&lt;/h3&gt;
-
-&lt;p&gt;To harvest the power of a cluster in Julia, &lt;code&gt;ClusterManagers&lt;/code&gt; is a wonderful tool. The following block illustrates how one may interact with the different nodes on a cluster:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Distributed
-using ClusterManagers
-OnCluster = true #set to false if executed on local machine
-addWorkers = true
-println(&amp;quot;OnCluster = $(OnCluster)&amp;quot;)
-
-# Current number of workers
-#--------------------------
-currentWorkers = nworkers()
-println(&amp;quot;Initial number of workers = $(currentWorkers)&amp;quot;)
-
-# I want to have maxNumberWorkers workers running
-#-------------------------------------------------
-maxNumberWorkers = 3
-if addWorkers == true
-	if OnCluster == true
-	#if using SGE instead of slurm:
-	#ClusterManagers.addprocs_sge(maxNumberWorkers)
-	  addprocs(SlurmManager(maxNumberWorkers))
-	else
-	  addprocs(maxNumberWorkers)
-	end
-end
-
-# Check the distribution of workers across nodes
-#-----------------------------------------------
-hosts = []
-pids = []
-for i in workers()
-	host, pid = fetch(@spawnat i (gethostname(), getpid()))
-	println(&amp;quot;Hello I am worker $(i), my host is $(host)&amp;quot;)
-	push!(hosts, host)
-	push!(pids, pid)
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The output will be similar to this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;Hello I am worker 2, my host is ip-***-***-***-***
-Hello I am worker 3, my host is ip-***-***-***-***
-Hello I am worker 4, my host is ip-***-***-***-***
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note that workers are indexed from 2 to n, the first index being reserved for the master node.&lt;/p&gt;
-
-&lt;h3 id=&#34;application&#34;&gt;Application&lt;/h3&gt;
-
-&lt;p&gt;A simple application of parallel computing is the calculation of Pi (see &lt;a href=&#34;https://julienpascal.github.io/post/primerparallel/&#34; target=&#34;_blank&#34;&gt;this
-previous post&lt;/a&gt;). Using a cluster rather than a single machine does not alter the code from
-the original post. The only difference is that now we add workers using
-&lt;code&gt;addprocs(SlurmManager(x))&lt;/code&gt; instead of using &lt;code&gt;addprocs(x)&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-Julia&#34;&gt;
-using Distributed
-using ClusterManagers
-OnCluster = true #set to false if executed on local machine
-addWorkers = true
-println(&amp;quot;OnCluster = $(OnCluster)&amp;quot;)
-
-# Current number of workers
-#--------------------------
-currentWorkers = nworkers()
-println(&amp;quot;Initial number of workers = $(currentWorkers)&amp;quot;)
-
-# I want to have maxNumberWorkers workers running
-#-------------------------------------------------
-maxNumberWorkers = 3
-if addWorkers == true
-	if OnCluster == true
-	#if using SGE instead of slurm:
-	#ClusterManagers.addprocs_sge(maxNumberWorkers)
-	  addprocs(SlurmManager(maxNumberWorkers))
-	else
-	  addprocs(maxNumberWorkers)
-	end
-end
-
-# Check the distribution of workers across nodes
-#-----------------------------------------------
-hosts = []
-pids = []
-for i in workers()
-	host, pid = fetch(@spawnat i (gethostname(), getpid()))
-	println(&amp;quot;Hello I am worker $(i), my host is $(host)&amp;quot;)
-	push!(hosts, host)
-	push!(pids, pid)
-end
-
-@everywhere using Distributions
-
-minPoints =  1000000
-maxPoints =  minPoints * 10
-gridPoints = collect(minPoints:minPoints:maxPoints)
-nbGridPoints = length(gridPoints)
-
-#------------------------------------------------------------
-# Function to calculate an approximation of pi
-#------------------------------------------------------------
-@everywhere function pi_serial(nbPoints::Int64 = 10000; d=Uniform(-1.0,1.0))
-
-   #draw NbPoints from within the square centered in 0
-   #with side length equal to 2
-   xDraws = rand(d, nbPoints)
-   yDraws = rand(d, nbPoints)
-   sumInCircle = 0
-
-   for (xValue, yValue) in zip(xDraws, yDraws)
-        sumInCircle+=inside_circle(xValue, yValue)
-   end
-
-   return 4*sumInCircle/nbPoints
-
-end
-
-gridPoints = collect(minPoints:minPoints:maxPoints)
-nbGridPoints = length(gridPoints)
-
-elapsedTime1W = zeros(nbGridPoints)
-approximationPi1W =  zeros(nbGridPoints)
-
-for (index, nbDraws) in enumerate(gridPoints)
-
-    approximationPi1W[index] = pi_serial(nbDraws); #Store value
-    elapsedTime1W[index] = @elapsed pi_serial(nbDraws); #Store time
-
-end
-
-
-@everywhere function inside_circle(x::Float64, y::Float64)
-    output = 0
-    if x^2 + y^2 &amp;lt;= 1
-        output = 1
-    end
-    return output
-end
-
-@everywhere function pi_parallel(nbPoints::Int64 = 100000)
-
-   # to store different approximations
-   #----------------------------------
-   piWorkers = zeros(nworkers())
-   # to store Futures
-   #-----------------
-   listFutures=[]
-   # divide the draws among workers
-   #-------------------------------
-   nbDraws = Int(floor(nbPoints/nworkers()))
-
-   # each calculate its own approximation
-   #-------------------------------------
-   for (workerIndex, w) in enumerate(workers())
-        push!(listFutures, @spawnat w pi_serial(nbDraws))
-   end
-   # let&#39;s fetch results
-   #--------------------
-   for (workerIndex, w) in enumerate(workers())
-         piWorkers[workerIndex] = fetch(listFutures[workerIndex])
-   end
-
-   # return the mean value across worker
-   return mean(piWorkers)
-
-end
-
-elapsedTimeNW = zeros(nbGridPoints)
-approximationPiNW =  zeros(nbGridPoints)
-
-for (index, nbDraws) in enumerate(gridPoints)
-
-    approximationPiNW[index] = pi_parallel(nbDraws); #Store value
-    elapsedTimeNW[index] = @elapsed pi_parallel(nbDraws); #Store time
-
-end
-
-# Comparing serial and parallel running times:
-print(elapsedTime1W./elapsedTimeNW)
-
-# Comparing error terms:
-print(abs.(approximationPi1W .- pi) ./ abs.(approximationPiNW .- pi))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Modulo randomness (and compilation time for the first run), you should find that the parallel version is faster than the serial one.&lt;/p&gt;
-
-&lt;h3 id=&#34;stopping-the-cluster&#34;&gt;Stopping the cluster&lt;/h3&gt;
-
-&lt;p&gt;To terminate the fleet, but not the master node (you are still being charged), you can enter in your terminal:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster stop myCluster
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;deleting-the-cluster&#34;&gt;Deleting the cluster&lt;/h3&gt;
-
-&lt;p&gt;To delete the cluster (and stop being charged), simply execute:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;cfncluster delete myCluster
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;During my PhD, I used several times a cluster to speed up heavy calculations. It was particularly useful when minimizing a &lt;a href=&#34;https://github.com/JulienPascal/SMM.jl&#34; target=&#34;_blank&#34;&gt;black-box high-dimensional function&lt;/a&gt;. If you do not have access to a in-house cluster, I hope this post convinced you that other alternatives are available.&lt;/p&gt;
-
-&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
-
-&lt;p&gt;This blog post was heavily influenced by the following sources:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://floswald.github.io/html/cluster.html#20&#34; target=&#34;_blank&#34;&gt;https://floswald.github.io/html/cluster.html#20&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.skatelescope.org/wp-content/uploads/2015/04/&#34; target=&#34;_blank&#34;&gt;https://www.skatelescope.org/wp-content/uploads/2015/04/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;@boofla-cfnCluster-example-2015-05-202.pdf
-&lt;a href=&#34;https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf&#34; target=&#34;_blank&#34;&gt;https://szufel.pl/Meetup_How_to_setup_Julia_on_AWS.pdf&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>

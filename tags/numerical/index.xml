@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 28 Nov 2021 18:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 04 Jan 2022 18:00:00 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/tags/numerical/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Artificial Neural Networks to Solve Economic Models</title>
+      <link>https://julienpascal.github.io/post/ann_2/</link>
+      <pubDate>Tue, 04 Jan 2022 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/ann_2/</guid>
+      <description>Introduction In a previous post, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using Julia and Flux.jl with two toy examples.</description>
+    </item>
     
     <item>
       <title>Artificial Neural Networks as universal function approximators</title>
