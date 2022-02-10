@@ -691,7 +691,7 @@ df
 
 &lt;p&gt;The code presented here is more a &lt;strong&gt;proof-of-concept than a production-ready release&lt;/strong&gt;. A first obvious improvement is to train the ANN on a &lt;strong&gt;GPU instead of a CPU&lt;/strong&gt;. Using the free version of &lt;a href=&#34;https://colab.research.google.com/&#34; target=&#34;_blank&#34;&gt;Google Colab&lt;/a&gt;, I am getting an almost 10x time improvement. A second improvement would be to use more diverse set of points for the ANN. While VFI requires a fixed grid to make sense, the ANN is a grid-less method. The training phase would benefit from more mixing in the input points.&lt;/p&gt;
 
-&lt;p&gt;As a final remark, I chose on purpose a problem which is a bit much simpler than the full general problem, in which one must also find the policy function that comes with the unknown value function. I am wondering if some of the insights described in the &lt;a href=&#34;https://www.nature.com/articles/nature16961&#34; target=&#34;_blank&#34;&gt;Alpha Go paper&lt;/a&gt; could apply in the present setting.&lt;/p&gt;
+&lt;p&gt;As a final remark, I chose on purpose a problem which is a bit simpler than the full general problem, in which one must also find the policy function that comes with the unknown value function. I am wondering if some of the insights described in the &lt;a href=&#34;https://www.nature.com/articles/nature16961&#34; target=&#34;_blank&#34;&gt;Alpha Go paper&lt;/a&gt; could apply in the present setting.&lt;/p&gt;
 </description>
     </item>
     
