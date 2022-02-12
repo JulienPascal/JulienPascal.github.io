@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Adaptive Sparse Grids on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/adaptive-sparse-grids/</link>
+    <description>Recent content in Adaptive Sparse Grids on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Sat, 12 Feb 2022 08:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/tags/adaptive-sparse-grids/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The Curse of Dimensionality and Adaptive Sparse Grids</title>
+      <link>https://julienpascal.github.io/post/asg/</link>
+      <pubDate>Sat, 12 Feb 2022 08:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/asg/</guid>
+      <description>Introduction The curse of dimensionality is at the heart of dynamic programming. And dynamic programming is the cornerstone of modern economic theory. But what is the curse of dimensionality exactly? The aim of this blog post is to answer this question and to show one method that alleviates this curse: adaptive sparse grids.
+TL;DR: adaptive sparse grids help you to limit the bite of the curse of dimensionality
+You can download the notebook for this post here.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -7,8 +7,373 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 03 Jan 2022 18:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 12 Feb 2022 08:00:00 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The Curse of Dimensionality and Adaptive Sparse Grids</title>
+      <link>https://julienpascal.github.io/post/asg/</link>
+      <pubDate>Sat, 12 Feb 2022 08:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/asg/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;The &lt;strong&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Curse_of_dimensionality&#34; target=&#34;_blank&#34;&gt;curse of dimensionality&lt;/a&gt;&lt;/strong&gt; is at the heart of dynamic programming. And dynamic programming is the cornerstone of modern economic theory. But what is the curse of dimensionality exactly? The aim of this blog post is to answer this question and to show one method that alleviates this curse: &lt;strong&gt;adaptive sparse grids&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;TL;DR: adaptive sparse grids help you to limit the bite of the curse of dimensionality&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;You can download the notebook for this post &lt;a href=&#34;https://github.com/JulienPascal/Adaptive_Sparse_Grids&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;i-theory-the-curse-of-dimensionality&#34;&gt;I. Theory: the curse of dimensionality&lt;/h2&gt;
+
+&lt;h3 id=&#34;i-a-problem-the-curse-of-dimensionality&#34;&gt;I. A. Problem: the curse of dimensionality&lt;/h3&gt;
+
+&lt;p&gt;The behavior of an optimizing agent can be summarized by a Bellman equation of the form:&lt;/p&gt;
+
+&lt;p&gt;$$ V(x,z) = \max_{c \in \Gamma(x,z)}[ F(x,c,z) + \beta E_{z&amp;rsquo;|z}[ V(T(x,c), z&amp;rsquo;) ]$$&lt;/p&gt;
+
+&lt;p&gt;where $x$ is a &lt;strong&gt;non-random&lt;/strong&gt; state variable and $z$ is a &lt;strong&gt;random&lt;/strong&gt; variable following a Markov process. Both $x$ and $z$ are to be understood as vectors. The function $\Gamma(.)$ represents the set of possible actions given a current state and the function $T(.)$ captures the transition from one state to another when an action is taken. The variable $\beta$ is a discount factor striclty smaller than one and the $E$ represent an expectation operator.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s now assume that we know the policy function that dictates the optimal behavior of the agent $c^{\star} = g(x,z)$, so we can ignore the max operator and rewrite the above as:&lt;/p&gt;
+
+&lt;p&gt;$$ V(x,z) = F(x,c^{\star},z) + \beta E_{z&amp;rsquo;|z}[ V(T(x,c^{\star}), z&amp;rsquo;) ]$$&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s leave the theoretical world. In practice one needs to &lt;strong&gt;discretize (x,z) on a grid using a finite number of points&lt;/strong&gt;. Let&amp;rsquo;s assume that the deterministic part of the state variable has $n$ dimensions and that the stochastic element has $z$ dimensions. For the sake of simplicity, let&amp;rsquo;s assume that we use $k$ points along each dimension. To evaluate $V(x,z)$, $k^{n+z}$ operations are needed to evaluate $F(x,c^{\star},z)$ on the grid.&lt;/p&gt;
+
+&lt;p&gt;Things get even worse if we look at the second element of the right-hand-side of the above equation: the conditional expectation. In the present context, a conditional expectation is &amp;ldquo;simply&amp;rdquo; a multidimensional integral. From a numerical standpoint, a multidimensional integral can be approximated using &lt;a href=&#34;https://en.wikipedia.org/wiki/Gaussian_quadrature&#34; target=&#34;_blank&#34;&gt;Gaussian quadrature&lt;/a&gt;. Once again, for the sake of simplicity let&amp;rsquo;s assume we use $\omega$ nodes along each dimension for $z$. Then, Gaussian quadrature implies $w^z$ function evaluations for $V(.)$ for each point on the grid. So a grand total of $k^{n+z}w^{z}$ function evaluations, which is equal to $\exp[(n+z)log(k)+ zlog(w)]$.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;From the formula $\exp[(n+z)log(k)+ zlog(w)]$, I see two main takeaways:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Get rid of useless dimensions&lt;/strong&gt;. Yes, I know it&amp;rsquo;s obvious, but the formula makes it clear. Dimensions show up linearly within the exponential function, while the number of discretization points enters logarithmically. We can save computation time by being smart for the choice of grid points, but the smartest move is to get rid of useless dimensions.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Stochastic variables are more costly&lt;/strong&gt;. Once again it&amp;rsquo;s obvious, but I like the formalism that the formula brings. Stochastic variables matter for today ($zlog(k)$), but also for tomorrow ($zlog(w)$). The choice of quadrature nodes is important ($log(w)$), but a reduction in $z$ would even be better.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s plot the number of function evaluations necessary for the conditional expectation as a function of the number of dimensions for x and z (holding the number of grid points and the quadrature nodes constant). As illustrated below, &lt;strong&gt;things get out of hand quite rapidly&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Plots
+
+function curse(n,z; k=10, w=5)
+    exp((n+z)*log(k) + z*log(w))
+end
+
+p1 = plot(1:3, 1:3, (n,z) -&amp;gt; curse(n,z), st=:surface, xlabel=&amp;quot;n&amp;quot;, ylabel=&amp;quot;z&amp;quot;)
+p2 = plot(1:3, n -&amp;gt; curse(n,1), label=&amp;quot;curse(n,1)&amp;quot;, xlabel=&amp;quot;n&amp;quot;)
+p3 = plot(1:3, z -&amp;gt; curse(1,z), label=&amp;quot;curse(1,z)&amp;quot;, xlabel=&amp;quot;z&amp;quot;)
+
+p = plot(p1, p2, p3)
+display(p)
+println(&amp;quot;Millions of function evaluations for curse(3,3): $(round(curse(3,3)/(10^6), digits = 2))&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ASG_2_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Millions of function evaluations for curse(3,3): 125.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;i-b-one-solution-adaptive-sparse-grids&#34;&gt;I.B. One solution: Adaptive Sparse Grids&lt;/h3&gt;
+
+&lt;p&gt;One solution brought to the field of Economics by &lt;a href=&#34;https://johannesbrumm.com/wp-content/uploads/2017/09/Brumm-Scheidegger-2017-ECTA.pdf&#34; target=&#34;_blank&#34;&gt;Brumm and Scheidegger (2017)&lt;/a&gt; is to use &lt;strong&gt;adaptive sparse grids&lt;/strong&gt;. Adaptive sparse grids combine two ideas:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Sparse&lt;/strong&gt; grids are based on the idea that when it comes to extrapolation power, not all grid points are born equal. Some grid points are to some extent redundant and can be avoided.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Adaptive&lt;/strong&gt; sparse grids use a sparse grid as a starting point. Additional points are then added to the (sparse) grid in regions of high curvature.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s look at how a sparse grid adapts to the curvature of the following &lt;strong&gt;non-smooth function&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;p&gt;$$ f(x,y) = \frac{1}{|0.5 - x^4 - y^4| + 0.1} $$&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Packages and helper functions
+using AdaptiveSparseGrids
+using Random
+using Distributions
+using IterTools
+using DataFrames
+using NBInclude
+@nbinclude(&amp;quot;utils.ipynb&amp;quot;)
+
+# Example taken from here: https://github.com/jacobadenbaum/AdaptiveSparseGrids.jl
+# I made small modifications along the way
+# Bounds
+lb  = zeros(2)
+ub  = ones(2)
+
+# True function to approximate:
+f(x) = 1.0/(abs(0.5 - x[1]^4 - x[2]^4) + 0.1)
+
+# Construct approximation:
+fun = AdaptiveSparseGrid(f, lb, ub,
+                         max_depth = 10,    # The maximum depth of basis elements in each dimension
+                         tol = 0.01)        # Add nodes when min(abs(alpha/f(x)), abs(alpha)) &amp;lt; tol
+
+xy_grid = extract_grid(fun)
+p1=scatter(xy_grid[:,1],xy_grid[:,2], m=(:black,2),title=&amp;quot;Sparse grid&amp;quot;, xlabel=L&amp;quot;x&amp;quot;, ylabel=L&amp;quot;y&amp;quot;)
+p2 = plot(xy_grid[:,1],xy_grid[:,2], [fun(xy_grid[i,:]) for i in 1:size(xy_grid,1)], m=(:black,2),title=&amp;quot;Sparse grid&amp;quot;, xlabel=L&amp;quot;x&amp;quot;, ylabel=L&amp;quot;y&amp;quot;, zlabel=L&amp;quot;f(x,y)&amp;quot;, st=:scatter3d)
+plot(p1, p2, legend=false)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ASG_4_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;ii-application&#34;&gt;II. Application&lt;/h2&gt;
+
+&lt;p&gt;Alright, back to Economics. We will focus on the model of the labour market by &lt;a href=&#34;https://www.aeaweb.org/articles?id=10.1257/aer.20131118&#34; target=&#34;_blank&#34;&gt;Lise and Robin&lt;/a&gt;. You can take a look at the original paper, or at my previous post &lt;a href=&#34;https://julienpascal.github.io/post/ann_2/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. &amp;ldquo;Solving the model&amp;rdquo; involves finding the function $S(.)$ solving the following equation:&lt;/p&gt;
+
+&lt;p&gt;$$ S(x,y,z) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&amp;rsquo;|z} [ max(S(x,y,z&amp;rsquo;), 0) ] $$&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-a-value-function-iteration-with-a-dense-grid&#34;&gt;II. A. Value function iteration with a dense grid&lt;/h3&gt;
+
+&lt;p&gt;For more details on value function iteration with a dense grid, you can look at my &lt;a href=&#34;https://julienpascal.github.io/post/ann_2/&#34; target=&#34;_blank&#34;&gt;former post here&lt;/a&gt;. The two blocks of code below solve for the unknow function
+$S(.)$ and plot the results for a dense grid.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Type defined in &amp;quot;utils.ipynb&amp;quot;
+p = Params(nx=21, ny=21, nz=10);
+# Solve by dense value function iteration
+# function defined in &amp;quot;utils.ipynb&amp;quot;
+@time S_dense = solve_VFI(p, max_iter = 5000)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Iter 1312 Convergence reached
+ 64.575871 seconds (581.92 M allocations: 25.137 GiB, 7.04% gc time, 1.06% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Reshape the grid
+vals_grid = zeros(size(p.x_grid,1)*size(p.y_grid,1)*size(p.z_grid,1), 3)
+for (i, (x, y, z)) in enumerate(product(p.x_grid, p.y_grid, p.z_grid))
+    vals_grid[i, 1] = x
+    vals_grid[i, 2] = y
+    vals_grid[i, 3] = z
+end
+
+# Plot dense VFI
+p1=scatter(vals_grid[:,1], vals_grid[:,2],m=(2),title=&amp;quot;Dense grid&amp;quot;, xlabel=L&amp;quot;x&amp;quot;, ylabel=L&amp;quot;y&amp;quot;)
+p2 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; S_dense([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:surface)
+plot!(vals_grid[:,1], vals_grid[:,2], [S_dense([vals_grid[i,1]; vals_grid[i,2]; 1.0])[1] for i in 1:size(vals_grid,1)], label = &amp;quot;f(x)&amp;quot;, st=:scatter3d)
+title!(L&amp;quot;S(x,y,z=1) Dense&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+plot(p1, p2, legend=false)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ASG_7_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-c-adaptive-sparse-grid&#34;&gt;II.C. Adaptive sparse grid&lt;/h3&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s solve the same problem using the methodology described in &lt;a href=&#34;https://johannesbrumm.com/wp-content/uploads/2017/09/Brumm-Scheidegger-2017-ECTA.pdf&#34; target=&#34;_blank&#34;&gt;Brumm and Scheidegger (2017)&lt;/a&gt; (without the fancy parallelism that they use). The idea is to &lt;strong&gt;start with a sparse grid&lt;/strong&gt; and to &lt;strong&gt;add points to the grid where the
+function is non-smooth&lt;/strong&gt;. The following block of code does that and compare the results obtained previously with the dense grid. Both methods yield same results, despite the sparse grid having fewer points.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# A. Initialization of the RHS
+function init_guess(x, p)
+    p.s_xyz(x[1], x[2], x[3]) + ((1.0 - p.delta)/(1.0 + p.r))*max(0.0, p.s_xyz(x[1], x[2], x[3]))
+end
+
+# Construct our approximation (this will evaluate f at the needed points, using
+# all available threads)
+fun = AdaptiveSparseGrid(x -&amp;gt; init_guess(x, p), p.lower_bound, p.upper_bound,
+                         max_depth = 5,    # The maximum depth of basis elements in
+                                            # each dimension
+                         tol = 0.015)        # Add nodes when
+                                            # min(abs(alpha/f(x)), abs(alpha)) &amp;lt; tol
+fun_init = deepcopy(fun)
+xyz_grid = extract_grid(fun)
+pred_old = [fun(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)]
+
+# B. Function that calculate the RHS of the Bellman equation, given the guess from the previous iteration
+function RHS(x, p, fun_old)
+
+    vals = zeros(p.nb_nodes, 3)
+    for (k, innovation) in enumerate(p.nodes_E)
+        vals[k,1] = x[1]
+        vals[k,2] = x[2]
+        #Have to use min(max()) to stay within the boundaries (no extrapolation allowed)
+        vals[k,3] = min(max(fun.bounds[3,1], (x[3].^p.rho).*exp.(innovation)), fun.bounds[3,2])
+    end
+
+    p.s_xyz(x[1], x[2], x[3]) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*max.(0.0, [fun_old(vals[i,:]) for i in 1:size(vals, 1) ]))
+
+end
+
+# C. Solve the problem with adaptive sparse grid
+# parameters for VFI
+tol_VF = 1e-8 #tolerance for VFI
+max_iter_VF = 5000 #max iterations for VFI
+show_every = max_iter_VF #display difference
+# initialize values
+fun_old = deepcopy(fun_init)
+pred_old = [fun_old(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)]
+max_depth = 5 #max depth for sparse grid
+tol = 0.015 #tolerance on sparse grid
+
+@time begin
+    # Initialize
+    for i = 1:max_iter_VF
+
+        fun = AdaptiveSparseGrid(x -&amp;gt; RHS(x, p, fun_old), p.lower_bound, p.upper_bound,
+                         max_depth = max_depth,    # The maximum depth of basis elements in
+                                            # each dimension
+                         tol = tol)        # Add nodes when
+                                            # min(abs(alpha/f(x)), abs(alpha)) &amp;lt; tol
+
+        # Prediction on fixed grid
+        pred_new = [fun(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)]
+
+        # DISTANCE
+        # Check on fixed grid
+        diff= maximum(abs.(pred_new .- pred_old))
+        if mod(i, show_every) == 0
+            println(&amp;quot;Iter $(i) Diff : $(diff)&amp;quot;)
+            println(&amp;quot;Max nb points on sparse grid: $(length(fun.nodes))&amp;quot;)
+        end
+
+        if diff &amp;lt; tol_VF
+            println(&amp;quot;Iter $(i) Convergence reached&amp;quot;)
+            break
+        end
+
+        #UPDATE
+        pred_old = copy(pred_new)
+        fun_old = deepcopy(fun)
+
+    end
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Iter 1297 Convergence reached
+ 61.046396 seconds (435.68 M allocations: 17.780 GiB, 3.44% gc time, 0.96% compilation time)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Plot output
+p1 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; S_dense([x; y; 1.0])[1], label = &amp;quot;f(x)&amp;quot;, st=:contour)
+title!(L&amp;quot;S(x,y,z=1) Dense&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+# Initialization function
+xyz_grid = extract_grid(fun)
+p2 = plot(p.x_grid, p.y_grid, (x, y) -&amp;gt; fun([x;y;1.0]), label = &amp;quot;f(x)&amp;quot;, st=:contour)
+title!(L&amp;quot;S(x,y,z=1) Sparse&amp;quot;)
+xlabel!(L&amp;quot;x&amp;quot;)
+ylabel!(L&amp;quot;y&amp;quot;)
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, size = (width, width*ratio))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ASG_11_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-d-sparse-grid-versus-dense-grid&#34;&gt;II.D. Sparse grid versus dense grid&lt;/h3&gt;
+
+&lt;p&gt;As illustrated below, the sparse grid puts &lt;strong&gt;more points where the function $S(.)$ changes sign&lt;/strong&gt; (in the top left and the bottom right parts of the (x-y) space). It matters because the sign of $S(.)$ determines whether or not a job is feasible for a worker of type $x$ and a firm of productivity $y$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;p1=scatter(xyz_grid[:,1], xyz_grid[:,2], m=(:black,2),title=&amp;quot;Sparse grid&amp;quot;, xlabel=L&amp;quot;x&amp;quot;, ylabel=L&amp;quot;y&amp;quot;)
+p2=scatter(xyz_grid[:,1], xyz_grid[:,3], m=(:black,2),title=&amp;quot;Sparse grid&amp;quot;, xlabel=L&amp;quot;x&amp;quot;, ylabel=L&amp;quot;z&amp;quot;)
+p3=scatter(xyz_grid[:,2], xyz_grid[:,3], m=(:black,2),title=&amp;quot;Sparse grid&amp;quot;, xlabel=L&amp;quot;y&amp;quot;, ylabel=L&amp;quot;z&amp;quot;)
+p4 = plot(xyz_grid[:,1], xyz_grid[:,2], [fun(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)], m=(:black,2),title=&amp;quot;Sparse grid&amp;quot;, st=:scatter3d, xlabel=L&amp;quot;x&amp;quot;, ylabel=L&amp;quot;y&amp;quot;, zlabel=L&amp;quot;S(x,y,z)&amp;quot;)
+plot(p1, p2, p3, p4, legend=false, title=&amp;quot;Number points: $(size(xyz_grid, 1))&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ASG_13_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ii-e-accuracy&#34;&gt;II.E. Accuracy&lt;/h3&gt;
+
+&lt;p&gt;Looking at the mean squared error, or the median squared error, the adaptive sparse grid method is &lt;strong&gt;more accurate&lt;/strong&gt;. This holds despite the fact that the sparse grid has approximately &lt;strong&gt;four time less points&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#Random draws from space
+nb_draws = 1000
+x_grid_rand = rand(Uniform(p.lower_bound[1], p.upper_bound[1]), nb_draws)
+y_grid_rand = rand(Uniform(p.lower_bound[2], p.upper_bound[2]), nb_draws)
+z_grid_rand = rand(Uniform(p.lower_bound[3], p.upper_bound[3]), nb_draws);
+
+#LHS
+LHS_dense = zeros(nb_draws)
+LHS_sparse = zeros(nb_draws)
+for (index, (xValue, yValue, zValue)) in enumerate(zip(x_grid_rand, y_grid_rand, z_grid_rand))
+    LHS_dense[index] = S_dense([xValue; yValue; zValue])
+    LHS_sparse[index] = fun([xValue; yValue; zValue])
+end
+
+#RHS
+RHS_dense = zeros(nb_draws)
+RHS_sparse = zeros(nb_draws)
+for (index, (xValue, yValue, zValue)) in enumerate(zip(x_grid_rand, y_grid_rand, z_grid_rand))
+    RHS_dense[index] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*[max.(0.0, S_dense([xValue; yValue; (zValue.^p.rho).*exp.(innovation)])) for innovation in p.nodes_E])
+    RHS_sparse[index] = RHS([xValue, yValue, zValue], p, fun)
+end
+
+err_dense = LHS_dense - RHS_dense
+err_sparse = LHS_sparse - RHS_sparse
+
+p1 = histogram(err_dense, label=&amp;quot;Error VFI dense&amp;quot;)
+p2 = histogram(err_sparse, label=&amp;quot;Error VFI sparse&amp;quot;)
+plot(p1, p2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;ASG_15_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;df = DataFrame(Method = [&amp;quot;VFI Dense&amp;quot;, &amp;quot;VFI Sparse&amp;quot;],
+                MEAN_SE = [mean(err_dense).^2, mean(err_sparse).^2],
+                MEDIAN_SE = [median(err_dense).^2, median(err_sparse).^2],
+                MAX_SE = [maximum(err_dense).^2, maximum(err_sparse).^2],
+                MIN_SE = [minimum(err_dense).^2, minimum(err_sparse).^2],
+                NB_Points = [size(vals_grid,1), size(xyz_grid,1)])
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div class=&#34;data-frame&#34;&gt;&lt;p&gt;2 rows × 6 columns&lt;/p&gt;&lt;table class=&#34;data-frame&#34;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Method&lt;/th&gt;&lt;th&gt;MEAN_SE&lt;/th&gt;&lt;th&gt;MEDIAN_SE&lt;/th&gt;&lt;th&gt;MAX_SE&lt;/th&gt;&lt;th&gt;MIN_SE&lt;/th&gt;&lt;th&gt;NB_Points&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th title=&#34;String&#34;&gt;String&lt;/th&gt;&lt;th title=&#34;Float64&#34;&gt;Float64&lt;/th&gt;&lt;th title=&#34;Float64&#34;&gt;Float64&lt;/th&gt;&lt;th title=&#34;Float64&#34;&gt;Float64&lt;/th&gt;&lt;th title=&#34;Float64&#34;&gt;Float64&lt;/th&gt;&lt;th title=&#34;Int64&#34;&gt;Int64&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;th&gt;1&lt;/th&gt;&lt;td&gt;VFI Dense&lt;/td&gt;&lt;td&gt;3.5566e-7&lt;/td&gt;&lt;td&gt;1.8067e-8&lt;/td&gt;&lt;td&gt;0.00135398&lt;/td&gt;&lt;td&gt;6.68973e-8&lt;/td&gt;&lt;td&gt;4410&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th&gt;2&lt;/th&gt;&lt;td&gt;VFI Sparse&lt;/td&gt;&lt;td&gt;7.1713e-8&lt;/td&gt;&lt;td&gt;1.63528e-8&lt;/td&gt;&lt;td&gt;0.0010258&lt;/td&gt;&lt;td&gt;0.000577696&lt;/td&gt;&lt;td&gt;1644&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;When no closed-form solution is available, the curse of dimensionality makes the use of &amp;ldquo;brute-force methods&amp;rdquo; (e.g. value function iteration on a dense grid) unpractical/unfeasible. Using Adaptive sparse grids is one promising way to work with high-dimensional models.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
+
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://johannesbrumm.com/wp-content/uploads/2017/09/Brumm-Scheidegger-2017-ECTA.pdf&#34; target=&#34;_blank&#34;&gt;Brumm, Johannes, and Simon Scheidegger&lt;/a&gt;. &amp;ldquo;Using adaptive sparse grids to solve high‐dimensional dynamic models.&amp;rdquo; Econometrica 85.5 (2017): 1575-1612.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;related-packages&#34;&gt;Related packages&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/jacobadenbaum/AdaptiveSparseGrids.jl&#34; target=&#34;_blank&#34;&gt;AdaptiveSparseGrids&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/floswald/Tasmanian.jl&#34; target=&#34;_blank&#34;&gt;Tasmanian.jl&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;version&#34;&gt;Version&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;versioninfo()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Julia Version 1.7.1
+Commit ac5cc99908 (2021-12-22 19:35 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-12.0.1 (ORCJIT, skylake)
+Environment:
+  JULIA_NUM_THREADS = 4
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Artificial Neural Networks to Solve Economic Models</title>
@@ -4788,363 +5153,6 @@ Iteration. While the model presented here is quite simple, the three-step approa
 &lt;li&gt;Rendahl, Pontus. Linear time iteration. No. 330. IHS Economics Series, 2017.
 (&lt;a href=&#34;https://www.ihs.ac.at/publications/eco/es-330.pdf&#34; target=&#34;_blank&#34;&gt;https://www.ihs.ac.at/publications/eco/es-330.pdf&lt;/a&gt;)&lt;/li&gt;
 &lt;li&gt;The original Matlab code is available &lt;a href=&#34;https://sites.google.com/site/pontusrendahl/Research&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Linear Time Iteration (Part I)</title>
-      <link>https://julienpascal.github.io/post/lineartimeiteration/</link>
-      <pubDate>Sun, 25 Aug 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/lineartimeiteration/</guid>
-      <description>
-
-&lt;p&gt;The details of solving rational expectation models are somewhat tricky. Yet, a recent paper by &lt;a href=&#34;https://sites.google.com/site/pontusrendahl/&#34; target=&#34;_blank&#34;&gt;Pontus Rendahl&lt;/a&gt; underlines that an easy (and fast) method exists. What&amp;rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agent models and uses Reiter&amp;rsquo;s (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.&lt;/p&gt;
-
-&lt;h2 id=&#34;intuition&#34;&gt;Intuition&lt;/h2&gt;
-
-&lt;p&gt;Below, I quote some fundamental passages from the paper, discussing the intuition of the method:&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&amp;ldquo;The logic underlying the procedure is simple enough to be described in words. Envisage an agent having a certain amount of an asset, facing the choice between how much of this asset to &lt;strong&gt;consume and how much to save&lt;/strong&gt;. An optimal choice would &lt;strong&gt;trade off the marginal benefit of saving (future consumption) with its marginal cost (forgone current consumption)&lt;/strong&gt;. The resulting optimal decision is implied by a linear(ized) second-order difference equation&amp;rdquo;&lt;/p&gt;
-
-&lt;p&gt;&amp;ldquo;[&amp;hellip;] the future marginal benefit of saving depends on &lt;strong&gt;the optimal saving choice in the future&lt;/strong&gt;. Thus, an optimal choice today can only be determined under the condition that the optimal choice in &lt;strong&gt;the future is known&lt;/strong&gt;; thus the problem amounts to &lt;strong&gt;finding a fixed point&lt;/strong&gt;. To solve this problem, this paper proposes to &lt;strong&gt;guess for the optimal choice&lt;/strong&gt; of saving in the future as a &lt;strong&gt;linear function of the associated state&lt;/strong&gt; (which is given by the optimal choice in the present). Given such a guess, the optimal choice in the present is then trivially given by solving a linear equation. However, the current optimal choice provides us with another suggestion regarding future optimal behavior, and the guess is updated accordingly.&amp;rdquo;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;To summarize (i) solving a rational expectation model is intrinsically a fixed-point problem (ii) the Linear Time Iteration approach assumes a particular form for the solution and iterates until convergence is reached. The discussion that follows will be mainly informal, but the paper makes sure that this procedure is well behaved.&lt;/p&gt;
-
-&lt;h2 id=&#34;the-method&#34;&gt;The Method&lt;/h2&gt;
-
-&lt;p&gt;We are interested in solving a model of the form:&lt;/p&gt;
-
-&lt;p&gt;$$Ax_{t-1}+B x_{t}+CE_{t}[x_{t+1}]+u_{t}=0$$&lt;/p&gt;
-
-&lt;p&gt;Where $x_t$ is an n × 1 vector containing endogenous and exogenous variables, $u_t$ is an n × 1 vector of mean-zero disturbances, and $A$, $B$ and $C$ are conformable matrices.&lt;/p&gt;
-
-&lt;p&gt;Let us assume that the solution is:&lt;/p&gt;
-
-&lt;p&gt;$$ x_{t} = F x_{t-1} + Q u_{t} $$&lt;/p&gt;
-
-&lt;p&gt;where $F$ and $Q$ are unknown matrices.&lt;/p&gt;
-
-&lt;p&gt;Substituting the linear law of motion into the first equation (and using the fact that $u_{t+1}$ is a mean-zero random noise term) yields:&lt;/p&gt;
-
-&lt;p&gt;$$ A x_{t−1} + B x_{t} + CF x_{t} + u_{t} = 0. $$&lt;/p&gt;
-
-&lt;p&gt;This equation can be written as:&lt;/p&gt;
-
-&lt;p&gt;$$ x_{t} = -(B + CF)^{-1} A x_{t−1} + (-(B + CF)^{-1})u_t $$&lt;/p&gt;
-
-&lt;p&gt;Comparing the solution we assumed in the first place, and the last equation, we see that:&lt;/p&gt;
-
-&lt;p&gt;$$ Q = -(B + CF)^{-1} $$&lt;/p&gt;
-
-&lt;p&gt;The previous manipulations show that if one knows $F$, finding $Q$ is trivial (because $B$ and $C$ are known).
-In practical terms, we can focus on solving the deterministic part of the problem (ignoring the $u_t$), since
-we can then back out the stochastic solution using our equation for $Q$.&lt;/p&gt;
-
-&lt;p&gt;The deterministic problem is:&lt;/p&gt;
-
-&lt;p&gt;$$ A x_{t-1} + B x_{t} + C x_{t+1}  = 0 $$&lt;/p&gt;
-
-&lt;p&gt;And its associated solution is:&lt;/p&gt;
-
-&lt;p&gt;$$ x_{t} = F x_{t-1} $$&lt;/p&gt;
-
-&lt;p&gt;Now let&amp;rsquo;s guess a value for $F$, denoted by $F_{n}$.&lt;/p&gt;
-
-&lt;p&gt;A simple substitution gives:&lt;/p&gt;
-
-&lt;p&gt;$$ A x_{t-1} + B x_{t} + F_{n} C x_{t}  = 0 $$&lt;/p&gt;
-
-&lt;p&gt;Which can be re-written as:&lt;/p&gt;
-
-&lt;p&gt;$$ x_{t}  = - (B + F_{n} C)^{-1}A x_{t-1}  $$&lt;/p&gt;
-
-&lt;p&gt;Comparing the solution we assumed in the first place and the last equation, the following &lt;strong&gt;updating rule&lt;/strong&gt; seems to make sense:&lt;/p&gt;
-
-&lt;p&gt;$$ F_{n+1} = - (B + F_{n} C)^{-1} A $$&lt;/p&gt;
-
-&lt;p&gt;One could apply the updating rule until the distance between $F_{n+1}$ and $F_{n}$ is small, but the paper uses
-another stopping rule. Let&amp;rsquo;s start with an observation and then give a definition:&lt;/p&gt;
-
-&lt;h4 id=&#34;fact&#34;&gt;Fact&lt;/h4&gt;
-
-&lt;p&gt;If $F$ solves&lt;/p&gt;
-
-&lt;p&gt;$$ A x_{t−1} + B x_{t} + CF x_{t} = 0 $$&lt;/p&gt;
-
-&lt;p&gt;then $F$ solves the quadratic matrix equation:&lt;/p&gt;
-
-&lt;p&gt;$$ A + B F + C F^2 = 0 $$&lt;/p&gt;
-
-&lt;h4 id=&#34;definition&#34;&gt;Definition&lt;/h4&gt;
-
-&lt;p&gt;A solution to the equation&lt;/p&gt;
-
-&lt;p&gt;$$ A + B F + C F^2 = 0 $$&lt;/p&gt;
-
-&lt;p&gt;is called a &lt;strong&gt;solvent&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;We now have all the elements to describe the Linear Time Iteration algorithm.&lt;/p&gt;
-
-&lt;h4 id=&#34;algorithm&#34;&gt;Algorithm&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Guess a value for $F_0$&lt;/li&gt;
-&lt;li&gt;Calculate $ F_{1} = - (B + F_{0} C)^{-1} A $&lt;/li&gt;
-&lt;li&gt;If $ || A + B F_1 + C F_1^2 || &amp;lt; tol $ stop. $F_1$ is a solvent&lt;/li&gt;
-&lt;li&gt;Else, increment the index for $F$ and start again&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;If all the eigenvalues of the resulting solvent are less than $1$ in absolute value, then we found a stable solution
-to the quadratic matrix equation. However, it is not necessarily the unique stable solution. For discussion on uniqueness and stability, an interested reader may refer to proposition 2 of the paper.&lt;/p&gt;
-
-&lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-
-&lt;p&gt;Let&amp;rsquo;s now see how the Linear Time Iteration performs on two simple examples described in the original paper.&lt;/p&gt;
-
-&lt;h3 id=&#34;example-1-a-uni-dimensional-example&#34;&gt;Example 1: a uni-dimensional example&lt;/h3&gt;
-
-&lt;p&gt;$$ 0.75 x_{t−1} − 2 x_{t} + x_{t+1} = 0 $$&lt;/p&gt;
-
-&lt;p&gt;In this example, using Linear Time Iteration is clearly an overkill since we can calculate the solution by hand.
-The two solvents are $1.5$ and $0.5$. As we will see, the method laid above converges to the smaller of the two values.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;versioninfo()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Julia Version 1.0.3
-Commit 099e826241 (2018-12-18 01:34 UTC)
-Platform Info:
-  OS: Linux (x86_64-pc-linux-gnu)
-  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
-  WORD_SIZE: 64
-  LIBM: libopenlibm
-  LLVM: libLLVM-6.0.0 (ORCJIT, skylake)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Parameters
-a = 0.75
-b = -2.0
-c = 1.0
-# Tolerance
-tol = 1e-6
-# Maximum iterations
-max_iter = 1000
-# Initial guess for F
-F_n = 0.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;0.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;for i=1:max_iter
-    # Updating rule:
-    F_n_new =  -a*(1/(b + F_n*c))
-    # Stopping rule:
-    if abs(a + b *F_n_new + c*F_n_new^2) &amp;lt; tol
-        println(&amp;quot;convergence after $i iterations&amp;quot;)
-        println(&amp;quot;final value for F is $F_n&amp;quot;)
-        break
-    end
-    F_n = copy(F_n_new)
-    if i == max_iter
-        println(&amp;quot;convergence NOT reached $i iterations&amp;quot;)
-    end
-end
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;convergence after 12 iterations
-final value for F is 0.4999981183200362
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;dealing-with-singular-solvents&#34;&gt;Dealing with singular solvents&lt;/h3&gt;
-
-&lt;p&gt;Even in some reasonable cases, the simple Linear Time Iteration algorithm described above might fail. For instance, because the model contains accounting identities, in which case the solvent may be &amp;ldquo;singular&amp;rdquo;.&lt;/p&gt;
-
-&lt;h4 id=&#34;definition-1&#34;&gt;Definition&lt;/h4&gt;
-
-&lt;p&gt;A solvent is &lt;strong&gt;singular&lt;/strong&gt; if it contains at least one eigenvalue equal to 1.&lt;/p&gt;
-
-&lt;p&gt;Fortunately, a simple trick extends the Linear Time Iteration method to singular solvents.
-One solves the modified quadratic matrix equation&lt;/p&gt;
-
-&lt;p&gt;$$ \hat{A} S^2 + \hat{B} S + \hat{C} = 0 $$&lt;/p&gt;
-
-&lt;p&gt;where&lt;/p&gt;
-
-&lt;p&gt;$$ \hat{A} = C M^2 + B M + A $$
-$$ \hat{B} = B + 2 C M$$
-$$ \hat{C} = C$$
-$$ M = \mu I $$&lt;/p&gt;
-
-&lt;p&gt;with $\mu$ a small positive real number and $I$ a conformable identity matrix. If the Linear Time Iteration
-algorithm applied to the modified system converges to $S$, the $F = S + M$ is solution to the original system.
-Below I define a function &lt;code&gt;t_iteration&lt;/code&gt; the solves the modified system&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using LinearAlgebra
-
-# Source: adapted from the matlab version made available by Pontus Rendahl on his website
-# https://sites.google.com/site/pontusrendahl/Research
-# This function solves the model Ax_{t-1}+Bx_{t}+CE_t[x_{t+1}]+u_t=0, and
-# finds the solution x_t=Fx_{t-1}+Qu_t. The parameter mu should be set
-# equal to a small number, e.g. mu=1e-6;
-
-function t_iteration(A::Array{Float64,2},
-                    B::Array{Float64,2},
-                    C::Array{Float64,2},
-                    mu::Float64;
-                    tol::Float64=1e-12,
-                    max_iter::Int64 = 1000,
-                    F0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
-                    S0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
-                    verbose::Bool=false)
-
-# success flag:
-flag = 0
-
-# Initialization
-dim = size(A,2)
-if isempty(F0) == true
-    F = zeros(dim,dim)
-else
-    F = F0
-end
-if isempty(S0) == true
-    S = zeros(dim,dim)
-else
-    S = S0
-end
-
-eye = zeros(dim,dim)
-for i = 1:dim
-    eye[i,i] = 1.0
-end
-
-I = eye*mu
-Ch = C
-Bh = (B+C*2*I)
-Ah = (C*I^2+B*I+A)
-
-#Check the reciprocal condition number
-#if rcond(Ah)&amp;lt;1e-16
-#    disp(&#39;Matrix Ah is singular&#39;)
-#end
-
-metric = 1;
-nb_iter = 0
-
-while metric&amp;gt;tol
-    nb_iter+=1
-    #\(x, y)
-    #Left division operator:
-    #multiplication of y by the inverse of x on the left.
-    F = -(Bh+Ch*F)\Ah
-    S = -(Bh+Ah*S)\Ch;
-
-    metric1 = maximum(abs.(Ah+Bh*F+Ch*F*F))
-    metric2 = maximum(abs.(Ah*S*S+Bh*S+Ch))
-    metric = max(metric1, metric2)
-
-    if nb_iter == max_iter
-        if verbose == true
-            print(&amp;quot;Maximum number of iterations reached. Convergence not reached.&amp;quot;)
-            print(&amp;quot;metric = $metric&amp;quot;)
-        end
-        break
-    end
-end
-
-
-eig_F = maximum(abs.(eigvals(F)));
-eig_S = maximum(abs.(eigvals(S)));
-
-if eig_F&amp;gt;1 || eig_S&amp;gt;1 || mu&amp;gt;1-eig_S
-    if verbose == true
-        println(&amp;quot;Conditions of Proposition 3 violated&amp;quot;)
-    end
-else
-    flag = 1
-end
-
-F = F+I;
-Q = -inv(B+C*F);
-
-return F, Q, flag
-
-end
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;t_iteration (generic function with 1 method)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;example-2-a-bi-dimensional-problem&#34;&gt;Example 2: a bi-dimensional problem&lt;/h3&gt;
-
-&lt;p&gt;The problem is&lt;/p&gt;
-
-&lt;p&gt;$$ 0.75 y_t - 0.5 y_{t+1} = 0 $$
-$$ -2 x_t + x_{t-1} - y_{t} = 0 $$&lt;/p&gt;
-
-&lt;p&gt;This problem has three solvents. Two of them lead to an unstable solution. The solvent associated to a stable solution is given by:&lt;/p&gt;
-
-&lt;p&gt;$\begin{bmatrix} 0 &amp;amp; 0 \\ 0 &amp;amp; 0.5\end{bmatrix}$&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Defining the problem
-A = [[0. 0.];
-     [0. 1.]]
-
-B = [[0.75 0.];
-     [-1. -2.]]
-
-C = [[-0.5 0.];
-     [0. 0.]]
-
-# Finding a solvent
-F_n, Q_n, flag = t_iteration(A, B, C, 0.01, max_iter=1000)
-
-println(&amp;quot;F is :&amp;quot;, F_n)
-
-# Simulating the model forward
-using Plots
-pyplot()
-
-nb_periods = 20
-x = ones(2, nb_periods)
-#initialization
-x[:,1] = [1.0 1.0] #starting value
-
-for t=2:nb_periods
-    # Update rule
-    x[:,t] = F_n * x[:,t-1]
-end
-
-plot(x[1,:], label = &amp;quot;xt&amp;quot;)
-plot!(x[2,:], label = &amp;quot;yt&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;F is :[0.0 0.0; 0.0 0.5]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We successfully recovered the stable solution.
-Starting an initial condition, we can simulate the behavior of the system
-using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;Linear%20Time%20Iteration_50_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;Linear Time Iteration is an intuitive and easily applicable method to solve (linear) rational expectation models. This post aimed at describing the intuition for it and give simple examples. In a subsequent post, I will use this technique to solve the stochastic growth model.&lt;/p&gt;
-
-&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Rendahl, Pontus. Linear time iteration. No. 330. IHS Economics Series, 2017.
-(&lt;a href=&#34;https://www.ihs.ac.at/publications/eco/es-330.pdf&#34; target=&#34;_blank&#34;&gt;https://www.ihs.ac.at/publications/eco/es-330.pdf&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;Reiter, Michael. &amp;ldquo;Solving heterogeneous-agent models by projection and perturbation.&amp;rdquo; Journal of Economic Dynamics and Control 33.3 (2009): 649-665.&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>

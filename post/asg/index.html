@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.1.0">
+  <meta name="generator" content="Hugo 0.54.0" />
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Julien Pascal, PhD">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Introduction The curse of dimensionality is at the heart of dynamic programming. And dynamic programming is the cornerstone of modern economic theory. But what is the curse of dimensionality exactly? The aim of this blog post is to answer this question and to show one method that alleviates this curse: adaptive sparse grids.
+TL;DR: adaptive sparse grids help you to limit the bite of the curse of dimensionality
+You can download the notebook for this post here.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/asg/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="anonymous">
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-114454001-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://julienpascal.github.io/post/asg/">
+
+  
+  
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="twitter:site" content="@Juli3nPascal">
+  <meta property="twitter:creator" content="@Juli3nPascal">
+  
+  <meta property="og:site_name" content="Julien Pascal">
+  <meta property="og:url" content="https://julienpascal.github.io/post/asg/">
+  <meta property="og:title" content="The Curse of Dimensionality and Adaptive Sparse Grids | Julien Pascal">
+  <meta property="og:description" content="Introduction The curse of dimensionality is at the heart of dynamic programming. And dynamic programming is the cornerstone of modern economic theory. But what is the curse of dimensionality exactly? The aim of this blog post is to answer this question and to show one method that alleviates this curse: adaptive sparse grids.
+TL;DR: adaptive sparse grids help you to limit the bite of the curse of dimensionality
+You can download the notebook for this post here."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2022-02-12T08:00:00&#43;01:00">
+  
+  <meta property="article:modified_time" content="2022-02-12T08:00:00&#43;01:00">
+  
+
+  
+
+  
+
+  <title>The Curse of Dimensionality and Adaptive Sparse Grids | Julien Pascal</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Julien Pascal</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav mr-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#projects">
+            
+            <span>Projects</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#teaching">
+            
+            <span>Teaching</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#publications">
+            
+            <span>Publications</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#computing">
+            
+            <span>Computing</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/pdf/Julien_Pascal_Academic_Resume.pdf">
+            
+            <span>Academic Resume</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">The Curse of Dimensionality and Adaptive Sparse Grids</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2022-02-12 08:00:00 &#43;0100 CET" itemprop="datePublished">
+<meta content="2022-02-12 08:00:00 &#43;0100 CET" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>Feb 12, 2022</time>
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    10 min read
+  </span>
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=The%20Curse%20of%20Dimensionality%20and%20Adaptive%20Sparse%20Grids&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fasg%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpost%2fasg%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fasg%2f&amp;title=The%20Curse%20of%20Dimensionality%20and%20Adaptive%20Sparse%20Grids"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fasg%2f&amp;title=The%20Curse%20of%20Dimensionality%20and%20Adaptive%20Sparse%20Grids"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=The%20Curse%20of%20Dimensionality%20and%20Adaptive%20Sparse%20Grids&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fasg%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The <strong><a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality" target="_blank">curse of dimensionality</a></strong> is at the heart of dynamic programming. And dynamic programming is the cornerstone of modern economic theory. But what is the curse of dimensionality exactly? The aim of this blog post is to answer this question and to show one method that alleviates this curse: <strong>adaptive sparse grids</strong>.</p>
+
+<p><strong>TL;DR: adaptive sparse grids help you to limit the bite of the curse of dimensionality</strong></p>
+
+<p>You can download the notebook for this post <a href="https://github.com/JulienPascal/Adaptive_Sparse_Grids" target="_blank">here</a>.</p>
+
+<hr />
+
+<h2 id="i-theory-the-curse-of-dimensionality">I. Theory: the curse of dimensionality</h2>
+
+<h3 id="i-a-problem-the-curse-of-dimensionality">I. A. Problem: the curse of dimensionality</h3>
+
+<p>The behavior of an optimizing agent can be summarized by a Bellman equation of the form:</p>
+
+<p>$$ V(x,z) = \max_{c \in \Gamma(x,z)}[ F(x,c,z) + \beta E_{z&rsquo;|z}[ V(T(x,c), z&rsquo;) ]$$</p>
+
+<p>where $x$ is a <strong>non-random</strong> state variable and $z$ is a <strong>random</strong> variable following a Markov process. Both $x$ and $z$ are to be understood as vectors. The function $\Gamma(.)$ represents the set of possible actions given a current state and the function $T(.)$ captures the transition from one state to another when an action is taken. The variable $\beta$ is a discount factor striclty smaller than one and the $E$ represent an expectation operator.</p>
+
+<p>Let&rsquo;s now assume that we know the policy function that dictates the optimal behavior of the agent $c^{\star} = g(x,z)$, so we can ignore the max operator and rewrite the above as:</p>
+
+<p>$$ V(x,z) = F(x,c^{\star},z) + \beta E_{z&rsquo;|z}[ V(T(x,c^{\star}), z&rsquo;) ]$$</p>
+
+<hr />
+
+<p>Now let&rsquo;s leave the theoretical world. In practice one needs to <strong>discretize (x,z) on a grid using a finite number of points</strong>. Let&rsquo;s assume that the deterministic part of the state variable has $n$ dimensions and that the stochastic element has $z$ dimensions. For the sake of simplicity, let&rsquo;s assume that we use $k$ points along each dimension. To evaluate $V(x,z)$, $k^{n+z}$ operations are needed to evaluate $F(x,c^{\star},z)$ on the grid.</p>
+
+<p>Things get even worse if we look at the second element of the right-hand-side of the above equation: the conditional expectation. In the present context, a conditional expectation is &ldquo;simply&rdquo; a multidimensional integral. From a numerical standpoint, a multidimensional integral can be approximated using <a href="https://en.wikipedia.org/wiki/Gaussian_quadrature" target="_blank">Gaussian quadrature</a>. Once again, for the sake of simplicity let&rsquo;s assume we use $\omega$ nodes along each dimension for $z$. Then, Gaussian quadrature implies $w^z$ function evaluations for $V(.)$ for each point on the grid. So a grand total of $k^{n+z}w^{z}$ function evaluations, which is equal to $\exp[(n+z)log(k)+ zlog(w)]$.</p>
+
+<hr />
+
+<p>From the formula $\exp[(n+z)log(k)+ zlog(w)]$, I see two main takeaways:</p>
+
+<ol>
+<li><p><strong>Get rid of useless dimensions</strong>. Yes, I know it&rsquo;s obvious, but the formula makes it clear. Dimensions show up linearly within the exponential function, while the number of discretization points enters logarithmically. We can save computation time by being smart for the choice of grid points, but the smartest move is to get rid of useless dimensions.</p></li>
+
+<li><p><strong>Stochastic variables are more costly</strong>. Once again it&rsquo;s obvious, but I like the formalism that the formula brings. Stochastic variables matter for today ($zlog(k)$), but also for tomorrow ($zlog(w)$). The choice of quadrature nodes is important ($log(w)$), but a reduction in $z$ would even be better.</p></li>
+</ol>
+
+<p>Now let&rsquo;s plot the number of function evaluations necessary for the conditional expectation as a function of the number of dimensions for x and z (holding the number of grid points and the quadrature nodes constant). As illustrated below, <strong>things get out of hand quite rapidly</strong>.</p>
+
+<pre><code class="language-julia">using Plots
+
+function curse(n,z; k=10, w=5)
+    exp((n+z)*log(k) + z*log(w))
+end
+
+p1 = plot(1:3, 1:3, (n,z) -&gt; curse(n,z), st=:surface, xlabel=&quot;n&quot;, ylabel=&quot;z&quot;)
+p2 = plot(1:3, n -&gt; curse(n,1), label=&quot;curse(n,1)&quot;, xlabel=&quot;n&quot;)
+p3 = plot(1:3, z -&gt; curse(1,z), label=&quot;curse(1,z)&quot;, xlabel=&quot;z&quot;)
+
+p = plot(p1, p2, p3)
+display(p)
+println(&quot;Millions of function evaluations for curse(3,3): $(round(curse(3,3)/(10^6), digits = 2))&quot;)
+</code></pre>
+
+<p><img src="ASG_2_0.svg" alt="svg" /></p>
+
+<pre><code>Millions of function evaluations for curse(3,3): 125.0
+</code></pre>
+
+<h3 id="i-b-one-solution-adaptive-sparse-grids">I.B. One solution: Adaptive Sparse Grids</h3>
+
+<p>One solution brought to the field of Economics by <a href="https://johannesbrumm.com/wp-content/uploads/2017/09/Brumm-Scheidegger-2017-ECTA.pdf" target="_blank">Brumm and Scheidegger (2017)</a> is to use <strong>adaptive sparse grids</strong>. Adaptive sparse grids combine two ideas:</p>
+
+<ol>
+<li><p><strong>Sparse</strong> grids are based on the idea that when it comes to extrapolation power, not all grid points are born equal. Some grid points are to some extent redundant and can be avoided.</p></li>
+
+<li><p><strong>Adaptive</strong> sparse grids use a sparse grid as a starting point. Additional points are then added to the (sparse) grid in regions of high curvature.</p></li>
+</ol>
+
+<p>Now let&rsquo;s look at how a sparse grid adapts to the curvature of the following <strong>non-smooth function</strong>:</p>
+
+<p>$$ f(x,y) = \frac{1}{|0.5 - x^4 - y^4| + 0.1} $$</p>
+
+<pre><code class="language-julia"># Packages and helper functions
+using AdaptiveSparseGrids
+using Random
+using Distributions
+using IterTools
+using DataFrames
+using NBInclude
+@nbinclude(&quot;utils.ipynb&quot;)
+
+# Example taken from here: https://github.com/jacobadenbaum/AdaptiveSparseGrids.jl
+# I made small modifications along the way
+# Bounds
+lb  = zeros(2)
+ub  = ones(2)
+
+# True function to approximate:
+f(x) = 1.0/(abs(0.5 - x[1]^4 - x[2]^4) + 0.1)
+
+# Construct approximation:
+fun = AdaptiveSparseGrid(f, lb, ub,
+                         max_depth = 10,    # The maximum depth of basis elements in each dimension
+                         tol = 0.01)        # Add nodes when min(abs(alpha/f(x)), abs(alpha)) &lt; tol
+
+xy_grid = extract_grid(fun)
+p1=scatter(xy_grid[:,1],xy_grid[:,2], m=(:black,2),title=&quot;Sparse grid&quot;, xlabel=L&quot;x&quot;, ylabel=L&quot;y&quot;)
+p2 = plot(xy_grid[:,1],xy_grid[:,2], [fun(xy_grid[i,:]) for i in 1:size(xy_grid,1)], m=(:black,2),title=&quot;Sparse grid&quot;, xlabel=L&quot;x&quot;, ylabel=L&quot;y&quot;, zlabel=L&quot;f(x,y)&quot;, st=:scatter3d)
+plot(p1, p2, legend=false)
+</code></pre>
+
+<p><img src="ASG_4_0.svg" alt="svg" /></p>
+
+<h2 id="ii-application">II. Application</h2>
+
+<p>Alright, back to Economics. We will focus on the model of the labour market by <a href="https://www.aeaweb.org/articles?id=10.1257/aer.20131118" target="_blank">Lise and Robin</a>. You can take a look at the original paper, or at my previous post <a href="https://julienpascal.github.io/post/ann_2/" target="_blank">here</a>. &ldquo;Solving the model&rdquo; involves finding the function $S(.)$ solving the following equation:</p>
+
+<p>$$ S(x,y,z) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&rsquo;|z} [ max(S(x,y,z&rsquo;), 0) ] $$</p>
+
+<h3 id="ii-a-value-function-iteration-with-a-dense-grid">II. A. Value function iteration with a dense grid</h3>
+
+<p>For more details on value function iteration with a dense grid, you can look at my <a href="https://julienpascal.github.io/post/ann_2/" target="_blank">former post here</a>. The two blocks of code below solve for the unknow function
+$S(.)$ and plot the results for a dense grid.</p>
+
+<pre><code class="language-julia"># Type defined in &quot;utils.ipynb&quot;
+p = Params(nx=21, ny=21, nz=10);
+# Solve by dense value function iteration
+# function defined in &quot;utils.ipynb&quot;
+@time S_dense = solve_VFI(p, max_iter = 5000)
+</code></pre>
+
+<pre><code>Iter 1312 Convergence reached
+ 64.575871 seconds (581.92 M allocations: 25.137 GiB, 7.04% gc time, 1.06% compilation time)
+</code></pre>
+
+<pre><code class="language-julia"># Reshape the grid
+vals_grid = zeros(size(p.x_grid,1)*size(p.y_grid,1)*size(p.z_grid,1), 3)
+for (i, (x, y, z)) in enumerate(product(p.x_grid, p.y_grid, p.z_grid))
+    vals_grid[i, 1] = x
+    vals_grid[i, 2] = y
+    vals_grid[i, 3] = z
+end
+
+# Plot dense VFI
+p1=scatter(vals_grid[:,1], vals_grid[:,2],m=(2),title=&quot;Dense grid&quot;, xlabel=L&quot;x&quot;, ylabel=L&quot;y&quot;)
+p2 = plot(p.x_grid, p.y_grid, (x, y) -&gt; S_dense([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:surface)
+plot!(vals_grid[:,1], vals_grid[:,2], [S_dense([vals_grid[i,1]; vals_grid[i,2]; 1.0])[1] for i in 1:size(vals_grid,1)], label = &quot;f(x)&quot;, st=:scatter3d)
+title!(L&quot;S(x,y,z=1) Dense&quot;)
+xlabel!(L&quot;x&quot;)
+ylabel!(L&quot;y&quot;)
+
+plot(p1, p2, legend=false)
+</code></pre>
+
+<p><img src="ASG_7_0.svg" alt="svg" /></p>
+
+<h3 id="ii-c-adaptive-sparse-grid">II.C. Adaptive sparse grid</h3>
+
+<p>Now let&rsquo;s solve the same problem using the methodology described in <a href="https://johannesbrumm.com/wp-content/uploads/2017/09/Brumm-Scheidegger-2017-ECTA.pdf" target="_blank">Brumm and Scheidegger (2017)</a> (without the fancy parallelism that they use). The idea is to <strong>start with a sparse grid</strong> and to <strong>add points to the grid where the
+function is non-smooth</strong>. The following block of code does that and compare the results obtained previously with the dense grid. Both methods yield same results, despite the sparse grid having fewer points.</p>
+
+<pre><code class="language-julia"># A. Initialization of the RHS
+function init_guess(x, p)
+    p.s_xyz(x[1], x[2], x[3]) + ((1.0 - p.delta)/(1.0 + p.r))*max(0.0, p.s_xyz(x[1], x[2], x[3]))
+end
+
+# Construct our approximation (this will evaluate f at the needed points, using
+# all available threads)
+fun = AdaptiveSparseGrid(x -&gt; init_guess(x, p), p.lower_bound, p.upper_bound,
+                         max_depth = 5,    # The maximum depth of basis elements in
+                                            # each dimension
+                         tol = 0.015)        # Add nodes when
+                                            # min(abs(alpha/f(x)), abs(alpha)) &lt; tol
+fun_init = deepcopy(fun)
+xyz_grid = extract_grid(fun)
+pred_old = [fun(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)]
+
+# B. Function that calculate the RHS of the Bellman equation, given the guess from the previous iteration
+function RHS(x, p, fun_old)
+
+    vals = zeros(p.nb_nodes, 3)
+    for (k, innovation) in enumerate(p.nodes_E)
+        vals[k,1] = x[1]
+        vals[k,2] = x[2]
+        #Have to use min(max()) to stay within the boundaries (no extrapolation allowed)
+        vals[k,3] = min(max(fun.bounds[3,1], (x[3].^p.rho).*exp.(innovation)), fun.bounds[3,2])
+    end
+
+    p.s_xyz(x[1], x[2], x[3]) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*max.(0.0, [fun_old(vals[i,:]) for i in 1:size(vals, 1) ]))
+
+end
+
+# C. Solve the problem with adaptive sparse grid
+# parameters for VFI
+tol_VF = 1e-8 #tolerance for VFI
+max_iter_VF = 5000 #max iterations for VFI
+show_every = max_iter_VF #display difference
+# initialize values
+fun_old = deepcopy(fun_init)
+pred_old = [fun_old(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)]
+max_depth = 5 #max depth for sparse grid
+tol = 0.015 #tolerance on sparse grid
+
+@time begin
+    # Initialize
+    for i = 1:max_iter_VF
+
+        fun = AdaptiveSparseGrid(x -&gt; RHS(x, p, fun_old), p.lower_bound, p.upper_bound,
+                         max_depth = max_depth,    # The maximum depth of basis elements in
+                                            # each dimension
+                         tol = tol)        # Add nodes when
+                                            # min(abs(alpha/f(x)), abs(alpha)) &lt; tol
+
+        # Prediction on fixed grid
+        pred_new = [fun(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)]
+
+        # DISTANCE
+        # Check on fixed grid
+        diff= maximum(abs.(pred_new .- pred_old))
+        if mod(i, show_every) == 0
+            println(&quot;Iter $(i) Diff : $(diff)&quot;)
+            println(&quot;Max nb points on sparse grid: $(length(fun.nodes))&quot;)
+        end
+
+        if diff &lt; tol_VF
+            println(&quot;Iter $(i) Convergence reached&quot;)
+            break
+        end
+
+        #UPDATE
+        pred_old = copy(pred_new)
+        fun_old = deepcopy(fun)
+
+    end
+end
+</code></pre>
+
+<pre><code>Iter 1297 Convergence reached
+ 61.046396 seconds (435.68 M allocations: 17.780 GiB, 3.44% gc time, 0.96% compilation time)
+</code></pre>
+
+<pre><code class="language-julia"># Plot output
+p1 = plot(p.x_grid, p.y_grid, (x, y) -&gt; S_dense([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:contour)
+title!(L&quot;S(x,y,z=1) Dense&quot;)
+xlabel!(L&quot;x&quot;)
+ylabel!(L&quot;y&quot;)
+
+# Initialization function
+xyz_grid = extract_grid(fun)
+p2 = plot(p.x_grid, p.y_grid, (x, y) -&gt; fun([x;y;1.0]), label = &quot;f(x)&quot;, st=:contour)
+title!(L&quot;S(x,y,z=1) Sparse&quot;)
+xlabel!(L&quot;x&quot;)
+ylabel!(L&quot;y&quot;)
+
+ratio = 9/16
+width = 800
+pp = plot(p1, p2, size = (width, width*ratio))
+</code></pre>
+
+<p><img src="ASG_11_0.svg" alt="svg" /></p>
+
+<h3 id="ii-d-sparse-grid-versus-dense-grid">II.D. Sparse grid versus dense grid</h3>
+
+<p>As illustrated below, the sparse grid puts <strong>more points where the function $S(.)$ changes sign</strong> (in the top left and the bottom right parts of the (x-y) space). It matters because the sign of $S(.)$ determines whether or not a job is feasible for a worker of type $x$ and a firm of productivity $y$.</p>
+
+<pre><code class="language-julia">p1=scatter(xyz_grid[:,1], xyz_grid[:,2], m=(:black,2),title=&quot;Sparse grid&quot;, xlabel=L&quot;x&quot;, ylabel=L&quot;y&quot;)
+p2=scatter(xyz_grid[:,1], xyz_grid[:,3], m=(:black,2),title=&quot;Sparse grid&quot;, xlabel=L&quot;x&quot;, ylabel=L&quot;z&quot;)
+p3=scatter(xyz_grid[:,2], xyz_grid[:,3], m=(:black,2),title=&quot;Sparse grid&quot;, xlabel=L&quot;y&quot;, ylabel=L&quot;z&quot;)
+p4 = plot(xyz_grid[:,1], xyz_grid[:,2], [fun(xyz_grid[i,:]) for i in 1:size(xyz_grid,1)], m=(:black,2),title=&quot;Sparse grid&quot;, st=:scatter3d, xlabel=L&quot;x&quot;, ylabel=L&quot;y&quot;, zlabel=L&quot;S(x,y,z)&quot;)
+plot(p1, p2, p3, p4, legend=false, title=&quot;Number points: $(size(xyz_grid, 1))&quot;)
+</code></pre>
+
+<p><img src="ASG_13_0.svg" alt="svg" /></p>
+
+<h3 id="ii-e-accuracy">II.E. Accuracy</h3>
+
+<p>Looking at the mean squared error, or the median squared error, the adaptive sparse grid method is <strong>more accurate</strong>. This holds despite the fact that the sparse grid has approximately <strong>four time less points</strong>.</p>
+
+<pre><code class="language-julia">#Random draws from space
+nb_draws = 1000
+x_grid_rand = rand(Uniform(p.lower_bound[1], p.upper_bound[1]), nb_draws)
+y_grid_rand = rand(Uniform(p.lower_bound[2], p.upper_bound[2]), nb_draws)
+z_grid_rand = rand(Uniform(p.lower_bound[3], p.upper_bound[3]), nb_draws);
+
+#LHS
+LHS_dense = zeros(nb_draws)
+LHS_sparse = zeros(nb_draws)
+for (index, (xValue, yValue, zValue)) in enumerate(zip(x_grid_rand, y_grid_rand, z_grid_rand))
+    LHS_dense[index] = S_dense([xValue; yValue; zValue])
+    LHS_sparse[index] = fun([xValue; yValue; zValue])
+end
+
+#RHS
+RHS_dense = zeros(nb_draws)
+RHS_sparse = zeros(nb_draws)
+for (index, (xValue, yValue, zValue)) in enumerate(zip(x_grid_rand, y_grid_rand, z_grid_rand))
+    RHS_dense[index] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*[max.(0.0, S_dense([xValue; yValue; (zValue.^p.rho).*exp.(innovation)])) for innovation in p.nodes_E])
+    RHS_sparse[index] = RHS([xValue, yValue, zValue], p, fun)
+end
+
+err_dense = LHS_dense - RHS_dense
+err_sparse = LHS_sparse - RHS_sparse
+
+p1 = histogram(err_dense, label=&quot;Error VFI dense&quot;)
+p2 = histogram(err_sparse, label=&quot;Error VFI sparse&quot;)
+plot(p1, p2)
+</code></pre>
+
+<p><img src="ASG_15_0.svg" alt="svg" /></p>
+
+<pre><code class="language-julia">df = DataFrame(Method = [&quot;VFI Dense&quot;, &quot;VFI Sparse&quot;],
+                MEAN_SE = [mean(err_dense).^2, mean(err_sparse).^2],
+                MEDIAN_SE = [median(err_dense).^2, median(err_sparse).^2],
+                MAX_SE = [maximum(err_dense).^2, maximum(err_sparse).^2],
+                MIN_SE = [minimum(err_dense).^2, minimum(err_sparse).^2],
+                NB_Points = [size(vals_grid,1), size(xyz_grid,1)])
+
+</code></pre>
+
+<div class="data-frame"><p>2 rows × 6 columns</p><table class="data-frame"><thead><tr><th></th><th>Method</th><th>MEAN_SE</th><th>MEDIAN_SE</th><th>MAX_SE</th><th>MIN_SE</th><th>NB_Points</th></tr><tr><th></th><th title="String">String</th><th title="Float64">Float64</th><th title="Float64">Float64</th><th title="Float64">Float64</th><th title="Float64">Float64</th><th title="Int64">Int64</th></tr></thead><tbody><tr><th>1</th><td>VFI Dense</td><td>3.5566e-7</td><td>1.8067e-8</td><td>0.00135398</td><td>6.68973e-8</td><td>4410</td></tr><tr><th>2</th><td>VFI Sparse</td><td>7.1713e-8</td><td>1.63528e-8</td><td>0.0010258</td><td>0.000577696</td><td>1644</td></tr></tbody></table></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>When no closed-form solution is available, the curse of dimensionality makes the use of &ldquo;brute-force methods&rdquo; (e.g. value function iteration on a dense grid) unpractical/unfeasible. Using Adaptive sparse grids is one promising way to work with high-dimensional models.</p>
+
+<hr />
+
+<hr />
+
+<h2 id="appendix">Appendix</h2>
+
+<h3 id="references">References</h3>
+
+<ul>
+<li><a href="https://johannesbrumm.com/wp-content/uploads/2017/09/Brumm-Scheidegger-2017-ECTA.pdf" target="_blank">Brumm, Johannes, and Simon Scheidegger</a>. &ldquo;Using adaptive sparse grids to solve high‐dimensional dynamic models.&rdquo; Econometrica 85.5 (2017): 1575-1612.</li>
+</ul>
+
+<h3 id="related-packages">Related packages</h3>
+
+<ul>
+<li><a href="https://github.com/jacobadenbaum/AdaptiveSparseGrids.jl" target="_blank">AdaptiveSparseGrids</a></li>
+<li><a href="https://github.com/floswald/Tasmanian.jl" target="_blank">Tasmanian.jl</a></li>
+</ul>
+
+<h3 id="version">Version</h3>
+
+<pre><code class="language-julia">versioninfo()
+</code></pre>
+
+<pre><code>Julia Version 1.7.1
+Commit ac5cc99908 (2021-12-22 19:35 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-12.0.1 (ORCJIT, skylake)
+Environment:
+  JULIA_NUM_THREADS = 4
+</code></pre>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/numerical/">Numerical</a>
+  
+  <a class="badge badge-light" href="/tags/adaptive-sparse-grids/">Adaptive Sparse Grids</a>
+  
+</div>
+
+
+
+
+    
+      
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  
+  <img class="portrait mr-3" src="/author/admin/avatar_hu3ebf584d0e96ded762042713d38b4f6f_6501895_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  
+
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/authors/admin">Julien Pascal, PhD</a></h5>
+    <h6 class="card-subtitle">Economist</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/Juli3nPascal" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/JulienPascal" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://www.linkedin.com/in/julien-pascal-62a322aa/" target="_blank" rel="noopener">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://medium.com/@julien.pascal" target="_blank" rel="noopener">
+          <i class="fab fa-medium"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+      
+      
+      <div class="article-widget">
+        <div class="hr-light"></div>
+        <h3>Related</h3>
+        <ul>
+          
+          <li><a href="/post/ann_2/">Artificial Neural Networks to Solve Economic Models</a></li>
+          
+          <li><a href="/post/ann_1/">Artificial Neural Networks as universal function approximators</a></li>
+          
+        </ul>
+      </div>
+      
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2017 Julien Pascal &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/julia.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/shell.min.js"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
+      
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="anonymous"></script>
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+
+  </body>
+</html>
+

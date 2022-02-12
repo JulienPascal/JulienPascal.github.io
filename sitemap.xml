@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/post/asg/</loc>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/ann_2/</loc>
       <lastmod>2022-01-03T18:00:00+01:00</lastmod>
     </url>
@@ -259,6 +267,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/adaptive-sparse-grids/</loc>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/author/</loc>
       <priority>0</priority>
     </url>
@@ -399,7 +416,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2022-01-03T18:00:00+01:00</lastmod>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -435,7 +452,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/tags/numerical/</loc>
-      <lastmod>2022-01-03T18:00:00+01:00</lastmod>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -444,7 +461,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/post/</loc>
-      <lastmod>2022-01-03T18:00:00+01:00</lastmod>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
     </url>
     
   
