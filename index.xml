@@ -3699,13 +3699,13 @@ found &lt;a href=&#34;https://github.com/JulienPascal/LogisticRegression&#34; ta
 model makes the assumption that the probability of winning is given by the logistic
 function :&lt;/p&gt;
 
-&lt;p&gt;$$ f(y_i | x_{i}, \theta_{i}) =  \sigma(x_{i} &amp;lsquo;\theta)$$&lt;/p&gt;
+&lt;p&gt;$$ f(y_i = 1| x_{i}, \theta_{i}) =  \sigma(x_{i} &amp;lsquo;\theta)$$&lt;/p&gt;
 
 &lt;p&gt;with $\sigma(v) = \frac{exp(v)}{1+exp(v)}$&lt;/p&gt;
 
 &lt;p&gt;The probability of losing is 1 minus the probability of wining:&lt;/p&gt;
 
-&lt;p&gt;$$ f(y_i | x_{i}, \theta) =  1 - \sigma(x_{i} &amp;lsquo;\theta)$$&lt;/p&gt;
+&lt;p&gt;$$ f(y_i = 0| x_{i}, \theta) =  1 - \sigma(x_{i} &amp;lsquo;\theta)$$&lt;/p&gt;
 
 &lt;h2 id=&#34;a-latent-variable-formulation&#34;&gt;A latent variable formulation&lt;/h2&gt;
 
@@ -3716,10 +3716,10 @@ An unobservable latent variable $z_{i}$ depends linearly on $x_{i}$ plus a noise
 
 &lt;p&gt;We only observe $y_i$, which is equal to 1 when $z_{i}$ is strictly positive, and 0 otherwise. If the error term is distributed according to the &lt;a href=&#34;https://en.wikipedia.org/wiki/Logistic_distribution&#34; target=&#34;_blank&#34;&gt;logistic distribution&lt;/a&gt;, we end up with the logistic model described above. If the error term is normally distributed, the model is a &lt;a href=&#34;https://en.wikipedia.org/wiki/Probit_model&#34; target=&#34;_blank&#34;&gt;probit model&lt;/a&gt;. To see that, simply express the probability of the latent variable to be bigger than 0:&lt;/p&gt;
 
-&lt;p&gt;$$ f(y_i | x_{i}, \theta_{i}) = P( x_{i} &amp;lsquo;\theta + \varepsilon_{i} &amp;gt; 0) $$
+&lt;p&gt;$$ f(y_i = 1| x_{i}, \theta_{i}) = P( x_{i} &amp;lsquo;\theta + \varepsilon_{i} &amp;gt; 0) $$
 $$  = 1 - P( x_{i} &amp;lsquo;\theta + \varepsilon_{i} \leq 0) $$
 $$  = 1 - P(\varepsilon_{i} \leq - x_{i} &amp;lsquo;\theta ) $$
-$$  = 1 - P(\varepsilon_{i} \leq - x_{i} &amp;lsquo;\theta ) $$
+$$  = 1 - \frac{1}{1+exp(x_{i} &amp;lsquo;\theta )} $$
 $$  = \frac{exp(x_{i} &amp;lsquo;\theta )}{1+exp(x_{i} &amp;lsquo;\theta )} $$&lt;/p&gt;
 
 &lt;p&gt;where the last line comes from using the expression for the &lt;a href=&#34;https://en.wikipedia.org/wiki/Logistic_distribution&#34; target=&#34;_blank&#34;&gt;cdf of the logistic distribution&lt;/a&gt; with zero mean and scale parameter equal to 1.&lt;/p&gt;
@@ -3728,13 +3728,13 @@ $$  = \frac{exp(x_{i} &amp;lsquo;\theta )}{1+exp(x_{i} &amp;lsquo;\theta )} $$&l
 
 &lt;p&gt;How can we read the coefficients from a logistic model? The marginal effect of a change in $x_{ij}$ (the $jth$ component of $x_i$) on the probability that $y_i = 1$ is given by:&lt;/p&gt;
 
-&lt;p&gt;$$ \frac{\partial f(y_i | x_{i}, \theta)}{\partial x_{ij}} = \sigma(x_{i} &amp;lsquo;\theta)(1-\sigma(x_{i} &amp;lsquo;\theta))\theta_j$$&lt;/p&gt;
+&lt;p&gt;$$ \frac{\partial f(y_i = 1| x_{i}, \theta)}{\partial x_{ij}} = \sigma(x_{i} &amp;lsquo;\theta)(1-\sigma(x_{i} &amp;lsquo;\theta))\theta_j$$&lt;/p&gt;
 
 &lt;p&gt;A first observation is that the marginal effect depends on $x_i$, unlike in the linear regression model. A second observation is that the first two terms are always positive, so we do have that the interpretation that if $\theta_j$ is positive, an increase in the $jth$ component of $x_i$ leads to a bigger probability of obtaining a success (holding everything else constant).&lt;/p&gt;
 
 &lt;p&gt;Another way to read the results from a logistic model is to realize that it implies that the log of odd ratio is linear:&lt;/p&gt;
 
-&lt;p&gt;$$ log\Big(\frac{f(y_i | x_{i}, \theta)}{1 - f(y_i | x_{i}, \theta)}\Big) = x_{i} &amp;lsquo;\theta$$&lt;/p&gt;
+&lt;p&gt;$$ log\Big(\frac{f(y_i =1 | x_{i}, \theta)}{1 - f(y_i =1| x_{i}, \theta)}\Big) = x_{i} &amp;lsquo;\theta$$&lt;/p&gt;
 
 &lt;p&gt;Going back to what makes a politician successful in an election, if the coefficient $\theta_j$ is equal to 0.1, it means that a one unit increase in $x_{ij}$ rises the &lt;strong&gt;relative&lt;/strong&gt; probability of winning an election by approximately $10\%$.&lt;/p&gt;
 

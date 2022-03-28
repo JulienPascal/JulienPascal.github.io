@@ -48,6 +48,15 @@ This project  Cluster neighborhoods in Paris and analyze cluster properties  Dat
     </item>
     
     <item>
+      <title>Econometrics II: Lecture I OLS</title>
+      <link>https://julienpascal.github.io/slides/lectures-econo-2-1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/slides/lectures-econo-2-1/</guid>
+      <description>Econometrics II Lecture I - OLS Introduction Motivation  Econometrics is the science of making causal statements using both theory and data Constraints: the world is probabilistic, the data we have is messy, theories are incomplete, etc&amp;hellip; We have to take these constraints into consideration  Looks causal Obvious spurious correlation Looks causal, but careful (see the lecture on Instrumental Variables ) The Linear Model  A building block to model and assess causality is the linear model  $$ y = X \beta + \varepsilon $$</description>
+    </item>
+    
+    <item>
       <title>Rental Housing Market and Directed Search</title>
       <link>https://julienpascal.github.io/slides/rental-market/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

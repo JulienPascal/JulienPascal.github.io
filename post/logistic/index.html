@@ -541,13 +541,13 @@ found <a href="https://github.com/JulienPascal/LogisticRegression" target="_blan
 model makes the assumption that the probability of winning is given by the logistic
 function :</p>
 
-<p>$$ f(y_i | x_{i}, \theta_{i}) =  \sigma(x_{i} &lsquo;\theta)$$</p>
+<p>$$ f(y_i = 1| x_{i}, \theta_{i}) =  \sigma(x_{i} &lsquo;\theta)$$</p>
 
 <p>with $\sigma(v) = \frac{exp(v)}{1+exp(v)}$</p>
 
 <p>The probability of losing is 1 minus the probability of wining:</p>
 
-<p>$$ f(y_i | x_{i}, \theta) =  1 - \sigma(x_{i} &lsquo;\theta)$$</p>
+<p>$$ f(y_i = 0| x_{i}, \theta) =  1 - \sigma(x_{i} &lsquo;\theta)$$</p>
 
 <h2 id="a-latent-variable-formulation">A latent variable formulation</h2>
 
@@ -558,10 +558,10 @@ An unobservable latent variable $z_{i}$ depends linearly on $x_{i}$ plus a noise
 
 <p>We only observe $y_i$, which is equal to 1 when $z_{i}$ is strictly positive, and 0 otherwise. If the error term is distributed according to the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">logistic distribution</a>, we end up with the logistic model described above. If the error term is normally distributed, the model is a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank">probit model</a>. To see that, simply express the probability of the latent variable to be bigger than 0:</p>
 
-<p>$$ f(y_i | x_{i}, \theta_{i}) = P( x_{i} &lsquo;\theta + \varepsilon_{i} &gt; 0) $$
+<p>$$ f(y_i = 1| x_{i}, \theta_{i}) = P( x_{i} &lsquo;\theta + \varepsilon_{i} &gt; 0) $$
 $$  = 1 - P( x_{i} &lsquo;\theta + \varepsilon_{i} \leq 0) $$
 $$  = 1 - P(\varepsilon_{i} \leq - x_{i} &lsquo;\theta ) $$
-$$  = 1 - P(\varepsilon_{i} \leq - x_{i} &lsquo;\theta ) $$
+$$  = 1 - \frac{1}{1+exp(x_{i} &lsquo;\theta )} $$
 $$  = \frac{exp(x_{i} &lsquo;\theta )}{1+exp(x_{i} &lsquo;\theta )} $$</p>
 
 <p>where the last line comes from using the expression for the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">cdf of the logistic distribution</a> with zero mean and scale parameter equal to 1.</p>
@@ -570,13 +570,13 @@ $$  = \frac{exp(x_{i} &lsquo;\theta )}{1+exp(x_{i} &lsquo;\theta )} $$</p>
 
 <p>How can we read the coefficients from a logistic model? The marginal effect of a change in $x_{ij}$ (the $jth$ component of $x_i$) on the probability that $y_i = 1$ is given by:</p>
 
-<p>$$ \frac{\partial f(y_i | x_{i}, \theta)}{\partial x_{ij}} = \sigma(x_{i} &lsquo;\theta)(1-\sigma(x_{i} &lsquo;\theta))\theta_j$$</p>
+<p>$$ \frac{\partial f(y_i = 1| x_{i}, \theta)}{\partial x_{ij}} = \sigma(x_{i} &lsquo;\theta)(1-\sigma(x_{i} &lsquo;\theta))\theta_j$$</p>
 
 <p>A first observation is that the marginal effect depends on $x_i$, unlike in the linear regression model. A second observation is that the first two terms are always positive, so we do have that the interpretation that if $\theta_j$ is positive, an increase in the $jth$ component of $x_i$ leads to a bigger probability of obtaining a success (holding everything else constant).</p>
 
 <p>Another way to read the results from a logistic model is to realize that it implies that the log of odd ratio is linear:</p>
 
-<p>$$ log\Big(\frac{f(y_i | x_{i}, \theta)}{1 - f(y_i | x_{i}, \theta)}\Big) = x_{i} &lsquo;\theta$$</p>
+<p>$$ log\Big(\frac{f(y_i =1 | x_{i}, \theta)}{1 - f(y_i =1| x_{i}, \theta)}\Big) = x_{i} &lsquo;\theta$$</p>
 
 <p>Going back to what makes a politician successful in an election, if the coefficient $\theta_j$ is equal to 0.1, it means that a one unit increase in $x_{ij}$ rises the <strong>relative</strong> probability of winning an election by approximately $10\%$.</p>
 

@@ -156,14 +156,6 @@
     
     <url>
     
-      <loc>https://julienpascal.github.io/project/taxation_labor/</loc>
-      <lastmod>2019-03-13T18:11:18+01:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>https://julienpascal.github.io/project/spatialeq/</loc>
       <lastmod>2019-03-12T18:11:07+01:00</lastmod>
     </url>
@@ -373,6 +365,13 @@
       <loc>https://julienpascal.github.io/tags/econometrics/</loc>
       <lastmod>2019-11-22T18:53:22+01:00</lastmod>
       <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/lectures-econo-2-1/</loc>
     </url>
     
   
