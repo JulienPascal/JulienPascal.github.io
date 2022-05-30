@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Migration on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/migration/</link>
+    <description>Recent content in Migration on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Sun, 29 May 2022 18:11:07 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/tags/migration/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>(In)efficient commuting and migration choices</title>
+      <link>https://julienpascal.github.io/project/inefficient_commuting/</link>
+      <pubDate>Sun, 29 May 2022 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/inefficient_commuting/</guid>
+      <description>We develop a monocentric urban search-and-matching model in which workers can choose to commute or to migrate within the region. The equilibrium endogenously allocates the population into three categories: migrants (relocate from their hometown to the city), commuters (traveling to work in the city) and home stayers (remaining in their hometown). We prove that the market equilibrium is usually not optimal: a composition externality may generate under- or over-migration with respect to the central planner’s solution, which in all cases results in under-investment in job vacancies and therefore production.</description>
+    </item>
+    
+  </channel>
+</rss>

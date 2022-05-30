@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/project/inefficient_commuting/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/asg/</loc>
       <lastmod>2022-02-12T08:00:00+01:00</lastmod>
     </url>
@@ -326,6 +334,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/commuting/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/competition/</loc>
       <lastmod>2017-03-07T15:51:54+01:00</lastmod>
       <priority>0</priority>
@@ -396,6 +413,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/e%EF%AC%80iciency/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/ha-models/</loc>
       <lastmod>2021-01-18T18:53:22+01:00</lastmod>
       <priority>0</priority>
@@ -415,7 +441,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -450,8 +476,26 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/migration/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/numerical/</loc>
       <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/policy/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -468,7 +512,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/project/</loc>
-      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -531,8 +575,26 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/urban-search-and-matching/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/wip/</loc>
       <lastmod>2019-03-14T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/working-paper/</loc>
+      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
