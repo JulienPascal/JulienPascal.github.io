@@ -7,8 +7,766 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sun, 29 May 2022 18:11:07 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 03 Sep 2022 18:00:00 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Numerical Approximation of Expectations Squared</title>
+      <link>https://julienpascal.github.io/post/integral_squared/</link>
+      <pubDate>Sat, 03 Sep 2022 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/integral_squared/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Recently, I came across a simple question that led me through a quite interesting rabbit hole. The question is very simple (and very niche), but the analysis involves key results from statistical theory and numerical analysis (the Central Limit Theorem, the Delta method, and the second-order Delta method, Monte Carlo integration).&lt;/p&gt;
+
+&lt;p&gt;Here is the seemingly innocent (and slightly bizarre) question:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Context:&lt;/strong&gt; One is interested in evaluating the square of an expectation $E\Big[g(X) \Big]^2 = \big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2 = \mu^2$, where $\mu$ is an unknown quantity &lt;strong&gt;&amp;ldquo;close to zero&amp;rdquo;&lt;/strong&gt;. Note that the integral squared can be rewritten as $\big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2  = \int_{a}^{b} \int_{a}^{b} g(x) g(y) f_X(x) f_Y(y) dx dy $. Transforming the square of an integral into a double integral is a standard trick, that is for instance used when calculating the &lt;a href=&#34;https://en.wikipedia.org/wiki/Gaussian_integral&#34; target=&#34;_blank&#34;&gt;Gaussian integral&lt;/a&gt;. Let&amp;rsquo;s say one want to numerically approximate $\mu^2$ using &lt;a href=&#34;https://en.wikipedia.org/wiki/Monte_Carlo_integration&#34; target=&#34;_blank&#34;&gt;Monte Carlo integration&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Question:&lt;/strong&gt; Is it better to approximate $\mu^2$ using the square of the Monte Carlo estimator $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$, or the Monte Carlo estimator based on the double integral: $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $? Here the sample ${x_i}$ and ${y_i}$ are i.i.d random variables with density f(.). The random variables ${x_i}$ and ${y_i}$ have the same density function, but they are drawn independently from each other.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;i-consistency&#34;&gt;I. Consistency&lt;/h2&gt;
+
+&lt;p&gt;Notice that both estimators are &lt;a href=&#34;https://en.wikipedia.org/wiki/Consistent_estimator&#34; target=&#34;_blank&#34;&gt;consistent&lt;/a&gt;. That is, as we increase $N$, the estimators converges in probability to the true value of the parameter $\mu^2$.&lt;/p&gt;
+
+&lt;h3 id=&#34;estimator-big-frac-1-n-sum-i-1-n-f-x-i-big-2&#34;&gt;Estimator $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.mit.edu/~kircher/sim.pdf&#34; target=&#34;_blank&#34;&gt;We know that Monte Carlo estimator are consistent&lt;/a&gt;: So $\frac{1}{N} \sum_{i=1}^{N} f(x_i)  \overset{p}{\to} \mu$. Because the function $x \rightarrow x^2$ is continuous on $R$, the &lt;a href=&#34;https://en.wikipedia.org/wiki/Continuous_mapping_theorem&#34; target=&#34;_blank&#34;&gt;continuous mapping theorem&lt;/a&gt; implies that  $\Big(\frac{1}{N} \sum_{i=1}^{N} f(x_i)\Big)^2  \overset{p}{\to} \mu^2$.&lt;/p&gt;
+
+&lt;h3 id=&#34;estimator-frac-1-n-sum-i-1-n-f-x-i-f-y-i&#34;&gt;Estimator $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $&lt;/h3&gt;
+
+&lt;p&gt;Once again, we know that Monte Carlo estimator are consistent. So $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) \overset{p}{\to} \int_{a}^{b} \int_{a}^{b} g(x) g(y) f_X(x) f_Y(y) dx dy = \big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2  = \mu^2$.&lt;/p&gt;
+
+&lt;p&gt;Hence, both estimators get closer to the true value as we increase the number of draws N.&lt;/p&gt;
+
+&lt;h2 id=&#34;ii-bias&#34;&gt;II. Bias&lt;/h2&gt;
+
+&lt;p&gt;Interestingly, $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$ has a small sample bias, while $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $ does not.&lt;/p&gt;
+
+&lt;h3 id=&#34;estimator-big-frac-1-n-sum-i-1-n-f-x-i-big-2-1&#34;&gt;Estimator $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$&lt;/h3&gt;
+
+&lt;p&gt;$$ E[ \big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2] = \big(E [\frac{1}{N} \sum_{i=1}^{N} f(x_i)] \Big)^2 + Var(\frac{1}{N} \sum_{i=1}^{N} f(x_i))$$&lt;/p&gt;
+
+&lt;p&gt;$$ E[ \big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2] = \mu^2 + \frac{\sigma^2}{N} $$&lt;/p&gt;
+
+&lt;p&gt;$$ Bias(\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2) = \frac{\sigma^2}{N} $$&lt;/p&gt;
+
+&lt;h3 id=&#34;estimator-frac-1-n-sum-i-1-n-f-x-i-f-y-i-1&#34;&gt;Estimator $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $&lt;/h3&gt;
+
+&lt;p&gt;$$ E [\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i)] = \frac{1}{N} \sum_{i=1}^{N} E[f(x_i) f(y_i)]  $$&lt;/p&gt;
+
+&lt;p&gt;$$ = \frac{1}{N} \sum_{i=1}^{N} E[f(x_i)] E[ f(y_i)]  $$&lt;/p&gt;
+
+&lt;p&gt;$$ = \mu^2  $$&lt;/p&gt;
+
+&lt;p&gt;$$ Bias(\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) ) = 0 $$&lt;/p&gt;
+
+&lt;p&gt;Where, going from the first line to the second is based on the fact that $X$ and $Y$ are independent random variables. However, the bias is just one part of the whole story. To see which estimator is better, we also need to investigate their variance.&lt;/p&gt;
+
+&lt;h2 id=&#34;iii-variance-case-mu-0&#34;&gt;III. Variance. Case $\mu &amp;gt; 0$&lt;/h2&gt;
+
+&lt;h3 id=&#34;estimator-big-frac-1-n-sum-i-1-n-f-x-i-big-2-2&#34;&gt;Estimator $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$&lt;/h3&gt;
+
+&lt;p&gt;Note that the value $\bar{X&lt;em&gt;n} = \frac{1}{N} \sum&lt;/em&gt;{i=1}^{N} f(x_i) $ is the sample mean. The &lt;a href=&#34;https://en.wikipedia.org/wiki/Central_limit_theorem&#34; target=&#34;_blank&#34;&gt;Central Limit Theorem&lt;/a&gt; implies that:&lt;/p&gt;
+
+&lt;p&gt;$$\sqrt{N} \frac{(\bar{X_n} - \mu)}{\sigma} \overset{d}{\to} N(0,1)$$&lt;/p&gt;
+
+&lt;p&gt;To get the (asymptotic) variance of $\bar{X_n}^2$, one may use the &lt;a href=&#34;https://en.wikipedia.org/wiki/Delta_method&#34; target=&#34;_blank&#34;&gt;delta method&lt;/a&gt;. The delta method states that if there is a sequence of random variables $X_n$ satisfying:&lt;/p&gt;
+
+&lt;p&gt;$$\sqrt{N} (\bar{X_n} - \theta) \overset{d}{\to} N(0,\sigma^2)$$&lt;/p&gt;
+
+&lt;p&gt;with $\theta$ and $\sigma^2$ finite valued constants. Assume that $g$ is a function with continuous first derivative, satisfying the property that $g&amp;rsquo;(\theta)$ is &lt;strong&gt;non-zero valued&lt;/strong&gt;. Then,&lt;/p&gt;
+
+&lt;p&gt;$$\sqrt{N} (g(\bar{X_n}) - g(\theta)) \overset{d}{\to} N(0,\sigma^2 [g&amp;rsquo;(\theta)]^2)$$&lt;/p&gt;
+
+&lt;p&gt;Here $g(x) = x^2$, $g&amp;rsquo;(x) = 2x$, so the delta method implies that:&lt;/p&gt;
+
+&lt;p&gt;$$\sqrt{N} (\bar{X_n}^2 - \mu^2) \overset{d}{\to} N(0,4\mu^2 \sigma^2)$$.&lt;/p&gt;
+
+&lt;h3 id=&#34;estimator-frac-1-n-sum-i-1-n-f-x-i-f-y-i-2&#34;&gt;Estimator $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s use the notation $\bar{XY}_n = \frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $. Once again, the &lt;a href=&#34;https://en.wikipedia.org/wiki/Central_limit_theorem&#34; target=&#34;_blank&#34;&gt;Central Limit Theorem&lt;/a&gt; implies that:&lt;/p&gt;
+
+&lt;p&gt;$$\sqrt{N} (\bar{XY}_n - \mu^2) \overset{d}{\to} N(0, \sigma_{XY})$$&lt;/p&gt;
+
+&lt;p&gt;with $\sigma_{XY} = \sqrt{Var(\bar{XY}_n)}$.&lt;/p&gt;
+
+&lt;p&gt;If $X$ and $Y$ are independent random variables, then $Var(XY) = Var(X)Var(Y) + Var(X)(E[Y]^2) + Var(Y)(E[X]^2)$.&lt;/p&gt;
+
+&lt;p&gt;Here $Var(X) = Var(Y) = \sigma$, and $E[X] = E[Y] = \mu$, so the above equation simplifies to:&lt;/p&gt;
+
+&lt;p&gt;$$ Var(XY) = \sigma^4 + 2 \mu^2 \sigma^2$$.&lt;/p&gt;
+
+&lt;h3 id=&#34;comparison-var-bar-xy-n-vs-var-bar-x-n-2&#34;&gt;Comparison $Var(\bar{XY}_n)$ vs $Var(\bar{X}_n^2)$&lt;/h3&gt;
+
+&lt;p&gt;For large values of $\mu$, the estimator $\bar{XY}_n$ has smaller variance. However, when $\mu$ is small, $\bar{X_n}$ has a smaller variance. This property is illustrated below by plotting the function  $\mu \rightarrow (\sigma^4 + 2\mu^2\sigma^2) - 4\mu^2\sigma^2$ for different choices of $\sigma$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Plots
+using LaTeXStrings
+using Distributions
+gr()
+
+N = 100
+grid_sigma = collect(range(0, 1.0, length=N))
+grid_mu = collect(range(0, 1.0, length=N))
+grid_mu_smaller = collect(range(0, 0.25, length=N))
+diff = zeros(N,N)
+
+
+f(mu, sigma) = (sigma.^4 .+ (2.0.*mu.^2).*(sigma.^2)) .- 4.0 .*(mu.^2).*(sigma.^2)
+
+#p = plot(grid_mu, grid_sigma, (x,y) -&amp;gt; f(x,y), st = :contourf, xlabel=L&amp;quot;\mu&amp;quot;, ylabel=L&amp;quot;\sigma&amp;quot;, fill=true)
+p0 = plot(grid_mu, x -&amp;gt; 0.0, label=L&amp;quot;0&amp;quot;, linestyle=:dash, ylabel=L&amp;quot;(\sigma^4 + 2\mu^2\sigma^2) - 4\mu^2\sigma^2&amp;quot;)
+plot!(p0, grid_mu, x -&amp;gt; f(x,1.0), xlabel=L&amp;quot;\mu&amp;quot;, label=L&amp;quot;f(\mu, \sigma=1.0)&amp;quot;)
+plot!(p0, grid_mu, x -&amp;gt; f(x,0.75), xlabel=L&amp;quot;\mu&amp;quot;, label=L&amp;quot;f(\mu, \sigma=0.75)&amp;quot;)
+plot!(p0, grid_mu, x -&amp;gt; f(x,0.5), xlabel=L&amp;quot;\mu&amp;quot;, label=L&amp;quot;f(\mu, \sigma=0.5)&amp;quot;)
+
+p1 = plot(grid_mu_smaller, x -&amp;gt; 0.0, label=L&amp;quot;0&amp;quot;, linestyle=:dash, ylabel=L&amp;quot;(\sigma^4 + 2\mu^2\sigma^2) - 4\mu^2\sigma^2&amp;quot;)
+plot!(p1, grid_mu_smaller, x -&amp;gt; f(x,0.25), xlabel=L&amp;quot;\mu&amp;quot;, label=L&amp;quot;f(\mu, \sigma=0.25)&amp;quot;)
+plot!(p1, grid_mu_smaller, x -&amp;gt; f(x,0.20), xlabel=L&amp;quot;\mu&amp;quot;, label=L&amp;quot;f(\mu, \sigma=0.20)&amp;quot;)
+plot!(p1, grid_mu_smaller, x -&amp;gt; f(x,0.15), xlabel=L&amp;quot;\mu&amp;quot;, label=L&amp;quot;f(\mu, \sigma=0.15)&amp;quot;)
+
+plot(p0, p1)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_6_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the block of code below, I estimate $\bar{XY}_n$ and $\bar{X}_n^2$ in two cases. First, I assume that $X$ is normally distributed with mean $\mu$ and unit variance. In this case, we do not even need the central limit theorem, because the sum of iid Normal variables is also normally distributed. In the second case, I assume that $X$ is uniformly distributed $Uni(\mu-1, \mu+1)$, in which case the mean of $X$ is equal to $\mu$.&lt;/p&gt;
+
+&lt;p&gt;As illustrated below, in both instances $\bar{X}_n^2$ has a smaller variance than $\bar{XY}_n$. The figure also underlines that even when $X$ is not normally distributed, the CLT kicks in and the above analysis provides a good estimate of the small sample behavior of our estimators.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;N = 1000 #number of draws
+N_replicate = 5000 #number of replications for the distribution of the estimator
+list_plots = [] #to store plots
+sigma = 1.0 #variance when simulating from Normal
+
+for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;, &amp;quot;Uniform&amp;quot;])
+    for (index_mu, mu) in enumerate([0.20, 0.10, 0.05])
+
+        #println(mu)
+
+        if distribution == &amp;quot;Normal&amp;quot;
+            d_x = Normal(mu, sigma)
+            d_x1 = Normal(mu, sigma)
+            d_x2 = Normal(mu, sigma)
+        else
+            d_x = Uniform(-1,1) + mu
+            d_x1 = Uniform(-1,1) + mu
+            d_x2 = Uniform(-1,1) + mu
+        end
+
+        # f(x) = x
+        distristribution_square = zeros(N_replicate) # (mean(x))^2
+        distristribution_square_centered = zeros(N_replicate) # (mean(x))^2 - mu^2
+        distristribution_product_centered = zeros(N_replicate) # (mean(x1 x2) - mu^2
+
+        distristribution_square_std = zeros(N_replicate)
+        distristribution_square_mean = zeros(N_replicate)
+
+        distristribution_product_std = zeros(N_replicate)
+        distristribution_product_mean = zeros(N_replicate)
+
+        for i=1:N_replicate
+
+            draws_x = rand(d_x, N)
+            draws_x1 = rand(d_x1, N)
+            draws_x2 = rand(d_x2, N)
+
+            distristribution_square[i] = mean(draws_x .- mu)^2
+            distristribution_square_centered[i] = sqrt(N)*(mean(draws_x)^2 - mu^2)
+            distristribution_product_centered[i] = sqrt(N)*(mean(draws_x1.*draws_x2) - mu^2)
+
+            distristribution_square_std[i] = std(draws_x)
+            distristribution_square_mean[i] = mean(draws_x)
+
+            distristribution_product_std[i] = std(draws_x1.*draws_x2)
+            distristribution_product_mean[i] = mean(draws_x1.*draws_x2)
+
+        end
+
+        # Empirical sigmas
+        mu_X1X2 = mean(distristribution_product_mean)
+        sigma_X1X2 = mean(distristribution_square_std)
+        var_n0_empirical = sigma_X1X2^4 + sigma_X1X2^2*(2*mu_X1X2^2)
+
+        mu_X_squared = mean(distristribution_square_mean)
+        sigma_X_squared = mean(distristribution_square_std)
+        var_n1_empirical = (4*mu_X_squared^2*sigma_X_squared^2)
+
+        # Theoretical sigmas when using Normal draws
+        var_n0 = sigma^2 * sigma^2 + sigma^2*(2*mu^2) #var(distristribution_product_centered) #(sigma^2)
+        var_n1 = (4*mu^2*sigma^2)
+
+        pdf_normal_0 = Normal(0, sqrt(var_n0_empirical))
+        pdf_normal_1 = Normal(0, sqrt(var_n1_empirical))
+
+        # Plotting
+        show_legend = false
+        if index_mu == 2 &amp;amp;&amp;amp; index_distribution == 1
+            show_legend = true
+        end
+        title_name = &amp;quot;&amp;quot;
+        if index_distribution == 1
+            title_name = &amp;quot;N($(mu), $(sigma))&amp;quot;
+        else
+            title_name = &amp;quot;U(-1, 1) + $(mu)&amp;quot;
+        end
+
+        p1 = histogram(distristribution_product_centered, label=L&amp;quot;$\sqrt{N}(\bar{X_1 X_2}_{n} - \mu^2 ) $&amp;quot;, normalize=true, alpha=0.5)
+        histogram!(p1, distristribution_square_centered, label=L&amp;quot;$\sqrt{N}(\bar{X}_{n}^2 - \mu^2 )$&amp;quot;, normalize=true, alpha=0.5, title=title_name)
+
+        plot!(p1, minimum(distristribution_product_centered):0.1:maximum(distristribution_product_centered), x-&amp;gt; pdf(pdf_normal_0, x), label=L&amp;quot;$N(0, \sigma^4 + 2\mu^2\sigma^2)$&amp;quot;)
+        plot!(p1, minimum(distristribution_square_centered):0.1:maximum(distristribution_square_centered), x-&amp;gt; pdf(pdf_normal_1, x), label=L&amp;quot;$N(0, 4 \mu^2 \sigma^2)$&amp;quot;, legend = show_legend)
+        push!(list_plots, p1)
+
+    end
+
+end
+
+plot(list_plots[1], list_plots[2], list_plots[3], list_plots[4], list_plots[5], list_plots[6])
+plot!(size=(1000,600))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_8_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;iv-variance-case-mu-0&#34;&gt;IV. Variance. Case $\mu = 0$&lt;/h2&gt;
+
+&lt;p&gt;The limit case $\mu = 0$ deserves a special treatment. Indeed, for the delta method to applies, the condition that $g′(\theta)$ is &lt;strong&gt;non-zero valued&lt;/strong&gt; must hold. However with $g(\theta) = \theta^2$, $g&amp;rsquo;(0) = 2\times0=0$.&lt;/p&gt;
+
+&lt;p&gt;In that context, the second-order delta method applies:&lt;/p&gt;
+
+&lt;h3 id=&#34;second-order-delta-method&#34;&gt;Second order delta method&lt;/h3&gt;
+
+&lt;p&gt;Consider a sequence of random variables $X_n$ satisfying:&lt;/p&gt;
+
+&lt;p&gt;$$\sqrt{N} (\bar{X_n} - \theta) \overset{d}{\to} N(0,\sigma^2)$$&lt;/p&gt;
+
+&lt;p&gt;with $\theta$ and $\sigma^2$ finite valued constants. Assume that $g$ is a function with continuous first and second derivatives, satisfying the property that $g&amp;rsquo;(\theta) = 0$ and $g&amp;rdquo;(\theta) \neq 0$. Then:&lt;/p&gt;
+
+&lt;p&gt;$$N (g(\bar{X_n}) - g(\theta)) \overset{d}{\to} \sigma^2 \frac{g&amp;rdquo;(\theta)}{2} \chi^2(1)$$&lt;/p&gt;
+
+&lt;p&gt;So applying the second order delta method with $g&amp;rsquo;(\theta) = \theta^2$ and $\mu=0$ gives us:&lt;/p&gt;
+
+&lt;p&gt;$$N (\bar{X_n}^2) \overset{d}{\to} \sigma^2 \chi^2(1)$$&lt;/p&gt;
+
+&lt;p&gt;Using the fact that $Var(\chi^2(1)) = 2$ and rearranging terms gives:&lt;/p&gt;
+
+&lt;p&gt;$$ Var(\bar{X_n}^2) \approx \frac{2 \sigma^4}{N^2}$$&lt;/p&gt;
+
+&lt;p&gt;This approximation should get increasingly better as $N$ increases.&lt;/p&gt;
+
+&lt;h3 id=&#34;comparison-var-bar-xy-n-vs-var-bar-x-n-2-1&#34;&gt;Comparison $Var(\bar{XY}_n)$ vs $Var(\bar{X}_n^2)$&lt;/h3&gt;
+
+&lt;p&gt;When $\mu=0$:&lt;/p&gt;
+
+&lt;p&gt;$$Var(\bar{XY}_n) = \frac{\sigma^4}{N}$$&lt;/p&gt;
+
+&lt;p&gt;and&lt;/p&gt;
+
+&lt;p&gt;$$Var(\bar{X_n}^2) = \frac{2\sigma^4}{N^2}$$&lt;/p&gt;
+
+&lt;p&gt;Because of the $N^2$ at the denominator, we see that $\bar{X_n}^2$ converges much faster than $\bar{XY}_n$. This property is illustrated on the plot below, in which I do the same exercice as before, but with $\mu=0$. Note that I show the histogram of $\sqrt{N}(\bar{X_1 X_2}_{n} - \mu^2 )$ versus $N(\bar{X}^2_{n} - \mu^2 )$ (scaling with $\sqrt{N}$ versus $N$).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;N = 1000#number of draws
+N_replicate = 5000 #number of replications for the distribution of the estimator
+list_plots = []
+sigma=1.0 #variance when simulating from Normal
+
+for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;, &amp;quot;Uniform&amp;quot;])
+    for (index_mu, mu) in enumerate([0.0])
+
+        #println(mu)
+
+        if distribution == &amp;quot;Normal&amp;quot;
+            d_x = Normal(mu, sigma)
+            d_x1 = Normal(mu, sigma)
+            d_x2 = Normal(mu, sigma)
+        else
+            d_x = Uniform(-1,1) + mu
+            d_x1 = Uniform(-1,1) + mu
+            d_x2 = Uniform(-1,1) + mu
+        end
+
+        # f(x) = x
+        distristribution_square = zeros(N_replicate) # (mean(x))^2
+        distristribution_square_centered = zeros(N_replicate) # (mean(x))^2 - mu^2
+        distristribution_product_centered = zeros(N_replicate) # (mean(x1 x2) - mu^2
+
+        distristribution_square_std = zeros(N_replicate)
+        distristribution_square_var = zeros(N_replicate)
+        distristribution_square_mean = zeros(N_replicate)
+
+        distristribution_product_std = zeros(N_replicate)
+        distristribution_product_mean = zeros(N_replicate)
+
+        for i=1:N_replicate
+
+            draws_x = rand(d_x, N)
+            draws_x1 = rand(d_x1, N)
+            draws_x2 = rand(d_x2, N)
+
+            distristribution_square[i] = mean(draws_x .- mu)^2
+            distristribution_square_centered[i] = N*(mean(draws_x)^2 - mu^2)/sigma
+            distristribution_product_centered[i] = sqrt(N)*(mean(draws_x1.*draws_x2) - mu^2)
+
+            distristribution_square_std[i] = std(draws_x)
+            distristribution_square_var[i] = var(draws_x)
+            distristribution_square_mean[i] = mean(draws_x)
+
+            distristribution_product_std[i] = std(draws_x1.*draws_x2)
+            distristribution_product_mean[i] = mean(draws_x1.*draws_x2)
+
+        end
+
+        # Empirical sigmas
+        mu_X1X2 = mean(distristribution_product_mean)
+        sigma_X1X2 = mean(distristribution_product_std)
+
+        mu_X_squared = mean(distristribution_square_mean)
+        var_X_squared = mean(distristribution_square_var)
+
+        var_n0_empirical = var_X_squared^2 + sigma_X1X2^2*(2*mu_X1X2^2)
+
+        pdf_normal_0 = Normal(0, sqrt(var_n0_empirical))
+        pdf_chisq_1 = Chisq(1)
+
+        # Plotting
+        show_legend = false
+        if index_mu == 1 &amp;amp;&amp;amp; index_distribution == 2
+            show_legend = true
+        end
+        title_name = &amp;quot;&amp;quot;
+        if index_distribution == 1
+            title_name = &amp;quot;N($(mu), $(sigma))&amp;quot;
+        else
+            title_name = &amp;quot;U(-1, 1) + $(mu)&amp;quot;
+        end
+
+        p1 = histogram(distristribution_product_centered, label=L&amp;quot;$\sqrt{N}(\bar{X_1 X_2}_{n} - \mu^2 ) $&amp;quot;, normalize=true, alpha=0.5)
+        histogram!(p1,distristribution_square_centered, label=L&amp;quot;$N(\bar{X}_{n}^2 - \mu^2)/\sigma^2$&amp;quot;, normalize=true, alpha=0.5, title=title_name)
+
+        plot!(p1, minimum(distristribution_product_centered):0.1:maximum(distristribution_product_centered), x-&amp;gt; pdf(pdf_normal_0, x), label=L&amp;quot;$N(0, \sigma^4 + 2\mu^2\sigma^2)$&amp;quot;)
+        plot!(p1, 0.001:0.01:maximum(distristribution_square_centered), x-&amp;gt; pdf(pdf_chisq_1, x), label=L&amp;quot;$\chi^2(1)$&amp;quot;, legend = show_legend)
+        push!(list_plots, p1)
+
+    end
+
+end
+
+plot(list_plots[1], list_plots[2])
+plot!(size=(1000,300))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_11_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;v-mean-squared-error&#34;&gt;V. Mean Squared Error&lt;/h2&gt;
+
+&lt;p&gt;To is a measure the quality of an estimator, it is common to use the mean squared error (MSE). In plain English, the mean squared error measures the average squared difference between the estimated values and the actual value:&lt;/p&gt;
+
+&lt;p&gt;$$ MSE(\hat{\theta}) = E_{\theta} [ (\hat{\theta} - \theta)^2] $$&lt;/p&gt;
+
+&lt;p&gt;The MSE has the appealing property that it is equal to the variance of the estimator, plus the bias squared:&lt;/p&gt;
+
+&lt;p&gt;$$ MSE(\hat{\theta}) = V [ \hat{\theta} ] + Bias(\hat{\theta})^2$$&lt;/p&gt;
+
+&lt;p&gt;Fortunately, we have already done the heavy lifting by calculating the biases and the variances of the estimators.
+Collecting the previous results, we have.&lt;/p&gt;
+
+&lt;h3 id=&#34;case-mu-0&#34;&gt;Case $\mu &amp;gt;0 $&lt;/h3&gt;
+
+&lt;p&gt;$$ MSE(\bar{X}^2_n) = \frac{\sigma_f^4 + 4N \mu^2 \sigma_f^2}{N^2} $$&lt;/p&gt;
+
+&lt;p&gt;$$ MSE(\bar{XY}_n) = \frac{\sigma_f^4}{N} $$&lt;/p&gt;
+
+&lt;h3 id=&#34;case-mu-0-1&#34;&gt;Case $\mu = 0$&lt;/h3&gt;
+
+&lt;p&gt;$$ MSE(\bar{X}^2_n) = \frac{3 \sigma_f^4}{N^2}$$&lt;/p&gt;
+
+&lt;p&gt;$$ MSE(\bar{XY}_n) = \frac{\sigma_f^4}{N} $$&lt;/p&gt;
+
+&lt;p&gt;It is easy to see that when $\mu$ is close or equal to 0, it is better to use $\bar{X}^2_n$ instead $\bar{XY}_n$. In the next section, I check that numerically with some examples.&lt;/p&gt;
+
+&lt;h2 id=&#34;vi-numerical-illustration&#34;&gt;VI. Numerical illustration&lt;/h2&gt;
+
+&lt;h3 id=&#34;case-mu-0-2&#34;&gt;Case $\mu = 0$&lt;/h3&gt;
+
+&lt;p&gt;The takeaway of the previous sections is that if we suspect $\mu$ in a neighborhood of 0, one is better off using $\bar{X_n}^2$ instead of $\bar{XY}_n$.&lt;/p&gt;
+
+&lt;p&gt;Now I compare the accuracy of both approaches for a numerical integration exercice. For instance, let&amp;rsquo;s approximate the integral:&lt;/p&gt;
+
+&lt;p&gt;$$ \Big(\int_{-\infty}^{+\infty} x^3 \frac{1}{\sqrt{2\pi}}  \exp(\frac{-1}{2}x^2) dx \Big)^2 $$&lt;/p&gt;
+
+&lt;p&gt;The true value of the integral is known to be &lt;strong&gt;zero&lt;/strong&gt; (odd central moment of a normally distributed random variable). The left panel in the next graph shows the mean squared error for $\bar{X}^2_n$ and $\bar{XY}_n$. As expected given the previous sections, $\bar{X}^2_n$ provides a much better approximation to $\mu^2$ than $\bar{XY}_n$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;grid_N = [100, 1000, 10000, 100000, 1000000]
+N_replicate = 1000 #number of replications for the distribution of the estimator
+
+# To store stats values
+distristribution_mean = zeros(length(grid_N), N_replicate)
+distristribution_var = zeros(length(grid_N), N_replicate)
+distristribution_var_product = zeros(length(grid_N), N_replicate)
+distristribution_square_mean = zeros(length(grid_N), N_replicate)
+distristribution_product_mean = zeros(length(grid_N), N_replicate)
+
+# Store stats on distribution of values for each replication
+
+distristribution_mean_var = zeros(length(grid_N))
+distristribution_mean_var_product = zeros(length(grid_N))
+distristribution_square_average = zeros(length(grid_N))
+distristribution_square_var = zeros(length(grid_N))
+
+distristribution_product_average = zeros(length(grid_N))
+distristribution_product_var = zeros(length(grid_N))
+
+# To store stats on Mean Squared Error (MSE)
+distristribution_square_MSE_average = zeros(length(grid_N))
+distristribution_square_MSE_var = zeros(length(grid_N))
+
+distristribution_product_MSE_average = zeros(length(grid_N))
+distristribution_product_MSE_var = zeros(length(grid_N))
+
+
+mu = 0
+sigma = 1.0 #variance when simulating from Normal
+f(x) = x.^3
+
+for (index_N, N) in enumerate(grid_N)
+
+    d_x = Normal(mu, sigma)
+    d_x1 = Normal(mu, sigma)
+    d_x2 = Normal(mu, sigma)
+
+    for i=1:N_replicate
+
+        draws_x = rand(d_x, N)
+        draws_x1 = rand(d_x1, N)
+        draws_x2 = rand(d_x2, N)
+
+        distristribution_mean[index_N, i] = mean(f(draws_x)) #mean f(x)
+        distristribution_var[index_N, i] = var(f(draws_x)) #variance of f(x)
+        distristribution_var_product[index_N, i] = var(f(draws_x1).*f(draws_x2)) #variance of f(x1)*f(x2)
+        distristribution_square_mean[index_N, i] = mean(f(draws_x))^2
+        distristribution_product_mean[index_N, i] = mean(f(draws_x1).*f(draws_x2))
+
+    end
+
+    #Stats across different replications
+    # Variance estimator
+    # E(x^2)
+    distristribution_mean_var[index_N] = mean(distristribution_var[index_N, :]) #average of variances
+    distristribution_mean_var_product[index_N] = mean(distristribution_var_product[index_N, :]) #average of variances of products
+    distristribution_square_var[index_N] = var(distristribution_square_mean[index_N, :])
+    distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
+
+    # E(xy)
+    # prevent negative values using abs.
+    distristribution_product_var[index_N] = var(distristribution_product_mean[index_N, :])
+    distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
+
+    # Mean squared error
+    # Note that here the true value is 0
+    # E(x^2)
+    distristribution_square_MSE_var[index_N] = var((distristribution_square_mean[index_N, :]).^2)
+    distristribution_square_MSE_average[index_N] = mean((distristribution_square_mean[index_N, :]).^2)
+
+    # E(xy)
+    distristribution_product_MSE_var[index_N] = var(distristribution_product_mean[index_N, :].^2)
+    distristribution_product_MSE_average[index_N] = mean(distristribution_product_mean[index_N, :].^2)
+
+
+end
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Plot for the expected value
+p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;, ylabel=L&amp;quot;$log_{10}(MSE)$&amp;quot;)
+plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$3\sigma_f^4/N^2$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+
+# Plot for the variance
+p1 = plot(log10.(grid_N), log10.(distristribution_square_var), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.(distristribution_product_var),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+# Variance absolute value of $\bar{XY}_n$
+# Using Jensen&#39;s inequality, it is slightly below the variance of $\bar{XY}_n$
+# plot!(p1, log10.(grid_N), log10.(var(abs.(distristribution_product_mean), dims=2)),  label =L&amp;quot;$|\bar{XY}_n|$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.((2.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$2\sigma_f^4/N^2$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(p1, log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, title=&amp;quot;Variance Estimator&amp;quot;, ylabel=L&amp;quot;$log_{10}(Variance)$&amp;quot;, linestyle=:dash, linewidth=2.0)
+
+
+plot(p0, p1)
+plot!(size=(800,400))
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_15_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The log scale of the previous graph does not do justice to the difference that exists between both estimators.
+So in the next graph, I keep a linear scale. The blue line is the average value for a given $N$. This graph makes obvious $\bar{X}_n$ converges much quicker to $\mu^2$ than $\bar{XY}_n$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;grid_N = collect(range(100, 100000, step=1000))
+N_replicate = 100 #number of replications for the distribution of the estimator
+
+distristribution_square_mean = zeros(length(grid_N), N_replicate)
+distristribution_product_mean = zeros(length(grid_N), N_replicate)
+
+# Distribution of values for each replication
+distristribution_square_average = zeros(length(grid_N))
+distristribution_square_var = zeros(length(grid_N))
+
+distristribution_product_average = zeros(length(grid_N))
+distristribution_product_var = zeros(length(grid_N))
+
+
+mu = 0
+sigma=1.0 #variance when simulating from Normal
+f(x) = x.^3
+
+for (index_N, N) in enumerate(grid_N)
+
+    d_x = Normal(mu, sigma)
+    d_x1 = Normal(mu, sigma)
+    d_x2 = Normal(mu, sigma)
+
+    for i=1:N_replicate
+
+        draws_x = rand(d_x, N)
+        draws_x1 = rand(d_x1, N)
+        draws_x2 = rand(d_x2, N)
+
+        distristribution_square_mean[index_N, i] = mean(f(draws_x))^2
+        distristribution_product_mean[index_N, i] = mean(f(draws_x1).*f(draws_x2))
+
+    end
+
+    #Stats across different replications
+    # E(x^2)
+    distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
+
+    # E(xy)
+    distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
+
+end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;min_val = minimum(distristribution_product_mean)
+max_val = maximum(distristribution_product_mean)
+p0 = scatter(grid_N, distristribution_square_mean, legend=false,title=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$N$&amp;quot;, alpha=0.5, ylims=(min_val, max_val ))
+plot!(p0, grid_N, distristribution_square_average, label=&amp;quot;mean&amp;quot;, ylims=(min_val, max_val ), linewidth=2.0, color=&amp;quot;blue&amp;quot;, xrotation = 15)
+p1 = scatter(grid_N, distristribution_product_mean, legend=false,title=L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$N$&amp;quot;, ylims=(min_val, max_val ))
+plot!(p1, grid_N, distristribution_product_average, label=&amp;quot;mean&amp;quot;, ylims=(min_val, max_val ), linewidth=2.0, color=&amp;quot;blue&amp;quot;, xrotation = 15)
+plot(p0, p1)
+plot!(size=(800,600))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_18_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;case-mu-small&#34;&gt;Case $\mu$ small&lt;/h3&gt;
+
+&lt;p&gt;In practice, we do not know for sure that $\mu$ is exactly equal to zero. However, we know that $\mu$ is &amp;ldquo;close to zero&amp;rdquo;. Are we still better off using $\bar{X}^2_n$ instead of $\bar{XY}_n$?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;grid_N = [10, 100, 1000, 10000, 100000, 1000000]
+#grid_N = [10, 100, 1000, 10000]
+N_replicate = 1000 #number of replications for the distribution of the estimator
+
+# To store stats values
+distristribution_mean = zeros(length(grid_N), N_replicate)
+distristribution_var = zeros(length(grid_N), N_replicate)
+distristribution_var_product = zeros(length(grid_N), N_replicate)
+distristribution_square_mean = zeros(length(grid_N), N_replicate)
+distristribution_product_mean = zeros(length(grid_N), N_replicate)
+
+# Store stats on distribution of values for each replication
+distristribution_mean_average = zeros(length(grid_N))
+distristribution_mean_var = zeros(length(grid_N))
+distristribution_mean_var_product = zeros(length(grid_N))
+distristribution_square_average = zeros(length(grid_N))
+distristribution_square_var = zeros(length(grid_N))
+
+distristribution_product_average = zeros(length(grid_N))
+distristribution_product_var = zeros(length(grid_N))
+
+# To store stats on Mean Squared Error (MSE)
+distristribution_square_MSE_average = zeros(length(grid_N))
+distristribution_square_MSE_var = zeros(length(grid_N))
+
+distristribution_product_MSE_average = zeros(length(grid_N))
+distristribution_product_MSE_var = zeros(length(grid_N))
+
+
+true_value = sqrt(0.01)
+mu = true_value  #mean normal
+sigma = 1.0 #variance when simulating from Normal
+f(x) = x
+
+for (index_N, N) in enumerate(grid_N)
+
+    d_x = Normal(mu, sigma)
+    d_x1 = Normal(mu, sigma)
+    d_x2 = Normal(mu, sigma)
+
+    for i=1:N_replicate
+
+        draws_x = rand(d_x, N)
+        draws_x1 = rand(d_x1, N)
+        draws_x2 = rand(d_x2, N)
+
+        distristribution_mean[index_N, i] = mean(f(draws_x)) #mean f(x)
+        distristribution_var[index_N, i] = var(f(draws_x)) #variance of f(x)
+        distristribution_var_product[index_N, i] = var(f(draws_x1).*f(draws_x2)) #variance of f(x1)*f(x2)
+        distristribution_square_mean[index_N, i] = mean(f(draws_x))^2
+        distristribution_product_mean[index_N, i] = mean(f(draws_x1).*f(draws_x2))
+
+    end
+
+    #Stats across different replications
+    # Average of mean
+    distristribution_mean_average[index_N] = mean(mean(distristribution_mean[index_N, :]))
+
+    # Variance estimator
+    # E(x^2)
+    distristribution_mean_var[index_N] = mean(distristribution_var[index_N, :]) #average of variances
+    distristribution_mean_var_product[index_N] = mean(distristribution_var_product[index_N, :]) #average of variances of products
+    distristribution_square_var[index_N] = var(distristribution_square_mean[index_N, :])
+    distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
+
+    # E(xy)
+    # prevent negative values using abs.
+    distristribution_product_var[index_N] = var(distristribution_product_mean[index_N, :])
+    distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
+
+    # Mean squared error
+    # Note that here the true value is 0
+    # E(x^2)
+    distristribution_square_MSE_var[index_N] = var((distristribution_square_mean[index_N, :] .- true_value^2).^2)
+    distristribution_square_MSE_average[index_N] = mean((distristribution_square_mean[index_N, :] .- true_value^2).^2)
+
+    # E(xy)
+    distristribution_product_MSE_var[index_N] = var((distristribution_product_mean[index_N, :] .- true_value^2).^2)
+    distristribution_product_MSE_average[index_N] = mean((distristribution_product_mean[index_N, :] .- true_value^2).^2)
+
+
+end
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Plot for the expected value
+p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;, ylabel=L&amp;quot;$log_{10}(MSE)$&amp;quot;)
+plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$3\sigma_f^4/N^2$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 + 4 .* grid_N .* distristribution_square_average .* distristribution_mean_var)./(grid_N.^2)), label=L&amp;quot;$\frac{\sigma_f^4 + 4N \mu^2 \sigma_f^2}{N^2}$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+
+
+# Plot for the variance
+p1 = plot(log10.(grid_N), log10.(distristribution_square_var), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.(distristribution_product_var),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.((2.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$2\sigma_f^4/N^2$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(p1, log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, title=&amp;quot;Variance Estimator&amp;quot;, ylabel=L&amp;quot;$log_{10}(Variance)$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((4 .* distristribution_square_average .* distristribution_mean_var)./(grid_N)), label=L&amp;quot;$\frac{4 \mu^2 \sigma_f^2}{N^2}$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+
+
+plot(p0, p1)
+plot!(size=(800,400))
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_21_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Below is another example with a linear scale:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;grid_N = collect(range(10, 1000, step=10))
+N_replicate = 100 #number of replications for the distribution of the estimator
+
+distristribution_square_mean = zeros(length(grid_N), N_replicate)
+distristribution_product_mean = zeros(length(grid_N), N_replicate)
+
+# Distribution of values for each replication
+distristribution_square_average = zeros(length(grid_N))
+distristribution_square_var = zeros(length(grid_N))
+
+distristribution_product_average = zeros(length(grid_N))
+distristribution_product_var = zeros(length(grid_N))
+
+
+mu = true_value
+sigma=1.0 #variance when simulating from Normal
+f(x) = x
+
+for (index_N, N) in enumerate(grid_N)
+
+    d_x = Normal(mu, sigma)
+    d_x1 = Normal(mu, sigma)
+    d_x2 = Normal(mu, sigma)
+
+    for i=1:N_replicate
+
+        draws_x = rand(d_x, N)
+        draws_x1 = rand(d_x1, N)
+        draws_x2 = rand(d_x2, N)
+
+        distristribution_square_mean[index_N, i] = mean(f(draws_x))^2
+        distristribution_product_mean[index_N, i] = mean(f(draws_x1).*f(draws_x2))
+
+    end
+
+    #Stats across different replications
+    # E(x^2)
+    distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
+
+    # E(xy)
+    distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
+
+end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;min_val = minimum(distristribution_product_mean)
+max_val = maximum(distristribution_product_mean)
+p0 = scatter(grid_N, distristribution_square_mean, legend=false,title=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$N$&amp;quot;, alpha=0.5, ylims=(min_val, max_val ))
+plot!(p0, grid_N, distristribution_square_average, label=&amp;quot;mean&amp;quot;, ylims=(min_val, max_val ), linewidth=3.0, color=&amp;quot;blue&amp;quot;, xrotation = 15)
+plot!(grid_N, x -&amp;gt; mu^2, label=L&amp;quot;\mu^2&amp;quot;, linestyle = :dash, linewidth=3.0)
+p1 = scatter(grid_N, distristribution_product_mean, legend=false,title=L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$N$&amp;quot;, ylims=(min_val, max_val ))
+plot!(p1, grid_N, distristribution_product_average, label=&amp;quot;mean&amp;quot;, ylims=(min_val, max_val ), linewidth=3.0, color=&amp;quot;blue&amp;quot;, xrotation = 15)
+plot!(p1, grid_N, x -&amp;gt; mu^2, label=L&amp;quot;\mu^2&amp;quot;, linestyle = :dash, linewidth=3.0)
+plot(p0, p1)
+plot!(size=(800,600))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;Integral_Squared_24_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Based on a comparison of the mean squared error, $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$ is a &lt;strong&gt;better&lt;/strong&gt; estimator than $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $
+&lt;strong&gt;when $\mu^2$ is small&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Why should we care? In some applications, we aim at finding a function $f$ that minimizes the square of an expectation: $\big(E[f(X)]\big)^2$. Numerical methods can find $\hat{f}$ such that $\big(E[\hat{f}(X)]\big)^2 \approx 0$. In general, no closed-form solution is available for the expectation, so one must use numerical methods. For instance, Monte Carlo integration. Hence, the question of $\bar{X}_n^2$ vs $\bar{XY}_n$ appears quite naturally in that context.&lt;/p&gt;
+
+&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;versioninfo()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Julia Version 1.7.1
+Commit ac5cc99908 (2021-12-22 19:35 UTC)
+Platform Info:
+  OS: Linux (x86_64-pc-linux-gnu)
+  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-12.0.1 (ORCJIT, skylake)
+Environment:
+  JULIA_NUM_THREADS = 4
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>(In)efficient commuting and migration choices</title>
@@ -4488,262 +5246,6 @@ ylabel!(&amp;quot;estimated value (GD)&amp;quot;)
 &lt;p&gt;3.180767 seconds (9.71 M allocations: 7.547 GiB, 12.66% gc time)&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;OLSMachineLearning_29_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>The BKM Algorithm</title>
-      <link>https://julienpascal.github.io/post/bkm/</link>
-      <pubDate>Mon, 16 Sep 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/bkm/</guid>
-      <description>
-
-&lt;p&gt;Finding solutions to economic models with heterogeneity and aggregate uncertainty is a notoriously difficult task.
-It is an active area of research in Mathematics (see &lt;a href=&#34;https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2013.0397&#34; target=&#34;_blank&#34;&gt;mean field games with aggregate uncertainty&lt;/a&gt;). Because such models naturally arise when considering economic situations, Economists have developed a battery of techniques to (numerically) solve them. In this post, I would like to describe a recent algorithm by &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v89y2018icp68-92.html&#34; target=&#34;_blank&#34;&gt;Boppart, Krusell and Mitman (BKM)&lt;/a&gt; that is both fast and accurate. I will first describe the problem that Economists face when working with heterogeneous model with aggregate uncertainty, heuristically discuss the BKM algorithm (based on the presentation of &lt;a href=&#34;https://ideas.repec.org/a/eee/dyncon/v89y2018icp93-99.html&#34; target=&#34;_blank&#34;&gt;Reiter (2018)&lt;/a&gt;) and show an application in Julia.&lt;/p&gt;
-
-&lt;h3 id=&#34;bkm-in-a-nutshell&#34;&gt;BKM in a nutshell&lt;/h3&gt;
-
-&lt;p&gt;It is common to use Bellman&amp;rsquo;s principle of optimality to characterize solutions of a multi-stage decision processes.
-The principle of optimality leads to a solution in a &lt;strong&gt;recursive form&lt;/strong&gt; $d_{t} = d(S_{t})$, where $S_t$ is a vector of state variables and $d(.)$ a policy function describing the optimal action of a decision-maker when faced with any given state.&lt;/p&gt;
-
-&lt;p&gt;An alternative representation of the problem is to consider a solution in the &lt;strong&gt;sequence form&lt;/strong&gt;. At each step in time, a decision-maker observes a new realization of a random process $z_t$ and taking into account the full history of past shocks, the agent makes a new choice to maximize her expected discounted sum of returns: $d_t = d(z_t, z_{t-1}, z_{t-2}, &amp;hellip;)$.&lt;/p&gt;
-
-&lt;p&gt;While most of the time the recursive form is a much more parsimonious approach, it fails when $S_t$ is infinite-dimensional. In models with heterogeneous agents (HA) and aggregate uncertainty, this is generally the case because the distribution of agents over certain variables will end up being in $S_t$. While this a problem with is the recursive approach (how can we discretize $S_t$ to put it on a computer?), the sequence form is immune to this problem. The BKM algorithm uses this insight, adding the &lt;strong&gt;assumption&lt;/strong&gt; of &lt;strong&gt;linearity&lt;/strong&gt; of $d(.)$ with respect to the &lt;strong&gt;aggregate state&lt;/strong&gt; $z_t$:&lt;/p&gt;
-
-&lt;p&gt;$$ d_t = z_t d(1, 0, 0, &amp;hellip;) + z_{t-1}d(0, 1, 0, &amp;hellip;) + z_{t-2}d(0, 0, 1, &amp;hellip;) + &amp;hellip; $$
-$$ d_t = \sum_{k=0}^{+\infty} z_{t-k} d_{k} $$&lt;/p&gt;
-
-&lt;p&gt;where $$ d_{1} = d(1,0,0,&amp;hellip;)$$
-$$ d_{2} = d(0,1,0,&amp;hellip;)$$
-$$ d_{3} = d(0,0,1,&amp;hellip;)$$&lt;/p&gt;
-
-&lt;p&gt;The series of $d_{k}$ describes the trajectory of the economy after an &amp;ldquo;MIT&amp;rdquo; shock (when the economy is hit by an unexpected single-period aggregate shock). If the linearity assumption holds, the evolution of equilibrium variables are simply a moving average of past shocks. We made progress because solving for the trajectory after an MIT shock is perfectly feasible in a RA model. As long as one can calculate the steady-state with no aggregate uncertainty and solve the &lt;strong&gt;deterministic perfect foresight path&lt;/strong&gt;, BKM can be used.&lt;/p&gt;
-
-&lt;h3 id=&#34;numerical-implementation&#34;&gt;Numerical implementation&lt;/h3&gt;
-
-&lt;p&gt;Here is the implementation of the method using a toy example. I intentionally circumvent the problem of finding the perfect foresight transition path, which is (potentially) the complicated part of BKM. This is the example given in Reiter (2018): the exact model is the non-linear model $x_{t} = a x_{t-1} + b x_{t-1}^2 + z_{t}$&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Distributions
-using Plots
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Parameters
-max_iter=100 #number of iterations for the simulation
-a = 0.5
-b = 0.1
-sigma_shock=1.0
-mu_shock=0.
-d = Normal(mu_shock, sigma_shock)
-
-# transition function
-function iter_x(x_min1::Float64, a::Float64, b::Float64)
-    a*x_min1 + b*x_min1^2
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;iter_x (generic function with 1 method)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;impulse-response-function&#34;&gt;Impulse response function&lt;/h4&gt;
-
-&lt;p&gt;Let us assume that the economy is at the non-stochastic steady-state and a shock occurs:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# We assume that after 100 periods, the economy is back to the steady-state
-max_iter_mit = 100
-x_mit=zeros(max_iter_mit)
-# Initial shock
-z_t[1] = sigma_shock #a 1 std. deviation
-x_mit[1] = 0 #steady-state
-
-for i=2:max_iter_mit
-    x_mit[i] = iter_x(x_mit[i-1], a, b) + z_t[i-1]
-end
-
-# Scaled-version of the impulse response:
-x_mit_scaled = x_mit./z_t[1];
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I define two functions to calculate the moving average:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;function calculate_Xt(x_scaled::Array{Float64,1}, shocks::Array{Float64,1}, t::Int64, kk::Int64)
-
-    output = 0.
-
-    for k=1:kk
-        output+=x_scaled[k]*shocks[t-k+1]
-    end
-
-    return output
-end
-
-function BPM_path!(XT::Array{Float64,1}, max_iter::Int64, x_scaled::Array{Float64,1}, shocks::Array{Float64,1})
-
-    for t=2:max_iter
-        XT[t] = calculate_Xt(x_scaled, shocks, t, t)
-    end
-
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;BPM_path! (generic function with 1 method)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Initialization
-XT = zeros(max_iter);
-# Series of shocks
-shocks_t = rand(d, max_iter).*0.5;
-# Solving using BKM:
-@time BPM_path!(XT, max_iter, x_mit_scaled, shocks_t)
-# True value:
-x_true = zeros(max_iter)
-for i=2:max_iter
-    x_true[i] = iter_x(x_true[i-1], a, b) + shocks_t[i-1]
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;  0.025906 seconds (29.30 k allocations: 1.489 MiB, 26.80% gc time)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;plot(XT[2:end], label=&amp;quot;x_t BKM&amp;quot;)
-plot!(x_true[2:end], label=&amp;quot;x_t true&amp;quot;)
-title!(&amp;quot;b=$(b)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_16_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The previous plot shows how the BKM algorithm approximates the true model and it does quite a good job.
-Of course, the more the model is linear with respect to $z_t$ (captured by the value of $b_2$), the better the approximation. To illustrate this idea, I use BKM on a perfectly linear model ($b=0$) and on a model with stronger non-linearities ($b=0.2$). As expected, the approximation is perfect when the model is linear and the approximation deteriorates when strong non-linearities are present.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;plot(p1,p2)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_18_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h3&gt;
-
-&lt;p&gt;The BKM algorithm is a new addition to the toolbox of methods to solve HA models. The sequence representation of the problem seems to be a fruitful area of research, as it has also been used in Le Grand and Ragot (&lt;a href=&#34;http://xavier-ragot.fr/pdf/progress/LeGrand_Ragot_final.pdf&#34; target=&#34;_blank&#34;&gt;2017&lt;/a&gt;) and (&lt;a href=&#34;http://xavier-ragot.fr/pdf/progress/Optimal_policies.pdf&#34; target=&#34;_blank&#34;&gt;2019&lt;/a&gt;) to develop fast and reliable method to solve HA models. The recent contribution of &lt;a href=&#34;https://github.com/shade-econ/sequence-jacobian/#sequence-space-jacobian&#34; target=&#34;_blank&#34;&gt;Auclert at al (2019)&lt;/a&gt; also uses a similar approach.&lt;/p&gt;
-
-&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Achdou, Yves, et al. &amp;ldquo;Partial differential equation models in macroeconomics.&amp;rdquo; Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences 372.2028 (2014): 20130397.&lt;/li&gt;
-&lt;li&gt;Auclert, Adrien, et al. Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent Models. No. w26123. National Bureau of Economic Research, 2019.&lt;/li&gt;
-&lt;li&gt;Boppart, Timo, Per Krusell, and Kurt Mitman. &amp;ldquo;Exploiting MIT shocks in heterogeneous-agent economies: the impulse response as a numerical derivative.&amp;rdquo; Journal of Economic Dynamics and Control 89 (2018): 68-92.&lt;/li&gt;
-&lt;li&gt;Le Grand, François, and Xavier Ragot. &amp;ldquo;Optimal fiscal policy with heterogeneous agents and aggregate shocks.&amp;rdquo; Document de travail (2017).&lt;/li&gt;
-&lt;li&gt;Le Grand, François, and Ragot, Xavier. &amp;ldquo;Managing Inequality over the Business Cycles: Optimal Policies with Heterogeneous Agents and Aggregate Shocks&amp;rdquo;. No. 1090. Society for Economic Dynamics, 2019.&lt;/li&gt;
-&lt;li&gt;Reiter, Michael. &amp;ldquo;Comments on&amp;rdquo; Exploiting MIT Shocks in Heterogeneous-Agent Economies: The Impulse Response as a Numerical Derivative&amp;rdquo; by T. Boppart, P. Krusell and K. Mitman.&amp;rdquo; Journal of Economic Dynamics and Control 89 (2018): 93-99.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;versioninfo()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Julia Version 1.0.3
-Commit 099e826241 (2018-12-18 01:34 UTC)
-Platform Info:
-  OS: Linux (x86_64-pc-linux-gnu)
-  CPU: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
-  WORD_SIZE: 64
-  LIBM: libopenlibm
-  LLVM: libLLVM-6.0.0 (ORCJIT, skylake)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;### To create plot 2
-
-#### Linear Model
-
-# Parameters
-max_iter=100 #number of iterations for the simulation
-a = 0.5
-b = 0.0
-sigma_shock=1.0
-mu_shock=0.
-d = Normal(mu_shock, sigma_shock)
-
-# IRF
-x_mit=zeros(max_iter_mit)
-# Initial shock
-z_t[1] = sigma_shock #a 1 std. deviation
-x_mit[1] = 0 #steady-state
-
-for i=2:max_iter_mit
-    x_mit[i] = iter_x(x_mit[i-1], a, b) + z_t[i-1]
-end
-
-# Scaled-version of the impulse response:
-x_mit_scaled = x_mit./z_t[1];
-
-
-# Initialization
-XT = zeros(max_iter);
-# Series of shocks
-shocks_t = rand(d, max_iter).*0.5;
-# Solving using BKM:
-@time BPM_path!(XT, max_iter, x_mit_scaled, shocks_t)
-# True value:
-x_true = zeros(max_iter)
-for i=2:max_iter
-    x_true[i] = iter_x(x_true[i-1], a, b) + shocks_t[i-1]
-end
-
-p1 = plot(XT[2:end], label=&amp;quot;x_t BKM&amp;quot;)
-plot!(x_true[2:end], label=&amp;quot;x_t true&amp;quot;)
-title!(&amp;quot;b=$(b)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;0.000009 seconds (4 allocations: 160 bytes)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_24_1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;### Plot 2
-
-#### Linear Model
-
-# Parameters
-max_iter=100 #number of iterations for the simulation
-a = 0.5
-b = 0.2
-sigma_shock=1.0
-mu_shock=0.
-d = Normal(mu_shock, sigma_shock)
-
-# IRF
-x_mit=zeros(max_iter_mit)
-# Initial shock
-z_t[1] = sigma_shock #a 1 std. deviation
-x_mit[1] = 0 #steady-state
-
-for i=2:max_iter_mit
-    x_mit[i] = iter_x(x_mit[i-1], a, b) + z_t[i-1]
-end
-
-# Scaled-version of the impulse response:
-x_mit_scaled = x_mit./z_t[1];
-
-
-# Initialization
-XT = zeros(max_iter);
-# Series of shocks
-shocks_t = rand(d, max_iter).*0.5;
-# Solving using BKM:
-@time BPM_path!(XT, max_iter, x_mit_scaled, shocks_t)
-# True value:
-x_true = zeros(max_iter)
-for i=2:max_iter
-    x_true[i] = iter_x(x_true[i-1], a, b) + shocks_t[i-1]
-end
-
-p2 = plot(XT[2:end], label=&amp;quot;x_t BKM&amp;quot;)
-plot!(x_true[2:end], label=&amp;quot;x_t true&amp;quot;)
-title!(&amp;quot;b=$(b)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;  0.000007 seconds (4 allocations: 160 bytes)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BKM_Algorithm_25_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
 </description>
     </item>
     

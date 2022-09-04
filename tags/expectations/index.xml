@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Expectations on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/expectations/</link>
+    <description>Recent content in Expectations on Julien Pascal</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Sat, 03 Sep 2022 18:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="https://julienpascal.github.io/tags/expectations/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Numerical Approximation of Expectations Squared</title>
+      <link>https://julienpascal.github.io/post/integral_squared/</link>
+      <pubDate>Sat, 03 Sep 2022 18:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/integral_squared/</guid>
+      <description>Introduction Recently, I came across a simple question that led me through a quite interesting rabbit hole. The question is very simple (and very niche), but the analysis involves key results from statistical theory and numerical analysis (the Central Limit Theorem, the Delta method, and the second-order Delta method, Monte Carlo integration).
+Here is the seemingly innocent (and slightly bizarre) question:
+ Context: One is interested in evaluating the square of an expectation $E\Big[g(X) \Big]^2 = \big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2 = \mu^2$, where $\mu$ is an unknown quantity &amp;ldquo;close to zero&amp;rdquo;.</description>
+    </item>
+    
+  </channel>
+</rss>
