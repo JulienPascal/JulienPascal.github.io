@@ -33,6 +33,8 @@
 
 &lt;p&gt;Notice that both estimators are &lt;a href=&#34;https://en.wikipedia.org/wiki/Consistent_estimator&#34; target=&#34;_blank&#34;&gt;consistent&lt;/a&gt;. That is, as we increase $N$, the estimators converges in probability to the true value of the parameter $\mu^2$.&lt;/p&gt;
 
+&lt;p&gt;In what follows, I use the notation $\mu$ to refer to $E\Big[f(X) \Big]$ and $\sigma^2$ to $Var\Big[f(X) \Big]$.&lt;/p&gt;
+
 &lt;h3 id=&#34;estimator-big-frac-1-n-sum-i-1-n-f-x-i-big-2&#34;&gt;Estimator $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://www.mit.edu/~kircher/sim.pdf&#34; target=&#34;_blank&#34;&gt;We know that Monte Carlo estimator are consistent&lt;/a&gt;: So $\frac{1}{N} \sum_{i=1}^{N} f(x_i)  \overset{p}{\to} \mu$. Because the function $x \rightarrow x^2$ is continuous on $R$, the &lt;a href=&#34;https://en.wikipedia.org/wiki/Continuous_mapping_theorem&#34; target=&#34;_blank&#34;&gt;continuous mapping theorem&lt;/a&gt; implies that  $\Big(\frac{1}{N} \sum_{i=1}^{N} f(x_i)\Big)^2  \overset{p}{\to} \mu^2$.&lt;/p&gt;
@@ -139,7 +141,7 @@ plot(p0, p1)
 
 &lt;p&gt;As illustrated below, in both instances $\bar{X}_n^2$ has a smaller variance than $\bar{XY}_n$. The figure also underlines that even when $X$ is not normally distributed, the CLT kicks in and the above analysis provides a good estimate of the small sample behavior of our estimators.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;N = 1000 #number of draws
+&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;N = 5000 #number of draws
 N_replicate = 5000 #number of replications for the distribution of the estimator
 list_plots = [] #to store plots
 sigma = 1.0 #variance when simulating from Normal
@@ -164,8 +166,10 @@ for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;,
         distristribution_square_centered = zeros(N_replicate) # (mean(x))^2 - mu^2
         distristribution_product_centered = zeros(N_replicate) # (mean(x1 x2) - mu^2
 
-        distristribution_square_std = zeros(N_replicate)
-        distristribution_square_mean = zeros(N_replicate)
+        # Stats on f(X)
+        distristribution_std_f = zeros(N_replicate) #std f(X)
+        distristribution_mean_f = zeros(N_replicate) #mean f(X)
+        distribution_var_f = zeros(N_replicate) #var f(X)
 
         distristribution_product_std = zeros(N_replicate)
         distristribution_product_mean = zeros(N_replicate)
@@ -180,25 +184,30 @@ for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;,
             distristribution_square_centered[i] = sqrt(N)*(mean(draws_x)^2 - mu^2)
             distristribution_product_centered[i] = sqrt(N)*(mean(draws_x1.*draws_x2) - mu^2)
 
-            distristribution_square_std[i] = std(draws_x)
-            distristribution_square_mean[i] = mean(draws_x)
+            # Stats on f(X)
+            distristribution_std_f[i] = std(draws_x)
+            distristribution_mean_f[i] = mean(draws_x)
+            distribution_var_f[i] = var(draws_x)
 
             distristribution_product_std[i] = std(draws_x1.*draws_x2)
             distristribution_product_mean[i] = mean(draws_x1.*draws_x2)
 
         end
 
-        # Empirical sigmas
-        mu_X1X2 = mean(distristribution_product_mean)
-        sigma_X1X2 = mean(distristribution_square_std)
-        var_n0_empirical = sigma_X1X2^4 + sigma_X1X2^2*(2*mu_X1X2^2)
+        # Mean of certain statistics
+        mu_fX = mean(distristribution_mean_f)
+        sigma_fX = mean(distristribution_std_f)
+        variance_fX = mean(distribution_var_f)
 
-        mu_X_squared = mean(distristribution_square_mean)
-        sigma_X_squared = mean(distristribution_square_std)
-        var_n1_empirical = (4*mu_X_squared^2*sigma_X_squared^2)
+        # Empirical sigmas
+        # Var(XY)
+        var_n0_empirical = variance_fX^2 + variance_fX*(2*mu_fX^2)
+
+        # Var(X^2)
+        var_n1_empirical = (4*mu_fX^2*sigma_fX^2)        
 
         # Theoretical sigmas when using Normal draws
-        var_n0 = sigma^2 * sigma^2 + sigma^2*(2*mu^2) #var(distristribution_product_centered) #(sigma^2)
+        var_n0 = sigma^2 * sigma^2 + sigma^2*(2*mu^2)
         var_n1 = (4*mu^2*sigma^2)
 
         pdf_normal_0 = Normal(0, sqrt(var_n0_empirical))
@@ -279,8 +288,6 @@ sigma=1.0 #variance when simulating from Normal
 for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;, &amp;quot;Uniform&amp;quot;])
     for (index_mu, mu) in enumerate([0.0])
 
-        #println(mu)
-
         if distribution == &amp;quot;Normal&amp;quot;
             d_x = Normal(mu, sigma)
             d_x1 = Normal(mu, sigma)
@@ -296,9 +303,10 @@ for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;,
         distristribution_square_centered = zeros(N_replicate) # (mean(x))^2 - mu^2
         distristribution_product_centered = zeros(N_replicate) # (mean(x1 x2) - mu^2
 
-        distristribution_square_std = zeros(N_replicate)
-        distristribution_square_var = zeros(N_replicate)
-        distristribution_square_mean = zeros(N_replicate)
+        # Stats on f(X)
+        distristribution_std_f = zeros(N_replicate) #std f(X)
+        distristribution_mean_f = zeros(N_replicate) #mean f(X)
+        distribution_var_f = zeros(N_replicate) #var f(X)
 
         distristribution_product_std = zeros(N_replicate)
         distristribution_product_mean = zeros(N_replicate)
@@ -313,23 +321,24 @@ for (index_distribution, distribution) in enumerate([&amp;quot;Normal&amp;quot;,
             distristribution_square_centered[i] = N*(mean(draws_x)^2 - mu^2)/sigma
             distristribution_product_centered[i] = sqrt(N)*(mean(draws_x1.*draws_x2) - mu^2)
 
-            distristribution_square_std[i] = std(draws_x)
-            distristribution_square_var[i] = var(draws_x)
-            distristribution_square_mean[i] = mean(draws_x)
+            # Stats on f(X)
+            distristribution_std_f[i] = std(draws_x)
+            distristribution_mean_f[i] = mean(draws_x)
+            distribution_var_f[i] = var(draws_x)
 
             distristribution_product_std[i] = std(draws_x1.*draws_x2)
             distristribution_product_mean[i] = mean(draws_x1.*draws_x2)
 
         end
 
+        # Mean of certain statistics
+        mu_fX = mean(distristribution_mean_f)
+        sigma_fX = mean(distristribution_std_f)
+        variance_fX = mean(distribution_var_f)
+
         # Empirical sigmas
-        mu_X1X2 = mean(distristribution_product_mean)
-        sigma_X1X2 = mean(distristribution_product_std)
-
-        mu_X_squared = mean(distristribution_square_mean)
-        var_X_squared = mean(distristribution_square_var)
-
-        var_n0_empirical = var_X_squared^2 + sigma_X1X2^2*(2*mu_X1X2^2)
+        # Var(XY)
+        var_n0_empirical = variance_fX^2 + variance_fX*(2*mu_fX^2)
 
         pdf_normal_0 = Normal(0, sqrt(var_n0_empirical))
         pdf_chisq_1 = Chisq(1)
@@ -463,7 +472,6 @@ for (index_N, N) in enumerate(grid_N)
     distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
 
     # E(xy)
-    # prevent negative values using abs.
     distristribution_product_var[index_N] = var(distristribution_product_mean[index_N, :])
     distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
 
@@ -480,23 +488,22 @@ for (index_N, N) in enumerate(grid_N)
 
 end
 
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Plot for the expected value
-p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
-plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;, ylabel=L&amp;quot;$log_{10}(MSE)$&amp;quot;)
-plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, linestyle=:dash, linewidth=2.0)
-plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$3\sigma_f^4/N^2$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&amp;quot;Empirical $\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&amp;quot;Empirical $\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;, ylabel=L&amp;quot;$log_{10}(MSE)$&amp;quot;)
+plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma^4/N$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$3\sigma^4/N^2$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
 
 # Plot for the variance
-p1 = plot(log10.(grid_N), log10.(distristribution_square_var), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
-plot!(p1, log10.(grid_N), log10.(distristribution_product_var),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+p1 = plot(log10.(grid_N), log10.(distristribution_square_var), label=L&amp;quot;Empirical $\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.(distristribution_product_var),  label =L&amp;quot;Empirical $\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
 # Variance absolute value of $\bar{XY}_n$
 # Using Jensen&#39;s inequality, it is slightly below the variance of $\bar{XY}_n$
 # plot!(p1, log10.(grid_N), log10.(var(abs.(distristribution_product_mean), dims=2)),  label =L&amp;quot;$|\bar{XY}_n|$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
-plot!(p1, log10.(grid_N), log10.((2.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$2\sigma_f^4/N^2$&amp;quot;, linestyle=:dash, linewidth=2.0)
-plot!(p1, log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, title=&amp;quot;Variance Estimator&amp;quot;, ylabel=L&amp;quot;$log_{10}(Variance)$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(p1, log10.(grid_N), log10.((2.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$2\sigma^4/N^2$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(p1, log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma^4/N$&amp;quot;, title=&amp;quot;Variance Estimator&amp;quot;, ylabel=L&amp;quot;$log_{10}(Variance)$&amp;quot;, linestyle=:dash, linewidth=2.0)
 
 
 plot(p0, p1)
@@ -572,7 +579,6 @@ plot!(size=(800,600))
 &lt;p&gt;In practice, we do not know for sure that $\mu$ is exactly equal to zero. However, we know that $\mu$ is &amp;ldquo;close to zero&amp;rdquo;. Are we still better off using $\bar{X}^2_n$ instead of $\bar{XY}_n$?&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;grid_N = [10, 100, 1000, 10000, 100000, 1000000]
-#grid_N = [10, 100, 1000, 10000]
 N_replicate = 1000 #number of replications for the distribution of the estimator
 
 # To store stats values
@@ -605,11 +611,19 @@ mu = true_value  #mean normal
 sigma = 1.0 #variance when simulating from Normal
 f(x) = x
 
+distribution = &amp;quot;Uniform&amp;quot; # Choice between Normal(mu, sigma) or Uniform(-1,1) + mu
+
 for (index_N, N) in enumerate(grid_N)
 
-    d_x = Normal(mu, sigma)
-    d_x1 = Normal(mu, sigma)
-    d_x2 = Normal(mu, sigma)
+    if distribution == &amp;quot;Normal&amp;quot;
+        d_x = Normal(mu, sigma)
+        d_x1 = Normal(mu, sigma)
+        d_x2 = Normal(mu, sigma)
+    else
+        d_x = Uniform(-1,1) + mu
+        d_x1 = Uniform(-1,1) + mu
+        d_x2 = Uniform(-1,1) + mu
+    end
 
     for i=1:N_replicate
 
@@ -619,6 +633,7 @@ for (index_N, N) in enumerate(grid_N)
 
         distristribution_mean[index_N, i] = mean(f(draws_x)) #mean f(x)
         distristribution_var[index_N, i] = var(f(draws_x)) #variance of f(x)
+
         distristribution_var_product[index_N, i] = var(f(draws_x1).*f(draws_x2)) #variance of f(x1)*f(x2)
         distristribution_square_mean[index_N, i] = mean(f(draws_x))^2
         distristribution_product_mean[index_N, i] = mean(f(draws_x1).*f(draws_x2))
@@ -633,11 +648,11 @@ for (index_N, N) in enumerate(grid_N)
     # E(x^2)
     distristribution_mean_var[index_N] = mean(distristribution_var[index_N, :]) #average of variances
     distristribution_mean_var_product[index_N] = mean(distristribution_var_product[index_N, :]) #average of variances of products
+
     distristribution_square_var[index_N] = var(distristribution_square_mean[index_N, :])
     distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
 
     # E(xy)
-    # prevent negative values using abs.
     distristribution_product_var[index_N] = var(distristribution_product_mean[index_N, :])
     distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
 
@@ -658,19 +673,19 @@ end
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Plot for the expected value
-p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
-plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;, ylabel=L&amp;quot;$log_{10}(MSE)$&amp;quot;)
-plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, linestyle=:dash, linewidth=2.0)
-plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$3\sigma_f^4/N^2$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
-plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 + 4 .* grid_N .* distristribution_square_average .* distristribution_mean_var)./(grid_N.^2)), label=L&amp;quot;$\frac{\sigma_f^4 + 4N \mu^2 \sigma_f^2}{N^2}$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&amp;quot;$Empirical \bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&amp;quot;$Empirical \bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;, ylabel=L&amp;quot;$log_{10}(MSE)$&amp;quot;)
+plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 + 2 .* distristribution_mean_average.^2 .* distristribution_mean_var)./(grid_N)), label=L&amp;quot;$(\sigma^4  + 2 \mu^2 \sigma^2)/N$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$3\sigma^4/N^2$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((distristribution_mean_var.^2 + 4 .* grid_N .* distristribution_square_average .* distristribution_mean_var)./(grid_N.^2)), label=L&amp;quot;$\frac{\sigma^4 + 4N \mu^2 \sigma^2}{N^2}$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
 
 
 # Plot for the variance
-p1 = plot(log10.(grid_N), log10.(distristribution_square_var), label=L&amp;quot;$\bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
-plot!(p1, log10.(grid_N), log10.(distristribution_product_var),  label =L&amp;quot;$\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
-plot!(p1, log10.(grid_N), log10.((2.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$2\sigma_f^4/N^2$&amp;quot;, linestyle=:dash, linewidth=2.0)
-plot!(p1, log10.(grid_N), log10.((distristribution_mean_var.^2 )./(grid_N)), label=L&amp;quot;$\sigma_f^4/N$&amp;quot;, title=&amp;quot;Variance Estimator&amp;quot;, ylabel=L&amp;quot;$log_{10}(Variance)$&amp;quot;, linestyle=:dash, linewidth=2.0)
-plot!(log10.(grid_N), log10.((4 .* distristribution_square_average .* distristribution_mean_var)./(grid_N)), label=L&amp;quot;$\frac{4 \mu^2 \sigma_f^2}{N^2}$&amp;quot;, title=&amp;quot;Mean Squared Error&amp;quot;, linestyle=:dash, linewidth=2.0)
+p1 = plot(log10.(grid_N), log10.(distristribution_square_var), label=L&amp;quot;$Empirical \bar{X}^2_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.(distristribution_product_var),  label =L&amp;quot;Empirical $\bar{XY}_n$&amp;quot;, xlabel=L&amp;quot;$log_{10}(N)$&amp;quot;)
+plot!(p1, log10.(grid_N), log10.((2.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&amp;quot;$2\sigma^4/N^2$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(p1, log10.(grid_N), log10.((distristribution_mean_var.^2 + 2 .* distristribution_mean_average.^2 .* distristribution_mean_var)./(grid_N)), label=L&amp;quot;$(\sigma^4  + 2 \mu^2 \sigma^2)/N$&amp;quot;, title=&amp;quot;Variance Estimator&amp;quot;, ylabel=L&amp;quot;$log_{10}(Variance)$&amp;quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((4 .* distristribution_square_average .* distristribution_mean_var)./(grid_N)), label=L&amp;quot;$\frac{4 \mu^2 \sigma^2}{N}$&amp;quot;, linestyle=:dash, linewidth=2.0)
 
 
 plot(p0, p1)
@@ -680,7 +695,7 @@ plot!(size=(800,400))
 
 &lt;p&gt;&lt;img src=&#34;Integral_Squared_21_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Below is another example with a linear scale:&lt;/p&gt;
+&lt;p&gt;Below is another example with a &lt;strong&gt;linear scale&lt;/strong&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;grid_N = collect(range(10, 1000, step=10))
 N_replicate = 100 #number of replications for the distribution of the estimator
@@ -700,11 +715,19 @@ mu = true_value
 sigma=1.0 #variance when simulating from Normal
 f(x) = x
 
+distribution = &amp;quot;Uniform&amp;quot; # Choice between Normal(mu, sigma) or Uniform(-1,1) + mu
+
 for (index_N, N) in enumerate(grid_N)
 
-    d_x = Normal(mu, sigma)
-    d_x1 = Normal(mu, sigma)
-    d_x2 = Normal(mu, sigma)
+    if distribution == &amp;quot;Normal&amp;quot;
+        d_x = Normal(mu, sigma)
+        d_x1 = Normal(mu, sigma)
+        d_x2 = Normal(mu, sigma)
+    else
+        d_x = Uniform(-1,1) + mu
+        d_x1 = Uniform(-1,1) + mu
+        d_x2 = Uniform(-1,1) + mu
+    end
 
     for i=1:N_replicate
 
