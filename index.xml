@@ -71,7 +71,7 @@
 
 &lt;h3 id=&#34;estimator-big-frac-1-n-sum-i-1-n-f-x-i-big-2-2&#34;&gt;Estimator $\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2$&lt;/h3&gt;
 
-&lt;p&gt;Note that the value $\bar{X&lt;em&gt;n} = \frac{1}{N} \sum&lt;/em&gt;{i=1}^{N} f(x_i) $ is the sample mean. The &lt;a href=&#34;https://en.wikipedia.org/wiki/Central_limit_theorem&#34; target=&#34;_blank&#34;&gt;Central Limit Theorem&lt;/a&gt; implies that:&lt;/p&gt;
+&lt;p&gt;Note that the value $\bar{X_n} = \frac{1}{N} \sum_{i=1}^{N} f(x_i) $ is the sample mean. The &lt;a href=&#34;https://en.wikipedia.org/wiki/Central_limit_theorem&#34; target=&#34;_blank&#34;&gt;Central Limit Theorem&lt;/a&gt; implies that:&lt;/p&gt;
 
 &lt;p&gt;$$\sqrt{N} \frac{(\bar{X_n} - \mu)}{\sigma} \overset{d}{\to} N(0,1)$$&lt;/p&gt;
 
@@ -99,7 +99,7 @@
 
 &lt;p&gt;Here $Var(X) = Var(Y) = \sigma$, and $E[X] = E[Y] = \mu$, so the above equation simplifies to:&lt;/p&gt;
 
-&lt;p&gt;$$ Var(XY) = \sigma^4 + 2 \mu^2 \sigma^2$$.&lt;/p&gt;
+&lt;p&gt;$$ Var(XY) = \sigma^4 + 2 \mu^2 \sigma^2 $$.&lt;/p&gt;
 
 &lt;h3 id=&#34;comparison-var-bar-xy-n-vs-var-bar-x-n-2&#34;&gt;Comparison $Var(\bar{XY}_n)$ vs $Var(\bar{X}_n^2)$&lt;/h3&gt;
 
@@ -365,7 +365,7 @@ plot!(size=(1000,300))
 
 &lt;h2 id=&#34;v-mean-squared-error&#34;&gt;V. Mean Squared Error&lt;/h2&gt;
 
-&lt;p&gt;To is a measure the quality of an estimator, it is common to use the mean squared error (MSE). In plain English, the mean squared error measures the average squared difference between the estimated values and the actual value:&lt;/p&gt;
+&lt;p&gt;To measure the quality of an estimator, it is common to use the mean squared error (MSE). In plain English, the mean squared error measures the average squared difference between the estimated values and the actual value:&lt;/p&gt;
 
 &lt;p&gt;$$ MSE(\hat{\theta}) = E_{\theta} [ (\hat{\theta} - \theta)^2] $$&lt;/p&gt;
 
@@ -378,15 +378,15 @@ Collecting the previous results, we have.&lt;/p&gt;
 
 &lt;h3 id=&#34;case-mu-0&#34;&gt;Case $\mu &amp;gt;0 $&lt;/h3&gt;
 
-&lt;p&gt;$$ MSE(\bar{X}^2_n) = \frac{\sigma_f^4 + 4N \mu^2 \sigma_f^2}{N^2} $$&lt;/p&gt;
+&lt;p&gt;$$ MSE(\bar{X}^2_n) = \frac{\sigma^4 + 4N \mu^2 \sigma^2}{N^2} $$&lt;/p&gt;
 
-&lt;p&gt;$$ MSE(\bar{XY}_n) = \frac{\sigma_f^4}{N} $$&lt;/p&gt;
+&lt;p&gt;$$ MSE(\bar{XY}_n) = \frac{\sigma^4 + 2 \mu^2 \sigma^2}{N} $$&lt;/p&gt;
 
 &lt;h3 id=&#34;case-mu-0-1&#34;&gt;Case $\mu = 0$&lt;/h3&gt;
 
-&lt;p&gt;$$ MSE(\bar{X}^2_n) = \frac{3 \sigma_f^4}{N^2}$$&lt;/p&gt;
+&lt;p&gt;$$ MSE(\bar{X}^2_n) = \frac{3 \sigma^4}{N^2}$$&lt;/p&gt;
 
-&lt;p&gt;$$ MSE(\bar{XY}_n) = \frac{\sigma_f^4}{N} $$&lt;/p&gt;
+&lt;p&gt;$$ MSE(\bar{XY}_n) = \frac{\sigma^4}{N} $$&lt;/p&gt;
 
 &lt;p&gt;It is easy to see that when $\mu$ is close or equal to 0, it is better to use $\bar{X}^2_n$ instead $\bar{XY}_n$. In the next section, I check that numerically with some examples.&lt;/p&gt;
 
