@@ -444,7 +444,7 @@ Here is the seemingly innocent (and slightly bizarre) question:
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    17 min read
+    21 min read
   </span>
   
 
@@ -566,6 +566,8 @@ Here is the seemingly innocent (and slightly bizarre) question:
 
 <p>$$ Bias(\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2) = \frac{\sigma^2}{N} $$</p>
 
+<p><strong>Question for the careful reader:</strong> How can you remove the bias? (See the answer below).</p>
+
 <h3 id="estimator-frac-1-n-sum-i-1-n-f-x-i-f-y-i-1">Estimator $\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $</h3>
 
 <p>$$ E [\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i)] = \frac{1}{N} \sum_{i=1}^{N} E[f(x_i) f(y_i)]  $$</p>
@@ -602,9 +604,9 @@ Here is the seemingly innocent (and slightly bizarre) question:
 
 <p>Let&rsquo;s use the notation $\bar{XY}_n = \frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) $. Once again, the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">Central Limit Theorem</a> implies that:</p>
 
-<p>$$\sqrt{N} (\bar{XY}_n - \mu^2) \overset{d}{\to} N(0, \sigma_{XY})$$</p>
+<p>$$\sqrt{N} (\bar{XY}_n - \mu^2) \overset{d}{\to} N(0, \sigma_{XY}^2)$$</p>
 
-<p>with $\sigma_{XY} = \sqrt{Var(\bar{XY}_n)}$.</p>
+<p>with $\sigma_{XY}^2 = Var(\bar{XY}_n)$.</p>
 
 <p>If $X$ and $Y$ are independent random variables, then $Var(XY) = Var(X)Var(Y) + Var(X)(E[Y]^2) + Var(Y)(E[X]^2)$.</p>
 
@@ -767,7 +769,7 @@ plot!(size=(1000,600))
 
 <p>$$N (g(\bar{X_n}) - g(\theta)) \overset{d}{\to} \sigma^2 \frac{g&rdquo;(\theta)}{2} \chi^2(1)$$</p>
 
-<p>So applying the second order delta method with $g&rsquo;(\theta) = \theta^2$ and $\mu=0$ gives us:</p>
+<p>So applying the second order delta method with $g(\theta) = \theta^2$ and $\mu=0$ gives us:</p>
 
 <p>$$N (\bar{X_n}^2) \overset{d}{\to} \sigma^2 \chi^2(1)$$</p>
 
@@ -1296,6 +1298,179 @@ Platform Info:
   LLVM: libLLVM-12.0.1 (ORCJIT, skylake)
 Environment:
   JULIA_NUM_THREADS = 4
+</code></pre>
+
+<hr />
+
+<hr />
+
+<h2 id="extra">Extra</h2>
+
+<p>We can also use the <strong>Minimum Variance Unbiased Estimator (MVUE)</strong> of $\mu^2$, which is</p>
+
+<p>$$  T_2 = \big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2 - \frac{S^2}{N}$$</p>
+
+<p>Where $S^2$ is the <strong>sample variance</strong>. It is unbiased because $S^2$ is an unbiased estimator of of $\sigma^2$. We saw above that the bias for $\bar{X}^2_n$ was $\frac{\sigma^2}{N}$.</p>
+
+<p>$$ V(T_2) = Var(\bar{X_n}^2) + Var(\frac{S^2}{N}) - \frac{2}{N} Cov(\bar{X_n}^2, S^2)$$</p>
+
+<p>Using the Cauchy-Schwarz inequality:</p>
+
+<p>$$ V(T_2) \leq Var(\bar{X_n}^2) + Var(\frac{S^2}{N}) + \frac{2}{N} \sqrt{Var(\bar{X_n}^2)Var(S^2)}$$</p>
+
+<p>We have seen above that for N sufficiently large, $Var(\bar{X_n}^2) \approx \frac{4\mu^2\sigma^2}{N}$.
+The variance of the sample variance is $Var(S^2) = \frac{\sigma^4}{N}(\kappa - 1 + \frac{2}{N-1})$, with $\kappa$ the kurtosis. Hence,</p>
+
+<p>$$ V(T_2) \leq \frac{4\mu^2\sigma^2}{N} + \frac{\sigma^4}{N^3}(\kappa - 1 + \frac{2}{N-1}) + \frac{4\mu\sigma^3}{N^2}\sqrt{\kappa - 1 + \frac{2}{N-1}}  $$</p>
+
+<hr />
+
+<p>Things get simpler if one assumes <strong>Normality</strong> for $f(x)$. First, normality implies that $\bar{X_n}$ and $S^2$ are independent (see <a href="https://en.wikipedia.org/wiki/Basu%27s_theorem" target="_blank">Basus&rsquo;s theorem</a>). Thus $\bar{X_n}^2$ and $S^2$ are independent, because $x-&gt;x^2$ is a measurable function on its domain. Then $Var(S^2) = \frac{2\sigma^4}{N-1}$. We also a formula for $Var(\bar{X_n}^2)$ in the normal case:</p>
+
+<p>$$ Var(\bar{X_n}^2) = \frac{4\mu^2\sigma^2}{N} \big( 1 + \frac{\sigma^2}{2n \mu^2}\big)$$</p>
+
+<p>source: <a href="https://journals.sagepub.com/doi/abs/10.1177/0008068319750115" target="_blank">https://journals.sagepub.com/doi/abs/10.1177/0008068319750115</a></p>
+
+<p>Hence, with the normality assumption we have:</p>
+
+<p>$$ Var(T_2) = \frac{4\mu^2\sigma^2}{N} + \frac{2\sigma^4}{N (N-1)}$$</p>
+
+<hr />
+
+<p>Now let&rsquo;s do a final comparison of MSE in the <strong>Normal case</strong>. Also, let&rsquo;s only use $N/2$ draws for $\bar{XY}_n$, <strong>to keep constant the number of time we call the function $f(.)$</strong> in the code ($\bar{XY}_n$ uses twice as much function calls, because we use two independent series of shocks).</p>
+
+<p>$$ MSE(\bar{XY}_n) = 2 \frac{\sigma^4 + 2 \mu^2 \sigma^2}{N} = \frac{4\mu^2\sigma^2}{N} + \frac{2\sigma^4}{N}$$</p>
+
+<p>$$ MSE(\bar{X}^2_n) = \frac{4\mu^2\sigma^2}{N} + \frac{3\sigma^4}{N^2} $$</p>
+
+<p>$$ MSE(T_2) = \frac{4\mu^2\sigma^2}{N} + \frac{2\sigma^4}{N (N-1)} $$</p>
+
+<ul>
+<li>When $N=2$, $MSE(\bar{XY}_n) = MSE(T_2)$. For $N&gt;2$, $MSE(\bar{XY}_n) &gt; MSE(T_2)$</li>
+<li>When $N=2$, $MSE(\bar{X}^2_n) &lt; MSE(T_2)$. When $N \geq 3$, $MSE(\bar{X}^2_n) \geq MSE(T_2)$</li>
+</ul>
+
+<p>So if one only looks at the MSE, the suggestion is to use:</p>
+
+<ul>
+<li>$\bar{X}^2_n$ when $N=2$</li>
+<li>$T_2$ when $N\geq 3$</li>
+</ul>
+
+<p><img src="Integral_Squared_31_0.svg" alt="svg" /></p>
+
+<pre><code class="language-julia">grid_N = [2, 4, 10, 100, 1000, 10000, 100000]
+N_replicate = 10000 #number of replications for the distribution of the estimator
+
+# To store stats values
+distristribution_mean = zeros(length(grid_N), N_replicate)
+distristribution_var = zeros(length(grid_N), N_replicate)
+distristribution_var_product = zeros(length(grid_N), N_replicate)
+distristribution_square_mean = zeros(length(grid_N), N_replicate)
+distribution_T2 = zeros(length(grid_N), N_replicate)
+distristribution_product_mean = zeros(length(grid_N), N_replicate)
+
+# Store stats on distribution of values for each replication
+distristribution_mean_average = zeros(length(grid_N))
+distristribution_mean_var = zeros(length(grid_N))
+distristribution_mean_var_product = zeros(length(grid_N))
+distristribution_square_average = zeros(length(grid_N))
+distristribution_square_var = zeros(length(grid_N))
+
+distristribution_product_average = zeros(length(grid_N))
+distristribution_product_var = zeros(length(grid_N))
+
+# To store stats on Mean Squared Error (MSE)
+distristribution_square_MSE_average = zeros(length(grid_N))
+distristribution_square_MSE_var = zeros(length(grid_N))
+
+distristribution_product_MSE_average = zeros(length(grid_N))
+distristribution_product_MSE_var = zeros(length(grid_N))
+
+distristribution_T2_MSE_var = zeros(length(grid_N))
+distristribution_T2_MSE_average = zeros(length(grid_N))
+
+true_value = sqrt(0.1)
+mu = true_value  #mean normal
+sigma = 1.0 #variance when simulating from Normal
+f(x) = x
+
+distribution = &quot;Normal&quot; #&quot;Uniform&quot; # Choice between Normal(mu, sigma) or Uniform(-1,1) + mu
+
+for (index_N, N) in enumerate(grid_N)
+
+    N2 = Int(N/2) #to keep the number of function evaluations constant
+
+    if distribution == &quot;Normal&quot;
+        d_x = Normal(mu, sigma)
+        d_x1 = Normal(mu, sigma)
+        d_x2 = Normal(mu, sigma)
+    else
+        d_x = Uniform(-1,1) + mu
+        d_x1 = Uniform(-1,1) + mu
+        d_x2 = Uniform(-1,1) + mu
+    end
+
+    for i=1:N_replicate
+
+        draws_x = rand(d_x, N)
+        draws_x1 = rand(d_x1, N2)
+        draws_x2 = rand(d_x2, N2)
+
+        distristribution_mean[index_N, i] = mean(f(draws_x)) #mean f(x)
+        distristribution_var[index_N, i] = var(f(draws_x)) #variance of f(x)
+
+        distristribution_var_product[index_N, i] = var(f(draws_x1).*f(draws_x2)) #variance of f(x1)*f(x2)
+        distristribution_square_mean[index_N, i] = mean(f(draws_x))^2
+        distribution_T2[index_N, i] = mean(f(draws_x))^2 - (var(f(draws_x))/N)
+        distristribution_product_mean[index_N, i] = mean(f(draws_x1).*f(draws_x2))
+
+    end
+
+    #Stats across different replications
+    # Average of mean
+    distristribution_mean_average[index_N] = mean(mean(distristribution_mean[index_N, :]))
+
+    # Variance estimator
+    # E(x^2)
+    distristribution_mean_var[index_N] = mean(distristribution_var[index_N, :]) #average of variances
+    distristribution_mean_var_product[index_N] = mean(distristribution_var_product[index_N, :]) #average of variances of products
+
+    distristribution_square_var[index_N] = var(distristribution_square_mean[index_N, :])
+    distristribution_square_average[index_N] = mean(distristribution_square_mean[index_N, :])
+
+    # E(xy)
+    distristribution_product_var[index_N] = var(distristribution_product_mean[index_N, :])
+    distristribution_product_average[index_N] = mean(distristribution_product_mean[index_N, :])
+
+    # Mean squared error
+    # Note that here the true value is 0
+    # E(x^2)
+    distristribution_square_MSE_var[index_N] = var((distristribution_square_mean[index_N, :] .- true_value^2).^2)
+    distristribution_square_MSE_average[index_N] = mean((distristribution_square_mean[index_N, :] .- true_value^2).^2)
+
+    # E(xy)
+    distristribution_product_MSE_var[index_N] = var((distristribution_product_mean[index_N, :] .- true_value^2).^2)
+    distristribution_product_MSE_average[index_N] = mean((distristribution_product_mean[index_N, :] .- true_value^2).^2)
+
+    # E(x^2) - S^2/N
+    distristribution_T2_MSE_var[index_N] = var((distribution_T2[index_N, :] .- true_value^2).^2)
+    distristribution_T2_MSE_average[index_N] = mean((distribution_T2[index_N, :] .- true_value^2).^2)
+
+
+end
+
+# Plot for the expected value
+p0 = plot(log10.(grid_N), log10.(distristribution_square_MSE_average), label=L&quot;$Empirical \bar{X}^2_n$&quot;, xlabel=L&quot;$log_{10}(N)$&quot;)
+plot!(log10.(grid_N), log10.(distristribution_product_MSE_average),  label =L&quot;$Empirical \bar{XY}_n$&quot;, xlabel=L&quot;$log_{10}(N)$&quot;, ylabel=L&quot;$log_{10}(MSE)$&quot;)
+plot!(log10.(grid_N), log10.(distristribution_T2_MSE_average),  label =L&quot;$Empirical T_{2,n}$&quot;, xlabel=L&quot;$log_{10}(N)$&quot;, ylabel=L&quot;$log_{10}(MSE)$&quot;)
+vline!([log10.(3)], label=L&quot;$log_{10}(3)$&quot;)
+plot!(log10.(grid_N), log10.(2*(distristribution_mean_var.^2 + 2 .* distristribution_mean_average.^2 .* distristribution_mean_var)./(grid_N)), label=L&quot;$2(\sigma^4  + 2 \mu^2 \sigma^2)/N$&quot;, linestyle=:dash, linewidth=2.0)
+#plot!(log10.(grid_N), log10.((3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&quot;$3\sigma^4/N^2$&quot;, title=&quot;Mean Squared Error&quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((4 .* distristribution_mean_average.^2 .* distristribution_mean_var)./(grid_N) + (2.0 .* distristribution_mean_var.^2 )./(grid_N.*(grid_N .- 1))), label=L&quot;$\frac{4 \mu^2 \sigma^2}{N} + \frac{2 \sigma^4}{N(N-1)}$&quot;, title=&quot;Mean Squared Error&quot;, linestyle=:dash, linewidth=2.0)
+plot!(log10.(grid_N), log10.((4 .* distristribution_mean_average.^2 .* distristribution_mean_var)./(grid_N) + (3.0 .* distristribution_mean_var.^2 )./(grid_N.^2)), label=L&quot;$\frac{4 \mu^2 \sigma^2}{N} + \frac{3 \sigma^4}{N^2}$&quot;, title=&quot;Mean Squared Error&quot;, linestyle=:dash, linewidth=2.0)
+
+plot!(size=(800,400))
 </code></pre>
 
     </div>
