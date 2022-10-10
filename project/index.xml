@@ -45,7 +45,7 @@
       <pubDate>Tue, 12 Mar 2019 18:11:07 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/spatialeq/</guid>
-      <description>I exploit a spatial discontinuity introduced by a French reform in September 2015 to measure the links between commuting costs, employment and location decisions. In the municipalities benefiting from the reform, I find that the reform led to a 2% decrease in the number of unemployed workers registered in the French unemployment agency. The employment effect is concentrated on long-term unemployed workers. I build a simple spatial search-and-matching to underline the mechanism at play.</description>
+      <description>I explore the links between commuting costs and local employment dynamics using a spatial discontinuity introduced by a French reform in September 2015. The reform decreased the cost of public transportation in selected areas of the Paris region, but did not affect other areas. In the baseline regression framework, which only includes units that are geographically close to each other, I find that areas benefiting from the reform experienced a:</description>
     </item>
     
     <item>
