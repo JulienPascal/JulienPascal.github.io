@@ -7,8 +7,34 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Sat, 03 Sep 2022 18:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 24 Apr 2023 18:11:07 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
+      <link>https://julienpascal.github.io/project/ann/</link>
+      <pubDate>Mon, 24 Apr 2023 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/ann/</guid>
+      <description>&lt;p&gt;Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic
+programming problems arising in economics. In this context, estimating ANN
+parameters involves minimizing a loss function based on the model’s stochastic functional
+equations. In general, the expectations appearing in the loss function admit
+no closed-form solution, so numerical approximation techniques must be used. In this
+paper, I analyze a bias-corrected Monte Carlo operator (bc-MC) that approximates
+expectations by Monte Carlo. I show that the bc-MC operator is a generalization of
+the all-in-one expectation operator, already proposed in the literature. I propose a
+method to optimally set the hyperparameters defining the bc-MC operator and illustrate
+the findings numerically with well-known economic models. I also demonstrate
+that the bc-MC operator can scale to high-dimensional models. With just a few minutes
+of computing time, I find a global solution to an economic model with a kink in
+the decision function and more than 100 dimensions.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.bcl.lu/en/publications/Working-papers/172/BCLWP172.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Numerical Approximation of Expectations Squared</title>
@@ -5195,255 +5221,6 @@ is a tutorial on how to do it.&lt;/p&gt;
 
 &lt;p&gt;From an academic perspective, Docker solves the dependency hell and helps in producing
 reproducible research. I will try to use it more often for sharing my own research.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>OLS the Machine Learning Way</title>
-      <link>https://julienpascal.github.io/post/ols_ml/</link>
-      <pubDate>Sun, 29 Sep 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/ols_ml/</guid>
-      <description>
-
-&lt;p&gt;Coming from an Economics/Econometrics background, I have always been a bit puzzled by the way several Machine Learning (ML) textbooks I have read solve the ordinary least squares model (OLS). When considering a linear model of the form:&lt;/p&gt;
-
-&lt;p&gt;$$ y = X \beta + e $$&lt;/p&gt;
-
-&lt;p&gt;with $e$ a zero-mean noise term, the closed-form solution associated with minimizing the mean square error is:&lt;/p&gt;
-
-&lt;p&gt;$$ \beta = (X&amp;rsquo;X)^{-1}X&amp;rsquo;y $$&lt;/p&gt;
-
-&lt;p&gt;Several ML textbooks explain that a recursive algorithm (see below) may be used to solve for $\beta$. Why not directly using the analytical formula to calculate an estimate of $\beta$ ? While feasible with &amp;ldquo;small&amp;rdquo; datasets (not too many explanatory variables and/or observations), direct inversion of $X&amp;rsquo;X$ is not recommended when working with thousands of explanatory variables and/or billions of observations. The alternative is to use &lt;a href=&#34;https://en.wikipedia.org/wiki/Gradient_descent&#34; target=&#34;_blank&#34;&gt;gradient descent&lt;/a&gt;, or better, &lt;a href=&#34;https://en.wikipedia.org/wiki/Stochastic_gradient_descent&#34; target=&#34;_blank&#34;&gt;stochastic gradient descent&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;In this short post, I solve OLS the &amp;ldquo;machine-learning way&amp;rdquo;. That is, using (stochastic) gradient descent. The idea for gradient descent (GD) is quite intuitive. The gradient of $f$ at a given point tells us the direction of &lt;strong&gt;greatest increase&lt;/strong&gt; for $f$ at this point. Hence, moving in the opposite direction (minus the gradient) is probably a good idea to find a local minimum. And indeed it is. The GD algorithm repetitively applies this procedure until a minimum (hopefully global) is found. Starting from an initial guess for $\beta$, one updates the guess using the following formula:&lt;/p&gt;
-
-&lt;p&gt;$$ \beta_{n} = \beta_{n-1} - \alpha * grad_{n}(\beta_{n-1},X,y) $$&lt;/p&gt;
-
-&lt;p&gt;where $\alpha$ is a small value (the &amp;ldquo;learning rate&amp;rdquo;) and $grad_{n}(\beta_{n-1},X,y)$ the gradient of the mean square error (another loss function can be used) evaluated at $\beta_{n-1}$ using the observations $X$ and $y$. Using the mean square error as a loss function generates a closed-form solution for the gradient:&lt;/p&gt;
-
-&lt;p&gt;$$ grad_{n}(\beta_{n-1},X,y) = (X&amp;rsquo;X)\beta - X&amp;rsquo;y $$&lt;/p&gt;
-
-&lt;p&gt;A refinement of GD, especially handy when dealing with a large dataset, is to use only a subset of the full sample when calculating the gradient:&lt;/p&gt;
-
-&lt;p&gt;$$ \beta_{n} = \beta_{n-1} - \alpha * grad_{n}(\beta_{n-1},X_n,y_n) $$&lt;/p&gt;
-
-&lt;p&gt;where $X_n$ and $y_n$ are a randomly selected sub-sample of $X$ and $y$. Stochastic Gradient Descent (SGD) reduces the computational burden associated with computing the gradient, while still having good convergence properties, as illustrated in the application below.&lt;/p&gt;
-
-&lt;h2 id=&#34;implementation-in-julia&#34;&gt;Implementation in Julia&lt;/h2&gt;
-
-&lt;p&gt;Let&amp;rsquo;s first load packages and define parameters&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using LinearAlgebra
-using Distributions
-using Plots
-using Distributions
-using Random
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;n_points=10000
-dim_input=100 #dim of input, without the intercept
-dim_output=1
-# Normal noise
-d = Normal()
-# True parameters
-beta = rand(d, dim_input + 1);
-# Noise
-e = rand(d, n_points);
-# Input data:
-X = rand(d, (n_points,dim_input));
-# Add the intercept:
-X = hcat(ones(n_points),X);
-#Linear Model
-y = X*beta .+ e;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This function calculates an estimate of $\beta$ using the analytical formula for OLS&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#OLS way
-function OLS_direct(X::Array, y::Vector)
-    inv(transpose(X)*X)*transpose(X)*y
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;OLS_direct (generic function with 1 method)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time beta_hat = OLS_direct(X, y);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;0.611144 seconds (1.85 M allocations: 96.576 MiB, 13.64% gc time)&lt;/p&gt;
-
-&lt;p&gt;Without any major surprise, using the analytical solution works perfectly well, as illustrated in the following plot&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;plot(beta, beta_hat, seriestype=:scatter, label=&amp;quot;OLS (Direct)&amp;quot;)
-plot!(beta, beta, seriestype=:line, label=&amp;quot;true&amp;quot;)
-xlabel!(&amp;quot;true value&amp;quot;)
-ylabel!(&amp;quot;estimated value (Direct)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;OLSMachineLearning_9_0.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;gradient-descent&#34;&gt;Gradient Descent&lt;/h2&gt;
-
-&lt;p&gt;Now it&amp;rsquo;s time to solve OLS the machine learning way. I first define a function that calculates the gradient of the loss
-function, evaluated at the current guess using the full sample. Then, a second function applies the GD updating rule.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#Calculate the gradient
-function grad_OLS!(G, beta_hat, X, y)
-    G[:] = transpose(X)*X*beta_hat - transpose(X)*y
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;grad_OLS! (generic function with 1 method)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#Gradient descent way
-function OLS_gd(X::Array, y::Vector; epochs::Int64=1000, r::Float64=1e-5, verbose::Bool=false)
-    #initial guess
-    beta_hat = zeros(size(X,2))
-    grad_n = zeros(size(X,2))
-    for epoch=1:epochs
-        grad_OLS!(grad_n, beta_hat, X, y)
-        beta_hat -= r*grad_n
-        if verbose==true
-            if mod(epoch, round(Int, epochs/10))==1
-                println(&amp;quot;MSE: $(mse(beta_hat, X, y))&amp;quot;)
-            end
-        end
-    end
-    return beta_hat
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;OLS_gd (generic function with 1 method)&lt;/p&gt;
-
-&lt;p&gt;As illustrated below, after 20 iterations we are quite close to the true value. After 100 iterations, values obtained by GD are indistinguishable from the true values.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time beta_hat_gd_20 = OLS_gd(X,y, epochs=20);
-@time beta_hat_gd = OLS_gd(X,y, epochs=100);
-plot(beta, beta_hat_gd_20, seriestype=:scatter, label=&amp;quot;GD (20 iter.)&amp;quot;)
-plot!(beta, beta_hat_gd, seriestype=:scatter, label=&amp;quot;GD (100 iter.)&amp;quot;)
-plot!(beta, beta, seriestype=:line, label=&amp;quot;true&amp;quot;)
-xlabel!(&amp;quot;true value&amp;quot;)
-ylabel!(&amp;quot;estimated value (GD)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;0.137474 seconds (81.55 k allocations: 5.814 MiB)
-0.466605 seconds (714 allocations: 8.225 MiB)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;OLSMachineLearning_15_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;stochastic-gradient-descent&#34;&gt;Stochastic Gradient Descent&lt;/h2&gt;
-
-&lt;p&gt;One issue associated with plain vanilla GD is that computing the gradient might be slow. Let&amp;rsquo;s now randomly select only a fraction of the full sample every time we iterate. Here, I take only 10 percent of the full sample.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#Gradient descent way
-function OLS_sgd(X::Array, y::Vector; epochs::Int64=1000, r::Float64=1e-5, verbose::Bool=false, batchsizePer::Int64=10)
-    #initial guess
-    beta_hat = zeros(size(X,2))
-    grad_n = zeros(size(X,2))
-    #how many draws from the dataset?
-    batchsize = round(Int, size(X,1)*(batchsizePer/100))
-    Xn = zeros(batchsize, size(X,2))
-    yn = zeros(batchsize)
-    for epoch=1:epochs
-        indices = shuffle(Vector(1:size(X,1)))
-        Xn = X[indices[1:batchsize],:]
-        yn = y[indices[1:batchsize]]
-        grad_OLS!(grad_n, beta_hat, Xn, yn)
-        #gradient descent:
-        beta_hat -= r*grad_n
-        if verbose==true
-            if mod(epoch, round(Int, epochs/10))==1
-                println(&amp;quot;MSE: $(mse(beta_hat, X, y))&amp;quot;)
-            end
-        end
-    end
-    return beta_hat
-end
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;OLS_sgd (generic function with 1 method)&lt;/p&gt;
-
-&lt;p&gt;The following block of code shows that SGD achieves the same degree of accuracy, while being much faster than GD.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time beta_hat_gd = OLS_gd(X,y, epochs=200);
-@time beta_hat_sgd = OLS_sgd(X,y, epochs=200, batchsizePer=20);
-plot(beta, beta_hat_sgd, seriestype=:scatter, label=&amp;quot;SGD&amp;quot;)
-plot!(beta, beta_hat_gd, seriestype=:scatter, label=&amp;quot;GD&amp;quot;)
-plot!(beta, beta, seriestype=:line, label=&amp;quot;true&amp;quot;)
-xlabel!(&amp;quot;true value&amp;quot;)
-ylabel!(&amp;quot;estimated value (SGD)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;0.894465 seconds (1.41 k allocations: 16.448 MiB, 0.42% gc time)
-0.513217 seconds (338.19 k allocations: 382.550 MiB, 4.60% gc time)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;OLSMachineLearning_20_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;The OLS analytical formula is the gold standard to derive theoretical properties and is perfectly fine when working with reasonably-sized data. In a big data context, (stochastic) gradient descent is the way to go. SGD can be applied to a wide-range of minimization problems. In a machine-learning context, SGD is used to estimate (&amp;ldquo;train&amp;rdquo;) much more complicated models than the simple linear model presented here. In the Appendix below, I show how one can use SGD when no analytical solution for the gradient is available.&lt;/p&gt;
-
-&lt;h2 id=&#34;appendix&#34;&gt;Appendix&lt;/h2&gt;
-
-&lt;h3 id=&#34;gd-without-analytical-solution-for-the-gradient&#34;&gt;GD without analytical solution for the gradient&lt;/h3&gt;
-
-&lt;p&gt;Let&amp;rsquo;s assume we don&amp;rsquo;t have a closed-form solution for the gradient. In this context, Julia&amp;rsquo;s automatic differentiation library &lt;code&gt;ForwardDiff&lt;/code&gt; is a good choice to calculate the gradient. Below, I define the loss function (MSE), I obtain the gradient of the loss function using &lt;code&gt;ForwardDiff&lt;/code&gt; and I apply the SGD algorithm.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using ForwardDiff
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;function mse(beta::Vector, X::Array, y::Vector)
-   result = zero(eltype(y))
-   for i in 1:length(y)
-       #sum squared errors
-       result += (y[i] - dot(X[i,:],beta))^2
-   end
-   return result
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;mse (generic function with 1 method)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;function grad!(G, beta_hat, X, y)
-    G[:] = ForwardDiff.gradient(x -&amp;gt; mse(x, X, y), beta_hat)
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;grad! (generic function with 1 method)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;#Gradient descent way
-function OLS_gd(X::Array, y::Vector; epochs::Int64=1000, r::Float64=1e-5, verbose::Bool=false)
-    #initial guess
-    beta_hat = zeros(size(X,2))
-    grad_n = zeros(size(X,2))
-    for epoch=1:epochs
-        grad!(grad_n, beta_hat, X, y)
-        beta_hat -= r*grad_n
-        if verbose==true
-            if mod(epoch, round(Int, epochs/10))==1
-                println(&amp;quot;MSE: $(mse(beta_hat, X, y))&amp;quot;)
-            end
-        end
-    end
-    return beta_hat
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;OLS_gd (generic function with 1 method)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;@time beta_hat_gd = OLS_gd(X,y, epochs=100);
-plot(beta, beta_hat_gd, seriestype=:scatter, label=&amp;quot;GD (100 iter.)&amp;quot;)
-plot!(beta, beta, seriestype=:line, label=&amp;quot;true&amp;quot;)
-xlabel!(&amp;quot;true value&amp;quot;)
-ylabel!(&amp;quot;estimated value (GD)&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;3.180767 seconds (9.71 M allocations: 7.547 GiB, 12.66% gc time)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;OLSMachineLearning_29_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
 </description>
     </item>
     

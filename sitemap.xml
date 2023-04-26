@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/project/ann/</loc>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/integral_squared/</loc>
       <lastmod>2022-09-03T18:00:00+01:00</lastmod>
     </url>
@@ -284,6 +292,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/artificial-neural-network/</loc>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/author/</loc>
       <priority>0</priority>
     </url>
@@ -378,6 +395,15 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/dynamic-programming/</loc>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/tags/dynamical-systems/</loc>
       <lastmod>2020-04-05T16:00:00+01:00</lastmod>
       <priority>0</priority>
@@ -458,7 +484,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2022-09-03T18:00:00+01:00</lastmod>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -483,7 +509,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/tags/machine-learning/</loc>
-      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -502,6 +528,15 @@
     
       <loc>https://julienpascal.github.io/tags/migration/</loc>
       <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/monte-carlo/</loc>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -536,7 +571,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/project/</loc>
-      <lastmod>2022-05-29T18:11:07+01:00</lastmod>
+      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     

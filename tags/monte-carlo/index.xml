@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Machine Learning on Julien Pascal</title>
-    <link>https://julienpascal.github.io/tags/machine-learning/</link>
-    <description>Recent content in Machine Learning on Julien Pascal</description>
+    <title>Monte Carlo on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/monte-carlo/</link>
+    <description>Recent content in Monte Carlo on Julien Pascal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
     <lastBuildDate>Mon, 24 Apr 2023 18:11:07 +0100</lastBuildDate>
     
-	<atom:link href="https://julienpascal.github.io/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://julienpascal.github.io/tags/monte-carlo/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,15 +19,6 @@
       
       <guid>https://julienpascal.github.io/project/ann/</guid>
       <description>Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model’s stochastic functional equations. In general, the expectations appearing in the loss function admit no closed-form solution, so numerical approximation techniques must be used. In this paper, I analyze a bias-corrected Monte Carlo operator (bc-MC) that approximates expectations by Monte Carlo.</description>
-    </item>
-    
-    <item>
-      <title>A Primer on Computer Vision</title>
-      <link>https://julienpascal.github.io/post/cnn/</link>
-      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/cnn/</guid>
-      <description>For a specific project on the housing market (here), I had to analyze thousands of photos. To do that, I used a convolutional neural network (CNN), which is a fancy name for a complicated function that can be &amp;ldquo;trained&amp;rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &amp;ldquo;Hello World&amp;rdquo; of computer vision and CNN: the classification of hand-written digits from the MNIST dataset.</description>
     </item>
     
   </channel>
