@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 06 Jun 2018 15:26:09 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 26 Jul 2023 15:51:54 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/authors/julien-pascal/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>(In)efficient commuting and migration choices: Theory and policy in an urban search model</title>
+      <link>https://julienpascal.github.io/publication/mpp_rsue_2023/</link>
+      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/publication/mpp_rsue_2023/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>The Simulated Method of Moments: a Parallel Implementation</title>

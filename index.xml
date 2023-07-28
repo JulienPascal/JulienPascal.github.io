@@ -7,8 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 24 Apr 2023 18:11:07 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 26 Jul 2023 15:51:54 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>(In)efficient commuting and migration choices: Theory and policy in an urban search model</title>
+      <link>https://julienpascal.github.io/publication/mpp_rsue_2023/</link>
+      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/publication/mpp_rsue_2023/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
@@ -992,22 +1001,6 @@ plot!(log10.(grid_N), log10.((4 .* distristribution_mean_average.^2 .* distristr
 
 plot!(size=(800,400))
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>(In)efficient commuting and migration choices</title>
-      <link>https://julienpascal.github.io/project/inefficient_commuting/</link>
-      <pubDate>Sun, 29 May 2022 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/inefficient_commuting/</guid>
-      <description>&lt;p&gt;We develop a monocentric urban search-and-matching model in which
-workers can choose to commute or to migrate within the region. The equilibrium endogenously allocates the population into three categories: migrants (relocate from their hometown to the city), commuters (traveling to work in the city) and home stayers (remaining in their hometown). We prove that the market equilibrium is usually not optimal: a composition externality may generate under- or over-migration with respect to the central planner’s solution, which in all cases results in under-investment in job
-vacancies and therefore production. We calibrate the model to the Greater Paris area to reproduce several gradients observed in the data, suggesting over-migration. We show how policy interventions can help to reduce ineﬀiciencies.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://www.bcl.lu/fr/Recherche/publications/cahiers_etudes/159/BCLWP159.pdf&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/pdf_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
