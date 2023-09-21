@@ -72,7 +72,7 @@ This project  Cluster neighborhoods in Paris and analyze cluster properties  Dat
       
       <guid>https://julienpascal.github.io/slides/rental-market/</guid>
       <description>Rental Housing Market and Directed Search Introduction Context  Housing shortages in many major cities Rents have surged in big cities worldwide   The median American rent payment rose 61% in real terms between 1960 and 2016 while the median tenant’s income grew by 5%
- Rents have outpaced household disposable income in Paris Questions  Do we observe asymmetric bargaining power between tenants and landlords?  Data Data Sources  Web scraping: online platform that collects online ads for the Paris market between April and May 2019 I have data on the two sides of the rental housing market:  supply: apartment features, text description and photos demand: number of contacts received by landlords (through the online platform)   Descriptive statistics Ads per city Apartment features Apartment features by city Population (2017) Number of ads Median rent per m² Aesthetic score  Aesthetic score calculated based on photos I use a convolutional neural network (CNN) based on the work of Talebi and Milanfar (2018) CNN assigns a score to each photo Ad aesthetic score = median score  Number of photos per ad Density aesthetic score Selected sample of photos in the top 1% Selected sample of photos in the bottom 1% What features are important to predict rent?</description>
+  36% households renters in the US (2019) (source), 30% in Euro area (2020) (source)  Housing costs have outpaced household disposable income worldwide % change in selected household items and median income, OECD average, 1995-2018: Source: OECD</description>
     </item>
     
   </channel>

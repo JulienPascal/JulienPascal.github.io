@@ -18,7 +18,7 @@
       <pubDate>Mon, 21 Oct 2019 18:11:07 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
-      <description>Using a novel dataset on the rental housing market in the Paris area, I show that the rental housing market is well described by a directed search model. I develop a hedonic pricing model taking into consideration apartment features and subjective attractiveness using photos and computer vision techniques from the machine learning literature.</description>
+      <description>This paper introduces new empirical findings concerning the rental housing market in the Paris metropolitan area. Utilizing a unique dataset gathered from online advertisements for Parisian rentals, along with a hedonic model that incorporates both apartment features and property-specific photographs, two main stylized facts are established. First, landlords who offer lower rent—while keeping property features constant— attract a greater number of applicants, consistent with predictions from standard directed search models. Second, a previously unreported trend in landlords&amp;rsquo; pricing strategies is identified: a significant portion employ a two-stage pricing approach, initially setting a high advertised rent and subsequently reducing it after a &amp;lsquo;wait-and-see period, consistent with the &amp;lsquo;slow Dutch auction&amp;rsquo; mechanism already studied in the auction literature and empirically observed in the property sales market.</description>
     </item>
     
   </channel>
