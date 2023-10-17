@@ -5128,15 +5128,7 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
       <pubDate>Mon, 21 Oct 2019 18:11:07 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
-      <description>&lt;p&gt;This paper introduces new empirical findings concerning the rental housing market in the Paris metropolitan area.
-Utilizing a unique dataset gathered from online advertisements for Parisian rentals,
-along with a hedonic model that incorporates both apartment features and property-specific photographs,
-two main stylized facts are established. First, landlords who offer lower rent—while keeping property features constant—
- attract a greater number of applicants, consistent with predictions from standard directed search models.
-Second, a previously unreported trend in landlords&amp;rsquo; pricing strategies is identified:
-a significant portion employ a two-stage pricing approach, initially setting a high advertised rent and subsequently
-reducing it after a &amp;lsquo;wait-and-see period, consistent with the &amp;lsquo;slow Dutch auction&amp;rsquo; mechanism
-already studied in the auction literature and empirically observed in the property sales market.&lt;/p&gt;
+      <description>&lt;p&gt;This paper introduces new empirical findings concerning the functioning of the rental housing market. Utilizing a unique dataset gathered from online advertisements for Parisian rentals, along with a hedonic model that incorporates both apartment features and property-specific photographs, two main stylized facts are established. First, landlords who offer lower rent, while keeping property features constant, attract a greater number of applicants, consistent with predictions from standard directed search models. Second, a previously unreported trend in landlords&amp;rsquo; pricing strategies is identified: a significant portion employ a two-stage pricing approach, initially setting a high advertised rent and subsequently reducing it after a &amp;ldquo;wait-and-see&amp;rdquo; period, consistent with the slow Dutch auction mechanism already studied in the auction literature and empirically observed in the property sales market.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Keywords&lt;/strong&gt;: Rental Housing Market; Hedonic Model; Directed Search Models; Landlords&amp;rsquo; Pricing Strategies; Machine Learning&lt;/p&gt;
 
