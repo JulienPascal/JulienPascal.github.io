@@ -4,16 +4,16 @@
     
     <url>
     
-      <loc>https://julienpascal.github.io/publication/mpp_rsue_2023/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+      <loc>https://julienpascal.github.io/publication/bc-mc-2024/</loc>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
     </url>
     
   
     
     <url>
     
-      <loc>https://julienpascal.github.io/project/ann/</loc>
-      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <loc>https://julienpascal.github.io/publication/mpp_rsue_2023/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
     </url>
     
   
@@ -252,7 +252,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/publication_types/2/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -285,15 +285,6 @@
     
       <loc>https://julienpascal.github.io/tags/adaptive-sparse-grids/</loc>
       <lastmod>2022-02-12T08:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/artificial-neural-network/</loc>
-      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -396,7 +387,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/tags/dynamic-programming/</loc>
-      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -475,7 +466,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -484,7 +475,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/authors/julien-pascal/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -518,7 +509,16 @@
     <url>
     
       <loc>https://julienpascal.github.io/tags/machine-learning/</loc>
-      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/machine-learning/</loc>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -545,7 +545,16 @@
     <url>
     
       <loc>https://julienpascal.github.io/tags/monte-carlo/</loc>
-      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/neural-network/</loc>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -589,7 +598,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/project/</loc>
-      <lastmod>2023-04-24T18:11:07+01:00</lastmod>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -598,7 +607,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/publication_types/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -607,7 +616,7 @@
     <url>
     
       <loc>https://julienpascal.github.io/publication/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
     </url>
     
   

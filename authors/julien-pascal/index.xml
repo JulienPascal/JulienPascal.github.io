@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Wed, 26 Jul 2023 15:51:54 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 01 Apr 2024 15:51:54 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/authors/julien-pascal/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
+      <link>https://julienpascal.github.io/publication/bc-mc-2024/</link>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/publication/bc-mc-2024/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>(In)efficient commuting and migration choices: Theory and policy in an urban search model</title>

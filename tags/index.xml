@@ -31,15 +31,6 @@
     </item>
     
     <item>
-      <title>Artificial Neural Network</title>
-      <link>https://julienpascal.github.io/tags/artificial-neural-network/</link>
-      <pubDate>Mon, 24 Apr 2023 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/artificial-neural-network/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Banking</title>
       <link>https://julienpascal.github.io/tags/banking/</link>
       <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
@@ -96,7 +87,7 @@
     <item>
       <title>Dynamic programming</title>
       <link>https://julienpascal.github.io/tags/dynamic-programming/</link>
-      <pubDate>Mon, 24 Apr 2023 18:11:07 +0100</pubDate>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/dynamic-programming/</guid>
       <description></description>
@@ -177,7 +168,16 @@
     <item>
       <title>Machine Learning</title>
       <link>https://julienpascal.github.io/tags/machine-learning/</link>
-      <pubDate>Mon, 24 Apr 2023 18:11:07 +0100</pubDate>
+      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Machine learning</title>
+      <link>https://julienpascal.github.io/tags/machine-learning/</link>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/machine-learning/</guid>
       <description></description>
@@ -204,9 +204,18 @@
     <item>
       <title>Monte Carlo</title>
       <link>https://julienpascal.github.io/tags/monte-carlo/</link>
-      <pubDate>Mon, 24 Apr 2023 18:11:07 +0100</pubDate>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/monte-carlo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Neural network</title>
+      <link>https://julienpascal.github.io/tags/neural-network/</link>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/neural-network/</guid>
       <description></description>
     </item>
     

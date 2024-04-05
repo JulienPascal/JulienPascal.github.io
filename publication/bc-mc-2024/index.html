@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
@@ -30,10 +28,10 @@
   
     
   
-  <meta name="description" content="I am an Economist at the Central Bank of Luxembourg. I hold a PhD in Economics from Sciences Po Paris.">
+  <meta name="description" content="Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model&#39;s stochastic functional equations. In general, the expectations appearing in the loss function admit no closed-form solution, so numerical approximation techniques must be used. In this paper, I analyze a bias-corrected Monte Carlo operator (bc-MC) that approximates expectations by Monte Carlo. I show that the bc-MC operator is a generalization of the all-in-one expectation operator, already proposed in the literature. I demonstrate that, under some conditions on the primitives of the economic model, the bc-MC operator is the unbiased estimator of the loss function with the minimum variance. I propose a method to optimally set the hyperparameters defining the bc-MC operator, and illustrate the findings numerically with well-known economic models. I also demonstrate that the bc-MC operator can scale to high-dimensional models. With just approximately a minute of computing time, I find a global solution to an economic model with a kink in the decision function and more than 100 dimensions.">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/tags/monte-carlo/">
+  <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/publication/bc-mc-2024/">
 
   
 
@@ -115,15 +113,15 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/tags/monte-carlo/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/tags/monte-carlo/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
+  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
   
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="https://julienpascal.github.io/tags/monte-carlo/">
+  <link rel="canonical" href="https://julienpascal.github.io/publication/bc-mc-2024/">
 
   
   
@@ -138,19 +136,21 @@
   <meta property="twitter:creator" content="@Juli3nPascal">
   
   <meta property="og:site_name" content="Julien Pascal">
-  <meta property="og:url" content="https://julienpascal.github.io/tags/monte-carlo/">
-  <meta property="og:title" content="Monte Carlo | Julien Pascal">
-  <meta property="og:description" content="I am an Economist at the Central Bank of Luxembourg. I hold a PhD in Economics from Sciences Po Paris."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:url" content="https://julienpascal.github.io/publication/bc-mc-2024/">
+  <meta property="og:title" content="Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator | Julien Pascal">
+  <meta property="og:description" content="Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model&#39;s stochastic functional equations. In general, the expectations appearing in the loss function admit no closed-form solution, so numerical approximation techniques must be used. In this paper, I analyze a bias-corrected Monte Carlo operator (bc-MC) that approximates expectations by Monte Carlo. I show that the bc-MC operator is a generalization of the all-in-one expectation operator, already proposed in the literature. I demonstrate that, under some conditions on the primitives of the economic model, the bc-MC operator is the unbiased estimator of the loss function with the minimum variance. I propose a method to optimally set the hyperparameters defining the bc-MC operator, and illustrate the findings numerically with well-known economic models. I also demonstrate that the bc-MC operator can scale to high-dimensional models. With just approximately a minute of computing time, I find a global solution to an economic model with a kink in the decision function and more than 100 dimensions."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
-  <meta property="og:updated_time" content="2024-04-01T15:51:54&#43;01:00">
+  <meta property="article:published_time" content="2024-04-01T15:51:54&#43;01:00">
+  
+  <meta property="article:modified_time" content="2024-04-01T15:51:54&#43;01:00">
   
 
   
 
   
 
-  <title>Monte Carlo | Julien Pascal</title>
+  <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
@@ -385,8 +385,9 @@
   </div>
 </nav>
 
+<div class="pub" itemscope itemtype="http://schema.org/CreativeWork">
 
-
+  
 
 
 
@@ -402,38 +403,282 @@
   
 
   
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</h1>
+
+  
+
+  
+    
+
+
+
+<meta content="2024-04-01 15:51:54 &#43;0100 &#43;0100" itemprop="datePublished">
+<meta content="2024-04-01 15:51:54 &#43;0100 &#43;0100" itemprop="dateModified">
+
+<div class="article-metadata">
+
+  
+  
+  
+  
+  <div>
+    
+
+
+
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+      <span itemprop="name">
+        
+
+      
+      
+      <a href="/authors/julien-pascal/">Julien Pascal</a></span></span>
+  
+
+
+
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    <time>April 2024</time>
+  </span>
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Artificial%20Neural%20Networks%20to%20solve%20dynamic%20programming%20problems%3a%20a%20bias-corrected%20Monte%20Carlo%20operator&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fbc-mc-2024%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fbc-mc-2024%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fbc-mc-2024%2f&amp;title=Artificial%20Neural%20Networks%20to%20solve%20dynamic%20programming%20problems%3a%20a%20bias-corrected%20Monte%20Carlo%20operator"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fbc-mc-2024%2f&amp;title=Artificial%20Neural%20Networks%20to%20solve%20dynamic%20programming%20problems%3a%20a%20bias-corrected%20Monte%20Carlo%20operator"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Artificial%20Neural%20Networks%20to%20solve%20dynamic%20programming%20problems%3a%20a%20bias-corrected%20Monte%20Carlo%20operator&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpublication%2fbc-mc-2024%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+<div class="btn-links mb-3">
+  
+  
+
+
+
+
   
   
     
   
-<div class="universal-wrapper pt-3">
-  <h1 itemprop="name">Monte Carlo</h1>
+<a class="btn btn-outline-primary my-1 mr-1" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4476122" target="_blank" rel="noopener">
+  Preprint
+</a>
+
+
+
 
   
+    
+  
+
+
+<a class="btn btn-outline-primary my-1 mr-1" href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank" rel="noopener">
+  PDF
+</a>
+
+
+
+
+  
+  
+    
+  
+<a class="btn btn-outline-primary my-1 mr-1" href="https://github.com/JulienPascal/bc-MC_Operator" target="_blank" rel="noopener">
+  Code
+</a>
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="btn btn-outline-primary my-1 mr-1" href="https://doi.org/https://doi.org/10.1016/j.jedc.2024.104853" target="_blank" rel="noopener">
+  DOI
+</a>
+
+
+
+</div>
+
 
   
 </div>
 
 
 
-<div class="universal-wrapper">
-  
+  <div class="article-container">
 
-  
-  
-  <div>
-    <h2><a href="/publication/bc-mc-2024/">Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</a></h2>
-    <div class="article-style">
-      
-      Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model's stochastic functional …
-      
+    
+    <h3>Abstract</h3>
+    <p class="pub-abstract" itemprop="text">Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model&rsquo;s stochastic functional equations. In general, the expectations appearing in the loss function admit no closed-form solution, so numerical approximation techniques must be used. In this paper, I analyze a bias-corrected Monte Carlo operator (bc-MC) that approximates expectations by Monte Carlo. I show that the bc-MC operator is a generalization of the all-in-one expectation operator, already proposed in the literature. I demonstrate that, under some conditions on the primitives of the economic model, the bc-MC operator is the unbiased estimator of the loss function with the minimum variance. I propose a method to optimally set the hyperparameters defining the bc-MC operator, and illustrate the findings numerically with well-known economic models. I also demonstrate that the bc-MC operator can scale to high-dimensional models. With just approximately a minute of computing time, I find a global solution to an economic model with a kink in the decision function and more than 100 dimensions.</p>
+    
+
+    
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
+        <div class="row">
+          <div class="col-12 col-md-3 pub-row-heading">Type</div>
+          <div class="col-12 col-md-9">
+            
+
+            
+            
+            <a href="/publication/#2">
+              Journal article
+            </a>
+            
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
     </div>
-  </div>
-  
+    <div class="d-md-none space-below"></div>
+    
 
-  
+    
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
+        <div class="row">
+          <div class="col-12 col-md-3 pub-row-heading">Publication</div>
+          <div class="col-12 col-md-9">In <em>Journal of Economic Dynamics and Control</em>, 2024</div>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+    <div class="d-md-none space-below"></div>
+    
 
+    <div class="space-below"></div>
+
+    <div class="article-style"></div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/dynamic-programming/">Dynamic programming</a>
+  
+  <a class="badge badge-light" href="/tags/neural-network/">Neural network</a>
+  
+  <a class="badge badge-light" href="/tags/machine-learning/">Machine learning</a>
+  
+  <a class="badge badge-light" href="/tags/monte-carlo/">Monte Carlo</a>
+  
 </div>
+
+
+
+    
+
+
+
+
+
+
+  
+  
+    
+  
+  
+
+
+
+
+
+
+
+
+  </div>
+</div>
+
+
+
 <div class="container">
   <footer class="site-footer">
   
@@ -592,6 +837,4 @@
 
   </body>
 </html>
-
-
 
