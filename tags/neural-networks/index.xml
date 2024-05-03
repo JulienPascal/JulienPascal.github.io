@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Monte Carlo on Julien Pascal</title>
-    <link>https://julienpascal.github.io/tags/monte-carlo/</link>
-    <description>Recent content in Monte Carlo on Julien Pascal</description>
+    <title>Neural Networks on Julien Pascal</title>
+    <link>https://julienpascal.github.io/tags/neural-networks/</link>
+    <description>Recent content in Neural Networks on Julien Pascal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
     <lastBuildDate>Wed, 01 May 2024 08:00:00 +0100</lastBuildDate>
     
-	<atom:link href="https://julienpascal.github.io/tags/monte-carlo/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://julienpascal.github.io/tags/neural-networks/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -20,15 +20,6 @@
       <guid>https://julienpascal.github.io/post/bc_mc/</guid>
       <description>Introduction In this blog post, I am going to present my recent work on the bc-MC operator, which was recently published here. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
 Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(.</description>
-    </item>
-    
-    <item>
-      <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
-      <link>https://julienpascal.github.io/publication/bc-mc-2024/</link>
-      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/publication/bc-mc-2024/</guid>
-      <description></description>
     </item>
     
   </channel>

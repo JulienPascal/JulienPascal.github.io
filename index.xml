@@ -7,8 +7,205 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 01 Apr 2024 15:51:54 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 01 May 2024 08:00:00 +0100</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The bc-MC Operator</title>
+      <link>https://julienpascal.github.io/post/bc_mc/</link>
+      <pubDate>Wed, 01 May 2024 08:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/bc_mc/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, I am going to present my recent work on the &lt;strong&gt;bc-MC operator&lt;/strong&gt;, which was recently published &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.&lt;/p&gt;
+
+&lt;h2 id=&#34;theory&#34;&gt;Theory&lt;/h2&gt;
+
+&lt;h3 id=&#34;structure-of-economic-models&#34;&gt;Structure of economic models&lt;/h3&gt;
+
+&lt;p&gt;In many cases, solving an economic model involves finding a policy function $g(.)$, which is a mapping from a state vector $s$ to a decision vector $a$. Usually, it is assumed that the economy is hit by random disturbances, which is usually modelled as zero-mean innovation vector $\varepsilon$, often considered to be normally distributed. The policy function $g(.)$ is such that the following stochastic equation holds:&lt;/p&gt;
+
+&lt;p&gt;$$ E_{\varepsilon}(f(s, \varepsilon)) = 0 $$&lt;/p&gt;
+
+&lt;p&gt;where $f(.)$ depends implicitly on the policy function $g(.)$ and on the particularities of the model under consideration. It looks a bit abstract, but we can usually write economic models in that form. For instance, in macroeconomic models, you usually have an Euler equation that can be written as such.&lt;/p&gt;
+
+&lt;p&gt;Here, let&amp;rsquo;s assume that we restrict ourselves to policy functions that depend on a parameter vector $\theta$: $g(. |\theta)$. Further, let&amp;rsquo;s assume that we use a multilayer perceptron for the policy function, so that the elements of $\theta$ are actually the weights and biases of that specific neural network. Now, the problem is in many ways much simpler, because it consists in finding a finite-size vector $\theta$, rather than finding a function, which is an infinite-dimensional object:&lt;/p&gt;
+
+&lt;p&gt;$$ E_{\varepsilon}(f(s, \varepsilon | \theta )) = 0 $$&lt;/p&gt;
+
+&lt;p&gt;We want the equation above to be true for all values of $s$. The common way to proceed is to define a grid for $s$ and to find $g(. |\theta)$ such that the previous equation holds on these grid points. For off-grid point values, interpolation schemes can be used. This is fine when $s$ is low-dimensional, but if $s$ is high-dimensional, the curse of dimensionality is going to bite: the number of grid points grows exponentially with the dimension of $s$, not linearly. The trick here is treat $s$ as a random variable, living within an ergodic set $S$ and to solve the following problem:&lt;/p&gt;
+
+&lt;p&gt;$$ E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) = 0 $$&lt;/p&gt;
+
+&lt;p&gt;This probabilistic formulation works well even if $s$ is high-dimensional, because we have numerical methods that can handle high-dimensional expectations. In particular, we have Monte Carlo integration, which consists in approximating expectations using sample means.&lt;/p&gt;
+
+&lt;p&gt;Now define $L(\theta)$ as the left-hand side of the previous equation:&lt;/p&gt;
+
+&lt;p&gt;$$ L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) $$&lt;/p&gt;
+
+&lt;p&gt;One way to find $\theta$ is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for $\theta$, denoted $\theta_{i}$, and we update the guess using the information contained in the gradient of L evaluated at $\theta_i$ denoted by $\nabla_{\theta} L(\theta_i)$, which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step $\gamma$ in the opposite direction of the gradient:&lt;/p&gt;
+
+&lt;p&gt;$$ \theta_{i+1} = \theta_{i} - \gamma \nabla_{\theta} L(\theta_{i}) $$&lt;/p&gt;
+
+&lt;p&gt;Below is an example of gradient descent for the function $x^2 + 2 y^2$. As expected, we iteratively converge to the minimum of this simple function, at $(0,0)$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Illustration of gradient descent using Python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from IPython.display import Image
+
+# Define the function and its gradient
+def f(x, y, a=1, b=2):
+    return a*x**2 + b*y**2
+
+def grad_f(x, y, a=1, b=2):
+    return a*2*x, b*2*y
+
+# Parameters
+alpha = 0.1  # Learning rate
+n_iterations = 25 #Number of steps
+
+# Initial point
+x, y = -10, -8
+trajectory = []
+
+# Gradient Descent Algorithm
+for _ in range(n_iterations):
+    trajectory.append((x, y))
+    dx, dy = grad_f(x, y)
+    x -= alpha * dx
+    y -= alpha * dy
+
+# Setting up the visualization
+x_vals = np.linspace(-10, 10, 400)
+y_vals = np.linspace(-10, 10, 400)
+X, Y = np.meshgrid(x_vals, y_vals)
+Z = f(X, Y)
+
+fig, ax = plt.subplots(figsize=(8, 8))
+CS = ax.contour(X, Y, Z, levels=np.logspace(-1, 3, 20), cmap=&#39;viridis&#39;)
+ax.plot(0, 0, &#39;ro&#39;)  # Mark the minimum
+
+# Animation function
+def update(frame):
+    ax.cla()
+    ax.contour(X, Y, Z, levels=np.logspace(-1, 3, 20), cmap=&#39;viridis&#39;)
+    ax.plot(0, 0, &#39;ro&#39;)  # Minimum
+    # Current point and arrow
+    x, y = trajectory[frame]
+    dx, dy = grad_f(x, y)
+    # Direction of update
+    ax.arrow(x, y, -alpha * dx, -alpha * dy, head_width=0.5, head_length=0.5, fc=&#39;k&#39;, ec=&#39;k&#39;)
+    ax.set_xlim([-10, 10])
+    ax.set_ylim([-10, 10])
+    ax.set_title(f&amp;quot;Gradient Descent Algorithm for $x^2 + 2y^2$. Iteration {frame + 1}&amp;quot;)
+
+ani = FuncAnimation(fig, update, frames=n_iterations, repeat=False)
+ani.save(&#39;gradient_descent.gif&#39;, writer=&#39;imagemagick&#39;, fps=1)
+plt.close()
+
+Image(url=&#39;gradient_descent.gif&#39;)  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;gradient_descent.gif&#34;/&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;the-bc-mc-operator&#34;&gt;The bc-MC operator&lt;/h3&gt;
+
+&lt;p&gt;As it is now clear from the previous visual illustration, knowledge of the gradient of the loss function is enough to find numerically a solution of our economic model, at least a local one (for the gradient descent algorithm to converge to a global minimum, we usually need the function to be convex over its domain).&lt;/p&gt;
+
+&lt;p&gt;One difficulty here is that we cannot compute the expectations appearing in $L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big)$. However, as suggested before, we can use Monte Carlo integration, which consists in using sample means to approximate expectations:&lt;/p&gt;
+
+&lt;p&gt;$$ L^{B}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M}\Big[ \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2 $$&lt;/p&gt;
+
+&lt;p&gt;Clearly, this is an &lt;a href=&#34;https://en.wikipedia.org/wiki/Estimator&#34; target=&#34;_blank&#34;&gt;estimator&lt;/a&gt; of $L(\theta)$ that makes a lot of sense. However, because of some unpleasant arithmetic regarding the &lt;a href=&#34;https://journals.sagepub.com/doi/abs/10.1177/0008068319750115&#34; target=&#34;_blank&#34;&gt;estimation the square of the mean&lt;/a&gt;, this is a biased one.&lt;/p&gt;
+
+&lt;p&gt;Start with the formula for the variance $Var(X) = E(X^2) - E(X)^2 \Leftrightarrow E(X^2) = E(X)^2 + Var(X)$. Using this formula&lt;/p&gt;
+
+&lt;p&gt;$$ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \Big( E_{\varepsilon}\Big[ \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big] \Big)^2 + Var_{\varepsilon} \Big( \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big) $$&lt;/p&gt;
+
+&lt;p&gt;Using the linearity of the expectation operator, and the fact that $Var(a X) = a^2 V(X)$, one gets:&lt;/p&gt;
+
+&lt;p&gt;$$ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \mu_{s_m}^2 + \frac{\sigma_{s_m}}{N} $$&lt;/p&gt;
+
+&lt;p&gt;In words, one gets the square of the mean, plus a bias term equal to the variance of $f$ (conditional on $s = s_m$) divided by $N$. Fortunately for us, there exists an unbiased estimator of the variance, given by the sample variance. An easy way to neutralize the bias is to subtract the sample variance (divided by N):&lt;/p&gt;
+
+&lt;p&gt;$$ L^{U}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M }\Big( \Big[ \frac{1}{N}  \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2
+ - \frac{S_m^2}{N} \Big) $$&lt;/p&gt;
+
+&lt;p&gt;The term &amp;ldquo;bc-MC operator&amp;rdquo; comes from bias correction.&lt;/p&gt;
+
+&lt;p&gt;The previous expression can be rewritten as:&lt;/p&gt;
+
+&lt;p&gt;$$ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} \sum_{m=1}^{M} \sum_{1 \leq i &amp;lt; j}^{N} f(s_m, \varepsilon^{i}_m | \theta ) f(s_m, \varepsilon^{j}_m | \theta ) $$&lt;/p&gt;
+
+&lt;p&gt;where $\varepsilon^{i}$ and $\varepsilon^{j}$ are i.i.d. shocks with the same distribution as $\varepsilon$. This expression is more convenient because it can be written as a sparse matrix multiplication:&lt;/p&gt;
+
+&lt;p&gt;$$ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} f&amp;rsquo; \Lambda f $$&lt;/p&gt;
+
+&lt;p&gt;where $\Lambda$ is a sparse matrix (see Appendix C in the paper). This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.&lt;/p&gt;
+
+&lt;h3 id=&#34;minimum-variance-unbiased-estimator&#34;&gt;Minimum Variance Unbiased Estimator&lt;/h3&gt;
+
+&lt;p&gt;Actually, under certain conditions on the economic model under consideration, I show that $L^{U}_{M,N}(\theta)$ it the Minimum Variance Unbiased Estimator (MVUE) of the loss function $L(\theta)$. That is, if one is willing to only consider unbiased estimators of $L(\theta)$, then $L^{U}_{M,N}(\theta)$ is the one with the lowest variance. In the paper, I use the &lt;a href=&#34;https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem&#34; target=&#34;_blank&#34;&gt;Lehman-Scheffé theorem&lt;/a&gt;. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.&lt;/p&gt;
+
+&lt;p&gt;But there is another simpler proof, if one is willing to only consider estimators that &lt;strong&gt;linearly&lt;/strong&gt; combine estimators of the square of means (conditional on $s=s_m$), denoted by $E_m$&lt;/p&gt;
+
+&lt;p&gt;$$ L_{a} = \sum_{m=1}^{M} a_m E_m $$&lt;/p&gt;
+
+&lt;p&gt;It is easy to show that for $L_{a}$ to be the MVUE of $L(\theta)$, its must be a linear combination of MVUEs for the square of means, denoted by $\tilde{E}_m$&lt;/p&gt;
+
+&lt;p&gt;$$ L_{a} = \sum_{m=1}^{M} a_m \tilde{E}_m $$&lt;/p&gt;
+
+&lt;p&gt;The proof relies on the &lt;a href=&#34;https://pages.stat.wisc.edu/~shao/stat610/stat610-04.pdf&#34; target=&#34;_blank&#34;&gt;following lemma&lt;/a&gt;: &amp;ldquo;An unbiased estimator $T(X)$ of $h(\theta)$ is UMVUE iff $T(X)$ is uncorrelated with all unbiased estimators of 0&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;It is clear here that taking unbiased estimators for $E_m$ will result in $L_{a}$ being unbiased as well, by linearity of the expectation operator. Then, we can consider an unbiased estimator of $0$, denoted by $U$:&lt;/p&gt;
+
+&lt;p&gt;$$ Cov(\sum_{m=1}^{M} a_m \tilde{E}_m, U) =  \sum_{m=1}^{M} a_m cov(\tilde{E}_m, U) = 0 $$&lt;/p&gt;
+
+&lt;p&gt;Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use &lt;a href=&#34;https://en.wikipedia.org/wiki/Inverse-variance_weighting&#34; target=&#34;_blank&#34;&gt;inverse-variance weighting&lt;/a&gt;, as we do with weighted least squares):&lt;/p&gt;
+
+&lt;p&gt;$$ L_{a} = \frac{1}{M} \sum_{m=1}^{M} \tilde{E}_m $$&lt;/p&gt;
+
+&lt;p&gt;For an i.i.d sample normally distributed with finite variance, the &lt;a href=&#34;https://journals.sagepub.com/doi/abs/10.1177/0008068319750115&#34; target=&#34;_blank&#34;&gt;MVUE of the square of the mean&lt;/a&gt; is the square of the empirical mean, minus the sample variance divided by the sample size. Said differently, we are back to the expression for the bc-MC operator, exactly as before:&lt;/p&gt;
+
+&lt;p&gt;$$ L_{a} =  \frac{1}{M} \sum_{m=1}^{M }\Big( \Big[ \frac{1}{N}  \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2
+ - \frac{S_m^2}{N} \Big) $$&lt;/p&gt;
+
+&lt;h3 id=&#34;choice-of-the-hyperparameters-m-and-n&#34;&gt;Choice of the hyperparameters $M$ and $N$&lt;/h3&gt;
+
+&lt;p&gt;One question that remains open is the optimal choice of the hyperparameters $M$ and $N$. In an ideal world in which computations are costless, we would like to take $M$ and $N$ to infinity. But in practice, the bc-MC estimator involves evaluating $f(s_m, \varepsilon_n)$ MN times, before combining these values using the formula $\frac{2}{MN(N-1)} f&amp;rsquo; \Lambda f $. A natural starting point for a &amp;ldquo;computational budget&amp;rdquo; consists in considering a multiple of $MN$, even if more sophisticated techniques could be used.&lt;/p&gt;
+
+&lt;p&gt;If you do that, you will find the variance of the loss (for a given $\theta$) can be written as $\frac{1}{MN} \times h(M, N, \theta) $, where $h(M, N, \theta)$ can be estimated using simulated data from the model (propositions 4-6 in the paper). Said differently, for a given &amp;ldquo;computational budget&amp;rdquo;, we can find the best combination of $M$ and $N$ such that $h(M, N, \theta)$ is minimized. We can train the neural network (update the value for $\theta$), while simultaneously changing the values for $M$ and $N$.&lt;/p&gt;
+
+&lt;p&gt;Note that if $N=2$ all the time, then we have&lt;/p&gt;
+
+&lt;p&gt;$$ L^{U}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M} f(s_m, \varepsilon^{1}_m | \theta ) f(s_m, \varepsilon^{2}_m | \theta ) $$&lt;/p&gt;
+
+&lt;p&gt;which is an estimator that was already suggested in &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0304393221000799&#34; target=&#34;_blank&#34;&gt;this paper&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;review-of-applications&#34;&gt;Review of applications&lt;/h3&gt;
+
+&lt;p&gt;In the paper, I start with the really simple &lt;a href=&#34;https://github.com/JulienPascal/bc-MC_Operator/tree/main/6.Brock_Mirman_Colab&#34; target=&#34;_blank&#34;&gt;Brock-Mirman Stochastic Growth Model from 1972&lt;/a&gt;. For this model, we get a closed-form solution for the policy function and we can very sharply characterize the best choice for the hyperparameters $M$ and $N$. So it is good warm-up.&lt;/p&gt;
+
+&lt;p&gt;A more interesting application is &lt;a href=&#34;https://github.com/JulienPascal/bc-MC_Operator/blob/main/9.large_scale_model_2/bc-MC-consumption-savings_large_scale_1.ipynb&#34; target=&#34;_blank&#34;&gt;consumption-savings model with a borrowing constraint&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;But you can also apply this methodology to &lt;a href=&#34;https://github.com/JulienPascal/bc-MC_Operator/blob/main/10.OLG_model/OLG.ipynb&#34; target=&#34;_blank&#34;&gt;OLG models&lt;/a&gt; with a large number of different age groups.&lt;/p&gt;
+
+&lt;p&gt;Probably the next step would be to use the methodology for a Krusell-Smith model.&lt;/p&gt;
+
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Julien Pascal, Artificial neural networks to solve dynamic programming problems: A bias-corrected Monte Carlo operator,
+Journal of Economic Dynamics and Control, Volume 162, 2024, 104853, ISSN 0165-1889,
+&lt;a href=&#34;https://doi.org/10.1016/j.jedc.2024.104853&#34; target=&#34;_blank&#34;&gt;https://doi.org/10.1016/j.jedc.2024.104853&lt;/a&gt;. (&lt;a href=&#34;https://www.sciencedirect.com/science/article/pii/S0165188924000459&#34; target=&#34;_blank&#34;&gt;https://www.sciencedirect.com/science/article/pii/S0165188924000459&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
@@ -5117,90 +5314,6 @@ identical to the ones we get using the package &lt;code&gt;GLM&lt;/code&gt;:&lt;
 &lt;hr /&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://julienpascal.github.io/slides/rental-market/#/&#34; target=&#34;_blank&#34;&gt;&lt;img src=&#34;https://julienpascal.github.io/img/icons/beamer_small.png&#34;&gt;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Docker for Dummies</title>
-      <link>https://julienpascal.github.io/post/docker/</link>
-      <pubDate>Fri, 18 Oct 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/docker/</guid>
-      <description>
-
-&lt;p&gt;In my quest for the perfect tool for reproducible science, I thought that the silver
-bullet was to wrap your code in a neat library/package and make it available to the world.
-Yet, I was wrong. &lt;a href=&#34;https://www.docker.com/&#34; target=&#34;_blank&#34;&gt;Docker&lt;/a&gt; is a much cooler and a much more effective way for sharing
-your work with a broad audience. This post is a 101 introduction to Docker.
-I describe what is Docker and show one simple application with a script in Julia.&lt;/p&gt;
-
-&lt;h2 id=&#34;why-docker&#34;&gt;Why Docker?&lt;/h2&gt;
-
-&lt;p&gt;Your script works locally, but not on your friend&amp;rsquo;s laptop because of dependency
-issues. Docker solves the &lt;a href=&#34;https://en.wikipedia.org/wiki/Dependency_hell&#34; target=&#34;_blank&#34;&gt;dependency hell&lt;/a&gt;
-by giving you the opportunity to &amp;ldquo;ship&amp;rdquo; your application in a &amp;ldquo;container&amp;rdquo;. One can think of a &amp;ldquo;container&amp;rdquo; as some sort of lightweight virtual image. Some technical details can be found &lt;a href=&#34;https://docs.docker.com/engine/docker-overview/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://devopscube.com/what-is-docker/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. In a nutshell, if your application works on your local machine, Docker helps you to put your application inside an container. Once in a container, your application will run smoothly for the rest of the world.&lt;/p&gt;
-
-&lt;h2 id=&#34;application-in-julia&#34;&gt;Application in Julia&lt;/h2&gt;
-
-&lt;p&gt;The goal is to create a container with a simple script to calculate an approximation
-of π. Here I am making a copy-paste from &lt;a href=&#34;https://julienpascal.github.io/post/buildyourcluster/&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, in which I calculated an approximation of π using Monte-Carlo. I create a folder
-&lt;code&gt;julia-app&lt;/code&gt;, which contains 3 files (see the Github repository with the 3 files &lt;a href=&#34;https://github.com/JulienPascal/MyFirstDockerApp&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;julia-app
-  ├ app.jl
-  ├ deps.jl
-  └ Dockerfile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The file &lt;code&gt;app.jl&lt;/code&gt; contains the application we want to containerize. The file &lt;code&gt;deps.jl&lt;/code&gt;
-contains the list of libraries/packages that are used within &lt;code&gt;app.jl&lt;/code&gt;. The file &lt;code&gt;Dockerfile&lt;/code&gt;
-is a &lt;a href=&#34;https://docs.docker.com/engine/reference/builder/&#34; target=&#34;_blank&#34;&gt;text document&lt;/a&gt; that contains instructions to build the container.
-Generally, a &lt;code&gt;Dockerfile&lt;/code&gt; contains 4 types of instructions:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;FROM&lt;/code&gt;: specifies the &amp;ldquo;base image&amp;rdquo; we want to use within the container. In our case,
-we want to run an application with Julia. Luckily, we can pull a base image with
-Julia pre-installed on it using &lt;code&gt;FROM julia:&amp;lt;julia-version-you-want&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;COPY&lt;/code&gt;: adds files to your container&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;RUN&lt;/code&gt;: executes command(s) in a new layer and creates a new image. &lt;code&gt;RUN&lt;/code&gt; is perfect
-for installing packages&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;CMD&lt;/code&gt;: specifies what command to run within the container&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;#choose a base image
-FROM julia:1.0.3
-
-# install julia dependencies
-COPY deps.jl /usr/src/app/
-RUN julia /usr/src/app/deps.jl
-
-# copy files required for the app to run
-COPY app.jl /usr/src/app/
-
-# run the application
-CMD [&amp;quot;julia&amp;quot;, &amp;quot;/usr/src/app/app.jl&amp;quot;]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;To create the container, use the command &lt;code&gt;docker build&lt;/code&gt;. You can give a name
-to your container using the &lt;code&gt;--tag , -t&lt;/code&gt; option:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker build julia-app -t &amp;lt;your-tag&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;To run the container you have just created:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker run --name julia-app &amp;lt;your-tag&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;After a few seconds, you should see an approximation of π showing up in your
-terminal. Voilà, you have have just created your first container. The next step
-is to put your container on &lt;a href=&#34;https://hub.docker.com/&#34; target=&#34;_blank&#34;&gt;DockerHub&lt;/a&gt;. &lt;a href=&#34;https://docs.docker.com/docker-hub/&#34; target=&#34;_blank&#34;&gt;Here&lt;/a&gt;
-is a tutorial on how to do it.&lt;/p&gt;
-
-&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;From an academic perspective, Docker solves the dependency hell and helps in producing
-reproducible research. I will try to use it more often for sharing my own research.&lt;/p&gt;
 </description>
     </item>
     
