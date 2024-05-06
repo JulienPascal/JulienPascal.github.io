@@ -11,7 +11,7 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>The bc-MC Operator</title>
+      <title>The bias-corrected Monte Carlo operator</title>
       <link>https://julienpascal.github.io/post/bc_mc/</link>
       <pubDate>Wed, 01 May 2024 08:00:00 +0100</pubDate>
       
@@ -20,7 +20,7 @@
 
 &lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;In this blog post, I am going to present my recent work on the &lt;strong&gt;bc-MC operator&lt;/strong&gt;, which was recently published &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.&lt;/p&gt;
+&lt;p&gt;In this blog post, I am going to present my recent work on the &lt;strong&gt;bias-corrected Monte Carlo&lt;/strong&gt; operator, or more compactly &amp;ldquo;bc-MC operator&amp;rdquo;, which was recently published &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; in the JEDC. In this paper, I propose a new methodology to combine &lt;strong&gt;Monte Carlo&lt;/strong&gt; and &lt;strong&gt;neural networks&lt;/strong&gt; to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.&lt;/p&gt;
 
 &lt;h2 id=&#34;theory&#34;&gt;Theory&lt;/h2&gt;
 
@@ -46,7 +46,7 @@
 
 &lt;p&gt;$$ L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) $$&lt;/p&gt;
 
-&lt;p&gt;One way to find $\theta$ is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for $\theta$, denoted $\theta_{i}$, and we update the guess using the information contained in the gradient of L evaluated at $\theta_i$ denoted by $\nabla_{\theta} L(\theta_i)$, which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step $\gamma$ in the opposite direction of the gradient:&lt;/p&gt;
+&lt;p&gt;One way to find $\theta$ is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for $\theta$, denoted $\theta_{i}$, and we update the guess using the information contained in the gradient of $L$ evaluated at $\theta_i$ denoted by $\nabla_{\theta} L(\theta_i)$, which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step $\gamma$ in the opposite direction of the gradient:&lt;/p&gt;
 
 &lt;p&gt;$$ \theta_{i+1} = \theta_{i} - \gamma \nabla_{\theta} L(\theta_{i}) $$&lt;/p&gt;
 
@@ -146,11 +146,18 @@ Image(url=&#39;gradient_descent.gif&#39;)
 
 &lt;p&gt;$$ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} f&amp;rsquo; \Lambda f $$&lt;/p&gt;
 
-&lt;p&gt;where $\Lambda$ is a sparse matrix (see Appendix C in the paper). This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.&lt;/p&gt;
+&lt;p&gt;where $\Lambda$ is a sparse matrix. More specifically&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;$f$ is MN column vector such that $f&amp;rsquo; = (f(s_1, \varepsilon^{1}_1), &amp;hellip;, f(s_1, \varepsilon^{N}_1), f(s_2, \varepsilon^{1}_2), &amp;hellip;, f(s_2, \varepsilon^{N}_2), &amp;hellip;, f(s_M, \varepsilon^{N}_M))$&lt;/li&gt;
+&lt;li&gt;$\Lambda = I_{N} \otimes U_{M}$ is $MN \times MN$ sparse matrix, with $ I_{N}$ the $N \times N$ identity matrix and $U_{M}$ a $M \times M$ upper triangular matrix whose diagonal elements are equal to zero, while the entries above the main diagonal are all equal to one. The symbol $\otimes$ denotes the Kronecker product.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.&lt;/p&gt;
 
 &lt;h3 id=&#34;minimum-variance-unbiased-estimator&#34;&gt;Minimum Variance Unbiased Estimator&lt;/h3&gt;
 
-&lt;p&gt;Actually, under certain conditions on the economic model under consideration, I show that $L^{U}_{M,N}(\theta)$ it the Minimum Variance Unbiased Estimator (MVUE) of the loss function $L(\theta)$. That is, if one is willing to only consider unbiased estimators of $L(\theta)$, then $L^{U}_{M,N}(\theta)$ is the one with the lowest variance. In the paper, I use the &lt;a href=&#34;https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem&#34; target=&#34;_blank&#34;&gt;Lehman-Scheffé theorem&lt;/a&gt;. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.&lt;/p&gt;
+&lt;p&gt;Actually, under certain conditions on the economic model under consideration, I show that $L^{U}_{M,N}(\theta)$ it the Minimum Variance Unbiased Estimator (MVUE) of the loss function $L(\theta)$. That is, if one is willing to only consider unbiased estimators of $L(\theta)$, then $L^{U}_{M,N}(\theta)$ is the one with the lowest variance. In the paper, I use the &lt;a href=&#34;https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem&#34; target=&#34;_blank&#34;&gt;Lehmann-Scheffé theorem&lt;/a&gt;. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.&lt;/p&gt;
 
 &lt;p&gt;But there is another simpler proof, if one is willing to only consider estimators that &lt;strong&gt;linearly&lt;/strong&gt; combine estimators of the square of means (conditional on $s=s_m$), denoted by $E_m$&lt;/p&gt;
 
@@ -166,7 +173,7 @@ Image(url=&#39;gradient_descent.gif&#39;)
 
 &lt;p&gt;$$ Cov(\sum_{m=1}^{M} a_m \tilde{E}_m, U) =  \sum_{m=1}^{M} a_m cov(\tilde{E}_m, U) = 0 $$&lt;/p&gt;
 
-&lt;p&gt;Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use &lt;a href=&#34;https://en.wikipedia.org/wiki/Inverse-variance_weighting&#34; target=&#34;_blank&#34;&gt;inverse-variance weighting&lt;/a&gt;, as we do with weighted least squares):&lt;/p&gt;
+&lt;p&gt;We still have to determine the optimal values for the $a_m$, under the constraint that they all sum up to one. Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use &lt;a href=&#34;https://en.wikipedia.org/wiki/Inverse-variance_weighting&#34; target=&#34;_blank&#34;&gt;inverse-variance weighting&lt;/a&gt;, as we do with weighted least squares):&lt;/p&gt;
 
 &lt;p&gt;$$ L_{a} = \frac{1}{M} \sum_{m=1}^{M} \tilde{E}_m $$&lt;/p&gt;
 

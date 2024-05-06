@@ -28,7 +28,7 @@
   
     
   
-  <meta name="description" content="Introduction In this blog post, I am going to present my recent work on the bc-MC operator, which was recently published here. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
+  <meta name="description" content="Introduction In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
 Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(.">
 
   
@@ -138,8 +138,8 @@ Theory Structure of economic models In many cases, solving an economic model inv
   
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/bc_mc/">
-  <meta property="og:title" content="The bc-MC Operator | Julien Pascal">
-  <meta property="og:description" content="Introduction In this blog post, I am going to present my recent work on the bc-MC operator, which was recently published here. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
+  <meta property="og:title" content="The bias-corrected Monte Carlo operator | Julien Pascal">
+  <meta property="og:description" content="Introduction In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
 Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
@@ -152,7 +152,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
 
   
 
-  <title>The bc-MC Operator | Julien Pascal</title>
+  <title>The bias-corrected Monte Carlo operator | Julien Pascal</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
@@ -409,7 +409,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
   
   
 <div class="article-container pt-3">
-  <h1 itemprop="name">The bc-MC Operator</h1>
+  <h1 itemprop="name">The bias-corrected Monte Carlo operator</h1>
 
   
 
@@ -441,7 +441,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    9 min read
+    10 min read
   </span>
   
 
@@ -456,7 +456,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
   <ul class="share">
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=The%20bc-MC%20Operator&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f"
+         href="https://twitter.com/intent/tweet?text=The%20bias-corrected%20Monte%20Carlo%20operator&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f"
          target="_blank" rel="noopener">
         <i class="fab fa-twitter"></i>
       </a>
@@ -470,21 +470,21 @@ Theory Structure of economic models In many cases, solving an economic model inv
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f&amp;title=The%20bc-MC%20Operator"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f&amp;title=The%20bias-corrected%20Monte%20Carlo%20operator"
          target="_blank" rel="noopener">
         <i class="fab fa-linkedin-in"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f&amp;title=The%20bc-MC%20Operator"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f&amp;title=The%20bias-corrected%20Monte%20Carlo%20operator"
          target="_blank" rel="noopener">
         <i class="fab fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=The%20bc-MC%20Operator&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f">
+         href="mailto:?subject=The%20bias-corrected%20Monte%20Carlo%20operator&amp;body=https%3a%2f%2fjulienpascal.github.io%2fpost%2fbc_mc%2f">
         <i class="fas fa-envelope"></i>
       </a>
     </li>
@@ -526,7 +526,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
 
 <h2 id="introduction">Introduction</h2>
 
-<p>In this blog post, I am going to present my recent work on the <strong>bc-MC operator</strong>, which was recently published <a href="https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459" target="_blank">here</a>. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.</p>
+<p>In this blog post, I am going to present my recent work on the <strong>bias-corrected Monte Carlo</strong> operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published <a href="https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459" target="_blank">here</a> in the JEDC. In this paper, I propose a new methodology to combine <strong>Monte Carlo</strong> and <strong>neural networks</strong> to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.</p>
 
 <h2 id="theory">Theory</h2>
 
@@ -552,7 +552,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
 
 <p>$$ L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) $$</p>
 
-<p>One way to find $\theta$ is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for $\theta$, denoted $\theta_{i}$, and we update the guess using the information contained in the gradient of L evaluated at $\theta_i$ denoted by $\nabla_{\theta} L(\theta_i)$, which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step $\gamma$ in the opposite direction of the gradient:</p>
+<p>One way to find $\theta$ is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for $\theta$, denoted $\theta_{i}$, and we update the guess using the information contained in the gradient of $L$ evaluated at $\theta_i$ denoted by $\nabla_{\theta} L(\theta_i)$, which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step $\gamma$ in the opposite direction of the gradient:</p>
 
 <p>$$ \theta_{i+1} = \theta_{i} - \gamma \nabla_{\theta} L(\theta_{i}) $$</p>
 
@@ -652,11 +652,18 @@ Image(url='gradient_descent.gif')
 
 <p>$$ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} f&rsquo; \Lambda f $$</p>
 
-<p>where $\Lambda$ is a sparse matrix (see Appendix C in the paper). This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.</p>
+<p>where $\Lambda$ is a sparse matrix. More specifically</p>
+
+<ul>
+<li>$f$ is MN column vector such that $f&rsquo; = (f(s_1, \varepsilon^{1}_1), &hellip;, f(s_1, \varepsilon^{N}_1), f(s_2, \varepsilon^{1}_2), &hellip;, f(s_2, \varepsilon^{N}_2), &hellip;, f(s_M, \varepsilon^{N}_M))$</li>
+<li>$\Lambda = I_{N} \otimes U_{M}$ is $MN \times MN$ sparse matrix, with $ I_{N}$ the $N \times N$ identity matrix and $U_{M}$ a $M \times M$ upper triangular matrix whose diagonal elements are equal to zero, while the entries above the main diagonal are all equal to one. The symbol $\otimes$ denotes the Kronecker product.</li>
+</ul>
+
+<p>This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.</p>
 
 <h3 id="minimum-variance-unbiased-estimator">Minimum Variance Unbiased Estimator</h3>
 
-<p>Actually, under certain conditions on the economic model under consideration, I show that $L^{U}_{M,N}(\theta)$ it the Minimum Variance Unbiased Estimator (MVUE) of the loss function $L(\theta)$. That is, if one is willing to only consider unbiased estimators of $L(\theta)$, then $L^{U}_{M,N}(\theta)$ is the one with the lowest variance. In the paper, I use the <a href="https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem" target="_blank">Lehman-Scheffé theorem</a>. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.</p>
+<p>Actually, under certain conditions on the economic model under consideration, I show that $L^{U}_{M,N}(\theta)$ it the Minimum Variance Unbiased Estimator (MVUE) of the loss function $L(\theta)$. That is, if one is willing to only consider unbiased estimators of $L(\theta)$, then $L^{U}_{M,N}(\theta)$ is the one with the lowest variance. In the paper, I use the <a href="https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem" target="_blank">Lehmann-Scheffé theorem</a>. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.</p>
 
 <p>But there is another simpler proof, if one is willing to only consider estimators that <strong>linearly</strong> combine estimators of the square of means (conditional on $s=s_m$), denoted by $E_m$</p>
 
@@ -672,7 +679,7 @@ Image(url='gradient_descent.gif')
 
 <p>$$ Cov(\sum_{m=1}^{M} a_m \tilde{E}_m, U) =  \sum_{m=1}^{M} a_m cov(\tilde{E}_m, U) = 0 $$</p>
 
-<p>Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use <a href="https://en.wikipedia.org/wiki/Inverse-variance_weighting" target="_blank">inverse-variance weighting</a>, as we do with weighted least squares):</p>
+<p>We still have to determine the optimal values for the $a_m$, under the constraint that they all sum up to one. Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use <a href="https://en.wikipedia.org/wiki/Inverse-variance_weighting" target="_blank">inverse-variance weighting</a>, as we do with weighted least squares):</p>
 
 <p>$$ L_{a} = \frac{1}{M} \sum_{m=1}^{M} \tilde{E}_m $$</p>
 

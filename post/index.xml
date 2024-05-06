@@ -13,12 +13,12 @@
     
     
     <item>
-      <title>The bc-MC Operator</title>
+      <title>The bias-corrected Monte Carlo operator</title>
       <link>https://julienpascal.github.io/post/bc_mc/</link>
       <pubDate>Wed, 01 May 2024 08:00:00 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/post/bc_mc/</guid>
-      <description>Introduction In this blog post, I am going to present my recent work on the bc-MC operator, which was recently published here. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
+      <description>Introduction In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &amp;ldquo;bc-MC operator&amp;rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
 Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(.</description>
     </item>
     
