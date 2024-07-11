@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Machine learning on Julien Pascal</title>
+    <title>Machine Learning on Julien Pascal</title>
     <link>https://julienpascal.github.io/tags/machine-learning/</link>
-    <description>Recent content in Machine learning on Julien Pascal</description>
+    <description>Recent content in Machine Learning on Julien Pascal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 01 Apr 2024 15:51:54 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 05 Dec 2019 18:53:22 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
-      <link>https://julienpascal.github.io/publication/bc-mc-2024/</link>
-      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      <title>A Primer on Computer Vision</title>
+      <link>https://julienpascal.github.io/post/cnn/</link>
+      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/publication/bc-mc-2024/</guid>
-      <description></description>
+      <guid>https://julienpascal.github.io/post/cnn/</guid>
+      <description>For a specific project on the housing market (here), I had to analyze thousands of photos. To do that, I used a convolutional neural network (CNN), which is a fancy name for a complicated function that can be &amp;ldquo;trained&amp;rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &amp;ldquo;Hello World&amp;rdquo; of computer vision and CNN: the classification of hand-written digits from the MNIST dataset.</description>
     </item>
     
   </channel>

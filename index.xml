@@ -129,7 +129,7 @@ Image(url=&#39;gradient_descent.gif&#39;)
 
 &lt;p&gt;Using the linearity of the expectation operator, and the fact that $Var(a X) = a^2 V(X)$, one gets:&lt;/p&gt;
 
-&lt;p&gt;$$ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \mu_{s_m}^2 + \frac{\sigma_{s_m}}{N} $$&lt;/p&gt;
+&lt;p&gt;$$ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \mu_{s_m}^2 + \frac{\sigma_{s_m}^2}{N} $$&lt;/p&gt;
 
 &lt;p&gt;In words, one gets the square of the mean, plus a bias term equal to the variance of $f$ (conditional on $s = s_m$) divided by $N$. Fortunately for us, there exists an unbiased estimator of the variance, given by the sample variance. An easy way to neutralize the bias is to subtract the sample variance (divided by N):&lt;/p&gt;
 
@@ -173,7 +173,7 @@ Image(url=&#39;gradient_descent.gif&#39;)
 
 &lt;p&gt;$$ Cov(\sum_{m=1}^{M} a_m \tilde{E}_m, U) =  \sum_{m=1}^{M} a_m cov(\tilde{E}_m, U) = 0 $$&lt;/p&gt;
 
-&lt;p&gt;We still have to determine the optimal values for the $a_m$, under the constraint that they all sum up to one. Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use &lt;a href=&#34;https://en.wikipedia.org/wiki/Inverse-variance_weighting&#34; target=&#34;_blank&#34;&gt;inverse-variance weighting&lt;/a&gt;, as we do with weighted least squares):&lt;/p&gt;
+&lt;p&gt;where $cov(\tilde{E}_m, U) = 0$, because each $\tilde{E}_m$ is itself a MVUE by assumption. We still have to determine the optimal values for the $a_m$, under the constraint that they all sum up to one. Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use &lt;a href=&#34;https://en.wikipedia.org/wiki/Inverse-variance_weighting&#34; target=&#34;_blank&#34;&gt;inverse-variance weighting&lt;/a&gt;, as we do with weighted least squares):&lt;/p&gt;
 
 &lt;p&gt;$$ L_{a} = \frac{1}{M} \sum_{m=1}^{M} \tilde{E}_m $$&lt;/p&gt;
 
@@ -211,6 +211,21 @@ Image(url=&#39;gradient_descent.gif&#39;)
 Journal of Economic Dynamics and Control, Volume 162, 2024, 104853, ISSN 0165-1889,
 &lt;a href=&#34;https://doi.org/10.1016/j.jedc.2024.104853&#34; target=&#34;_blank&#34;&gt;https://doi.org/10.1016/j.jedc.2024.104853&lt;/a&gt;. (&lt;a href=&#34;https://www.sciencedirect.com/science/article/pii/S0165188924000459&#34; target=&#34;_blank&#34;&gt;https://www.sciencedirect.com/science/article/pii/S0165188924000459&lt;/a&gt;)&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;To cite this work:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@article{PASCAL2024104853,
+title = {Artificial neural networks to solve dynamic programming problems: A bias-corrected Monte Carlo operator},
+journal = {Journal of Economic Dynamics and Control},
+volume = {162},
+pages = {104853},
+year = {2024},
+issn = {0165-1889},
+doi = {https://doi.org/10.1016/j.jedc.2024.104853},
+url = {https://www.sciencedirect.com/science/article/pii/S0165188924000459},
+author = {Julien Pascal}
+}
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
