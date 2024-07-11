@@ -656,7 +656,7 @@ Image(url='gradient_descent.gif')
 
 <ul>
 <li>$f$ is MN column vector such that $f&rsquo; = (f(s_1, \varepsilon^{1}_1), &hellip;, f(s_1, \varepsilon^{N}_1), f(s_2, \varepsilon^{1}_2), &hellip;, f(s_2, \varepsilon^{N}_2), &hellip;, f(s_M, \varepsilon^{N}_M))$</li>
-<li>$\Lambda = I_{N} \otimes U_{M}$ is $MN \times MN$ sparse matrix, with $ I_{N}$ the $N \times N$ identity matrix and $U_{M}$ a $M \times M$ upper triangular matrix whose diagonal elements are equal to zero, while the entries above the main diagonal are all equal to one. The symbol $\otimes$ denotes the Kronecker product.</li>
+<li>$\Lambda = I_{M} \otimes U_{N}$ is $MN \times MN$ sparse matrix, with $ I_{M}$ the $M \times M$ identity matrix and $U_{N}$ a $N \times N$ upper triangular matrix whose diagonal elements are equal to zero, while the entries above the main diagonal are all equal to one. The symbol $\otimes$ denotes the Kronecker product.</li>
 </ul>
 
 <p>This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.</p>
