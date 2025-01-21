@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 21 Oct 2019 18:11:07 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 17 Jan 2025 18:11:07 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/project/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Heterogeneity in Macroeconomic Models: a Review of Theory and Computation</title>
+      <link>https://julienpascal.github.io/project/hank_lit_review/</link>
+      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/project/hank_lit_review/</guid>
+      <description>This paper reviews the literature examining the consequences of heterogeneity in macroeconomic modeling, especially within the context of monetary and fiscal policy transmission. This review reveals that heterogeneity can significantly alter the transmission mechanisms of monetary policy in macroeconomic models and suggests possible advantages from collaboration between fiscal and monetary policies. The paper also provides a critical evaluation of various analytical (limited-heterogeneity, history truncation, no-trade equilibrium) and numerical methods (forecasting rules, linearization in state-space or sequence-space, global methods) to solve macroeconomic models with heterogeneity, underscoring how these methods relate to each other, while emphasizing the need for a careful methodological choice based on specific circumstances.</description>
+    </item>
     
     <item>
       <title>Rental Housing Market and Directed Search</title>
@@ -19,15 +28,6 @@
       
       <guid>https://julienpascal.github.io/project/rentalmarket/</guid>
       <description>This paper introduces new empirical findings concerning the functioning of the rental housing market. Utilizing a unique dataset gathered from online advertisements for Parisian rentals, along with a hedonic model that incorporates both apartment features and property-specific photographs, two main stylized facts are established. First, landlords who offer lower rent, while keeping property features constant, attract a greater number of applicants, consistent with predictions from standard directed search models. Second, a previously unreported trend in landlords&amp;rsquo; pricing strategies is identified: a significant portion employ a two-stage pricing approach, initially setting a high advertised rent and subsequently reducing it after a &amp;ldquo;wait-and-see&amp;rdquo; period, consistent with the slow Dutch auction mechanism already studied in the auction literature and empirically observed in the property sales market.</description>
-    </item>
-    
-    <item>
-      <title>Labor Policy in a Dynamic Search-Matching Model with Heterogeneous Workers and Firms</title>
-      <link>https://julienpascal.github.io/project/minwage/</link>
-      <pubDate>Thu, 14 Mar 2019 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/project/minwage/</guid>
-      <description>We analyse the consequences of the minimum wage on employment and sorting in a model of the labor market with search frictions, heterogeneous workers and firms, and business cycle fluctuations. This is a joint project with Jeremy Lise and Jean-Marc Robin.</description>
     </item>
     
     <item>

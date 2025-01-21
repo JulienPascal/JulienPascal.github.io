@@ -59,16 +59,6 @@ Star</description>
     </item>
     
     <item>
-      <title>Teaching</title>
-      <link>https://julienpascal.github.io/home/teaching/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://julienpascal.github.io/home/teaching/</guid>
-      <description>I have taught the following classes (assistant lecturer and sometimes lecturer):
-Econometrics II (graduate), Assistant Lecturer  Lecturer: Jean-Marc Robin Content: OLS, GLS, IV, qualitative response models, limited dependent variables  Applied Statistics for Business and Economics (graduate), Lecturer  Content: introduction to probability theory and regression analysis with a focus on applications in finance and economics  Introduction to Econometrics and Statistics (graduate), Assistant Lecturer  Lecturer: Matteo Mogliani Content: introduction to probability theory, univariate and multivariate regression models, inference and hypothesis testing  Money and Banking (undergraduate), Assistant Lecturer  Lecturer: Johannes Boehm Content: inter-temporal consumption and saving decisions, quantity theory of money, neo-keynesian models, central bank&amp;rsquo;s inflation bias, commitment vs discretion in monetary policy, bank runs  Version Control Here is a crash course on version control with Git and Gitlab.</description>
-    </item>
-    
-    <item>
       <title>Experience</title>
       <link>https://julienpascal.github.io/home/experience/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -106,13 +96,13 @@ Econometrics II (graduate), Assistant Lecturer  Lecturer: Jean-Marc Robin Conten
     </item>
     
     <item>
-      <title>Computing</title>
-      <link>https://julienpascal.github.io/home/computing/</link>
+      <title>Teaching</title>
+      <link>https://julienpascal.github.io/home/teaching/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://julienpascal.github.io/home/computing/</guid>
-      <description>For computationally intensive programs, I use Julia. For statistics, I mainly use R and Stata. For database management, I use SQL. For everything else, I use Python. I have made contributions to the following open source projects:
-Open Source Projects    Name Role Description Status     MSM.jl Author A Julia package to estimate economic models using the Method of Simulated Moments.    SMM.</description>
+      <guid>https://julienpascal.github.io/home/teaching/</guid>
+      <description>I have taught the following classes (assistant lecturer and sometimes lecturer):
+Econometrics II (graduate), Assistant Lecturer  Lecturer: Jean-Marc Robin Content: OLS, GLS, IV, qualitative response models, limited dependent variables  Applied Statistics for Business and Economics (graduate), Lecturer  Content: introduction to probability theory and regression analysis with a focus on applications in finance and economics  Introduction to Econometrics and Statistics (graduate), Assistant Lecturer  Lecturer: Matteo Mogliani Content: introduction to probability theory, univariate and multivariate regression models, inference and hypothesis testing  Money and Banking (undergraduate), Assistant Lecturer  Lecturer: Johannes Boehm Content: inter-temporal consumption and saving decisions, quantity theory of money, neo-keynesian models, central bank&amp;rsquo;s inflation bias, commitment vs discretion in monetary policy, bank runs  Version Control Here is a crash course on version control with Git and Gitlab.</description>
     </item>
     
     <item>
@@ -122,6 +112,16 @@ Open Source Projects    Name Role Description Status     MSM.jl Author A Julia p
       
       <guid>https://julienpascal.github.io/home/people/</guid>
       <description></description>
+    </item>
+    
+    <item>
+      <title>Computing</title>
+      <link>https://julienpascal.github.io/home/computing/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/home/computing/</guid>
+      <description>For computationally intensive programs, I use Julia. For statistics, I mainly use R and Stata. For database management, I use SQL. For everything else, I use Python. I have made contributions to the following open source projects:
+Open Source Projects    Name Role Description Status     MSM.jl Author A Julia package to estimate economic models using the Method of Simulated Moments.    SMM.</description>
     </item>
     
     <item>
