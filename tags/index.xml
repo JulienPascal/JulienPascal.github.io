@@ -85,6 +85,15 @@
     </item>
     
     <item>
+      <title>Dynamic Programming</title>
+      <link>https://julienpascal.github.io/tags/dynamic-programming/</link>
+      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/dynamic-programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Dynamic programming</title>
       <link>https://julienpascal.github.io/tags/dynamic-programming/</link>
       <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
@@ -139,15 +148,6 @@
     </item>
     
     <item>
-      <title>Fiscal Policy</title>
-      <link>https://julienpascal.github.io/tags/fiscal-policy/</link>
-      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/fiscal-policy/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>HA models</title>
       <link>https://julienpascal.github.io/tags/ha-models/</link>
       <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
@@ -157,18 +157,9 @@
     </item>
     
     <item>
-      <title>HANK model</title>
-      <link>https://julienpascal.github.io/tags/hank-model/</link>
-      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/hank-model/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Heterogeneity</title>
       <link>https://julienpascal.github.io/tags/heterogeneity/</link>
-      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/heterogeneity/</guid>
       <description></description>
@@ -195,7 +186,7 @@
     <item>
       <title>Literature Review</title>
       <link>https://julienpascal.github.io/tags/literature-review/</link>
-      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/literature-review/</guid>
       <description></description>
@@ -220,15 +211,6 @@
     </item>
     
     <item>
-      <title>Macroeconomic Modeling</title>
-      <link>https://julienpascal.github.io/tags/macroeconomic-modeling/</link>
-      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/macroeconomic-modeling/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Macroeconomics</title>
       <link>https://julienpascal.github.io/tags/macroeconomics/</link>
       <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
@@ -249,7 +231,7 @@
     <item>
       <title>Monetary Policy</title>
       <link>https://julienpascal.github.io/tags/monetary-policy/</link>
-      <pubDate>Fri, 17 Jan 2025 18:11:07 +0100</pubDate>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/monetary-policy/</guid>
       <description></description>
@@ -265,9 +247,18 @@
     </item>
     
     <item>
+      <title>Monte Carlo Methods</title>
+      <link>https://julienpascal.github.io/tags/monte-carlo-methods/</link>
+      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/monte-carlo-methods/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Neural Networks</title>
       <link>https://julienpascal.github.io/tags/neural-networks/</link>
-      <pubDate>Wed, 01 May 2024 08:00:00 +0100</pubDate>
+      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/neural-networks/</guid>
       <description></description>
@@ -288,6 +279,24 @@
       <pubDate>Sat, 12 Feb 2022 08:00:00 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/numerical/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Numerical Methods</title>
+      <link>https://julienpascal.github.io/tags/numerical-methods/</link>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/numerical-methods/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>PEA</title>
+      <link>https://julienpascal.github.io/tags/pea/</link>
+      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/pea/</guid>
       <description></description>
     </item>
     
