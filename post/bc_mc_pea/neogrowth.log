@@ -1,0 +1,112 @@
+Starting Dynare (version 6.0).
+Calling Dynare with arguments: noclearall
+Preprocessing time: 0h00m00s.
+
+STEADY-STATE RESULTS:
+
+k 		 2.62575
+c 		 1.07333
+z 		 1
+
+EIGENVALUES:
+         Modulus             Real        Imaginary
+             0.8              0.8                0
+           0.838            0.838                0
+           1.256            1.256                0
+       6.646e+17        6.646e+17                0
+
+There are 2 eigenvalue(s) larger than 1 in modulus for 2 forward-looking variable(s)
+The rank condition is verified.
+
+
+MODEL SUMMARY
+
+  Number of variables:         3
+  Number of stochastic shocks: 1
+  Number of state variables:   2
+  Number of jumpers:           2
+  Number of static variables:  0
+
+
+MATRIX OF COVARIANCE OF EXOGENOUS SHOCKS
+Variables         eps
+eps          0.019600
+
+POLICY AND TRANSITION FUNCTIONS
+                                   k               c               z
+Constant                    2.625746        1.073331        1.000000
+k(-1)                       0.838003        0.214628               0
+z(-1)                       0.686992        0.381732        0.800000
+eps                         0.858741        0.477165        1.000000
+
+
+THEORETICAL MOMENTS
+VARIABLE         MEAN  STD. DEV.   VARIANCE
+k              2.6257     0.8267     0.6834
+c              1.0733     0.2591     0.0671
+z              1.0000     0.2333     0.0544
+
+
+
+MATRIX OF CORRELATIONS
+Variables         k       c       z
+k            1.0000  0.9876  0.7354
+c            0.9876  1.0000  0.8327
+z            0.7354  0.8327  1.0000
+
+
+
+COEFFICIENTS OF AUTOCORRELATION
+Order          1       2       3       4       5
+k         0.9806  0.9358  0.8755  0.8067  0.7344
+c         0.9626  0.9064  0.8393  0.7671  0.6939
+z         0.8000  0.6400  0.5120  0.4096  0.3277
+
+MODEL SUMMARY
+
+  Number of variables:         3
+  Number of stochastic shocks: 1
+  Number of state variables:   2
+  Number of jumpers:           2
+  Number of static variables:  0
+
+
+MATRIX OF COVARIANCE OF EXOGENOUS SHOCKS
+Variables         eps
+eps          0.019600
+
+POLICY AND TRANSITION FUNCTIONS
+                                   k               c               z
+Constant                    2.627763        1.071313        1.000000
+(correction)                0.002018       -0.002018               0
+k(-1)                       0.838003        0.214628               0
+z(-1)                       0.686992        0.381732        0.800000
+eps                         0.858741        0.477165        1.000000
+k(-1),k(-1)                -0.006461       -0.013885               0
+z(-1),k(-1)                 0.087580        0.034525               0
+z(-1),z(-1)                -0.040418       -0.066454       -0.080000
+eps,eps                     0.473559        0.194394        0.500000
+k(-1),eps                   0.109475        0.043157               0
+z(-1),eps                   0.757695        0.311030        0.800000
+
+
+MOMENTS OF SIMULATED VARIABLES
+VARIABLE              MEAN       STD. DEV.        VARIANCE        SKEWNESS        KURTOSIS
+k                 2.803683        0.859478        0.738702        1.011294        2.092793
+c                 1.110625        0.255746        0.065406        0.671535        0.805383
+z                 1.019190        0.233502        0.054523        0.706720        0.814589
+
+
+CORRELATION OF SIMULATED VARIABLES
+VARIABLE         k       c       z
+k           1.0000  0.9824  0.7169
+c           0.9824  1.0000  0.8282
+z           0.7169  0.8282  1.0000
+
+
+AUTOCORRELATION OF SIMULATED VARIABLES
+VARIABLE         1       2       3       4       5
+k           0.9788  0.9302  0.8654  0.7927  0.7174
+c           0.9579  0.8965  0.8250  0.7499  0.6752
+z           0.7827  0.6114  0.4776  0.3748  0.2973
+Total computing time : 0h00m03s

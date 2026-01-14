@@ -29,6 +29,2124 @@
     </item>
     
     <item>
+      <title>A Generalization of the Parameterized Expectation Algorithm</title>
+      <link>https://julienpascal.github.io/post/bc_mc_pea/</link>
+      <pubDate>Mon, 01 Dec 2025 08:00:00 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/bc_mc_pea/</guid>
+      <description>
+
+&lt;h1 id=&#34;introduction&#34;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;This blog post is about my work on a &lt;em&gt;generalization of the Parameterized Expectations Algorithm&lt;/em&gt;, available &lt;a href=&#34;https://doi.org/10.1016/j.econlet.2025.112790&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The Parameterized Expectations Algorithm (PEA) is a classic computational approach to numerically &amp;ldquo;solve&amp;rdquo; economic models with rational expectations, i.e. finding an approximate solution. Usually, to solve economic models of this type, one has to find a policy function (e.g. how much to consume today, given a current level of capital) that satisfies a functional equation that holds in expectation (e.g. the Euler equation). The PEA flips this idea on its head: if we know the expectation term, we can recover the unknown policy function. For several reasons, this works better this way.&lt;/p&gt;
+
+&lt;p&gt;In my view, the paper &lt;em&gt;A Generalization of the Parameterized Expectations Algorithm&lt;/em&gt; can be read from two angles:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;TL;DR 1 [Practical side]:&lt;/strong&gt; This paper is a variance-reduced version of standard PEA that uses multiple innovation draws per state vector. The optimal number of innovation draws (given a fixed computational budget constraint) is calculated in closed form using only a small number of hyperparameters.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;TL;DR 2 [Theoretical side]:&lt;/strong&gt; This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/10.1111/iere.12575&#34; target=&#34;_blank&#34;&gt;Deep Equilibrium Nets&lt;/a&gt;; &lt;a href=&#34;https://doi.org/10.1016/j.jmoneco.2021.07.004&#34; target=&#34;_blank&#34;&gt;All-in-One Operator&lt;/a&gt;; &lt;a href=&#34;https://doi.org/10.1016/j.jedc.2024.104853&#34; target=&#34;_blank&#34;&gt;bc-MC Operator&lt;/a&gt; and the old-school PEA. This connection can be summarized as: NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS.&lt;/p&gt;
+
+&lt;p&gt;On the one hand, the result of &lt;em&gt;TL;DR 2&lt;/em&gt; is expected, because both approaches share many features (Monte Carlo integration, focus on the ergodic set for the state vector). On the other hand, this could be surprising because there are also substantial differences: NNs are highly non-linear and their parameters are tuned using gradient descent and backpropagation, while the PEA typically relies on a linear or log-linear model, where the parameters are calculated using linear or non-linear least squares.&lt;/p&gt;
+
+&lt;h2 id=&#34;i-theory&#34;&gt;I. Theory&lt;/h2&gt;
+
+&lt;h3 id=&#34;setting&#34;&gt;Setting&lt;/h3&gt;
+
+&lt;p&gt;In many cases, solving an economic model involves finding the parameter vector $\theta$ that minimizes a loss function of the form:&lt;/p&gt;
+
+&lt;p&gt;$$ L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) $$&lt;/p&gt;
+
+&lt;p&gt;where $s$ is a state vector, $\varepsilon$ a zero-mean random innovation vector and $f(.)$ a function that depends on the model. The expectation with respect to $\varepsilon$ is the usual expectation that shows up in Euler equations. The expectation with respect to the state vector $s$ is a bit more unusual, because we usually think about numerically solving an economic model using a fixed grid for $s$. Here we are saying: &amp;ldquo;I want to find $\theta$ such that the Euler equation holds, for all economically relevant values of the state vector $s$&amp;ldquo;, in the sense of minimizing the expected squared Euler residual over the ergodic distribution of states.&lt;/p&gt;
+
+&lt;p&gt;Focusing on the ergodic distribution is a nice feature because large parts of the state space are actually never visited or visited with very small probability. Here, we enforce accuracy where the economy actually spends time, rather than uniformly over an arbitrary grid.&lt;/p&gt;
+
+&lt;p&gt;With the NN computational approaches, $\theta$ is usually the parameter vector of a large NN (sometimes called &amp;ldquo;weights and biases&amp;rdquo;), that outputs the endogenous decision of agents (e.g. consumption functions of $A$ agents). The parameter vector $\theta$ can be calculated using gradient descent, using the update rule:&lt;/p&gt;
+
+&lt;p&gt;$$ \theta_{i+1} = \theta_{i} - \gamma \nabla_{\theta} L(\theta_{i}) $$&lt;/p&gt;
+
+&lt;p&gt;Where the gradient $\nabla_{\theta} L(\theta_{i})$ can be efficiently calculated using automatic differentiation and backpropagation, as long as you use Pytorch, Tensorflow, or something similar.&lt;/p&gt;
+
+&lt;h3 id=&#34;single-or-double-monte-carlo&#34;&gt;Single or double Monte Carlo?&lt;/h3&gt;
+
+&lt;p&gt;The loss function $L(\theta)$ contains two nested expectations. The &amp;ldquo;outside&amp;rdquo; expectation $E_{s}$ is standard and we approximate it using Monte Carlo integration (i.e. drawing $M$ samples and calculating the average: $E_{s} \approx 1/M \sum_{i=1}^{M}$).&lt;/p&gt;
+
+&lt;p&gt;There is a subtle point for the &amp;ldquo;inside&amp;rdquo; (conditional on $s$) expectation $E_{\varepsilon}$. If the exogenous innovation vector $\varepsilon$ has discrete support (e.g. discrete Markov chain), $E_{\varepsilon}$ can be calculated exactly. For continuous distributions, one may use a deterministic quadrature scheme (e.g. Gauss-Hermite quadrature).&lt;/p&gt;
+
+&lt;p&gt;However, if $\varepsilon$ is high-dimensional and/or continuous, one may instead use Monte Carlo integration to approximate the &amp;ldquo;inside&amp;rdquo; expectation operator ($E_{\varepsilon} \approx 1/N \sum_{i=1}^{N}$). The subtlety comes from the fact that taking the square of the empirical mean creates a bias, because of the variance formula $Var(X) = E(X^2) - E(X)^2 \Leftrightarrow E(X^2) = E(X)^2 + Var(X)$. A simple workaround consists in taking two independent copies of $\varepsilon$, denoted by $\varepsilon^1$ and $\varepsilon^2$, and using the fact that for independent variables, the product of expectations is the expectation of the product: $E[X_1 \times  X_2] = E[X_1] \times E[X_2] = E[X] \times E[X] = E[X]^2$. This is the trick behind the &lt;a href=&#34;https://doi.org/10.1016/j.jmoneco.2021.07.004&#34; target=&#34;_blank&#34;&gt;All-in-One Operator&lt;/a&gt;, which, applied to the loss function above, gives:&lt;/p&gt;
+
+&lt;p&gt;$$ L_{M}(\theta) = \frac{1}{M} \sum_{m=1}^{M} f(s_m, \varepsilon^{1}_m | \theta ) f(s_m, \varepsilon^{2}_m | \theta ) $$&lt;/p&gt;
+
+&lt;p&gt;But nothing prevents you from using more independent copies of $\varepsilon$. For instance, using three copies, one has $ \frac{1}{3}E[X_1 \times  X_2] + \frac{1}{3}E[X_1 \times  X_3] + \frac{1}{3}E[X_2 \times  X_3] = \frac{1}{3}  E[X]^2 +  \frac{1}{3}  E[X]^2 + \frac{1}{3}  E[X]^2 = E[X]^2$. One may even take $N$ independent copies of $\varepsilon$, in which case you get the &lt;a href=&#34;https://doi.org/10.1016/j.jedc.2024.104853&#34; target=&#34;_blank&#34;&gt;bc-MC Operator&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;$$ L_{M,N}(\theta) = \frac{2}{MN(N-1)} \sum_{m=1}^{M } \sum_{1\leq i &amp;lt; j}^{N} f(s_m, \varepsilon^{i}_m | \theta ) f(s_m, \varepsilon^{j}_m | \theta ) $$&lt;/p&gt;
+
+&lt;p&gt;Using more independent copies tends to reduce the integration error, at the cost of adding more computing time.&lt;/p&gt;
+
+&lt;h3 id=&#34;what-about-the-pea&#34;&gt;What about the PEA?&lt;/h3&gt;
+
+&lt;p&gt;The PEA is easier to present using an example. Consider for instance a representative household choosing consumption $c_t$ and next period&amp;rsquo;s capital $k_{t+1}$ to maximize expected utility:&lt;/p&gt;
+
+&lt;p&gt;$$
+\max_{(c_t,k_{t+1})_{t=0}^{\infty}} \; E_0 \sum_{t=0}^\infty \beta^t \frac{c_t^{1-\sigma} - 1}{1-\sigma}
+$$&lt;/p&gt;
+
+&lt;p&gt;subject to the resource constraint:
+$$
+k_{t+1} = z_t k_t^{\alpha} - c_t + (1-\delta)k_t
+$$&lt;/p&gt;
+
+&lt;p&gt;and the law of motion for TFP:
+$$
+\log(z_{t+1}) = \rho \log(z_t) + \varepsilon_{t+1}
+$$&lt;/p&gt;
+
+&lt;p&gt;The associated FOC is:
+$$ c_t^{-\sigma} = \beta E_t \big( c_{t+1}^{-\sigma} \left[\alpha z_{t+1} k_{t+1}^{\alpha-1} + 1-\delta \right] \big) $$&lt;/p&gt;
+
+&lt;p&gt;which can also be rewritten as:&lt;/p&gt;
+
+&lt;p&gt;$$
+\frac{c_{t}^{-\sigma} - c_{ss}^{-\sigma}}{c_{ss}^{-\sigma}} = E_t \big( \beta \big(\frac{c_{t+1}}{c_{ss}} \big)^{-\sigma} \left[\alpha z_{t+1} k_{t+1}^{\alpha-1} + 1-\delta \right]  - 1 \big)
+$$&lt;/p&gt;
+
+&lt;p&gt;Now define $E_t[\phi_{t+1}]$ as the right-hand side of the previous equation. That is,&lt;/p&gt;
+
+&lt;p&gt;$$
+\phi_{t+1} \equiv \beta \big(\frac{c_{t+1}}{c_{ss}} \big)^{-\sigma} \left[\alpha z_{t+1} k_{t+1}^{\alpha-1} + 1-\delta \right] - 1
+$$&lt;/p&gt;
+
+&lt;p&gt;Note that if we know the value of the conditional expectation, we can recover the implied current consumption using:&lt;/p&gt;
+
+&lt;p&gt;$c_t = c_{ss} (1 + E_t[\phi_{t+1}])^{-1/\sigma}$&lt;/p&gt;
+
+&lt;p&gt;Knowing the current consumption, we can iterate the model forward and keep repeating this process. Yet, we do not know $E_t[\phi_{t+1}]$, so it appears that we are stuck.&lt;/p&gt;
+
+&lt;p&gt;One solution is to assume that the conditional expectation is a linear function of some selected state variables:
+$$
+\phi_{t+1}(\theta) = \theta_0 + \theta_1 \log k_t + \theta_2 \log z_t + \theta_3 (\log k_t)^2 + \theta_4 (\log z_t)^2 + \theta_5 \log k_t \times \log z_t + \epsilon_t $$&lt;/p&gt;
+
+&lt;p&gt;or more compactly written as:
+$$ \phi_{t+1}(\theta) = s_{t}^{T} \theta + \epsilon_t $$&lt;/p&gt;
+
+&lt;p&gt;The PEA then proceeds in two steps:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;For a given vector $\theta^{(i)}$, simulate the economy forward and store the data&lt;/li&gt;
+&lt;li&gt;Given the data from step 1, update $\theta^{(i)}$ using a convex combination $\theta^{(i+1)} = \gamma \theta^{(i)} + (1 - \gamma) \theta^{OLS}$, where $\theta^{OLS}$ is the ordinary least squares estimate (OLS) of regressing $\phi_{t+1}(\theta^{(i)})$ on the state vector $s_t$.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This process is repeated until the parameter is no longer meaningfully updated: $d(\theta^{(i+1)}, \theta^{(i)}) \leq \text{tol}$, where $\text{tol}$ is a small real number, meaning that the actual guess for the conditional expectation matches the realized values.&lt;/p&gt;
+
+&lt;p&gt;For future reference, note that $\theta^{OLS}$ solves the normal equations:&lt;/p&gt;
+
+&lt;p&gt;$$
+\frac{-2}{T} \sum_{t=1}^{T} s_t \Big( \phi_{t+1}(\theta^{(i)}) - s_t^{T} \theta^{OLS} \Big) = 0
+$$&lt;/p&gt;
+
+&lt;h3 id=&#34;back-to-the-bc-mc-operator&#34;&gt;Back to the bc-MC operator&lt;/h3&gt;
+
+&lt;p&gt;As said previously, when using NN, the gradient of the loss function can be easily and efficiently calculated using backpropagation, as long as one uses the appropriate software (e.g. Pytorch, Tensorflow). Let&amp;rsquo;s now consider what happens when we want to calculate the gradient $\nabla_{\theta} L_{M,N}(\theta)$ &amp;ldquo;manually&amp;rdquo;. But let&amp;rsquo;s do that under two &amp;ldquo;PEA-style&amp;rdquo; restrictions:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;$f(s_m, \varepsilon^{i}_m | \theta ) = g(s_m, \varepsilon^{i}_m | \theta) - h(s_m, | \theta)$,&lt;/li&gt;
+&lt;li&gt;$h(s_m, | \theta) = s_m^T \theta$.
+&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The first assumption is a separability assumption, which implies that when the loss function is equal to zero, $h(.)$ is the conditional expectation $ E_{ \varepsilon} [ g(s_m, \varepsilon^{i}_m | \theta) ]$. The second assumption asserts that this conditional expectation is a linear function of the state vector $s_m$. After some intermediate calculations (see the &lt;a href=&#34;https://doi.org/10.1016/j.econlet.2025.112790&#34; target=&#34;_blank&#34;&gt;paper&lt;/a&gt;), one gets that the gradient is given by:&lt;/p&gt;
+
+&lt;p&gt;$$
+\nabla_{\theta} L_{M,N}(\theta) = \frac{-2}{M} \sum_{m=1}^{M} s_m \Big( \Big[ \frac{1}{N} \sum_{i=1}^{N} g(s_m, \varepsilon^{i}_m | \theta) \Big]- s_m^{T} \theta^{OLS} \Big) + R_{M,N}(\theta)
+$$&lt;/p&gt;
+
+&lt;p&gt;Note that the first term is identical to OLS normal equations above, where the dependent variable is an average over $N$ realizations $g(s_m, .)$. If we draw a single innovation per realization of the state vector ($N=1$), we are back to standard PEA.&lt;/p&gt;
+
+&lt;p&gt;The second term $R_{M,N}(\theta)$ is a bit nasty. It captures the fact that we are aiming at a &amp;ldquo;moving target&amp;rdquo;: the conditional expectation is not a simple &amp;ldquo;fixed&amp;rdquo; independent variable; it also depends on the parameter $\theta$ we are trying to estimate. Fortunately, it is equal to zero in expectation at stationary points of the gradient ($\nabla_{\theta} L_{M,N}(\theta^{*}) = 0$). Practically, this means that we can focus on minimizing the first part of $\nabla_{\theta} L_{M,N}(\theta)$ (the &amp;ldquo;averaged OLS problem&amp;rdquo;), which is no more than a simple OLS regression of $y_m = \frac{1}{N} \sum_{i=1}^{N} g(s_m, \varepsilon^{i}_m | \theta)$ on $s_m$. Hence, we are back to the PEA, with the possibility of more accurately calculating the conditional expectation using more innovation draws.&lt;/p&gt;
+
+&lt;h3 id=&#34;variance-reduction-under-a-computational-budget-constraint&#34;&gt;Variance reduction under a computational budget constraint&lt;/h3&gt;
+
+&lt;p&gt;At this stage, it is not necessarily obvious that using more innovation draws per state is really needed. If more accuracy is needed when estimating $\theta$ at the OLS stage, why don&amp;rsquo;t we simply simulate longer series in step 1 of the PEA? Or said differently, let&amp;rsquo;s increase $M$ and call it a day. Spoiler alert: the reason is that there are asymmetries between drawing more state and innovation vectors, which I discuss below.&lt;/p&gt;
+
+&lt;p&gt;First, note that drawing more state vectors is essentially a serial computation, because the state of the economy today depends on what happened yesterday. Instead, drawing more innovation vectors can be easily realized in parallel (given the current state, future realizations can be explored using a parallel for loop). This point is not even mentioned or used in the paper.&lt;/p&gt;
+
+&lt;p&gt;Second, there are asymmetric costs between simulating the economy and the OLS step. Simulating the economy forward with $M$ steps, while using $N$ independent innovation draws per state vector, has a computational complexity of $O(MN)$. The computational complexity of the OLS estimator with $M$ observations and $k$ explanatory variables is approximately $O(Mk^2)$. Hence, increasing the length of the simulation ($M$) comes with a penalty at the OLS stage, which is not the case for increasing $N$, because additional innovation draws are first averaged before being used at the OLS stage. This discussion implies the following timing model ($T$ in seconds) for the full simulation + OLS package:&lt;/p&gt;
+
+&lt;p&gt;$$ T = \alpha_0 + \alpha_{M} M + \alpha_{MN} M N $$&lt;/p&gt;
+
+&lt;p&gt;Third, in general the distribution of the innovation vector is known, while the ergodic distribution of the state vector is unknown and only sequentially approximated during the minimization process. This matters because with known distributions, we can use low-discrepancy sequences to approximate $E_{\varepsilon}$ instead of using simple random draws.&lt;/p&gt;
+
+&lt;p&gt;The above equation gives us a good model on how computing time changes with $M$ and $N$. The parameters $\alpha_{M}$ and $\alpha_{MN}$ can be estimated by varying $M$ and $N$ and using an OLS regression.&lt;/p&gt;
+
+&lt;p&gt;We also need to understand how the choice of $M$ and $N$ impacts the accuracy of our numerical solution. In the paper, under the assumption that the state vectors are &lt;strong&gt;i.i.d&lt;/strong&gt;, I show that the expected average squared forecast error of the OLS model is proportional to:&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{1}{N^{\alpha}} \frac{k}{M - k - 1} $$.&lt;/p&gt;
+
+&lt;p&gt;where $\alpha$ is between 1 (for standard random sampling) and 2 (low-discrepancy sequence in an ideal case).&lt;/p&gt;
+
+&lt;p&gt;To simplify things, let&amp;rsquo;s consider the &lt;strong&gt;random sampling case&lt;/strong&gt; ($\alpha = 1$). Under that assumption, if one minimizes the expected average squared forecast error of the OLS model for a given computational budget $T$, one finds:&lt;/p&gt;
+
+&lt;p&gt;$$ M^{\star} = \sqrt{\frac{(T - \alpha_{0}) (k+1)}{\alpha_{M}}}$$
+$$ N^{\star} = \frac{\alpha_{M}}{\alpha_{MN}} \big( \frac{M^{\star}}{k+1} - 1 \big)$$&lt;/p&gt;
+
+&lt;p&gt;where we have to round these numbers to the nearest positive integers. See the paper for the general case where $\alpha \neq 1$. The formula is more convoluted, but still manageable.&lt;/p&gt;
+
+&lt;p&gt;The equation for $M^{\star}$ makes sense. If the cost of the OLS step decreases ($\alpha_{M}$ lower), the optimal length of the simulation ($M^{\star}$) increases. If the linear model for the conditional expectation has more explanatory variables ($k$), the optimal length of the simulation must increase.&lt;/p&gt;
+
+&lt;p&gt;The equation for $N^{\star}$ is also intuitive. If the cost of the simulation step decreases ($\alpha_{MN}$ lower), the optimal length of the simulation ($N^{\star}$) increases.&lt;/p&gt;
+
+&lt;p&gt;Note that the special case &amp;ldquo;standard PEA&amp;rdquo; ($N^{\star}=1$) does occur when $\alpha_{M} \rightarrow 0$. But in general $N^{\star} \approx \frac{\alpha_{M}}{\alpha_{MN}} \frac{M^{\star}}{k+1} $ is often bigger than 1.&lt;/p&gt;
+
+&lt;h3 id=&#34;extension-to-serially-correlated-state-vectors&#34;&gt;Extension to serially correlated state vectors&lt;/h3&gt;
+
+&lt;p&gt;The i.i.d. assumption for the state vectors is a bit too restrictive. Often, data comes from serially correlated series. For instance, the logarithm of TFP is often assumed to be AR(1):&lt;/p&gt;
+
+&lt;p&gt;$$ \log(z_{t+1}) = \rho \log(z_{t}) + \varepsilon_{t+1} $$&lt;/p&gt;
+
+&lt;p&gt;with $ | \rho |&amp;lt; 1 $ and $\varepsilon$ an i.i.d. zero-mean Gaussian random variable. Under the assumption that the state vector $s_t$ has such an AR(1) structure, with persistence parameter $ | \rho |&amp;lt; 1 $, the new optimal value for $M$ is given by:&lt;/p&gt;
+
+&lt;p&gt;$$ M^{\star \star} = M^{\star}\frac{1 + \rho^2}{1 - \rho^2} $$&lt;/p&gt;
+
+&lt;p&gt;This point appears in the Online Appendix of the paper.&lt;/p&gt;
+
+&lt;p&gt;The serial correlation correction term $\frac{1 + \rho^2}{1 - \rho^2}$ increases the optimal value for $M$. This makes sense, because with serially correlated observations, each realization of $s_t$ is less information-rich (it is correlated with $s_{t-1}$). The larger the value for $|\rho|$, the bigger this correction term is.&lt;/p&gt;
+
+&lt;h3 id=&#34;extension-to-log-linear-models&#34;&gt;Extension to log-linear models&lt;/h3&gt;
+
+&lt;p&gt;Often, economic models are such that the &lt;strong&gt;logarithm&lt;/strong&gt; of the conditional expectation is a linear function of the state vector. Or more generally, it is linear in a continuous transformation of the state vector denoted by $x_t$ (e.g. taking logs):&lt;/p&gt;
+
+&lt;p&gt;$E_{\varepsilon}\left[g(\boldsymbol{s}_t, \varepsilon) \mid \boldsymbol{s}_t \right] = \exp(\boldsymbol{x}_t&amp;rsquo; \boldsymbol{\theta})$.&lt;/p&gt;
+
+&lt;p&gt;Fortunately, we can reuse the above framework, as discussed in the Online Appendix.&lt;/p&gt;
+
+&lt;p&gt;At the OLS regression step, we can simply regress $\log(y_m)$ on $x_t$, where $y_m = \frac{1}{N} \sum_{i=1}^{N} g(s_m, \varepsilon^{i}_m | \theta)$, as before.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;ii-numerical-example-a-model-with-a-borrowing-constraint&#34;&gt;II. Numerical example: a model with a borrowing constraint&lt;/h2&gt;
+
+&lt;p&gt;The PEA gracefully handles economic models with inequality constraints, so let&amp;rsquo;s study a standard consumption-savings problem, complicated by an occasionally binding investment constraint. The trick is to treat the Lagrange multiplier on the occasionally binding investment constraint as a residual variable that can be adjusted ex post.&lt;/p&gt;
+
+&lt;p&gt;A central planner chooses consumption $c_t$ and next period&amp;rsquo;s capital $k_{t+1}$ to maximize expected lifetime utility&lt;/p&gt;
+
+&lt;p&gt;$$
+\max_{(c_t, k_{t+1})_{t=0}^{\infty}} \; E_0 \sum_{t=0}^\infty \beta^t \frac{c_t^{1-\sigma}-1}{1-\sigma}
+$$&lt;/p&gt;
+
+&lt;p&gt;subject to:&lt;/p&gt;
+
+&lt;p&gt;1) a resource constraint:
+  $$
+  k_{t+1} = z_t k_t^\alpha - c_t + (1-\delta)k_t,
+  $$&lt;/p&gt;
+
+&lt;p&gt;2) a constraint on investment:
+  $$
+  k_{t+1} \geq (1-\delta)k_t,
+  $$&lt;/p&gt;
+
+&lt;p&gt;3) the law of motion for TFP:
+  $$
+  \log(z_{t+1}) = \rho \log(z_t) + \varepsilon_{t+1}.
+  $$&lt;/p&gt;
+
+&lt;p&gt;The associated FOCs are:
+$$
+c_t^{-\sigma} - \mu_t = \beta E_t \big( c_{t+1}^{-\sigma} \left[\alpha z_{t+1} k_{t+1}^{\alpha-1} + 1-\delta \right] - \mu_{t+1} (1 - \delta) \big), &lt;br /&gt;
+$$&lt;/p&gt;
+
+&lt;p&gt;$$
+\mu_t ( k_{t+1} - (1-\delta)k_t) = 0
+$$&lt;/p&gt;
+
+&lt;p&gt;$$
+\mu_t \geq 0
+$$&lt;/p&gt;
+
+&lt;h4 id=&#34;expectation-function-e-t-phi-t-1&#34;&gt;Expectation function $E_t[\phi_{t+1}]$:&lt;/h4&gt;
+
+&lt;p&gt;Let us consider:
+$$
+\phi_{t+1} \equiv \beta  \Big( c_{t+1}^{-\sigma} \left[\alpha z_{t+1} k_{t+1}^{\alpha-1} + 1-\delta \right] - \mu_{t+1} (1 - \delta)
+\Big)$$&lt;/p&gt;
+
+&lt;p&gt;When the investment constraint does not bind ($\mu_t = 0$), the above FOC equation can be written as:&lt;/p&gt;
+
+&lt;p&gt;$$ c_t^{-\sigma} = E&lt;em&gt;t[\phi&lt;/em&gt;{t+1}] $$&lt;/p&gt;
+
+&lt;p&gt;So if we know $ E_t[\phi_{t+1}]$, we can find the implied consumption today. As in standard PEA, let&amp;rsquo;s assume a parametric expression for the conditional expectation. Let&amp;rsquo;s use the following log-log model:&lt;/p&gt;
+
+&lt;p&gt;$$
+\log(E_t[\phi_{t+1}]) = \theta_0 + \theta_1 \log k_t + \theta_2 \log z_t + \theta_3 \left(\log k_t\right)^2 + \theta_4 \left(\log z_t\right)^2 + \theta_5 \log k_t \cdot \log z_t = \boldsymbol{s}_t&amp;rsquo; \boldsymbol{\theta}
+$$&lt;/p&gt;
+
+&lt;h4 id=&#34;implied-consumption&#34;&gt;Implied consumption&lt;/h4&gt;
+
+&lt;p&gt;Under the assumption that the constraint does not bind ($\mu_t = 0$), consumption in the current period is given by:&lt;/p&gt;
+
+&lt;p&gt;$$
+\tilde{c}_t = \exp(\boldsymbol{s}_t&amp;rsquo; \boldsymbol{\theta})^{-1/\sigma}
+$$&lt;/p&gt;
+
+&lt;p&gt;This consumption choice $\tilde{c}_t$ implies a savings choice: $\tilde{k}_{t+1} = z_t k_t^\alpha - \tilde{c}_t + (1-\delta)k_t$.&lt;/p&gt;
+
+&lt;p&gt;Two cases can occur:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;If $\tilde{k}_{t+1} \geq (1-\delta)k_t$, then the irreversible investment constraint does not bind:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;$$ c_t = \tilde{c}_t $$
+  $$ k_{t+1} = \tilde{k}_{t+1} $$
+  $$ \mu_t = 0 $$&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;If $\tilde{k}_{t+1} &amp;lt; (1-\delta)k_t$, then the irreversible investment constraint binds and we recover $c_t$ from the budget constraint:
+$$ c_t  = z_t k_t^\alpha $$
+$$ k_{t+1}  = (1-\delta)k_t $$
+$$ \mu_t &amp;gt; 0 $$&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In case 2, the value of the Lagrange multiplier is then:&lt;/p&gt;
+
+&lt;p&gt;$$
+\mu_t = c_t^{-\sigma} - \beta E_t \big( c_{t+1}^{-\sigma} \left[\alpha z_{t+1} k_{t+1}^{\alpha-1} + 1-\delta \right] - \mu_{t+1} (1 - \delta) \big) \approx c_t^{-\sigma} - \exp(\boldsymbol{s}_t&amp;rsquo; \boldsymbol{\theta})
+$$&lt;/p&gt;
+
+&lt;p&gt;provided that $\exp(\boldsymbol{s}_t&amp;rsquo; \boldsymbol{\theta})$ correctly approximates the conditional expectation.&lt;/p&gt;
+
+&lt;p&gt;Below is some code in Python that solves this model using this approach.&lt;/p&gt;
+
+&lt;h4 id=&#34;packages-and-types&#34;&gt;Packages and Types&lt;/h4&gt;
+
+&lt;p&gt;Let&amp;rsquo;s load the required packages and create a Class for convenience (some elements are useless, a clean-up is needed at some point).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;%matplotlib inline
+import matplotlib.pyplot as plt
+
+import random
+import scipy.stats
+import chaospy  ## for quadrature
+from itertools import product
+import os
+import re
+import subprocess
+import shutil
+
+import time
+import pandas as pd
+import numpy as np
+from math import sqrt
+from matplotlib import pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
+import matplotlib.ticker as mticker
+
+import seaborn as sns; sns.set()
+from tqdm import tqdm as tqdm
+import datetime
+from typing import Tuple
+class Vector: pass
+from scipy.stats import norm
+
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, Subset, Dataset, TensorDataset
+from torch.nn.utils import clip_grad_norm_
+
+# To create copies of NN
+import copy
+import matplotlib.ticker as mtick
+# To use sparse kronecker product
+from scipy import sparse
+
+import itertools
+# Interpolations
+from scipy.interpolate import LinearNDInterpolator
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+from scipy.interpolate import RegularGridInterpolator
+
+# Regressions
+import statsmodels.formula.api as smf
+import statsmodels.api as sm
+from statsmodels.stats.diagnostic import het_breuschpagan
+lowess = sm.nonparametric.lowess
+
+import quantecon as qe
+from interpolation import interp
+from quantecon.optimize import brentq
+from numba import njit
+
+import matplotlib.cm as cm
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.ticker import MaxNLocator
+
+import platform,socket,re,uuid,json,psutil,logging, cpuinfo, shutil
+
+from scipy.stats import chi2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Store economic and bc-MC-PEA parameters
+class MyParams():
+    &amp;quot;&amp;quot;&amp;quot;
+    N: number of draws for innovation vector (per state vector)
+    M: number of draws for the state vector
+    ...
+    &amp;quot;&amp;quot;&amp;quot;
+    def __init__(self, N, M, lr, optimizer, nb_epochs, order_gauss,
+                 beta, alpha, gamma, delta, std_tfp, rho_tfp,
+                 regression_two_steps, feasible_GLS, effective_sample_size):
+        # Economic model parameters
+        self.beta = beta # Discount factor (patience)
+        self.alpha = alpha # Capital share in production
+        self.gamma = gamma # CRRA coefficient
+        self.one_min_gamma = 1 - gamma #pre-compute
+        # depreciation rate capital
+        self.delta = delta
+        # Standard deviation exo random variables
+        self.std_tfp = std_tfp #0.01
+        # Mean value exo random variables
+        self.mean_tfp = 1.0
+        # Persistence params
+        self.rho_tfp = rho_tfp # Persistence log TFP values
+        # Non stochastic steady state calculations
+        self.kss = ((1 - self.beta * (1 - self.delta)) / (self.alpha * self.beta)) ** (1 / (self.alpha - 1))
+        self.std_k = 0 #std. dev capital
+        self.css = self.kss**self.alpha - self.delta*self.kss
+        self.std_c = 0 #std. dev consumption
+        self.zss = 1
+        self.std_z = 0
+        self.tol_c = 1e-3 #to prevent negative consumption
+        # Dependent variable in level or log
+        self.formula = &amp;quot;&amp;quot;
+        # Options for OLS regression
+        self.center_dep_var = False #True #False #demean
+        self.normalize_dep_var = False #True #False #divide by std. dev
+        self.nb_expl_vars = 10   # including constant
+        if self.nb_expl_vars not in (4, 6, 10):
+            raise ValueError( f&amp;quot;nb_expl_vars must be one of (4, 6, 10); got {self.nb_expl_vars}&amp;quot;  )
+        self.basis = 2          # 1: monomial, 2: Chebyshev
+        if self.basis not in (1, 2):
+            raise ValueError( f&amp;quot;basis must be either 1 (monomial) or 2 (Chebyshev); got {self.basis}&amp;quot; )
+        self.regression_two_steps = regression_two_steps #Use the two-step regression described in appendix (approximation to full GLS)
+        self.feasible_GLS = feasible_GLS #
+        if self.regression_two_steps and self.feasible_GLS:
+            raise RuntimeError(&amp;quot;Both regression_two_steps and feasible_GLS are True. Choose one of the options.&amp;quot;)
+        # Correction for serial correlation in dependent variables
+        self.effective_sample_size = effective_sample_size
+        self.nb_shocks = 1
+        ## State: Distribution of wealth + TFP (no persistence depreciation shocks)
+        self.dim_state = 2
+        ## Input for neural net
+        self.dim_input = 2
+        self.dim_output = 1
+        # Nb agents:
+        self.nb_agents = 1 #One representative household
+        # Functions
+        ## Utility
+        if self.gamma != 1:
+            self.u = lambda c: (1/self.one_min_gamma)*(c**(self.one_min_gamma) - 1)
+        else:
+            self.u = lambda c: torch.log(c)
+        self.u_prime =  lambda c: c**(-self.gamma)
+        self.u_prime_inv =  lambda c: c**(-(1/self.gamma))
+        # bc-MC hyperparameters
+        self.N = N #number of iid shocks used for each value of the state vector
+        self.M = M #number of iid realization of the state vector
+        self.MN = int(M*N)
+        # To keep constant the number of function evaluations
+        self.T = int((M*N)/2) #number
+        self.distribution_shocks = &amp;quot;Normal&amp;quot; #&amp;quot;Normal&amp;quot; #Lognormal
+        # Learning parameters
+        self.lr = lr
+        self.momentum = 0.9 #momentum for SGD with momentum
+        self.optimizer = optimizer #&amp;quot;Adam&amp;quot; #default: #Adam or SGD or SWA
+        self.freq_gamma = 0.95 #When using a scheduler for the learning rate, lr_{t} = freq_gamma*lr_{t-1}
+        self.use_scheduler = False #If true, use a scheduler for the learning rate
+        self.nb_epochs = nb_epochs
+        self.freq_scheduler = 1000
+        # GAUSSIAN QUADRATURE
+        ## INNOVATION VECTOR
+        strr = &amp;quot;chaospy.Normal(0, self.std_tfp)&amp;quot;
+        self.distrib = eval(&#39;chaospy.J({})&#39;.format(strr))
+        self.order_gauss = order_gauss
+        nodes, weights = chaospy.generate_quadrature(self.order_gauss, self.distrib, rule = &amp;quot;gaussian&amp;quot;, sparse=True) #dist(self.order_gauss, self.distrib, rule = &amp;quot;gaussian&amp;quot;, sp=True)
+        self.nodes = nodes
+        self.nodes_flat =  self.nodes.flatten() #make 1d array
+        self.weights = weights
+        self.weights_torch = torch.tensor(weights)
+        self.nodes_torch = torch.tensor(np.transpose(self.nodes)) #column=dim. Row=observation
+        # Save the number of points for the guassian quadrature:
+        self.N_gaussian = len(self.weights_torch)
+        # Implied number of points for the current space (T=MN/2 &amp;lt;-&amp;gt; M = 2T/N)
+        self.M_gaussian = int((2*self.T)/self.N_gaussian)
+        self.MN_gaussian = self.N_gaussian*self.M_gaussian
+        # Repeat nodes to match the number of function evaluations for the expectation
+        self.nodes_torch_repeated = self.nodes_torch.repeat(self.M_gaussian, 1)
+
+
+def show_params(params, limited=True):
+    &amp;quot;&amp;quot;&amp;quot;
+    Function to display parameter values
+    &amp;quot;&amp;quot;&amp;quot;
+    print(&amp;quot;learning rate: {}&amp;quot;.format(params.lr))
+    print(&amp;quot;nb epochs: {}&amp;quot;.format(params.nb_epochs))
+    print(&amp;quot;M: {}&amp;quot;.format(params.M))
+    print(&amp;quot;N: {}&amp;quot;.format(params.N))
+    print(&amp;quot;MN: {}&amp;quot;.format(params.MN))
+    print(&amp;quot;T: {}&amp;quot;.format(params.T))
+    print(&amp;quot;optimizer_chosen: {}&amp;quot;.format(params.optimizer))
+    print(&amp;quot;use_scheduler: {}&amp;quot;.format(params.use_scheduler))
+    print(&amp;quot;center_dep_var: {}&amp;quot;.format(params.center_dep_var))
+    print(&amp;quot;normalize_dep_var: {}&amp;quot;.format(params.normalize_dep_var))
+    print(&amp;quot;nb_expl_vars: {}&amp;quot;.format(params.nb_expl_vars))
+    print(&amp;quot;basis: {}&amp;quot;.format(params.basis))
+    print(&amp;quot;regression_two_steps: {}&amp;quot;.format(params.regression_two_steps))
+    print(&amp;quot;feasible_GLS: {}&amp;quot;.format(params.feasible_GLS))
+    print(&amp;quot;effective_sample_size: {}&amp;quot;.format(params.effective_sample_size))
+
+# Plotting options
+plot_scale = 0.75
+plt.rcParams[&amp;quot;figure.figsize&amp;quot;] = (plot_scale*16, plot_scale*9)
+# Controlling fontsizes
+SMALL_SIZE = 12
+MEDIUM_SIZE = SMALL_SIZE + 2
+BIGGER_SIZE =  SMALL_SIZE + 4
+plt.rcParams[&#39;legend.fontsize&#39;] = MEDIUM_SIZE
+dpi_chosen=600 #control the quality of .png
+linewidth_chosen = 2
+
+# Current working directory
+current_wd = os.getcwd()
+output_extension = &amp;quot;example_1&amp;quot;
+output_folder = output_extension + &amp;quot;/&amp;quot;
+print(output_folder)
+
+# Create folder if does not exist:
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;example_1/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s initialize an instance of MyParams():&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Economic Parameter. 
+beta_chosen = 0.95 #discount factor
+alpha_chosen = 0.3 #production params
+std_tfp_chosen = 0.14 # Std log TFP. High value for constraint to bind
+gamma_chosen = 1.0 #CRRA parameter
+rho_chosen = 0.8 #persistence TFP
+delta_chosen = 0.1 #depreciation rate
+
+# bc-MC-PEA hyperparamters
+M_chosen = 200 #Nb draws state vector
+N_chosen = 2 #Nb draws innovation vector for each realization of the state vector
+lr_chosen = 1e-5 #1e-4 #4 #1e-4 #3 #5 #1e-3 #default: 1e-4 #3 #Learning rate. Useful when using gradient descent instead of OLS
+nb_epochs_chosen = 2000 #
+order_gauss_chosen = 5 #number of Gaussian nodes for integration wrt to innovation vector
+optimizer_chosen = &amp;quot;Adam&amp;quot; 
+
+# bc-MC-PEA Options
+regression_two_steps_chosen = False
+feasible_GLS_chosen = False
+effective_sample_size_chosen = True
+
+# Extra hyperparamters (not used here)
+mu_chosen = 1e-5 
+mu_threshold = 1e-10 
+mu_decay_chosen = 1.0 
+use_Lookahead_chosen = False #Lookahead optimizer
+
+params = MyParams(N_chosen, M_chosen, lr_chosen, optimizer_chosen,
+                  nb_epochs_chosen, order_gauss_chosen,
+                  beta_chosen, alpha_chosen, gamma_chosen, delta_chosen,
+                  std_tfp_chosen, rho_chosen,
+                  regression_two_steps_chosen,
+                  feasible_GLS_chosen, effective_sample_size_chosen)
+
+show_params(params)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;learning rate: 1e-05
+nb epochs: 2000
+M: 200
+N: 2
+MN: 400
+T: 200
+optimizer_chosen: Adam
+use_scheduler: False
+center_dep_var: False
+normalize_dep_var: False
+nb_expl_vars: 10
+basis: 2
+regression_two_steps: False
+feasible_GLS: False
+effective_sample_size: True
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;initialization&#34;&gt;Initialization&lt;/h4&gt;
+
+&lt;p&gt;We use the following update rule for finding $\theta^{*}$:&lt;/p&gt;
+
+&lt;p&gt;$\theta^{(i+1)} = \gamma \theta^{(i)} + (1 - \gamma) \theta^{OLS}$, with $\gamma \in (0,1)$.&lt;/p&gt;
+
+&lt;p&gt;We need a starting value $\theta^{(0)}$.&lt;/p&gt;
+
+&lt;p&gt;Here, let&amp;rsquo;s solve the model &lt;strong&gt;without&lt;/strong&gt; the irreversible investment constraint using a &lt;strong&gt;1st order-linearization&lt;/strong&gt; and use some simulated data to estimate $\theta^{(0)}$. This is easy to do thanks to Dynare and this gives us a reasonable starting point.&lt;/p&gt;
+
+&lt;p&gt;Below is a somewhat hacky way to get Dynare within Python:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I write the .mod file of the model without the irreversible investment constraint to disk,&lt;/li&gt;
+&lt;li&gt;I call Octave and Dynare to solve and simulate the model at 1st order.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For this to work, &lt;strong&gt;you need to have Octave and Dynare installed on your machine&lt;/strong&gt; (it&amp;rsquo;s free and open source, see the section &amp;ldquo;Using Dynare with Octave&amp;rdquo; &lt;a href=&#34;https://www.dynare.org/resources/quick_start/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; ).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;fname = &amp;quot;neogrowth.mod&amp;quot;
+dirpath = os.getcwd()  # Get the current working directory
+fpath = os.path.join(dirpath, fname)
+
+# Content of the .mod file.
+file_content_1 = &amp;quot;&amp;quot;&amp;quot;
+% optimal_growth.mod
+% Dynare file for the standard optimal growth model (first-order approximation)
+
+var k c z;
+varexo eps;
+
+parameters beta gamma alpha delta rho sigma_eps;
+
+% Parameter values
+beta      = {beta};
+gamma     = {gamma};      % CRRA coefficient
+alpha     = {alpha};
+delta     = {delta};
+rho       = {rho_tfp};
+sigma_eps = {std_tfp};
+
+model;
+% Euler equation (after substituting the marginal utility condition)
+c^(-gamma) = beta * c(+1)^(-gamma) * ( alpha * z(+1) * k^(alpha-1) + 1 - delta );
+
+% Resource constraint (law of motion for capital)
+k = z * k(-1)^alpha - c + (1-delta)*k(-1);
+
+% Technology process (AR(1) in logs)
+log(z) = rho*log(z(-1)) + eps;
+
+end;
+
+initval;
+% Initial guesses for the steady state
+k   = ((alpha*beta)/(1 - beta*(1-delta)))^(1/(1-alpha));
+c   = ((alpha*beta)/(1 - beta*(1-delta)))^(alpha/(1-alpha)) - delta*(((alpha*beta)/(1 - beta*(1-delta)))^(alpha/(1-alpha)));
+z   = 1;
+eps = 0;
+end;
+
+steady;
+check;
+
+shocks;
+var eps = sigma_eps^2;
+end;
+
+% IRF
+stoch_simul(order=1, irf=100);
+
+% SIMULATED SERIES
+stoch_simul(periods=50000);
+&amp;quot;&amp;quot;&amp;quot;.format(beta = params.beta, alpha = params.alpha,  gamma = params.gamma,
+           delta = params.delta, std_tfp = params.std_tfp, rho_tfp = params.rho_tfp)
+
+file_content = file_content_1
+# Concat stings
+# Write the content to the file
+with open(fpath, &amp;quot;w&amp;quot;) as file:
+    file.write(file_content)
+
+# Write to disk an Octave script to solve and simulate the model
+file_content_1 = r&amp;quot;&amp;quot;&amp;quot;
+if exist(&#39;OCTAVE_VERSION&#39;, &#39;builtin&#39;)
+
+    function T = cell2table(C, varargin)
+        if nargin &amp;gt; 1
+            opts = varargin{2};
+            varname = opts{1};
+        else
+            varname = &#39;Var1&#39;;
+        end
+        T = struct();
+        for i = 1:size(C,2)
+            T.(varname) = C(:,i);
+        end
+    end
+
+    function T = struct2table(S, varargin)
+        T = S;
+    end
+
+    function T = array2table(A, varargin)
+        if nargin &amp;gt; 1
+            opts = varargin{2};
+            varnames = opts{1};
+        else
+            nvars = size(A,2);
+            varnames = cell(1, nvars);
+            for i = 1:nvars
+                varnames{i} = sprintf(&#39;Var%d&#39;, i);
+            end
+        end
+
+        T = struct();
+        for i = 1:size(A,2)
+            if iscell(varnames)
+                fieldname = varnames{i};
+            else
+                fieldname = varnames;
+            end
+            T.(fieldname) = A(:,i);
+        end
+    end
+
+    function writetable(T, filename)
+        fid = fopen(filename, &#39;w&#39;);
+        fields = fieldnames(T);
+
+        % Write header
+        for i = 1:length(fields)
+            fprintf(fid, &#39;%s&#39;, fields{i});
+            if i &amp;lt; length(fields)
+                fprintf(fid, &#39;,&#39;);
+            else
+                fprintf(fid, &#39;\n&#39;);
+            end
+        end
+
+        % Number of rows
+        nRows = length(T.(fields{1}));
+
+        % Write data
+        for row = 1:nRows
+            for col_idx = 1:length(fields)
+                col = T.(fields{col_idx});
+                value = col(row,:);
+                if iscell(col)
+                    fprintf(fid, &#39;%s&#39;, col{row});
+                elseif ischar(value)
+                    fprintf(fid, &#39;%s&#39;, strtrim(value));
+                elseif isnumeric(value)
+                    fprintf(fid, &#39;%g&#39;, value);
+                else
+                    error(&#39;writetable: unsupported data type in column %d&#39;, col_idx);
+                end
+
+                if col_idx &amp;lt; length(fields)
+                    fprintf(fid, &#39;,&#39;);
+                else
+                    fprintf(fid, &#39;\n&#39;);
+                end
+            end
+        end
+
+        fclose(fid);
+    end
+
+
+
+end
+
+% Go to working directory
+% cd &#39;/content&#39;;
+
+% Run Dynare
+dynare neogrowth.mod noclearall
+
+% Postprocess
+k_pos = strmatch(&#39;k&#39;, M_.endo_names, &#39;exact&#39;);
+c_pos = strmatch(&#39;c&#39;, M_.endo_names, &#39;exact&#39;);
+z_pos = strmatch(&#39;z&#39;, M_.endo_names, &#39;exact&#39;);
+
+var_positions = [k_pos; c_pos; z_pos];
+Sim_series = oo_.endo_simul(var_positions, :)&#39;;
+var_names = M_.endo_names_long(var_positions, :);
+
+if ~exist(&#39;output/Linearization&#39;, &#39;dir&#39;)
+    mkdir(&#39;output/Linearization&#39;);
+end
+
+% Save steady state values manually
+var_list = cellstr(oo_.var_list);  % Variable names
+ss_values = oo_.mean;              % Steady state values
+
+fid = fopen(&#39;output/Linearization/SS_values.csv&#39;, &#39;w&#39;);
+fprintf(fid, &#39;Variable,MeanValue\n&#39;);  % Header
+
+for i = 1:length(var_list)
+    fprintf(fid, &#39;%s,%g\n&#39;, var_list{i}, ss_values(i));
+end
+
+fclose(fid);
+
+
+% Save simulated series
+%Sim_table = array2table(Sim_series, &#39;VariableNames&#39;, cellstr(var_names));
+%writetable(Sim_table, &#39;output/Linearization/Sim_series.csv&#39;);
+
+% Save Sim_series manually
+csvwrite(&#39;output/Linearization/Sim_series_only_data.csv&#39;, Sim_series);
+
+% Also write header separately
+fid = fopen(&#39;output/Linearization/Sim_series.csv&#39;, &#39;w&#39;);
+fprintf(fid, &#39;k,c,z\n&#39;); % header with variable names
+
+data = Sim_series; % already transposed correctly (observations x variables)
+
+for i = 1:size(data,1)
+    fprintf(fid, &#39;%g,%g,%g\n&#39;, data(i,1), data(i,2), data(i,3));
+end
+
+fclose(fid);
+
+% State-space matrices
+A = oo_.dr.ghx(oo_.dr.inv_order_var(M_.state_var&#39;), :);
+B = oo_.dr.ghu(oo_.dr.inv_order_var(M_.state_var&#39;), :);
+control = (1:size(oo_.dr.ghu,1))&#39;;
+state = M_.state_var&#39;;
+for j = 1:length(state)
+    control(control == state(j)) = [];
+end
+C = oo_.dr.ghx(oo_.dr.inv_order_var(control), :);
+D = oo_.dr.ghu(oo_.dr.inv_order_var(control), :);
+
+S_variables_names = M_.endo_names(state,:);
+X_variables_names = M_.endo_names(control,:);
+shocks_names = M_.exo_names;
+
+% Save variable names
+writetable(cell2table(cellstr(S_variables_names)), &#39;output/Linearization/state_variables_names.csv&#39;);
+writetable(cell2table(cellstr(X_variables_names)), &#39;output/Linearization/control_variables_names.csv&#39;);
+writetable(cell2table(cellstr(shocks_names)), &#39;output/Linearization/exo_variables_names.csv&#39;);
+
+% Save matrices A, B, C, D
+csvwrite(&#39;output/Linearization/A.csv&#39;, A);
+csvwrite(&#39;output/Linearization/B.csv&#39;, B);
+csvwrite(&#39;output/Linearization/C.csv&#39;, C);
+csvwrite(&#39;output/Linearization/D.csv&#39;, D);
+
+% Simulations with shocks
+len_T = 10;
+e1 = zeros(len_T, 1);
+e1(1) = 1.0;
+horizon = length(e1) + 1;
+shocks = zeros(M_.exo_nbr, horizon);
+shocks(strcmp(cellstr(shocks_names), &#39;eps&#39;), 2:horizon) = e1;
+Ssim = zeros(length(state), horizon);
+Xsim = zeros(length(control), horizon);
+
+for j = 2:horizon
+    Ssim(:,j) = A * Ssim(:,j-1) + B * shocks(:,j);
+    Xsim(:,j) = C * Ssim(:,j-1) + D * shocks(:,j);
+end
+
+csvwrite(&#39;output/Linearization/Ssim.csv&#39;, Ssim&#39;);
+csvwrite(&#39;output/Linearization/Xsim.csv&#39;, Xsim&#39;);
+&amp;quot;&amp;quot;&amp;quot;
+
+fname = &amp;quot;solve_neogrowth_octave.m&amp;quot;
+dirpath = os.getcwd()  # Get the current working directory
+fpath = os.path.join(dirpath, fname)
+
+file_content = file_content_1
+# Concat stings
+# Write the content to the file
+with open(fpath, &amp;quot;w&amp;quot;) as file:
+    file.write(file_content)
+
+    
+print(&amp;quot;Calculating linearized model using Octave Dynare&amp;quot;)
+# Call Octave &amp;amp; Dynare
+!octave solve_neogrowth_octave.m
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Calculating linearized model using Octave Dynare
+Starting Dynare (version 6.0).
+Calling Dynare with arguments: noclearall
+Starting preprocessing of the model file ...
+Found 3 equation(s).
+Evaluating expressions...
+Computing static model derivatives (order 1).
+Normalizing the static model...
+Finding the optimal block decomposition of the static model...
+2 block(s) found:
+  1 recursive block(s) and 1 simultaneous block(s).
+  the largest simultaneous block has 2 equation(s)
+                                 and 2 feedback variable(s).
+Computing dynamic model derivatives (order 2).
+Normalizing the dynamic model...
+Finding the optimal block decomposition of the dynamic model...
+2 block(s) found:
+  1 recursive block(s) and 1 simultaneous block(s).
+  the largest simultaneous block has 2 equation(s)
+                                 and 2 feedback variable(s).
+Preprocessing completed.
+Preprocessing time: 0h00m00s.
+
+STEADY-STATE RESULTS:
+
+k        2.62575
+c        1.07333
+z        1
+
+EIGENVALUES:
+         Modulus             Real        Imaginary
+             0.8              0.8                0
+           0.838            0.838                0
+           1.256            1.256                0
+       6.646e+17        6.646e+17                0
+
+There are 2 eigenvalue(s) larger than 1 in modulus for 2 forward-looking variable(s)
+The rank condition is verified.
+
+
+MODEL SUMMARY
+
+  Number of variables:         3
+  Number of stochastic shocks: 1
+  Number of state variables:   2
+  Number of jumpers:           2
+  Number of static variables:  0
+
+
+MATRIX OF COVARIANCE OF EXOGENOUS SHOCKS
+Variables         eps
+eps          0.019600
+
+POLICY AND TRANSITION FUNCTIONS
+                                   k               c               z
+Constant                    2.625746        1.073331        1.000000
+k(-1)                       0.838003        0.214628               0
+z(-1)                       0.686992        0.381732        0.800000
+eps                         0.858741        0.477165        1.000000
+
+
+THEORETICAL MOMENTS
+VARIABLE         MEAN  STD. DEV.   VARIANCE
+k              2.6257     0.8267     0.6834
+c              1.0733     0.2591     0.0671
+z              1.0000     0.2333     0.0544
+
+
+
+MATRIX OF CORRELATIONS
+Variables         k       c       z
+k            1.0000  0.9876  0.7354
+c            0.9876  1.0000  0.8327
+z            0.7354  0.8327  1.0000
+
+
+
+COEFFICIENTS OF AUTOCORRELATION
+Order          1       2       3       4       5
+k         0.9806  0.9358  0.8755  0.8067  0.7344
+c         0.9626  0.9064  0.8393  0.7671  0.6939
+z         0.8000  0.6400  0.5120  0.4096  0.3277
+
+MODEL SUMMARY
+
+  Number of variables:         3
+  Number of stochastic shocks: 1
+  Number of state variables:   2
+  Number of jumpers:           2
+  Number of static variables:  0
+
+
+MATRIX OF COVARIANCE OF EXOGENOUS SHOCKS
+Variables         eps
+eps          0.019600
+
+POLICY AND TRANSITION FUNCTIONS
+                                   k               c               z
+Constant                    2.627763        1.071313        1.000000
+(correction)                0.002018       -0.002018               0
+k(-1)                       0.838003        0.214628               0
+z(-1)                       0.686992        0.381732        0.800000
+eps                         0.858741        0.477165        1.000000
+k(-1),k(-1)                -0.006461       -0.013885               0
+z(-1),k(-1)                 0.087580        0.034525               0
+z(-1),z(-1)                -0.040418       -0.066454       -0.080000
+eps,eps                     0.473559        0.194394        0.500000
+k(-1),eps                   0.109475        0.043157               0
+z(-1),eps                   0.757695        0.311030        0.800000
+
+
+MOMENTS OF SIMULATED VARIABLES
+VARIABLE              MEAN       STD. DEV.        VARIANCE        SKEWNESS        KURTOSIS
+k                 2.803683        0.859478        0.738702        1.011294        2.092793
+c                 1.110625        0.255746        0.065406        0.671535        0.805383
+z                 1.019190        0.233502        0.054523        0.706720        0.814589
+
+
+CORRELATION OF SIMULATED VARIABLES
+VARIABLE         k       c       z
+k           1.0000  0.9824  0.7169
+c           0.9824  1.0000  0.8282
+z           0.7169  0.8282  1.0000
+
+
+AUTOCORRELATION OF SIMULATED VARIABLES
+VARIABLE         1       2       3       4       5
+k           0.9788  0.9302  0.8654  0.7927  0.7174
+c           0.9579  0.8965  0.8250  0.7499  0.6752
+z           0.7827  0.6114  0.4776  0.3748  0.2973
+Total computing time : 0h00m03s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now, let&amp;rsquo;s load the simulated series and estimate our first first $\theta^{(0)}$:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#Load simulated data and fit linear model
+SS_values = pd.read_csv(&amp;quot;output/Linearization/SS_values.csv&amp;quot;)
+print(SS_values)
+
+Sim_series = pd.read_csv(&amp;quot;output/Linearization/Sim_series.csv&amp;quot;)
+print(Sim_series)
+
+# Load the data
+Sim_series = pd.read_csv(&amp;quot;output/Linearization/Sim_series.csv&amp;quot;)
+
+## Simulate realization conditional expectation
+Sim_series[&#39;c_plus_1&#39;] = Sim_series[&#39;c&#39;].shift(-1)
+Sim_series[&#39;z_plus_1&#39;] = Sim_series[&#39;z&#39;].shift(-1)
+Sim_series[&#39;k_plus_1&#39;] = Sim_series[&#39;k&#39;].shift(-1)
+# Conditional expectation
+Sim_series[&#39;cond_exp&#39;] = params.beta  * (Sim_series[&#39;c_plus_1&#39;]**(-params.gamma)) * ( params.alpha * Sim_series[&#39;z_plus_1&#39;] * Sim_series[&#39;k_plus_1&#39;]**(params.alpha - 1) + 1 - params.delta )
+# Production
+Sim_series[&#39;cash&#39;] = Sim_series[&#39;z&#39;] * Sim_series[&#39;k&#39;]**params.alpha + (1 - params.delta)*Sim_series[&#39;k&#39;] - Sim_series[&#39;c&#39;]
+# Log tfp
+Sim_series[&#39;a&#39;] = np.log(Sim_series[&#39;z&#39;])
+params.std_z = np.std(Sim_series[&#39;z&#39;])
+
+# Centered vars
+Sim_series[&#39;c_demeaned&#39;] = Sim_series[&#39;c&#39;] - params.css
+Sim_series[&#39;a_demeaned&#39;] = Sim_series[&#39;a&#39;] # mean is 0
+Sim_series[&#39;z_demeaned&#39;] = Sim_series[&#39;z&#39;] - params.zss
+Sim_series[&#39;k_demeaned&#39;] = Sim_series[&#39;k&#39;] - params.kss
+
+# Normalize vars:
+params.std_c = np.std(Sim_series[&#39;c&#39;])
+params.std_a = np.std(Sim_series[&#39;a&#39;])
+params.std_z = np.std(Sim_series[&#39;z&#39;])
+params.std_k = np.std(Sim_series[&#39;k&#39;])
+
+Sim_series[&#39;c_normalized&#39;] = Sim_series[&#39;c_demeaned&#39;]/params.std_c
+Sim_series[&#39;a_normalized&#39;] = Sim_series[&#39;a_demeaned&#39;]/params.std_a
+Sim_series[&#39;z_normalized&#39;] = Sim_series[&#39;z_demeaned&#39;]/params.std_z
+Sim_series[&#39;k_normalized&#39;] = Sim_series[&#39;k_demeaned&#39;]/params.std_k
+
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+fig.suptitle(&#39;Log variables&#39;)
+ax1.hist(np.log(Sim_series[&#39;c&#39;]))
+ax1.set_title(&amp;quot;Log c&amp;quot;)
+ax2.hist(Sim_series[&#39;a&#39;])
+ax2.set_title(&amp;quot;a (log z)&amp;quot;)
+ax3.hist(np.log(Sim_series[&#39;k&#39;]))
+ax3.set_title(&amp;quot;Log k&amp;quot;)
+plt.show()
+
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
+fig.suptitle(&#39;Normalized variables&#39;)
+ax1.hist(Sim_series[&#39;c_normalized&#39;])
+ax1.set_title(&amp;quot;c normalized&amp;quot;)
+ax2.hist(Sim_series[&#39;a_normalized&#39;])
+ax2.set_title(&amp;quot;a normalized&amp;quot;)
+ax3.hist(Sim_series[&#39;k_normalized&#39;])
+ax3.set_title(&amp;quot;k normalized&amp;quot;)
+ax4.hist(Sim_series[&#39;z_normalized&#39;])
+ax4.set_title(&amp;quot;z normalized&amp;quot;)
+plt.show()
+
+# Create a dataframe:
+df_Dynare = pd.DataFrame({&#39;k&#39;: Sim_series[&#39;k&#39;], &#39;z&#39;: Sim_series[&#39;z&#39;], &#39;a&#39;: Sim_series[&#39;a&#39;],
+                          &#39;k_demeaned&#39;: Sim_series[&#39;k_demeaned&#39;], &#39;a_demeaned&#39;: Sim_series[&#39;a_demeaned&#39;], &#39;z_demeaned&#39;: Sim_series[&#39;z_demeaned&#39;],
+                          &#39;k_normalized&#39;: Sim_series[&#39;k_normalized&#39;], &#39;a_normalized&#39;: Sim_series[&#39;a_normalized&#39;], &#39;z_normalized&#39;: Sim_series[&#39;z_normalized&#39;],
+                          &#39;cond_exp&#39;:  Sim_series[&#39;cond_exp&#39;],
+                          &#39;log_cond_exp&#39;:  np.log(Sim_series[&#39;cond_exp&#39;])})
+
+print(df_Dynare.head())
+
+# If required, transform explanatory variables (demean, normalize)
+if (params.center_dep_var == True) &amp;amp; (params.normalize_dep_var == True):
+    x1_chosen = &amp;quot;k_normalized&amp;quot;
+    x2_chosen = &amp;quot;a_normalized&amp;quot;
+elif (params.center_dep_var == True) &amp;amp; (params.normalize_dep_var == False):
+    x1_chosen = &amp;quot;k_demeaned&amp;quot;
+    x2_chosen = &amp;quot;a_demeaned&amp;quot;
+else:
+    x1_chosen = &amp;quot;np.log(k)&amp;quot;
+    x2_chosen = &amp;quot;a&amp;quot;
+
+# OLS formula to use, which depends on the number of explanatory variables and on the basis function used. 
+if params.nb_expl_vars == 4:
+    # only main + interaction
+    formula_OLS = (
+        f&amp;quot;log_cond_exp ~ &amp;quot;
+        f&amp;quot;{x1_chosen} + {x2_chosen} + {x1_chosen}*{x2_chosen}&amp;quot;
+    )
+
+elif params.nb_expl_vars == 6:
+    if params.basis == 1:
+        # monomial up to degree 2
+        formula_OLS = (
+            f&amp;quot;log_cond_exp ~ &amp;quot;
+            f&amp;quot;{x1_chosen} + {x2_chosen} + {x1_chosen}*{x2_chosen} + &amp;quot;
+            f&amp;quot;I({x1_chosen}**2) + I({x2_chosen}**2)&amp;quot;
+        )
+    else:
+        # Chebyshev up to order 2
+        formula_OLS = (
+            f&amp;quot;log_cond_exp ~ &amp;quot;
+            f&amp;quot;{x1_chosen} + {x2_chosen} + {x1_chosen}*{x2_chosen} + &amp;quot;
+            f&amp;quot;I({x1_chosen}**2 - 1) + I({x2_chosen}**2 - 1)&amp;quot;
+        )
+
+elif params.nb_expl_vars == 10:
+    if params.basis == 1:
+        # monomial up to degree 3
+        formula_OLS = (
+            f&amp;quot;log_cond_exp ~ &amp;quot;
+            f&amp;quot;{x1_chosen} + {x2_chosen} + {x1_chosen}*{x2_chosen} + &amp;quot;
+            f&amp;quot;I({x1_chosen}**2) + I({x2_chosen}**2) + &amp;quot;
+            f&amp;quot;I({x1_chosen}**3) + I({x1_chosen}**2*{x2_chosen}) + &amp;quot;
+            f&amp;quot;I({x1_chosen}*{x2_chosen}**2) + I({x2_chosen}**3)&amp;quot;
+        )
+    else:
+        # Chebyshev up to order 3
+        formula_OLS = (
+            f&amp;quot;log_cond_exp ~ &amp;quot;
+            f&amp;quot;{x1_chosen} + {x2_chosen} + {x1_chosen}*{x2_chosen} + &amp;quot;
+            f&amp;quot;I({x1_chosen}**2 - 1) + I({x2_chosen}**2 - 1) + &amp;quot;
+            f&amp;quot;I(4*{x1_chosen}**3 - 3*{x1_chosen}) + &amp;quot;
+            f&amp;quot;I(4*{x2_chosen}**3 - 3*{x2_chosen}) + &amp;quot;
+            f&amp;quot;I(({x1_chosen}**2 - 1)*{x2_chosen}) + &amp;quot;
+            f&amp;quot;I({x1_chosen}*({x2_chosen}**2 - 1))&amp;quot;
+        )
+
+else:
+    raise ValueError(
+        f&amp;quot;nb_expl_vars must be one of 4,6,10; got {params.nb_expl_vars}&amp;quot;
+    )
+
+# estimate model using OLS
+model = smf.ols(formula=formula_OLS, data=df_Dynare).fit()
+
+print(model.summary())
+plt.hist(model.resid)
+plt.show()
+
+coeff_vector = model.params
+print(coeff_vector)
+
+coeff_array_0 = model.params.values
+print(coeff_array_0)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;  Variable  MeanValue
+0        k    2.80368
+1        c    1.11063
+2        z    1.01919
+             k         c         z
+0      2.49443  0.995207  0.843225
+1      2.49373  1.029550  0.971857
+2      2.45133  1.005590  0.921800
+3      2.48612  1.036100  1.005670
+4      2.58609  1.082710  1.089010
+...        ...       ...       ...
+49995  2.63105  1.044140  0.895067
+49996  2.56844  1.036660  0.925521
+49997  2.73110  1.141380  1.176080
+49998  2.76882  1.122660  1.060340
+49999  2.81345  1.137810  1.075140
+
+[50000 rows x 3 columns]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;bc-MC-PEA_10_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;bc-MC-PEA_10_2.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;         k         z         a  k_demeaned  a_demeaned  z_demeaned  \
+0  2.49443  0.843225 -0.170521   -0.131316   -0.170521   -0.156775   
+1  2.49373  0.971857 -0.028547   -0.132016   -0.028547   -0.028143   
+2  2.45133  0.921800 -0.081427   -0.174416   -0.081427   -0.078200   
+3  2.48612  1.005670  0.005654   -0.139626    0.005654    0.005670   
+4  2.58609  1.089010  0.085269   -0.039656    0.085269    0.089010   
+
+   k_normalized  a_normalized  z_normalized  cond_exp  log_cond_exp  
+0     -0.152851     -0.756166     -0.671641  0.972367     -0.028022  
+1     -0.153666     -0.126588     -0.120568  0.989717     -0.010337  
+2     -0.203019     -0.361083     -0.335017  0.971439     -0.028977  
+3     -0.162524      0.025072      0.024291  0.937091     -0.064975  
+4     -0.046159      0.378120      0.381329  0.896667     -0.109071  
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           log_cond_exp   R-squared:                       0.959
+Model:                            OLS   Adj. R-squared:                  0.959
+Method:                 Least Squares   F-statistic:                 1.315e+05
+Date:                Wed, 14 Jan 2026   Prob (F-statistic):               0.00
+Time:                        11:39:46   Log-Likelihood:                 82307.
+No. Observations:               49999   AIC:                        -1.646e+05
+Df Residuals:                   49989   BIC:                        -1.645e+05
+Df Model:                           9                                         
+Covariance Type:            nonrobust                                         
+=========================================================================================================
+                                            coef    std err          t      P&amp;gt;|t|      [0.025      0.975]
+---------------------------------------------------------------------------------------------------------
+Intercept                                 0.3344      0.075      4.482      0.000       0.188       0.481
+np.log(k)                                -0.4777      0.071     -6.747      0.000      -0.616      -0.339
+a                                        -0.3446      0.076     -4.545      0.000      -0.493      -0.196
+np.log(k):a                               0.1172      0.065      1.805      0.071      -0.010       0.244
+I(np.log(k) ** 2 - 1)                    -0.1504      0.029     -5.183      0.000      -0.207      -0.094
+I(a ** 2 - 1)                             0.0180      0.044      0.406      0.685      -0.069       0.105
+I(4 * np.log(k) ** 3 - 3 * np.log(k))     0.0122      0.002      5.189      0.000       0.008       0.017
+I(4 * a ** 3 - 3 * a)                     0.0118      0.006      1.999      0.046       0.000       0.023
+I((np.log(k) ** 2 - 1) * a)              -0.0273      0.031     -0.873      0.383      -0.089       0.034
+I(np.log(k) * (a ** 2 - 1))              -0.0580      0.043     -1.362      0.173      -0.142       0.026
+==============================================================================
+Omnibus:                      209.185   Durbin-Watson:                   1.991
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              212.146
+Skew:                          -0.155   Prob(JB):                     8.57e-47
+Kurtosis:                       3.072   Cond. No.                     3.12e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 3.12e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;bc-MC-PEA_files/bc-MC-PEA_10_4.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Intercept                                0.334417
+np.log(k)                               -0.477687
+a                                       -0.344563
+np.log(k):a                              0.117191
+I(np.log(k) ** 2 - 1)                   -0.150438
+I(a ** 2 - 1)                            0.018025
+I(4 * np.log(k) ** 3 - 3 * np.log(k))    0.012195
+I(4 * a ** 3 - 3 * a)                    0.011829
+I((np.log(k) ** 2 - 1) * a)             -0.027310
+I(np.log(k) * (a ** 2 - 1))             -0.058041
+dtype: float64
+[ 0.3344173  -0.47768687 -0.34456269  0.11719071 -0.15043791  0.01802458
+  0.01219452  0.01182905 -0.02730956 -0.05804076]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;estimation-of-the-computational-cost-model-t-alpha-0-alpha-m-m-alpha-mn-m-n&#34;&gt;Estimation of the computational cost model $ T = \alpha_0 + \alpha_{M} M + \alpha_{MN} M N $&lt;/h4&gt;
+
+&lt;p&gt;In order to use the formulas for $M^{\star}$ and $N^{\star}$, we also need the values for $\alpha_M$ and $\alpha_{MN}$.&lt;/p&gt;
+
+&lt;p&gt;One approach is to actually try different values for $(M,N)$, store the computing time, and then use OLS to estimate $\alpha_{M}$ and $\alpha_{MN}$. This is what I do for the paper (see &lt;a href=&#34;https://github.com/JulienPascal/bc-MC-PEA/blob/main/3.irreversible_investment/irreversible_investment_Colab_9.ipynb&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Here, let&amp;rsquo;s use a shortcut. Let&amp;rsquo;s pretend we already know the ratio $\frac{\alpha_M}{\alpha_{MN}}$ and that we are using a given value for $M$ (e.g. $M = 1000$). The above formulas, using the serial correlation correction term, tell us that the optimal corresponding choice for $N$ is given by:&lt;/p&gt;
+
+&lt;p&gt;$$ N^{\star} = \frac{\alpha_{M}}{\alpha_{MN}} \big(\frac{1 - \rho^2}{1 + \rho^2} \frac{M}{k+1} - 1 \big)$$&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/JulienPascal/bc-MC-PEA/blob/main/3.irreversible_investment/irreversible_investment_Colab_9.ipynb&#34; target=&#34;_blank&#34;&gt;Here&lt;/a&gt;, I find that $\frac{\alpha_{M}}{\alpha_{MN}} \approx 4.175$. Note that this ratio obviously depends on the model you consider and on the actual software implementation. Here, let&amp;rsquo;s use a rough estimate for $\frac{\alpha_{M}}{\alpha_{MN}} \approx 4$. If you do not know this ratio and you do not want to estimate it, you may even use rough guesses (e.g. $\frac{\alpha_{M}}{\alpha_{MN}} = 1$).&lt;/p&gt;
+
+&lt;p&gt;Below is a function that returns such a $N^{\star}$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def optimal_N(alpha_ratio: float, rho: float, M: int, k: int) -&amp;gt; int:
+    # Correct for serial correlation in state vector
+    rho_sq = rho ** 2
+    serial_correction = (1 - rho_sq) / (1 + rho_sq)
+    
+    N_star = alpha_ratio * (serial_correction * ( M / (k + 1) ) - 1)
+
+    # Warning if implied value is negative
+    if N_star &amp;lt; 0:
+        min_M = (k + 1) * (1 + rho_sq) / (1 - rho_sq)
+        print(f&amp;quot;Warning: Implied N* = {N_star:.2f} is negative. &amp;quot;
+              f&amp;quot;M = {M} is too small given rho = {rho}. &amp;quot;
+              f&amp;quot;Consider using M &amp;gt; {min_M:.0f}.&amp;quot;)
+    
+    return max(1, round(N_star))
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Below, let&amp;rsquo;s use several values for $M$. We then calculate $N^{*}$ based on the above formula.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;alpha_ratio = 4.0 
+
+list_N        = []
+list_M        = []
+list_optimal  = []
+
+list_target_M = list(np.array([500, 1e3, 1e4, 1e5, 1e6, 2*1e6]).astype(int))
+list_N_temp = [1]
+
+# Create all comnbinations between lists
+df_MN = pd.DataFrame(list(product(list_target_M, list_N_temp)), columns=[&#39;M&#39;, &#39;N&#39;])
+df_MN[&amp;quot;is_optimal&amp;quot;] = 0
+
+
+# No add theoretical optimum 
+for M_vals in list_target_M:
+    # Skip large values for M
+    if M_vals &amp;gt; 1e4:
+        continue
+    # 4) compute the theoretical optimum 
+    N_opt = optimal_N(alpha_ratio, params.rho_tfp, M_vals, params.nb_expl_vars)
+    M_opt = M_vals
+    
+    print(f&amp;quot;M*: {M_opt}&amp;quot;)
+    print(f&amp;quot;N*: {N_opt}&amp;quot;)
+
+    # 5) append the optimal point
+    list_N.append(int(np.maximum(1, N_opt)))
+    list_M.append(int(M_opt))
+    list_optimal.append(1)
+
+# 6) build DataFrame
+df_MN_opt = pd.DataFrame({
+    &amp;quot;M&amp;quot;:           list_M,
+    &amp;quot;N&amp;quot;:           list_N,
+    &amp;quot;is_optimal&amp;quot;:  list_optimal,
+})
+
+df_MN = pd.concat([df_MN_opt, df_MN])
+df_MN.head(10)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;M*: 500
+N*: 36
+M*: 1000
+N*: 76
+M*: 10000
+N*: 794
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;M&lt;/th&gt;
+      &lt;th&gt;N&lt;/th&gt;
+      &lt;th&gt;is_optimal&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;500&lt;/td&gt;
+      &lt;td&gt;36&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;1000&lt;/td&gt;
+      &lt;td&gt;76&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;10000&lt;/td&gt;
+      &lt;td&gt;794&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;500&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;1000&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;10000&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;100000&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;1000000&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;5&lt;/th&gt;
+      &lt;td&gt;2000000&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&#34;jit-compiled-functions&#34;&gt;jit-compiled functions&lt;/h4&gt;
+
+&lt;p&gt;Below are jit-compiled functions to run the PEA efficiently.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;@njit
+def fill_X_row(X, i, x1, x2, nb_expl_vars, basis):
+    &amp;quot;&amp;quot;&amp;quot;
+    Fill row i of the design matrix X in place, using either
+      - basis=1 : monomial basis
+      - basis=2 : Chebyshev basis
+    up to nb_expl_vars terms (4, 6 or 10).
+
+    After calling this, X[i,:] will be set.
+    &amp;quot;&amp;quot;&amp;quot;
+    if nb_expl_vars == 4:
+        # simple cross basis
+        X[i, :] = np.array([1, x1, x2, x1*x2])
+        return
+
+    if basis == 1:
+        # —— Monomial basis ——
+        if nb_expl_vars == 6:
+            # total degree ≤2
+            X[i, :] = np.array([
+                1,
+                x1,
+                x2,
+                x1 * x2,
+                x1**2,
+                x2**2
+            ])
+        elif nb_expl_vars == 10:
+            # total degree ≤3
+            X[i, :] = np.array([
+                1,
+                x1,
+                x2,
+                x1 * x2,
+                x1**2,
+                x2**2,
+                x1**3,
+                x1**2 * x2,
+                x1 * x2**2,
+                x2**3
+            ])
+        else:
+            raise ValueError(
+                f&amp;quot;Monomial basis with nb_expl_vars={nb_expl_vars} not supported&amp;quot;
+            )
+
+    elif basis == 2:
+        # —— Chebyshev basis ——
+        if nb_expl_vars == 6:
+            # order ≤2 Chebyshev: T_i(x)T_j(y), i+j≤2
+            X[i, :] = np.array([
+                1,                   # T0(x)T0(y)
+                x1,                  # T1(x)T0(y)
+                x2,                  # T0(x)T1(y)
+                x1 * x2,             # T1(x)T1(y)
+                (x1**2 - 1),         # T2(x)T0(y)
+                (x2**2 - 1)          # T0(x)T2(y)
+            ])
+        elif nb_expl_vars == 10:
+            # order ≤3 Chebyshev: T_i(x)T_j(y), i+j≤3
+            X[i, :] = np.array([
+                1,                     # T0(x)T0(y)
+                x1,                    # T1(x)T0(y)
+                x2,                    # T0(x)T1(y)
+                x1 * x2,               # T1(x)T1(y)
+                (x1**2 - 1),           # T2(x)T0(y)
+                (x2**2 - 1),           # T0(x)T2(y)
+                (4*x1**3 - 3*x1),      # T3(x)T0(y)
+                (4*x2**3 - 3*x2),      # T0(x)T3(y)
+                (x1**2 - 1) * x2,      # T2(x)T1(y)
+                x1 * (x2**2 - 1)       # T1(x)T2(y)
+            ])
+        else:
+            raise ValueError(
+                f&amp;quot;Chebyshev basis with nb_expl_vars={nb_expl_vars} not supported&amp;quot;
+            )
+
+    else:
+        raise ValueError(f&amp;quot;Unknown basis={basis}; must be 1 or 2&amp;quot;)
+
+
+@njit
+def clamp(arr, low, high):
+    &amp;quot;&amp;quot;&amp;quot;
+    Element-wise clamp of `arr` between `low` and `high`.
+    Equivalent to np.clip(arr, low, high). np.clip has trouble with jit compilation.
+    &amp;quot;&amp;quot;&amp;quot;
+    return np.minimum(np.maximum(arr, low), high)
+
+
+@njit
+def fill_X_next(Xv, x1, x2, nb_expl_vars, basis):
+    &amp;quot;&amp;quot;&amp;quot;
+    In‐place fill of Xv (shape = (nb_expl_vars,)) for a single point (x1,x2),
+    using monomial basis (basis=1) or Chebyshev basis (basis=2),
+    with nb_expl_vars in {4,6,10}.
+    &amp;quot;&amp;quot;&amp;quot;
+    # 4‐term cross basis
+    if nb_expl_vars == 4:
+        Xv[0] = 1.0
+        Xv[1] = x1
+        Xv[2] = x2
+        Xv[3] = x1 * x2
+        return
+
+    if basis == 1:
+        # —— Monomial ——
+        if nb_expl_vars == 6:
+            # [1, x1, x2, x1*x2, x1^2, x2^2]
+            Xv[0] = 1.0
+            Xv[1] = x1
+            Xv[2] = x2
+            Xv[3] = x1 * x2
+            Xv[4] = x1 * x1
+            Xv[5] = x2 * x2
+            return
+        else:
+            # nb_expl_vars == 10
+            # [1, x1, x2, x1*x2, x1^2, x2^2, x1^3, x1^2*x2, x1*x2^2, x2^3]
+            Xv[0] = 1.0
+            Xv[1] = x1
+            Xv[2] = x2
+            Xv[3] = x1 * x2
+            Xv[4] = x1 * x1
+            Xv[5] = x2 * x2
+            Xv[6] = x1 * x1 * x1
+            Xv[7] = x1 * x1 * x2
+            Xv[8] = x1 * x2 * x2
+            Xv[9] = x2 * x2 * x2
+            return
+
+    else:
+        # —— Chebyshev ——
+        if nb_expl_vars == 6:
+            # [1, x1, x2, x1*x2, x1^2-1, x2^2-1]
+            Xv[0] = 1.0
+            Xv[1] = x1
+            Xv[2] = x2
+            Xv[3] = x1 * x2
+            Xv[4] = x1 * x1 - 1.0
+            Xv[5] = x2 * x2 - 1.0
+            return
+        else:
+            # nb_expl_vars == 10
+            # [1, x1, x2, x1*x2, x1^2-1, x2^2-1,
+            #  4x1^3-3x1, 4x2^3-3x2, (x1^2-1)*x2, x1*(x2^2-1)]
+            Xv[0] = 1.0
+            Xv[1] = x1
+            Xv[2] = x2
+            Xv[3] = x1 * x2
+            Xv[4] = x1 * x1 - 1.0
+            Xv[5] = x2 * x2 - 1.0
+            Xv[6] = 4.0*x1*x1*x1 - 3.0*x1
+            Xv[7] = 4.0*x2*x2*x2 - 3.0*x2
+            Xv[8] = (x1*x1 - 1.0) * x2
+            Xv[9] = x1 * (x2*x2 - 1.0)
+            return
+
+
+@njit
+def simulate_path_N_inplace(
+    M: int,
+    init: int,
+    kss: float,
+    e: np.ndarray,
+    E: np.ndarray,
+    b0: np.ndarray,
+    beta: float,
+    gamma: float,
+    alpha: float,
+    delta: float,
+    rho_tfp: float,
+    N: int,
+    nb_expl_vars: int,
+    tol_c: float,
+    center_dep_var: bool,
+    normalize_dep_var: bool,
+    basis: int,
+    a: np.ndarray,
+    k: np.ndarray,
+    mu: np.ndarray,
+    y: np.ndarray,
+    production: np.ndarray,
+    inv: np.ndarray,
+    cash: np.ndarray,
+    c: np.ndarray,
+    X: np.ndarray,
+    X_next: np.ndarray,
+    y_temp: np.ndarray
+) -&amp;gt; None:
+    &amp;quot;&amp;quot;&amp;quot;
+    Simulates one path of the model using a Parameterized Expectations Algorithm (PEA)
+    with in-place mutation of pre-allocated arrays. JIT-compiled with numba for maximum performance.
+
+    All outputs are written directly into the provided arrays; no value is returned.
+    &amp;quot;&amp;quot;&amp;quot;
+    slong = M + init
+
+    # To ensure consumption is a least tol_c
+    E_max = tol_c**(-gamma)
+
+    # Set value for constant vector
+    X[:, 0] = 1.0
+
+    # Initialize state
+    k[0] = kss
+    a[0] = 0.0
+    for i in range(1, slong):
+        a[i] = rho_tfp * a[i-1] + e[i]
+
+    for i in range(0, slong):
+        # Compute regressors x1, x2
+        x1 = np.log(k[i])
+        x2 = a[i]
+
+        # Fill in X[i] for OLS regression y = X*b
+        fill_X_row(X, i, x1, x2, nb_expl_vars, basis)
+
+        # Cash-in-hand and consumption decision
+        production[i] = np.exp(a[i]) * k[i] ** alpha
+        cash[i] = production[i] + (1 - delta) * k[i]
+
+        # Consumption, if current constraint on investment does not bind:
+        ## Dot product
+        scalar = np.dot(X[i, :], b0)
+
+        #E_t_tilde = clamp(np.exp(scalar), production[i]**(-gamma), E_max)
+        E_t_tilde = np.exp(scalar)
+        c[i] = E_t_tilde ** (-1 / gamma)
+
+        # Update guess, after calculating investment
+        inv[i] = production[i] - c[i]
+        if inv[i] &amp;gt; 0:
+            k[i+1] = cash[i] - c[i]
+            mu[i] = 0.0
+        else:
+            k[i+1] = (1 - delta) * k[i]
+            c[i] = production[i]
+            mu[i] = c[i]**( - gamma ) - E_t_tilde
+
+        # Only do MC expectation for i &amp;gt;= init. No need for burnin phase
+        if i &amp;gt;= init:
+            # Prepare next-period terms (precalculation of terms that do not depend on j)
+            term1 = alpha * k[i+1]**(alpha - 1.0)
+            term2 = k[i+1] ** alpha
+            a_tilde = rho_tfp * a[i]
+
+            x1_next = np.log(k[i+1])
+
+            # Monte Carlo expectation
+            for j in range(N):
+                a_next = a_tilde + E[i, j]
+                # production next period:
+                production_next = np.exp(a_next) * term2
+
+                x2_next = a_next
+
+                fill_X_next(X_next, x1_next, x2_next, nb_expl_vars, basis)
+                scalar_next = np.dot(X_next, b0)
+
+                # Consumption next period, assuming constraint does not bind:
+                #E_next_tilde = clamp(np.exp(scalar_next), production_next ** (-gamma), E_max)
+                E_next_tilde = np.exp(scalar_next)
+                c_next = E_next_tilde ** (-1 / gamma)
+
+                # Update guess, after calculating investment
+                inv_next = production_next - c_next
+                if inv_next &amp;gt; 0:
+                    # non-binding
+                    mu_next = 0
+                else:
+                    # binding
+                    c_next = production_next
+                    mu_next = c_next**( - gamma ) - E_next_tilde
+
+                ## g2(s,e)
+                y_temp[j] =  ( c_next**( -gamma ) ) * ( np.exp(a_next) * term1 + 1.0 - delta ) + mu_next * (1.0 - delta)
+
+            # Final aggregation
+            s = 0.0
+            for j in range(N):
+                s += y_temp[j]
+
+            y[i] = np.log( beta * (s / N) )
+
+
+@njit
+def evaluate_IE_and_EEE_Gauss_path_inplace(
+    slong: int,
+    kss: float,
+    e: np.ndarray,
+    b0: np.ndarray,
+    beta: float,
+    gamma: float,
+    alpha: float,
+    delta: float,
+    rho_tfp: float,
+    number_nodes: int,
+    quadrature_nodes: np.ndarray,
+    quadrature_weights: np.ndarray,
+    nb_expl_vars: int,
+    tol_c: float,
+    center_dep_var: bool,
+    normalize_dep_var: bool,
+    basis: int,
+    # Preallocated arrays for in-place mutation:
+    a: np.ndarray,            # shape (slong,)
+    k: np.ndarray,            # shape (slong+1,)
+    mu: np.ndarray,           # shape (slong+1,)
+    production: np.ndarray,   # shape (slong,)
+    inv: np.ndarray,          # shape (slong,)
+    IE: np.ndarray,           # shape (slong,)
+    EEE: np.ndarray,          # shape (slong,)
+    cash: np.ndarray,         # shape (slong,)
+    c: np.ndarray,            # shape (slong,)
+    X: np.ndarray,            # shape (slong, nb_expl_vars)
+    X_next: np.ndarray,       # shape (nb_expl_vars,)
+    linear_model: np.ndarray, # shape (slong,)
+    y_temp1: np.ndarray,      # shape (number_nodes,)
+) -&amp;gt; None:
+
+    &amp;quot;&amp;quot;&amp;quot;
+    In-place computation of MSIE (IE) and Euler equation errors (EEE)
+    along a single simulated path using Gauss–Hermite quadrature.
+
+    All output arrays (a, k, IE, EEE, cash, c, X, X_next, linear_model,
+    y_temp1, y_temp2) must be pre-allocated to the correct shape.
+    &amp;quot;&amp;quot;&amp;quot;
+    # Clear values
+    a[:] = 0.0
+    k[:] = 0.0
+    mu[:] = 0.0
+    production[:] = 0.0
+    inv[:] = 0.0
+    IE[:] = 0.0
+    EEE[:] = 0.0
+    cash[:] = 0.0
+    c[:] = 0.0
+    X[:,:] = 0.0
+    X_next[:] = 0.0
+    linear_model[:] = 0.0
+    y_temp1[:] = 0.0
+
+    # To ensure consumption is a least tol_c
+    E_max = tol_c**(-gamma)
+
+    # Set initial state
+    k[0] = kss
+    a[0] = 0.0
+
+    # AR(1) TFP path
+    for i in range(1, slong):
+        a[i] = rho_tfp * a[i - 1] + e[i]
+
+
+
+    # Main loop
+    for i in range(slong):
+        # 1) build current regressors x1,x2
+        x1 = np.log(k[i])
+        x2 = a[i]
+
+        # 2) fill X[i]
+        fill_X_row(X, i, x1, x2, nb_expl_vars, basis)
+
+        # 3) cash, linear prediction, consumption, and k forward
+        production[i] = np.exp(a[i]) * k[i] ** alpha
+        cash[i] = production[i] + (1 - delta) * k[i]
+
+        # inline dot(X[i], b0)
+        scalar = np.dot(X[i, :], b0)
+
+        linear_model[i] = scalar
+        #E_t_tilde = clamp(np.exp(linear_model[i]), production[i]**(-gamma), E_max)
+        E_t_tilde = np.exp(linear_model[i])
+        c[i] = E_t_tilde ** (-1 / gamma)
+
+        # Update guess, after calculating investment
+        inv[i] = production[i] - c[i]
+        if inv[i] &amp;gt; 0:
+            k[i+1] = cash[i] - c[i]
+            mu[i] = 0.0
+        else:
+            k[i+1] = (1 - delta) * k[i]
+            c[i] = production[i]
+            mu[i] = c[i]**( - gamma ) - E_t_tilde
+
+        # Precompute next‐period quantities
+        x1_next = np.log(k[i+1])
+
+        term1 = alpha * (k[i+1] ** (alpha - 1.0))
+        term2 = k[i+1] ** alpha
+        a_tilde = rho_tfp * a[i]
+
+        # 4) Quadrature loop
+        for j in range(number_nodes):
+            a_next = a_tilde + quadrature_nodes[j]
+
+            # production next period:
+            production_next = np.exp(a_next) * term2
+
+            x2_next = a_next
+
+            # inline dot(X_next, b0)
+
+            # Consumption next period, assuming constraint does not bind:
+            fill_X_next(X_next, x1_next, x2_next, nb_expl_vars, basis)
+            scalar_next = np.dot(X_next, b0)
+
+            E_next_tilde = np.exp(scalar_next)
+            c_next = E_next_tilde ** (-1 / gamma)
+
+            # Update guess, after calculating investment
+            inv_next = production_next - c_next
+            if inv_next &amp;gt; 0:
+                # non-binding
+                mu_next = 0
+            else:
+                # binding
+                c_next = production_next
+                mu_next = c_next**( - gamma ) - E_next_tilde
+
+            # Monte-Carlo expectation terms:
+            ## RHS of Euler equation
+            y_temp1[j] = beta * ( ( c_next ** ( - gamma ) ) * ( np.exp(a_next) * term1 + 1.0 - delta ) + mu_next * (1.0 - delta) )
+
+        # 5) Weighted averages &amp;amp; fill IE, EEE
+        s1 = 0.0
+        for j in range(number_nodes):
+            s1 += quadrature_weights[j] * y_temp1[j]
+
+        #Integration error: log(E_t) - x&#39; beta. E_t calculated using Gaussian intergration.
+        IE[i]  = np.log(s1) - linear_model[i]
+        #Euler equation error: 1 - (1/c_t)*(E_t()^{-1/gamma})
+        EEE[i] = 1.0 - (1.0 / c[i]) * ( ( s1  + mu[i] ) **(-1.0 / gamma))
+
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;time-accuracy-tradeoff&#34;&gt;Time &amp;amp; Accuracy tradeoff&lt;/h4&gt;
+
+&lt;p&gt;In the next block of code, I run standard PEA ($N=1$) and bc-MC-PEA ($N=N^{\star}$) for different choices of $M$.
+I store total computing time, as well as accuracy measurements. For each choice of $(M, N)$, I do that several times in a row and calculate average values. This is because:&lt;/p&gt;
+
+&lt;p&gt;1) PEA and bc-MC-PEA are stochastic methods&lt;/p&gt;
+
+&lt;p&gt;2) timing involves measurement errors.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#### ----------------------------------
+tol = 1e-8 # tolerance on parameter vector
+gam = 1.0  # smoothing parameter between two iterations
+max_iter = 50 # max number of iterations
+redraw_shocks_every = 1000 #redraw new realizations of innovations (new state and innovation vectors)
+init = 100 #burnin (drop first observation for OLS estimation)
+
+slong_test = 50000
+init_test = 100 #burnin for test simulation (when measuring accuracy)
+nb_tot_reps = 5 #nb of repetitions, to smooth out randomness and potential issues with measuring timing
+init = 100 #burnin
+# Preallocate arrays for test
+a_test            = np.zeros(slong_test)
+k_test            = np.zeros(slong_test+1)
+mu_test           = np.zeros(slong_test+1)
+production_test   = np.zeros(slong_test)
+inv_test          = np.zeros(slong_test)
+IE           = np.zeros(slong_test)
+EEE          = np.zeros(slong_test)
+cash_test         = np.zeros(slong_test)
+c_test            = np.zeros(slong_test)
+X_test            = np.zeros((slong_test, params.nb_expl_vars))
+X_next_test       = np.zeros(params.nb_expl_vars)
+linear_model_test = np.zeros(slong_test)
+y_temp1_test      = np.zeros(len(params.nodes_flat))
+
+# to store restults
+results = []
+np.random.seed(42)
+
+# Loop over (M,N)
+for idx, row in df_MN.iterrows():
+    M = row[&#39;M&#39;]
+    N = row[&#39;N&#39;]
+    is_optimal = row[&#39;is_optimal&#39;]
+    # Repeat experiment several times
+    for nb_rep in range(nb_tot_reps):
+        #np.random.seed(nb_rep)
+        # Innovations for the out-sample test
+        e_test = params.std_tfp * np.random.randn(slong_test) #New shocks
+
+        slong = init + M
+
+        b0_current = coeff_array_0.copy()  # initial guess 
+
+        # innovation for state vector (not used directly in simulation here
+        # for M large, no need to redraw many times.
+        e = params.std_tfp * np.random.randn(slong)
+        # extra draws for each state: shape (slong, N)
+        E = params.std_tfp * np.random.randn(slong, N)
+
+        # Preallocate arrays
+        a = np.zeros(slong)
+        k      = np.zeros(slong + 1)    # capital path (slong+1 because we update k[i+1])
+        mu     = np.zeros(slong + 1)    # Lagrange multiplier on investment constraint
+        y_out      = np.zeros(slong)    # simulated y
+        production = np.zeros(slong)    # production
+        inv = np.zeros(slong)           # investment
+        cash     = np.zeros(slong)      # cash in hand
+        c = np.zeros(slong)             # consumption
+        X_data      = np.zeros((slong, params.nb_expl_vars))   # regressor matrix (6 variables)
+        X_next = np.zeros(params.nb_expl_vars) # regressor, next period
+        y_temp = np.zeros(N)            # temporary array for innovations
+
+        # Warmup (compilation) first go
+        simulate_path_N_inplace(M, init, params.kss, e, E, b0_current,
+                                params.beta, params.gamma, params.alpha, params.delta, params.rho_tfp, N,
+                                params.nb_expl_vars, params.tol_c, params.center_dep_var, params.normalize_dep_var, params.basis,
+                                a, k, mu, y_out, production, inv, cash, c, X_data, X_next, y_temp)
+
+        iter_num = 1
+        crit = 1.0
+        # Run a fixed number of iterations (or use while crit &amp;gt; tol)
+        start_time = time.perf_counter()
+        while iter_num &amp;lt; max_iter:
+            if iter_num % redraw_shocks_every == 0:
+                e[:], E[:,:] = generate_random_arrays(slong, N, params.std_tfp)
+
+            # Simulation:
+            simulate_path_N_inplace(M, init, params.kss, e, E, b0_current,
+                                params.beta, params.gamma, params.alpha, params.delta, params.rho_tfp, N,
+                                params.nb_expl_vars, params.tol_c, params.center_dep_var, params.normalize_dep_var, params.basis,
+                                a, k, mu, y_out, production, inv, cash, c, X_data, X_next, y_temp)
+
+            # Remove burnin and last period
+            X_reg = X_data[init:-1, :]
+            y_reg = y_out[init:-1]
+            # OLS
+            bt, _, _, _ = np.linalg.lstsq(X_reg, y_reg, rcond=None)
+            # Parameter update
+            b_new = gam * bt + (1 - gam) * b0_current
+            crit = np.max(np.abs(b_new - b0_current))
+            b0_current = b_new.copy()
+            #print(&amp;quot;Iteration:&amp;quot;, iter_num, &amp;quot;Conv. crit.:&amp;quot;, crit)
+            iter_num += 1
+        end_time = time.perf_counter()
+        elapsed = end_time - start_time
+
+        # print(f&amp;quot;Iter {nb_rep}. M = {M}, N = {N}, elapsed time: {elapsed} seconds&amp;quot;)
+        # Compute residuals and In-sample MSE.
+        Res = y_reg - np.dot(X_reg, b0_current)
+        MSE = np.mean(Res ** 2)
+
+        # Mean squared integration error and EEE
+        evaluate_IE_and_EEE_Gauss_path_inplace(slong_test, params.kss,
+                                         e_test, b0_current, params.beta, params.gamma, params.alpha,
+                                         params.delta, params.rho_tfp, len(params.nodes_flat),
+                                         params.nodes_flat, params.weights, params.nb_expl_vars,
+                                         params.tol_c, params.center_dep_var, params.normalize_dep_var, params.basis,
+                                         a_test, k_test, mu_test, production_test, inv_test,
+                                         IE, EEE, cash_test, c_test, X_test, X_next_test, linear_model_test,
+                                         y_temp1_test)
+
+
+        MSIE = np.mean(IE[init_test:-1]**2)
+        A_EEE = np.mean(np.abs(EEE[init_test:-1]))
+
+        # Store the results in a dictionary
+        results.append({
+            &amp;quot;repetition&amp;quot;: nb_rep,
+            &amp;quot;k&amp;quot;: params.nb_expl_vars,
+            &amp;quot;M&amp;quot;: M,
+            &amp;quot;N&amp;quot;: N,
+            &amp;quot;Time&amp;quot;: elapsed,
+            &amp;quot;MSE&amp;quot;: MSE,
+            &amp;quot;MSIE&amp;quot;: MSIE,
+            &amp;quot;A_EEE&amp;quot;: A_EEE,
+            &amp;quot;is_optimal&amp;quot;: is_optimal
+        })
+        
+    print(&amp;quot;Final iteration M:&amp;quot;, M, &amp;quot;Iterations:&amp;quot;, iter_num, &amp;quot;OLS MSE:&amp;quot;, MSE, &amp;quot;MISE:&amp;quot;, MSIE, &amp;quot;Average EEE:&amp;quot;, A_EEE)
+    print(&amp;quot;Final b0:&amp;quot;, b0_current)
+
+# Create a Pandas DataFrame from the results
+df_results_2 = pd.DataFrame(results)
+df_results_2.to_csv(output_folder + &amp;quot;df_results_2.csv&amp;quot;)
+print(df_results_2.head())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;Final iteration M: 500 Iterations: 50 OLS MSE: 6.39689620736686e-05 MISE: 6.979887652063562e-06 Average EEE: 0.0015655538850610894
+Final b0: [ 0.16247757 -0.24985331 -0.76061818  0.25599638 -0.07506965 -0.16968142
+  0.00688403 -0.02032964 -0.12008197  0.17564347]
+Final iteration M: 1000 Iterations: 50 OLS MSE: 3.796981261039479e-05 MISE: 3.19778695810395e-06 Average EEE: 0.001112133816018006
+Final b0: [-0.09056384 -0.01856654 -1.01221979  0.43950113 -0.13488526 -0.35173479
+  0.01100738 -0.04441094 -0.19709003  0.33839319]
+Final iteration M: 10000 Iterations: 50 OLS MSE: 6.542653166420021e-06 MISE: 2.9566529603752238e-06 Average EEE: 0.001055960821718564
+Final b0: [-0.04979799 -0.05504875 -0.97966892  0.40987097 -0.11831992 -0.32878382
+  0.00979378 -0.04387424 -0.18413251  0.31862007]
+Final iteration M: 500 Iterations: 50 OLS MSE: 0.0022142019493280383 MISE: 0.00012135434094234673 Average EEE: 0.00668642546122861
+Final b0: [ 0.82229268 -0.90739086 -0.53642172 -0.18030242  0.33838932 -0.09953621
+ -0.02229608 -0.10234907  0.09603063  0.09430634]
+Final iteration M: 1000 Iterations: 50 OLS MSE: 0.0025993825788082916 MISE: 4.058952136372577e-05 Average EEE: 0.003625722738373235
+Final b0: [ 0.02385481 -0.16811925 -0.63398239  0.03385158 -0.07134272 -0.34193687
+  0.0082259  -0.04745522 -0.02632164  0.29541885]
+Final iteration M: 10000 Iterations: 50 OLS MSE: 0.0024508247787179416 MISE: 1.1136421709113198e-05 Average EEE: 0.0016576982242947937
+Final b0: [ 0.2617814  -0.36112256 -0.66835186  0.16369622 -0.03247485 -0.11747232
+  0.00252398 -0.01751672 -0.05608633  0.1099069 ]
+Final iteration M: 100000 Iterations: 50 OLS MSE: 0.002393585822859449 MISE: 5.4760625776998754e-06 Average EEE: 0.0013227092630956365
+Final b0: [-0.01766254 -0.10006983 -0.93743997  0.39022456 -0.11801585 -0.29676254
+  0.00994274 -0.03508161 -0.16897343  0.27758845]
+Final iteration M: 1000000 Iterations: 50 OLS MSE: 0.00238513101035928 MISE: 4.479321593683236e-06 Average EEE: 0.001291546782524435
+Final b0: [-0.03491625 -0.07837509 -0.95125539  0.39424473 -0.11779865 -0.30922358
+  0.00942587 -0.03916162 -0.17295513  0.29344339]
+Final iteration M: 2000000 Iterations: 50 OLS MSE: 0.002384620757014956 MISE: 5.775545032534041e-06 Average EEE: 0.0013630658243780791
+Final b0: [-0.02917404 -0.08457067 -0.9441379   0.39027564 -0.11913959 -0.30199118
+  0.00948944 -0.03804026 -0.17036995  0.28607765]
+   repetition   k    M   N      Time       MSE      MSIE     A_EEE  is_optimal
+0           0  10  500  36  0.050169  0.000073  0.000015  0.002113           1
+1           1  10  500  36  0.047353  0.000073  0.000005  0.001379           1
+2           2  10  500  36  0.046689  0.000075  0.000009  0.001008           1
+3           3  10  500  36  0.044587  0.000071  0.000009  0.001108           1
+4           4  10  500  36  0.045598  0.000064  0.000007  0.001566           1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As illustrated below, the bc-MC-PEA outfperforms the standard PEA, even when using a rough estimate for the ratio $\frac{\alpha_{M}}{\alpha_{MN}}$.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def compute_pareto_front(df, time_col=&#39;Time&#39;, mse_col=&#39;MSIE&#39;):
+    &amp;quot;&amp;quot;&amp;quot;
+    Compute Paretor frontier
+    &amp;quot;&amp;quot;&amp;quot;
+    # Sort by Time ascending
+    df_sorted = df.sort_values(by=time_col, ascending=True)
+
+    # List to store the Pareto front
+    pareto_points = []
+
+    # Keep track of the lowest MSE encountered so far
+    best_mse_so_far = float(&#39;inf&#39;)
+
+    for idx, row in df_sorted.iterrows():
+        mse_val = row[mse_col]
+        if mse_val &amp;lt; best_mse_so_far:
+            pareto_points.append(row)
+            best_mse_so_far = mse_val
+
+    return pd.DataFrame(pareto_points)
+
+df_results_2[&amp;quot;log_N&amp;quot;]    = np.log(df_results_2[&amp;quot;N&amp;quot;])
+df_results_2[&amp;quot;log_M&amp;quot;]    = np.log(df_results_2[&amp;quot;M&amp;quot;])
+df_results_2[&amp;quot;log_MN&amp;quot;]   = np.log(df_results_2[&amp;quot;M&amp;quot;] * df_results_2[&amp;quot;N&amp;quot;])
+
+df_results_2[&amp;quot;MN_label&amp;quot;] = df_results_2[&amp;quot;M&amp;quot;].astype(&amp;quot;str&amp;quot;) + &amp;quot;-&amp;quot; + df_results_2[&amp;quot;N&amp;quot;].astype(&amp;quot;str&amp;quot;)
+df_results_average_2 = df_results_2.groupby(&amp;quot;MN_label&amp;quot;).mean().reset_index()
+# Save to disk
+df_results_average_2.to_csv(output_folder + &amp;quot;df_results_average_2.csv&amp;quot;)
+
+# Focus on standard PEA (N = 1).
+df_one = df_results_average_2[df_results_average_2[&#39;N&#39;] == 1]
+df_one = df_one.sort_values(&#39;Time&#39;)
+
+# Now highlight the optimal points
+optimal_df = df_results_average_2[df_results_average_2[&#39;is_optimal&#39;] == 1]
+
+for (col, long_name) in zip([&#39;MSIE&#39;, &#39;A_EEE&#39;], [&#39;MSIE&#39;, &#39;Average EEE&#39;]):
+    # Compute Pareto frontier
+    pareto_df = compute_pareto_front(df_results_average_2, mse_col=col)
+    # Log or linear plots
+    for nb in [0]:
+        plt.figure(figsize=(8,6))
+        sns.scatterplot(data=df_results_average_2, x=&#39;Time&#39;, y=col, alpha=0.7)
+        plt.plot(pareto_df[&#39;Time&#39;], pareto_df[col], &#39;r-o&#39;, label=&#39;Pareto Frontier&#39;)
+         
+        plt.scatter(optimal_df[&#39;Time&#39;], optimal_df[col],
+                    marker=&#39;*&#39;, s=250, c=&#39;red&#39;,
+                    edgecolors=&#39;black&#39;, linewidths=1,
+                    label=&#39;Optimal (M, N)&#39;)
+        
+        plt.plot(df_one[&#39;Time&#39;], df_one[col], &#39;b&#39;, label=&#39;Frontier N = 1&#39;)
+        plt.scatter(df_one[&#39;Time&#39;], df_one[col],
+                    marker=&#39;+&#39;, s=250, c=&#39;b&#39;, linewidths=1,
+                    label=&#39;N = 1&#39;)
+        
+        plt.xlabel(&#39;Time (seconds)&#39;)
+        plt.ylabel(long_name)
+        if nb == 0:
+            plt.yscale(&#39;log&#39;)
+            plt.xscale(&#39;log&#39;)
+        plt.title(f&#39;Time vs. {long_name}, Colored by N&#39;)
+        plt.legend(loc= &amp;quot;upper right&amp;quot;)
+        plt.grid(True)
+        plt.savefig(output_folder + f&amp;quot;Time_vs_MSIE_{nb}.pdf&amp;quot;, dpi=300)
+        plt.show()
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;bc-MC-PEA_20_0.png&#34; alt=&#34;image&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;bc-MC-PEA_20_1.png&#34; alt=&#34;image&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;iii-conclusion&#34;&gt;III. Conclusion&lt;/h2&gt;
+
+&lt;p&gt;To reiterate what was said in the introduction, this paper can be read from two perspectives. On the practical side, the bc-MC-PEA can be seen as a practical recipe to get more accurate numerical solutions to economic models (at a constant computational budget) if one is already using the PEA. The method itself does not require massive coding skills and is easy to implement if one is willing to use a rough guess for the ratio $\frac{\alpha_{M}}{\alpha_{MN}}$.&lt;/p&gt;
+
+&lt;p&gt;On the theoretical side, I find it interesting that the PEA and its generalization can be seen as originating from a more general optimal estimator (the bc-MC operator). In my view, this creates a bridge between modern computational economics, which often uses complex neural networks and backpropagation to train them, and classic computational economics, for instance PEA + OLS.&lt;/p&gt;
+
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Julien Pascal, A generalization of the Parameterized Expectations Algorithm, Economics Letters, Volume 259, 2026, 112790, ISSN 0165-1765, &lt;a href=&#34;https://doi.org/10.1016/j.econlet.2025.112790&#34; target=&#34;_blank&#34;&gt;https://doi.org/10.1016/j.econlet.2025.112790&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To cite this work:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@article{PASCAL2026112790,
+title = {A generalization of the Parameterized Expectations Algorithm},
+journal = {Economics Letters},
+volume = {259},
+pages = {112790},
+year = {2026},
+issn = {0165-1765},
+doi = {https://doi.org/10.1016/j.econlet.2025.112790},
+url = {https://www.sciencedirect.com/science/article/pii/S0165176525006275},
+author = {Julien Pascal}
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>The bias-corrected Monte Carlo operator</title>
       <link>https://julienpascal.github.io/post/bc_mc/</link>
       <pubDate>Wed, 01 May 2024 08:00:00 +0100</pubDate>
@@ -4512,374 +6630,6 @@ plt.show()
 
 &lt;ul&gt;
 &lt;li&gt;The linear system studied in this notebook is based on the paper: Brunton, Steven L., et al. &amp;ldquo;Koopman invariant subspaces and finite linear representations of nonlinear dynamical systems for control.&amp;rdquo; PloS one 11.2 (2016).&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>A Primer on Computer Vision</title>
-      <link>https://julienpascal.github.io/post/cnn/</link>
-      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/post/cnn/</guid>
-      <description>
-
-&lt;p&gt;For a specific project on the housing market (&lt;a href=&#34;https://julienpascal.github.io/project/rentalmarket/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;), I had to analyze thousands of photos. To do that, I used a &lt;strong&gt;convolutional neural network&lt;/strong&gt; (CNN), which is a fancy name for a complicated function that can be &amp;ldquo;trained&amp;rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &lt;strong&gt;&amp;ldquo;Hello World&amp;rdquo;&lt;/strong&gt; of computer vision and CNN: the classification of hand-written digits from the &lt;a href=&#34;https://en.wikipedia.org/wiki/MNIST_database&#34; target=&#34;_blank&#34;&gt;MNIST dataset&lt;/a&gt;. There are thousands of tutorials on the same topic using Python freely available on the Internet. Instead, let&amp;rsquo;s use Julia and the package &lt;strong&gt;Flux.jl&lt;/strong&gt;. Why? Because &lt;strong&gt;Julia is fast&lt;/strong&gt;, and if you have millions of images to analyze, the speed up could be substantial compared to Python. The Jupyter notebook used to generate this post can be found &lt;a href=&#34;https://github.com/JulienPascal/CNNPrimer&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;data&#34;&gt;Data&lt;/h2&gt;
-
-&lt;p&gt;The MNIST dataset contains images of hand-written digits (0 to 9) in grayscale and that are nicely centered. Each pixel is represented by a number in between 0 (black) and 255 (white). Each image is 28 by 28 pixels. One way to represent an image is to see it as a 1d-column vector of 28*28 = 784 pixels. However, this representation ignores the &amp;ldquo;structure&amp;rdquo; of an image: pixels that are close to each others are informative on the digit we are trying to identify. A CNN is a good tool to keep the spatial structure of an image, while avoiding issues linked to the &lt;a href=&#34;https://en.wikipedia.org/wiki/Curse_of_dimensionality&#34; target=&#34;_blank&#34;&gt;curse of dimensionality&lt;/a&gt;: images are noisy and high-dimensional input data.&lt;/p&gt;
-
-&lt;h2 id=&#34;a-crash-course-on-cnn&#34;&gt;A crash course on CNN&lt;/h2&gt;
-
-&lt;p&gt;Two of the key ingredients of a CNN are a &lt;strong&gt;convolutional layer&lt;/strong&gt; (hence the name) and a &lt;strong&gt;maxpool layer&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;convolutional-layer&#34;&gt;Convolutional layer&lt;/h3&gt;
-
-&lt;p&gt;A convolutional layer applies a &lt;em&gt;stencil&lt;/em&gt; to each point. The output of a convolutional layer is an &amp;ldquo;image&amp;rdquo; of lower dimension, that is informative on some features of the input image (shapes, edges, etc.). The figure below shows how a convolutional layer works:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;convolution.gif&#34; alt=&#34;alt text&#34; /&gt;
-source:&lt;a href=&#34;https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&#34; target=&#34;_blank&#34;&gt;https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;maxpool-layer&#34;&gt;Maxpool layer&lt;/h3&gt;
-
-&lt;p&gt;A maxpool layer is a &lt;em&gt;stencil&lt;/em&gt; that selects the maximum value within a square. Below is an illustration of a maxpool layer applied to a $ 4 \times 4$ image:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;maxpool.gif&#34; alt=&#34;alt text&#34; /&gt;
-source:&lt;a href=&#34;https://mauriciocodesso.com/post/convolution-neural-network/&#34; target=&#34;_blank&#34;&gt;https://mauriciocodesso.com/post/convolution-neural-network/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;stride-and-padding&#34;&gt;Stride and Padding&lt;/h3&gt;
-
-&lt;p&gt;When building a CNN, one must specify two hyper parameters: &lt;strong&gt;stride and padding&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;When the stride is equal to 1, we move the filters one pixel at a time. When stride is equal to 2, we move the filters two pixel at a time, etc.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Padding refers to &amp;ldquo;adding zeroes&amp;rdquo; at the border of an image. Padding can be used to control the size of the output volume and helps in keeping information at the border of images&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Below is an example of a $3 \times 3$ filter applied to a $5 \times 5$ input padded with a $1 \times 1$ border of zeros using $2 \times 2$ strides:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;padding_strides.gif&#34; alt=&#34;alt text&#34; /&gt;
-source: &lt;a href=&#34;http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html&#34; target=&#34;_blank&#34;&gt;http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;The typical infrastructure of a CNN is first to apply a convolutional layer to the input image, then to use a maxpool layer, before using a fully-connected layer. Several &amp;ldquo;convolutional layer - maxpool layer&amp;rdquo; units can be stacked together before using a fully-connected (FC) layer. Note that an activation layer (often &lt;a href=&#34;https://en.wikipedia.org/wiki/Rectifier_(neural_networks)&#34; target=&#34;_blank&#34;&gt;ReLU&lt;/a&gt;) is generally inserted between the the convolutional and the maxpool layer.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;architecture.png&#34; alt=&#34;alt text&#34; /&gt;
-source: &lt;a href=&#34;https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69&#34; target=&#34;_blank&#34;&gt;https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;using-flux-jl&#34;&gt;Using Flux.jl&lt;/h2&gt;
-
-&lt;p&gt;Flux.jl is a leading machine learning package in the Julia ecosystem. In what follows, we load both the train and the test samples of the MNIST dataset. The train sample is a set of images used to fine-tune the parameters of the CNN, while the test sample contains images used to check that we did not overfit the train sample. A smoking gun for overfitting is when the accuracy in the train sample is much better than the accuracy using images from the test sample.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using Flux, Flux.Data.MNIST, Statistics
-using Flux: onehotbatch, onecold, crossentropy, throttle
-using Base.Iterators: repeated, partition
-using Printf, BSON
-using ImageView
-
-# Load labels and images from Flux.Data.MNIST
-# Train set: images used to estimate the CNN
-train_labels = MNIST.labels(:train)
-train_imgs = MNIST.images(:train);
-
-# Test set: images used to see how well the CNN perform &amp;quot;out-of-the-sample&amp;quot;
-test_imgs = MNIST.images(:test)
-test_labels = MNIST.labels(:test)
-
-print(&amp;quot;Images in the train set: $(size(train_imgs))&amp;quot;)
-print(&amp;quot;Images in the test set: $(size(test_imgs))&amp;quot;)
-
-# Visualization of one digit
-NROWS, NCOLS = 28, 28
-a = reshape(train_imgs[1], NROWS, NCOLS)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Images in the train set: (60000,)Images in the test set: (10000,)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_13_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;cnn-architecture&#34;&gt;CNN architecture&lt;/h2&gt;
-
-&lt;p&gt;Our CNN has the usual CONV-&amp;gt;ReLU-&amp;gt;MaxPool components, before using a FC layer. We use a $1 \times 1$ padding and a stride of $1$ (the default value). The size of input is gradually reduced by using $2 \times 2$ maxpool layers. The default activation in Flux.jl is the function is $ x-&amp;gt;x $. Here, we use the Rectified Linear Unit function (ReLU) instead:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;model = Chain(
-    # First convolution, operating upon a 28x28 image
-    Conv((3, 3), 1=&amp;gt;16, pad=(1,1), relu),
-    MaxPool((2,2)), #maxpooling
-
-    # Second convolution, operating upon a 14x14 image
-    Conv((3, 3), 16=&amp;gt;32, pad=(1,1), relu),
-    MaxPool((2,2)), #maxpooling
-
-    # Third convolution, operating upon a 7x7 image
-    Conv((3, 3), 32=&amp;gt;32,pad=(1,1), relu),
-    MaxPool((2,2)),
-
-    # Reshape 3d tensor into a 2d one, at this point it should be (3, 3, 32, N)
-    # which is where we get the 288 in the `Dense` layer below:
-    x -&amp;gt; reshape(x, :, size(x, 4)),
-    Dense(288, 10),
-
-    # Softmax to get probabilities
-    softmax,
-)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The ReLU activation function is a piece-wise linear function. In the &lt;a href=&#34;https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks&#34; target=&#34;_blank&#34;&gt;“ImageNet Classification with Deep Convolutional Neural Networks&amp;rdquo;&lt;/a&gt; paper by Krizhevsky and coauthors, the authors write:&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs). Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The ReLU activation function also helps in reducing the practical issues caused by &lt;a href=&#34;https://en.wikipedia.org/wiki/Vanishing_gradient_problem&#34; target=&#34;_blank&#34;&gt;the vanishing gradient problem&lt;/a&gt;. That is, the failure of the minizimation algorithm used to find the parameters of our CNN. Below is a plot of the ReLU activation function:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;xgrid = collect(range(-1, 1, length=100))
-plot(xgrid, NNlib.relu.(xgrid), label = &amp;quot;relu(x)&amp;quot;, title=&amp;quot;ReLU activation function&amp;quot;, xlabel=&amp;quot;x&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_18_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;training&#34;&gt;Training&lt;/h2&gt;
-
-&lt;h3 id=&#34;batching&#34;&gt;Batching&lt;/h3&gt;
-
-&lt;p&gt;The batch size is a parameter that tells us how many images the network will &amp;ldquo;see&amp;rdquo; at once when &amp;ldquo;training&amp;rdquo;.
-In technical terms, when performing gradient descent, we don&amp;rsquo;t use all the information at once (because of memory limitations and because it is not necessarily efficient). The following function generates &amp;ldquo;batches&amp;rdquo; of images:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Bundle images together with labels and group into minibatchess
-function make_minibatch(X, Y, idxs)
-    X_batch = Array{Float32}(undef, size(X[1])..., 1, length(idxs))
-    for i in 1:length(idxs)
-        X_batch[:, :, :, i] = Float32.(X[idxs[i]])
-    end
-    Y_batch = onehotbatch(Y[idxs], 0:9)
-    return (X_batch, Y_batch)
-end
-# The CNN only &amp;quot;sees&amp;quot; 128 images at each training cycle:
-batch_size = 128
-mb_idxs = partition(1:length(train_imgs), batch_size)
-# train set in the form of batches
-train_set = [make_minibatch(train_imgs, train_labels, i) for i in mb_idxs];
-# train set in one-go: used to calculate accuracy with the train set
-train_set_full = make_minibatch(train_imgs, train_labels, 1:length(train_imgs));
-# test set: to check we do not overfit the train data:
-test_set = make_minibatch(test_imgs, test_labels, 1:length(test_imgs));
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;loss-function-and-minimization&#34;&gt;Loss function and minimization&lt;/h3&gt;
-
-&lt;p&gt;For the CNN to &amp;ldquo;learn&amp;rdquo; anything at all, it must have a notion of &amp;ldquo;wrong&amp;rdquo; or &amp;ldquo;right&amp;rdquo;. The loss function does exactly that, by quantifying how well the model performs at recognizing digits. When the output is a probability, the &lt;a href=&#34;https://en.wikipedia.org/wiki/Cross_entropy&#34; target=&#34;_blank&#34;&gt;cross entropy&lt;/a&gt; loss function is appropriate. The final step is to select an algorithm to minimize the loss function. Here, let&amp;rsquo;s select the &lt;a href=&#34;https://arxiv.org/abs/1412.6980&#34; target=&#34;_blank&#34;&gt;ADAM&lt;/a&gt; algorithm, which I understand as some sort of &lt;a href=&#34;https://julienpascal.github.io/post/ols_ml/&#34; target=&#34;_blank&#34;&gt;Stochastic Gradient Descent&lt;/a&gt; with momentum and adaptive learning rate:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# `loss()` calculates the crossentropy loss between our prediction `y_hat`
-# We augment the data a bit, adding gaussian random noise to our image to make it more robust.
-function loss(x, y)
-    # Add some noise to the image
-    # we reduce the risk of overfitting the train sample by doing so:
-    x_aug = x .+ 0.1f0*gpu(randn(eltype(x), size(x)))
-
-    y_hat = model(x_aug)
-    return crossentropy(y_hat, y)
-end
-accuracy(x, y) = mean(onecold(model(x)) .== onecold(y))
-
-# ADAM optimizer
-opt = ADAM(0.001);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This block &amp;ldquo;train&amp;rdquo; (fine-tune the CNN parameter values) the model until a pre-determined accuracy level is reached:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;best_acc = 0.0
-last_improvement = 0
-accuracy_target = 0.97 #Set an accuracy target. When reached, we stop training.
-max_epochs = 100 #Maximum
-for epoch_idx in 1:100
-    global best_acc, last_improvement
-    # Train for a single epoch
-    Flux.train!(loss, params(model), train_set, opt)
-
-    # Calculate accuracy:
-    acc = accuracy(train_set_full...)
-    @info(@sprintf(&amp;quot;[%d]: Train accuracy: %.4f&amp;quot;, epoch_idx, acc))
-
-    # Calculate accuracy:
-    acc = accuracy(test_set...)
-    @info(@sprintf(&amp;quot;[%d]: Test accuracy: %.4f&amp;quot;, epoch_idx, acc))
-
-    # If our accuracy is good enough, quit out.
-    if acc &amp;gt;= accuracy_target
-        @info(&amp;quot; -&amp;gt; Early-exiting: We reached our target accuracy of $(accuracy_target*100)%&amp;quot;)
-        break
-    end
-
-    if epoch_idx - last_improvement &amp;gt;= 10
-        @warn(&amp;quot; -&amp;gt; We&#39;re calling this converged.&amp;quot;)
-        break
-    end
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;┌ Info: [1]: Train accuracy: 0.9579
-└ @ Main In[14]:12
-┌ Info: [1]: Test accuracy: 0.9605
-└ @ Main In[14]:16
-┌ Info: [2]: Train accuracy: 0.9749
-└ @ Main In[14]:12
-┌ Info: [2]: Test accuracy: 0.9756
-└ @ Main In[14]:16
-┌ Info:  -&amp;gt; Early-exiting: We reached our target accuracy of 97.0%
-└ @ Main In[14]:20
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;predictions&#34;&gt;Predictions&lt;/h2&gt;
-
-&lt;p&gt;Once the model is trained, predicted values are easily obtained as follows:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Get predictions and convert data to Array:
-pred = Tracker.data(model(test_set[1]));
-# Show the first 5 predictions
-# One column is an image
-# Each row corresponds to the probability of a digit
-pred[:,1:5]
-# Function to get the row index of the max value:
-f1(x) = getindex.(argmax(x, dims=1), 1)
-# Final predicted value is the one with the maximum probability:
-pred = f1(pred) .- 1; #minus 1 because the first element is 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Let&amp;rsquo;s see how the model performs on the test set. Can the CNN recognize digits using images that were not used when training the model? As you can see below, our model does an amazing job at recognizing hand-written digits:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;Predicted value = $(pred[1])&amp;quot;)
-a = reshape(test_imgs[1], NROWS, NCOLS)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Predicted value = 7
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_30_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;Predicted value = $(pred[2])&amp;quot;)
-a = reshape(test_imgs[2], NROWS, NCOLS)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Predicted value = 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_31_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;println(&amp;quot;Predicted value = $(pred[3])&amp;quot;)
-a = reshape(test_imgs[3], NROWS, NCOLS)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Predicted value = 1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_32_1.png&#34; alt=&#34;png&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;accuracy-checks&#34;&gt;Accuracy checks&lt;/h3&gt;
-
-&lt;p&gt;We now have a model that seems to do quite a good job in recognizing digits. But can we improve it? If yes, how?
-To improve our model, we first need to identify when and why it fails.&lt;/p&gt;
-
-&lt;h4 id=&#34;confusion-matrix&#34;&gt;Confusion matrix&lt;/h4&gt;
-
-&lt;p&gt;To do that, a useful reporting
-tool is a &lt;strong&gt;confusion matrix&lt;/strong&gt;. Each row of a confusion matrix shows instances of the true value, while each column displays instances of the predicted value. Ideally, we would like our model to perfectly predict the outcome. With a perfect model, all instances would be located on the diagonal elements of the confusion matrix.&lt;/p&gt;
-
-&lt;p&gt;The last time I checked, &lt;code&gt;Flux.jl&lt;/code&gt; did not have an in-built function to calculate confusion matrices. Fortunately, an implementation is available in the package &lt;code&gt;MLBase&lt;/code&gt;. The next block of code calculates the confusion matrix and displays it. Most of instances are on located on the diagonal, which is not a surprise given that the accuracy rate for our model is more than $97.0\%$&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;using MLBase
-# Adding 1 to outcome because the index 0 in arrays does not exist in Julia
-Cm = confusmat(10, test_labels .+ 1, vec(pred) .+ 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;10×10 Array{Int64,2}:
- 968     1     1    0    0    4    3    1    2    0
-   0  1128     3    0    0    0    1    0    3    0
-   3     5  1003    6    1    1    0    6    7    0
-   0     0     1  992    0   10    0    2    4    1
-   0     1     2    0  972    0    0    1    1    5
-   1     0     1    4    0  883    1    1    1    0
-   1     4     0    0    1   13  936    0    3    0
-   1     7    10    5    0    1    0  986    3   15
-   2     0     4    6    4    8    2    4  942    2
-   4     4     0    7    7   10    0    8    2  967
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Normalize output:
-Cm  = Cm ./ sum(Cm, dims=2)
-# Labels
-xs = [string(i) for i = 0:9]
-heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_41_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;To visualize where our model makes mistakes, one can use the optional argument &lt;code&gt;clim&lt;/code&gt;, to put an upper bound on
-the underlying colormap. For instance, the next plot shows that our model has troubles differencing 7 and 2 or 8 and 2.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# Limits to colormap, so we can see where errors are located:
-xs = [string(i) for i = 0:9]
-heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma, clim=(0., 0.01))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;CNN_43_0.svg&#34; alt=&#34;svg&#34; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;error-analysis&#34;&gt;Error Analysis&lt;/h4&gt;
-
-&lt;p&gt;The next block of code displays digits for which our CNN failed:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;# indices for errors:
-using ImageView, Gtk.ShortNames
-mistakes = test_labels .!= vec(pred)
-max_images = 5
-grid, frames, canvases = canvasgrid((1,max_images)); # 1 row
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-julia&#34;&gt;k=0#counter for mistakes
-for (j, i) in enumerate(mistakes)
-    if i == true
-        k+=1 # a false value has been found
-        println(&amp;quot;Predicted value = $(pred[j])&amp;quot;)
-        println(&amp;quot;True value = $(test_labels[j])&amp;quot;)
-        imshow(canvases[1,k], test_imgs[j])
-        idx = ImageView.annotate!(guidict, AnnotationText(0, 0, &amp;quot;$(pred[j])&amp;quot;, color=RGB(0,0,0), fontsize=3))
-    end
-    if k &amp;gt;= max_images
-        break
-    end
-end
-win = Window(grid);
-Gtk.showall(win);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;Predicted value = 5
-True value = 9
-Predicted value = 5
-True value = 6
-Predicted value = 4
-True value = 8
-Predicted value = 3
-True value = 2
-Predicted value = 7
-True value = 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;false_values.png&#34; alt=&#34;alt&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;While it seems obvious that the two digits starting from the left are a 9 and a 6, the remaining 3 elements are not trivial. The 8 in the middle could be easily confused with something else and the two remaining digits are weirdly shaped.&lt;/p&gt;
-
-&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;When dealing with images, a convolutional neural network generally does an amazing job at recognizing patterns. This blog post was a non-technical introduction to the topic. While Python is the tool of predilection in machine learning (Keras, TensorFlow, etc.), my guess is that Julia will get increasingly popular because Julia is both easy to use and fast.&lt;/p&gt;
-
-&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;This blog post is heavily based on this Flux.jl tutorial: &lt;a href=&#34;https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl&#34; target=&#34;_blank&#34;&gt;https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;On the links between CNN and PDEs: &lt;a href=&#34;https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&#34; target=&#34;_blank&#34;&gt;https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;A full course on CNN. Most of the content is available online: &lt;a href=&#34;http://cs231n.github.io/convolutional-networks/&#34; target=&#34;_blank&#34;&gt;http://cs231n.github.io/convolutional-networks/&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>
