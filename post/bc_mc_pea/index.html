@@ -535,7 +535,7 @@ The Parameterized Expectations Algorithm (PEA) is a classic computational approa
 
 <p><strong>TL;DR 1 [Practical side]:</strong> This paper is a variance-reduced version of standard PEA that uses multiple innovation draws per state vector. The optimal number of innovation draws (given a fixed computational budget constraint) is calculated in closed form using only a small number of hyperparameters.</p>
 
-<p><strong>TL;DR 2 [Theoretical side]:</strong> This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. <a href="https://onlinelibrary.wiley.com/doi/10.1111/iere.12575" target="_blank">Deep Equilibrium Nets</a>; <a href="https://doi.org/10.1016/j.jmoneco.2021.07.004" target="_blank">All-in-One Operator</a>; <a href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank">bc-MC Operator</a> and the old-school PEA. This connection can be summarized as: NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS.</p>
+<p><strong>TL;DR 2 [Theoretical side]:</strong> This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. <a href="https://onlinelibrary.wiley.com/doi/10.1111/iere.12575" target="_blank">Deep Equilibrium Nets</a>; <a href="https://doi.org/10.1016/j.jmoneco.2021.07.004" target="_blank">All-in-One Operator</a>; <a href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank">bc-MC Operator</a>) and the old-school PEA. This connection can be summarized as: NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS.</p>
 
 <p>On the one hand, the result of <em>TL;DR 2</em> is expected, because both approaches share many features (Monte Carlo integration, focus on the ergodic set for the state vector). On the other hand, this could be surprising because there are also substantial differences: NNs are highly non-linear and their parameters are tuned using gradient descent and backpropagation, while the PEA typically relies on a linear or log-linear model, where the parameters are calculated using linear or non-linear least squares.</p>
 
@@ -639,8 +639,8 @@ $$</p>
 <p>As said previously, when using NN, the gradient of the loss function can be easily and efficiently calculated using backpropagation, as long as one uses the appropriate software (e.g. Pytorch, Tensorflow). Let&rsquo;s now consider what happens when we want to calculate the gradient $\nabla_{\theta} L_{M,N}(\theta)$ &ldquo;manually&rdquo;. But let&rsquo;s do that under two &ldquo;PEA-style&rdquo; restrictions:</p>
 
 <ol>
-<li>$f(s_m, \varepsilon^{i}_m | \theta ) = g(s_m, \varepsilon^{i}_m | \theta) - h(s_m, | \theta)$,</li>
-<li>$h(s_m, | \theta) = s_m^T \theta$.
+<li>$f(s_m, \varepsilon^{i}_m | \theta ) = g(s_m, \varepsilon^{i}_m | \theta) - h(s_m | \theta)$,</li>
+<li>$h(s_m | \theta) = s_m^T \theta$.
 <br /></li>
 </ol>
 
@@ -668,7 +668,7 @@ $$</p>
 
 <p>The above equation gives us a good model on how computing time changes with $M$ and $N$. The parameters $\alpha_{M}$ and $\alpha_{MN}$ can be estimated by varying $M$ and $N$ and using an OLS regression.</p>
 
-<p>We also need to understand how the choice of $M$ and $N$ impacts the accuracy of our numerical solution. In the paper, under the assumption that the state vectors are <strong>i.i.d</strong>, I show that the expected average squared forecast error of the OLS model is proportional to:</p>
+<p>We also need to understand how the choice of $M$ and $N$ impacts the accuracy of our numerical solution. In the paper, under the assumption that the state vectors are <strong>i.i.d.</strong>, I show that the expected average squared forecast error of the OLS model is proportional to:</p>
 
 <p>$$ \frac{1}{N^{\alpha}} \frac{k}{M - k - 1} $$.</p>
 
@@ -762,7 +762,7 @@ $$
 
 <p>When the investment constraint does not bind ($\mu_t = 0$), the above FOC equation can be written as:</p>
 
-<p>$$ c_t^{-\sigma} = E<em>t[\phi</em>{t+1}] $$</p>
+<p>$$ c_t^{-\sigma} = E_t[\phi_{t+1}] $$</p>
 
 <p>So if we know $ E_t[\phi_{t+1}]$, we can find the implied consumption today. As in standard PEA, let&rsquo;s assume a parametric expression for the conditional expectation. Let&rsquo;s use the following log-log model:</p>
 
@@ -1086,7 +1086,7 @@ effective_sample_size: True
 
 <p>We need a starting value $\theta^{(0)}$.</p>
 
-<p>Here, let&rsquo;s solve the model <strong>without</strong> the irreversible investment constraint using a <strong>1st order-linearization</strong> and use some simulated data to estimate $\theta^{(0)}$. This is easy to do thanks to Dynare and this gives us a reasonable starting point.</p>
+<p>Here, let&rsquo;s solve the model <strong>without</strong> the irreversible investment constraint using a <strong>1st-order linearization</strong> and use some simulated data to estimate $\theta^{(0)}$. This is easy to do thanks to Dynare and this gives us a reasonable starting point.</p>
 
 <p>Below is a somewhat hacky way to get Dynare within Python:</p>
 
@@ -1498,7 +1498,7 @@ z           0.7827  0.6114  0.4776  0.3748  0.2973
 Total computing time : 0h00m03s
 </code></pre>
 
-<p>Now, let&rsquo;s load the simulated series and estimate our first first $\theta^{(0)}$:</p>
+<p>Now, let&rsquo;s load the simulated series and estimate our first $\theta^{(0)}$:</p>
 
 <pre><code class="language-python">#Load simulated data and fit linear model
 SS_values = pd.read_csv(&quot;output/Linearization/SS_values.csv&quot;)
@@ -2531,7 +2531,7 @@ Final b0: [-0.02917404 -0.08457067 -0.9441379   0.39027564 -0.11913959 -0.301991
 4           4  10  500  36  0.045598  0.000064  0.000007  0.001566           1
 </code></pre>
 
-<p>As illustrated below, the bc-MC-PEA outfperforms the standard PEA, even when using a rough estimate for the ratio $\frac{\alpha_{M}}{\alpha_{MN}}$.</p>
+<p>As illustrated below, the bc-MC-PEA outperforms the standard PEA, even when using a rough estimate for the ratio $\frac{\alpha_{M}}{\alpha_{MN}}$.</p>
 
 <pre><code class="language-python">def compute_pareto_front(df, time_col='Time', mse_col='MSIE'):
     &quot;&quot;&quot;
@@ -2759,6 +2759,21 @@ author = {Julien Pascal}
       <li>
         <a itemprop="sameAs" href="https://medium.com/@julien.pascal" target="_blank" rel="noopener">
           <i class="fab fa-medium"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://orcid.org/0000-0003-4818-3179" target="_blank" rel="noopener">
+          <i class="ai ai-orcid"></i>
         </a>
       </li>
       

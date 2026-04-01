@@ -46,7 +46,7 @@
 
 &lt;p&gt;&lt;strong&gt;TL;DR 1 [Practical side]:&lt;/strong&gt; This paper is a variance-reduced version of standard PEA that uses multiple innovation draws per state vector. The optimal number of innovation draws (given a fixed computational budget constraint) is calculated in closed form using only a small number of hyperparameters.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;TL;DR 2 [Theoretical side]:&lt;/strong&gt; This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/10.1111/iere.12575&#34; target=&#34;_blank&#34;&gt;Deep Equilibrium Nets&lt;/a&gt;; &lt;a href=&#34;https://doi.org/10.1016/j.jmoneco.2021.07.004&#34; target=&#34;_blank&#34;&gt;All-in-One Operator&lt;/a&gt;; &lt;a href=&#34;https://doi.org/10.1016/j.jedc.2024.104853&#34; target=&#34;_blank&#34;&gt;bc-MC Operator&lt;/a&gt; and the old-school PEA. This connection can be summarized as: NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR 2 [Theoretical side]:&lt;/strong&gt; This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/10.1111/iere.12575&#34; target=&#34;_blank&#34;&gt;Deep Equilibrium Nets&lt;/a&gt;; &lt;a href=&#34;https://doi.org/10.1016/j.jmoneco.2021.07.004&#34; target=&#34;_blank&#34;&gt;All-in-One Operator&lt;/a&gt;; &lt;a href=&#34;https://doi.org/10.1016/j.jedc.2024.104853&#34; target=&#34;_blank&#34;&gt;bc-MC Operator&lt;/a&gt;) and the old-school PEA. This connection can be summarized as: NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS.&lt;/p&gt;
 
 &lt;p&gt;On the one hand, the result of &lt;em&gt;TL;DR 2&lt;/em&gt; is expected, because both approaches share many features (Monte Carlo integration, focus on the ergodic set for the state vector). On the other hand, this could be surprising because there are also substantial differences: NNs are highly non-linear and their parameters are tuned using gradient descent and backpropagation, while the PEA typically relies on a linear or log-linear model, where the parameters are calculated using linear or non-linear least squares.&lt;/p&gt;
 
@@ -150,8 +150,8 @@ $$&lt;/p&gt;
 &lt;p&gt;As said previously, when using NN, the gradient of the loss function can be easily and efficiently calculated using backpropagation, as long as one uses the appropriate software (e.g. Pytorch, Tensorflow). Let&amp;rsquo;s now consider what happens when we want to calculate the gradient $\nabla_{\theta} L_{M,N}(\theta)$ &amp;ldquo;manually&amp;rdquo;. But let&amp;rsquo;s do that under two &amp;ldquo;PEA-style&amp;rdquo; restrictions:&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;$f(s_m, \varepsilon^{i}_m | \theta ) = g(s_m, \varepsilon^{i}_m | \theta) - h(s_m, | \theta)$,&lt;/li&gt;
-&lt;li&gt;$h(s_m, | \theta) = s_m^T \theta$.
+&lt;li&gt;$f(s_m, \varepsilon^{i}_m | \theta ) = g(s_m, \varepsilon^{i}_m | \theta) - h(s_m | \theta)$,&lt;/li&gt;
+&lt;li&gt;$h(s_m | \theta) = s_m^T \theta$.
 &lt;br /&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -179,7 +179,7 @@ $$&lt;/p&gt;
 
 &lt;p&gt;The above equation gives us a good model on how computing time changes with $M$ and $N$. The parameters $\alpha_{M}$ and $\alpha_{MN}$ can be estimated by varying $M$ and $N$ and using an OLS regression.&lt;/p&gt;
 
-&lt;p&gt;We also need to understand how the choice of $M$ and $N$ impacts the accuracy of our numerical solution. In the paper, under the assumption that the state vectors are &lt;strong&gt;i.i.d&lt;/strong&gt;, I show that the expected average squared forecast error of the OLS model is proportional to:&lt;/p&gt;
+&lt;p&gt;We also need to understand how the choice of $M$ and $N$ impacts the accuracy of our numerical solution. In the paper, under the assumption that the state vectors are &lt;strong&gt;i.i.d.&lt;/strong&gt;, I show that the expected average squared forecast error of the OLS model is proportional to:&lt;/p&gt;
 
 &lt;p&gt;$$ \frac{1}{N^{\alpha}} \frac{k}{M - k - 1} $$.&lt;/p&gt;
 
@@ -273,7 +273,7 @@ $$
 
 &lt;p&gt;When the investment constraint does not bind ($\mu_t = 0$), the above FOC equation can be written as:&lt;/p&gt;
 
-&lt;p&gt;$$ c_t^{-\sigma} = E&lt;em&gt;t[\phi&lt;/em&gt;{t+1}] $$&lt;/p&gt;
+&lt;p&gt;$$ c_t^{-\sigma} = E_t[\phi_{t+1}] $$&lt;/p&gt;
 
 &lt;p&gt;So if we know $ E_t[\phi_{t+1}]$, we can find the implied consumption today. As in standard PEA, let&amp;rsquo;s assume a parametric expression for the conditional expectation. Let&amp;rsquo;s use the following log-log model:&lt;/p&gt;
 
@@ -597,7 +597,7 @@ effective_sample_size: True
 
 &lt;p&gt;We need a starting value $\theta^{(0)}$.&lt;/p&gt;
 
-&lt;p&gt;Here, let&amp;rsquo;s solve the model &lt;strong&gt;without&lt;/strong&gt; the irreversible investment constraint using a &lt;strong&gt;1st order-linearization&lt;/strong&gt; and use some simulated data to estimate $\theta^{(0)}$. This is easy to do thanks to Dynare and this gives us a reasonable starting point.&lt;/p&gt;
+&lt;p&gt;Here, let&amp;rsquo;s solve the model &lt;strong&gt;without&lt;/strong&gt; the irreversible investment constraint using a &lt;strong&gt;1st-order linearization&lt;/strong&gt; and use some simulated data to estimate $\theta^{(0)}$. This is easy to do thanks to Dynare and this gives us a reasonable starting point.&lt;/p&gt;
 
 &lt;p&gt;Below is a somewhat hacky way to get Dynare within Python:&lt;/p&gt;
 
@@ -1009,7 +1009,7 @@ z           0.7827  0.6114  0.4776  0.3748  0.2973
 Total computing time : 0h00m03s
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now, let&amp;rsquo;s load the simulated series and estimate our first first $\theta^{(0)}$:&lt;/p&gt;
+&lt;p&gt;Now, let&amp;rsquo;s load the simulated series and estimate our first $\theta^{(0)}$:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#Load simulated data and fit linear model
 SS_values = pd.read_csv(&amp;quot;output/Linearization/SS_values.csv&amp;quot;)
@@ -2042,7 +2042,7 @@ Final b0: [-0.02917404 -0.08457067 -0.9441379   0.39027564 -0.11913959 -0.301991
 4           4  10  500  36  0.045598  0.000064  0.000007  0.001566           1
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As illustrated below, the bc-MC-PEA outfperforms the standard PEA, even when using a rough estimate for the ratio $\frac{\alpha_{M}}{\alpha_{MN}}$.&lt;/p&gt;
+&lt;p&gt;As illustrated below, the bc-MC-PEA outperforms the standard PEA, even when using a rough estimate for the ratio $\frac{\alpha_{M}}{\alpha_{MN}}$.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def compute_pareto_front(df, time_col=&#39;Time&#39;, mse_col=&#39;MSIE&#39;):
     &amp;quot;&amp;quot;&amp;quot;
