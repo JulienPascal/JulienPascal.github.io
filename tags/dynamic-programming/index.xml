@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Dynamic programming on Julien Pascal</title>
+    <title>Dynamic Programming on Julien Pascal</title>
     <link>https://julienpascal.github.io/tags/dynamic-programming/</link>
-    <description>Recent content in Dynamic programming on Julien Pascal</description>
+    <description>Recent content in Dynamic Programming on Julien Pascal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 01 Apr 2024 15:51:54 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 03 Dec 2025 15:51:54 +0100</lastBuildDate>
     
 	<atom:link href="https://julienpascal.github.io/tags/dynamic-programming/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
-      <link>https://julienpascal.github.io/publication/bc-mc-2024/</link>
-      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      <title>A generalization of the Parameterized Expectations Algorithm</title>
+      <link>https://julienpascal.github.io/publication/el_2025/</link>
+      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/publication/bc-mc-2024/</guid>
+      <guid>https://julienpascal.github.io/publication/el_2025/</guid>
       <description></description>
+    </item>
+    
+  </channel>
+</rss>description>
     </item>
     
   </channel>
