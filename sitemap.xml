@@ -1,11 +1,106 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/publication_types/2/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
   
     
     <url>
     
       <loc>https://julienpascal.github.io/publication/el_2025/</loc>
       <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/dynamic-programming/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/julien-pascal/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/monte-carlo-methods/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/neural-networks/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/pea/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/publication_types/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/publication/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/</loc>
+      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/heterogeneity/</loc>
+      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
     </url>
     
   
@@ -20,7 +115,47 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/literature-review/</loc>
+      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/monetary-policy/</loc>
+      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/numerical-methods/</loc>
+      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/bc_mc_pea/</loc>
+      <lastmod>2025-12-01T08:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/monte-carlo/</loc>
+      <lastmod>2025-12-01T08:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/post/</loc>
       <lastmod>2025-12-01T08:00:00+01:00</lastmod>
     </url>
     
@@ -44,8 +179,96 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/machine-learning/</loc>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/neural-network/</loc>
+      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/publication/mpp_rsue_2023/</loc>
       <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/commuting/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/efficiency/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/labor/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/luca-marchiori/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/migration/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/olivier-pierrard/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/policy/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/urban/</loc>
+      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/expectations/</loc>
+      <lastmod>2022-09-03T18:00:00+01:00</lastmod>
     </url>
     
   
@@ -60,8 +283,56 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/statistics/</loc>
+      <lastmod>2022-09-03T18:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/adaptive-sparse-grids/</loc>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/numerical/</loc>
+      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/asg/</loc>
       <lastmod>2022-02-12T08:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/lectures-econo-2-1/</loc>
+      <lastmod>2022-01-26T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/</loc>
+      <lastmod>2022-01-26T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/ai/</loc>
+      <lastmod>2022-01-03T18:00:00+01:00</lastmod>
     </url>
     
   
@@ -78,6 +349,38 @@
     
       <loc>https://julienpascal.github.io/post/ann_1/</loc>
       <lastmod>2021-11-28T18:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/intro_git/</loc>
+      <lastmod>2021-09-29T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/intro_git_local/</loc>
+      <lastmod>2021-09-29T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/ha-models/</loc>
+      <lastmod>2021-01-18T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/macroeconomics/</loc>
+      <lastmod>2021-01-18T18:53:22+01:00</lastmod>
     </url>
     
   
@@ -108,6 +411,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/dynamical-systems/</loc>
+      <lastmod>2020-04-05T16:00:00+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/lqr_partii/</loc>
       <lastmod>2020-04-05T16:00:00+01:00</lastmod>
     </url>
@@ -124,6 +435,14 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/slides/neighbourhoods_paris/</loc>
+      <lastmod>2020-02-21T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/cnn/</loc>
       <lastmod>2019-12-05T18:53:22+01:00</lastmod>
     </url>
@@ -132,8 +451,56 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/computer-vision/</loc>
+      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/classification/</loc>
+      <lastmod>2019-11-22T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/econometrics/</loc>
+      <lastmod>2019-11-22T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/post/logistic/</loc>
       <lastmod>2019-11-22T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/directed-search/</loc>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/housing/</loc>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/project/</loc>
+      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
     </url>
     
   
@@ -158,6 +525,14 @@
     
       <loc>https://julienpascal.github.io/post/ols_ml/</loc>
       <lastmod>2019-09-29T18:53:22+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/spatial-eq/</loc>
+      <lastmod>2019-09-26T00:00:00+00:00</lastmod>
     </url>
     
   
@@ -212,8 +587,24 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/wip/</loc>
+      <lastmod>2019-03-12T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/project/laborincomeshocks/</loc>
       <lastmod>2019-03-11T18:11:07+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/slides/rental-market/</loc>
+      <lastmod>2019-01-26T00:00:00+00:00</lastmod>
     </url>
     
   
@@ -260,7 +651,39 @@
     
     <url>
     
+      <loc>https://julienpascal.github.io/tags/banking/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/authors/christian-daude/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/competition/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://julienpascal.github.io/publication/efficiencycontestability/</loc>
+      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://julienpascal.github.io/tags/emerging-markets/</loc>
       <lastmod>2017-03-07T15:51:54+01:00</lastmod>
     </url>
     
@@ -275,41 +698,7 @@
     
     <url>
     
-      <loc>https://julienpascal.github.io/publication_types/2/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/intro_git/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/intro_git_local/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/ai/</loc>
-      <lastmod>2022-01-03T18:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/adaptive-sparse-grids/</loc>
-      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
-      <priority>0</priority>
+      <loc>https://julienpascal.github.io/authors/admin/</loc>
     </url>
     
   
@@ -317,31 +706,6 @@
     <url>
     
       <loc>https://julienpascal.github.io/author/</loc>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/authors/</loc>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/banking/</loc>
-      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/neighbourhoods_paris/</loc>
     </url>
     
   
@@ -349,370 +713,6 @@
     <url>
     
       <loc>https://julienpascal.github.io/categories/</loc>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/authors/christian-daude/</loc>
-      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/classification/</loc>
-      <lastmod>2019-11-22T18:53:22+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/commuting/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/competition/</loc>
-      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/computer-vision/</loc>
-      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/directed-search/</loc>
-      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/dynamic-programming/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/dynamic-programming/</loc>
-      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/dynamical-systems/</loc>
-      <lastmod>2020-04-05T16:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/econometrics/</loc>
-      <lastmod>2019-11-22T18:53:22+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/lectures-econo-2-1/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/efficiency/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/emerging-markets/</loc>
-      <lastmod>2017-03-07T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/expectations/</loc>
-      <lastmod>2022-09-03T18:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/ha-models/</loc>
-      <lastmod>2021-01-18T18:53:22+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/heterogeneity/</loc>
-      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/housing/</loc>
-      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/authors/julien-pascal/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/spatial-eq/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/labor/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/literature-review/</loc>
-      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/authors/luca-marchiori/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/machine-learning/</loc>
-      <lastmod>2019-12-05T18:53:22+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/machine-learning/</loc>
-      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/macroeconomics/</loc>
-      <lastmod>2021-01-18T18:53:22+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/migration/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/monetary-policy/</loc>
-      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/monte-carlo/</loc>
-      <lastmod>2025-12-01T08:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/monte-carlo-methods/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/neural-networks/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/neural-network/</loc>
-      <lastmod>2024-04-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/numerical/</loc>
-      <lastmod>2022-02-12T08:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/numerical-methods/</loc>
-      <lastmod>2025-12-01T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/authors/olivier-pierrard/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/pea/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/policy/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/post/</loc>
-      <lastmod>2025-12-01T08:00:00+01:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/project/</loc>
-      <lastmod>2019-10-21T18:11:07+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/publication_types/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/publication/</loc>
-      <lastmod>2025-12-03T15:51:54+01:00</lastmod>
     </url>
     
   
@@ -720,65 +720,6 @@
     <url>
     
       <loc>https://julienpascal.github.io/talk/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/rental-market/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/slides/</loc>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/statistics/</loc>
-      <lastmod>2022-09-03T18:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/</loc>
-      <lastmod>2022-01-03T18:00:00+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/urban/</loc>
-      <lastmod>2023-07-26T15:51:54+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/tags/wip/</loc>
-      <lastmod>2019-03-12T18:11:07+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://julienpascal.github.io/authors/admin/</loc>
-      <priority>0</priority>
     </url>
     
   

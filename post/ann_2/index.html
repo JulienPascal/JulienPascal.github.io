@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,7 +28,9 @@
   
     
   
-  <meta name="description" content="Introduction In a previous post, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using Julia and Flux.jl with two toy examples.">
+  <meta name="description" content="Introduction
+In a previous post, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using Julia and Flux.jl with two toy examples.
+Now it&rsquo;s time to be a bit more ambitious. In my previous post, we could sample from the function we wanted to approximate. However, in many instances we cannot simply do that. The unknown element is the function we want to approximate.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/ann_2/">
@@ -100,9 +102,6 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -125,7 +124,9 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/ann_2/">
   <meta property="og:title" content="Artificial Neural Networks to Solve Economic Models | Julien Pascal">
-  <meta property="og:description" content="Introduction In a previous post, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using Julia and Flux.jl with two toy examples."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="Introduction
+In a previous post, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using Julia and Flux.jl with two toy examples.
+Now it&rsquo;s time to be a bit more ambitious. In my previous post, we could sample from the function we wanted to approximate. However, in many instances we cannot simply do that. The unknown element is the function we want to approximate."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2022-01-03T18:00:00&#43;01:00">
@@ -518,295 +519,233 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<h2 id="introduction">Introduction</h2>
-
-<p>In <a href="https://julienpascal.github.io/post/ann_1/" target="_blank">a previous post</a>, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using <a href="https://julialang.org/" target="_blank">Julia</a> and <a href="https://github.com/FluxML/Flux.jl" target="_blank">Flux.jl</a> with two toy examples.</p>
-
+      <h2 id="introduction">Introduction</h2>
+<p>In <a href="https://julienpascal.github.io/post/ann_1/" target="_blank" rel="noopener">a previous post</a>, I discussed why Artificial Neural Networks (ANN) are very popular tools: (i) they can approximate a very large set of functions (ii) they work well in high-dimensional spaces (iii) we can train them efficiently using gradient descent (even better if you have a GPU). In the application part, I showed how to use them in practice using <a href="https://julialang.org/" target="_blank" rel="noopener">Julia</a> and <a href="https://github.com/FluxML/Flux.jl" target="_blank" rel="noopener">Flux.jl</a> with two toy examples.</p>
 <p>Now it&rsquo;s time to be a bit more ambitious. In my previous post, we could sample from the function we wanted to approximate. However, in many instances we cannot simply do that. <strong>The unknown element</strong> is the <strong>function we want to approximate</strong>.</p>
-
 <p><strong>TL;DR: ANN work well to approximate unknown functions.</strong></p>
-
-<p>The notebook for this post is available <a href="https://github.com/JulienPascal/ANN_Flux" target="_blank">here</a>.</p>
-
+<p>The notebook for this post is available <a href="https://github.com/JulienPascal/ANN_Flux" target="_blank" rel="noopener">here</a>.</p>
 <h2 id="i-theory">I. Theory</h2>
-
-<p>The cornerstone of Macro and Labour Economics is the dynamic optimization problem, in which an agent chooses a series of actions, taking account a set of constraints and the evolution of the state of the economy. A classical example is the a central planner deciding <a href="https://en.wikipedia.org/wiki/Ramsey%E2%80%93Cass%E2%80%93Koopmans_model" target="_blank">how much to save and consume</a> at any point in time. Another example would be <a href="https://www.jstor.org/stable/2297896" target="_blank">a worker searching for a job and deciding which job to accept and when to resign</a>.</p>
-
-<p>These types of problems naturally lend themselves to the following <a href="https://en.wikipedia.org/wiki/Bellman_equation" target="_blank">Bellman equation</a>:</p>
-
-<p>$$ V(x,z) = \max_{c \in \Gamma(x,z)}[ F(x,c,z) + \beta E[ V(T(x,c), z&rsquo;) ]$$</p>
-
-<p>where $x$ is a known state variable and $z$ is a random variable following a Markov process. Both $x$ and $z$ are vectors. The function $\Gamma(.)$ represents the set of possible actions given a current state and the function $T(.)$ captures the transition from one state to another when an action is taken. The variable $\beta$ is a discount factor strictly smaller than one and the $E$ represent an expectation operator.</p>
-
-<p>I do not want to delve too much into the fascinating theory of optimal control. The point is that the unknown is the function $V(.)$. Given the good properties of ANN mentioned above, one may be tempted to use them to approximate the true $V(.)$. And this is exactly what we are going to do.</p>
-
+<p>The cornerstone of Macro and Labour Economics is the dynamic optimization problem, in which an agent chooses a series of actions, taking account a set of constraints and the evolution of the state of the economy. A classical example is the a central planner deciding <a href="https://en.wikipedia.org/wiki/Ramsey%E2%80%93Cass%E2%80%93Koopmans_model" target="_blank" rel="noopener">how much to save and consume</a> at any point in time. Another example would be <a href="https://www.jstor.org/stable/2297896" target="_blank" rel="noopener">a worker searching for a job and deciding which job to accept and when to resign</a>.</p>
+<p>These types of problems naturally lend themselves to the following <a href="https://en.wikipedia.org/wiki/Bellman_equation" target="_blank" rel="noopener">Bellman equation</a>:</p>
+\[ V(x,z) = \max_{c \in \Gamma(x,z)}[ F(x,c,z) &#43; \beta E[ V(T(x,c), z&#39;) ]\]<p>where \(x\) is a known state variable and \(z\) is a random variable following a Markov process. Both \(x\) and \(z\) are vectors. The function \(\Gamma(.)\) represents the set of possible actions given a current state and the function \(T(.)\) captures the transition from one state to another when an action is taken. The variable \(\beta\) is a discount factor strictly smaller than one and the \(E\) represent an expectation operator.</p>
+<p>I do not want to delve too much into the fascinating theory of optimal control. The point is that the unknown is the function \(V(.)\). Given the good properties of ANN mentioned above, one may be tempted to use them to approximate the true \(V(.)\). And this is exactly what we are going to do.</p>
 <h2 id="ii-application">II. Application</h2>
-
-<p>For the application, let&rsquo;s focus on the model of the labour market of <a href="https://www.aeaweb.org/articles?id=10.1257/aer.20131118" target="_blank">Lise and Robin 2017</a>.Why? Because I have worked a lot with this model <a href="https://www.theses.fr/2020IEPP0013" target="_blank">during my PhD</a> and also because the model has really nice properties. The model features <strong>heterogeneous firms, workers</strong> (one can think of large versus small firms and workers with different skills) and <strong>business cycle fluctuations</strong> (booms and busts). Despite the underlying complexity, the model lends itself to a pretty simple Bellman equation:</p>
-
-<p>$$ S(x,y,z) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&rsquo;|z} [ max(S(x,y,z&rsquo;), 0) ] $$</p>
-
-<p>where $x$ is the worker&rsquo;s type; $y$ the firm&rsquo;s type; $z$ the aggregate (stochastic) state of the economy; $\delta$ the probability that a current job is going to be destroyed next period for exogenous reasons and $r$ the interest rate. The function $s(x,y,z)$ captures the value of net output when a worker of type $x$ works with a firm of type $y$ when the state of the economy is $z$. If the job is not productive enough, workers and firms decide to separate, which happens when $S(x,y,z) &lt; 0$. This is why there is a max operator within the expectation operator.</p>
-
+<p>For the application, let&rsquo;s focus on the model of the labour market of <a href="https://www.aeaweb.org/articles?id=10.1257/aer.20131118" target="_blank" rel="noopener">Lise and Robin 2017</a>.Why? Because I have worked a lot with this model <a href="https://www.theses.fr/2020IEPP0013" target="_blank" rel="noopener">during my PhD</a> and also because the model has really nice properties. The model features <strong>heterogeneous firms, workers</strong> (one can think of large versus small firms and workers with different skills) and <strong>business cycle fluctuations</strong> (booms and busts). Despite the underlying complexity, the model lends itself to a pretty simple Bellman equation:</p>
+\[ S(x,y,z) = s(x,y,z) &#43; \frac{1 - \delta}{1 &#43; r} E_{z&#39;|z} [ max(S(x,y,z&#39;), 0) ] \]<p>where \(x\) is the worker&rsquo;s type; \(y\) the firm&rsquo;s type; \(z\) the aggregate (stochastic) state of the economy; \(\delta\) the probability that a current job is going to be destroyed next period for exogenous reasons and \(r\) the interest rate. The function \(s(x,y,z)\) captures the value of net output when a worker of type \(x\) works with a firm of type \(y\) when the state of the economy is \(z\). If the job is not productive enough, workers and firms decide to separate, which happens when \(S(x,y,z) &lt; 0\). This is why there is a max operator within the expectation operator.</p>
 <p>What we want to do is to use an ANN such that:</p>
-
-<p>$$ ANN(x,y,z|\theta) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&rsquo;|z} [ ANN(x,y,z&rsquo;|\theta), 0) ] $$</p>
-
-<p>Note that this equation can be rewritten as:</p>
-
-<p>$$ ANN(x,y,z|\theta) - s(x,y,z) - \frac{1 - \delta}{1 + r} E_{z&rsquo;|z} [ ANN(x,y,z&rsquo;|\theta), 0) ] = 0$$</p>
-
-<p>Our approximation is not going to be 100 percent perfect. But we can hope to find a good value of $\theta$ by minimizing the Mean Squared Error</p>
-
-<p>$$ \frac{1}{n}\sum(y_i - \hat{y}_i)^2 $$</p>
-
-<p>where $y_i$ is 0 everywhere and $\hat{y}_i = ANN(x_i,y_i,z_i|\theta) - \frac{1 - \delta}{1 + r} E_{z_i&rsquo;|z_i} [ ANN(x_i,y_i,z_i&rsquo;|\theta), 0) ] - s(x_i,y_i,z_i)$. Here the index $i$ captures the idea that we are going to draw several points from the space $X \times Y \times Z$</p>
-
+\[ ANN(x,y,z|\theta) = s(x,y,z) &#43; \frac{1 - \delta}{1 &#43; r} E_{z&#39;|z} [ ANN(x,y,z&#39;|\theta), 0) ] \]<p>Note that this equation can be rewritten as:</p>
+\[ ANN(x,y,z|\theta) - s(x,y,z) - \frac{1 - \delta}{1 &#43; r} E_{z&#39;|z} [ ANN(x,y,z&#39;|\theta), 0) ] = 0\]<p>Our approximation is not going to be 100 percent perfect. But we can hope to find a good value of \(\theta\) by minimizing the Mean Squared Error</p>
+\[ \frac{1}{n}\sum(y_i - \hat{y}_i)^2 \]<p>where \(y_i\) is 0 everywhere and \(\hat{y}_i = ANN(x_i,y_i,z_i|\theta) - \frac{1 - \delta}{1 &#43; r} E_{z_i&#39;|z_i} [ ANN(x_i,y_i,z_i&#39;|\theta), 0) ] - s(x_i,y_i,z_i)\). Here the index \(i\) captures the idea that we are going to draw several points from the space \(X \times Y \times Z\)</p>
 <h3 id="ii-a-preliminaries">II. A. Preliminaries</h3>
-
-<p>Let&rsquo;s load useful packages and define a structure (using <a href="https://github.com/mauro3/Parameters.jl" target="_blank">Parameters.jl</a>) to hold parameter values and primitive functions of the model.</p>
-
-<pre><code class="language-julia">using Random
-using DataFrames
-using DataStructures
-using Statistics
-using Plots
-using IterTools
-using Flux
-using Flux.Data: DataLoader
-using ProgressMeter
-using Parameters
-using Expectations
-using Distributions
-using Surrogates
-using LinearAlgebra
-using LaTeXStrings
-using Interpolations
-using BenchmarkTools
-using Parameters
-using StatsPlots
-using Kronecker
-using SparseArrays
-using CUDA
-gr()
-
-if CUDA.has_cuda()
-    device = gpu
-    @info &quot;GPU available&quot;
-else
-    device = cpu
-    @info &quot;GPU not available&quot;
-end
-</code></pre>
-
-<pre><code>┌ Info: GPU not available
+<p>Let&rsquo;s load useful packages and define a structure (using <a href="https://github.com/mauro3/Parameters.jl" target="_blank" rel="noopener">Parameters.jl</a>) to hold parameter values and primitive functions of the model.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Random
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> DataFrames
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> DataStructures
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Statistics
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Plots
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> IterTools
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Flux
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Flux<span style="color:#f92672">.</span>Data<span style="color:#f92672">:</span> DataLoader
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> ProgressMeter
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Parameters
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Expectations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Distributions
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Surrogates
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> LinearAlgebra
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> LaTeXStrings
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Interpolations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> BenchmarkTools
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Parameters
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> StatsPlots
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Kronecker
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> SparseArrays
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> CUDA
+</span></span><span style="display:flex;"><span>gr()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> CUDA<span style="color:#f92672">.</span>has_cuda()
+</span></span><span style="display:flex;"><span>    device <span style="color:#f92672">=</span> gpu
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@info</span> <span style="color:#e6db74">&#34;GPU available&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    device <span style="color:#f92672">=</span> cpu
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@info</span> <span style="color:#e6db74">&#34;GPU not available&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>┌ Info: GPU not available
 └ @ Main In[120]:30
 </code></pre>
-
-<pre><code class="language-julia">@with_kw struct Params
-    x_min::Float64 = 0.0
-    x_max::Float64 = 1.0
-    y_min::Float64 = 0.0
-    y_max::Float64 = 1.0
-    nx::Int64 = 21 # grid points for human capital
-    ny::Int64 = 21 # grid points for firm productivity
-    dt::Float64 = 1.0/52.0 # length of a period in years
-    r::Float64 = (1.0 + 0.05)^dt - 1.0 # interest rate
-    delta::Float64 = 0.0127012273 #job destrution rate
-    epsilon::Float64 = 0.001 # distance to stay away from bounds of the interval
-    x_grid = collect(range(x_min + epsilon, x_max - epsilon, length = nx))
-    y_grid = collect(range(y_min + epsilon, y_max - epsilon, length = nx))
-    # log of aggregate shocks are AR(1):
-    # ln(zt) = rho*ln(zt-1) + e_k
-    # with e_k distributed as N(0,psi^2)
-    # and psi = sigma*sqrt(1-rho²)
-    rho::Float64 = 0.9997369438 #persitence parameter
-    sigma::Float64 = 0.0714488990 #volatility parameter
-    psi::Float64 = sigma*sqrt(1.0 - rho^2) #std dev. of innovation term
-    distrib_innovation::Any = Normal(0, psi) #0 mean and std = psi
-    nb_nodes::Int64 = 10 #number nodes for the expectation
-    E::Any = expectation(distrib_innovation, n = nb_nodes) #expectation operator
-    nodes_E = nodes(E) #nodes for expectation
-    weigths_E = weights(E) #weights for expectation
-    f0::Float64     =    6.0873503685 # market production parameter
-    f1::Float64     =    0.0025488557 # market production parameter
-    f2::Float64     =    2.0529182143 # market production parameter
-    f3::Float64     =    -0.1400252578 # market production parameter
-    f4::Float64     =    8.0349795180 # market production parameter
-    f5::Float64     =    -1.9072145913 # market production parameter
-    f6::Float64     =    6.5961298483 # market production parameter
-    b0::Float64     = 0.7 # home production parameter
-    p_xyz::Function = (x, y, z) -&gt; f0*z*(f1 + f2*x + f3*y + f4*(x^2) + f5*(y^2) + f6*x*y)*dt #value of market production
-    b_x::Function = (x) -&gt; b0*p_xyz(x, x, 1.0) #value of market production
-    s_xyz::Function = (x,y,z) -&gt; p_xyz(x,y,z) - b_x(x) #surplus
-    # VECTORIZED FUNCTIONS
-    # input of the form:
-    # row: observation
-    # column: dimension
-    p_xyz_v::Function = x -&gt; f0.*x[:,3].*(f1 .+ f2.*x[:,1] .+ f3.*x[:,2] .+ f4.*(x[:,1].^2) .+ f5.*(x[:,2].^2) .+ f6.*x[:,1].*x[:,2]).*dt #value of market production
-    b_x_v::Function = x -&gt; b0.*f0.*1.0.*(f1 .+ f2.*x[:,1] .+ f3.*x[:,1] .+ f4.*(x[:,1].^2) .+ f5.*(x[:,1].^2) .+ f6.*x[:,1].*x[:,1]).*dt #value of market production
-    s_xyz_v::Function = x -&gt; p_xyz_v(x) .- b_x_v(x) #surplus
-    # VECTORIZED FUNCTIONS
-    # input of the form:
-    # row: dimension
-    # column: observation
-    p_xyz_r::Function = x -&gt; f0.*x[3, :].*(f1 .+ f2.*x[1, :] .+ f3.*x[2,:] .+ f4.*(x[1,:].^2) .+ f5.*(x[2,:].^2) .+ f6.*x[1,:].*x[2,:]).*dt #value of market production
-    b_x_r::Function = x -&gt; b0.*f0.*1.0.*(f1 .+ f2.*x[1,:] .+ f3.*x[1,:] .+ f4.*(x[1,:].^2) .+ f5.*(x[1,:].^2) .+ f6.*x[1,:].*x[1,:]).*dt #value of market production
-    s_xyz_r::Function = x -&gt; p_xyz_r(x) .- b_x_r(x) #surplus
-end
-</code></pre>
-
-<pre><code class="language-julia">p = Params();
-</code></pre>
-
-<h3 id="ii-b-value-function-iteration">II. B. Value function iteration</h3>
-
-<p>To check the accuracy of the ANN approach, we will also use another &ldquo;legacy&rdquo; method to find another approximation for $S(x,y,z)$. The traditional way is to use <strong>Value Function Iteration (VFI)</strong>. For a detailed treatment, the textbook of <a href="https://www.google.com/search?q=Recursive+methods+in+economic+dynamics&amp;client=ubuntu&amp;hs=q3T&amp;sa=X&amp;channel=fs&amp;sxsrf=AOaemvLsI7n9lOLie8RSVfOPi0l2weq7Pg:1641306887162&amp;tbm=isch&amp;source=iu&amp;ictx=1&amp;fir=GH2dBz2E9vFPDM%252CzAM-vlBogjsh7M%252C%252Fm%252F0cgvb6c&amp;vet=1&amp;usg=AI4_-kQJc5H3CV04Yfys38GSbnPN50KV5A&amp;ved=2ahUKEwi-xOfPqJj1AhWySvEDHWK1BeUQ_B16BAgbEAI&amp;biw=1232&amp;bih=626&amp;dpr=1.5#imgrc=GH2dBz2E9vFPDM" target="_blank">Stockey and Lucas</a> is a must-read. For explanations with codes, I suggest <a href="https://julia.quantecon.org/dynamic_programming/optgrowth.html" target="_blank">QuantEcon</a>.</p>
-
-<p>VFI, as suggested by the name, is an iterated procedure that converges to the true function. One starts by assuming a function $V^{(0)}$. Then one applies the &ldquo;right-hand-side operator&rdquo; of the Bellman equation to get $V^{(1)}$:</p>
-
-<p>$ V^{(1)}(x,y,z) = s(x,y,z) + \frac{1 - \delta}{1 + r} E_{z&rsquo;|z} [ max(V^{(0)}(x,y,z&rsquo;), 0) ]$</p>
-
-<p>In practice, one must calculate $V^{(n)}(x,y,z)$ on a grid. Off-grid points can be obtained by linear interpolation. After some time, the distance between $V^{(n)}(x,y,z)$ and $V^{(n-1)}(x,y,z)$ is small and the procedure may be stopped.</p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#a6e22e">@with_kw</span> <span style="color:#66d9ef">struct</span> <span style="color:#66d9ef">Params</span>
+</span></span><span style="display:flex;"><span>    x_min<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>    x_max<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span>    y_min<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>    y_max<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span>    nx<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">21</span> <span style="color:#75715e"># grid points for human capital</span>
+</span></span><span style="display:flex;"><span>    ny<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">21</span> <span style="color:#75715e"># grid points for firm productivity</span>
+</span></span><span style="display:flex;"><span>    dt<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">52.0</span> <span style="color:#75715e"># length of a period in years</span>
+</span></span><span style="display:flex;"><span>    r<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.05</span>)<span style="color:#f92672">^</span>dt <span style="color:#f92672">-</span> <span style="color:#ae81ff">1.0</span> <span style="color:#75715e"># interest rate</span>
+</span></span><span style="display:flex;"><span>    delta<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0127012273</span> <span style="color:#75715e">#job destrution rate</span>
+</span></span><span style="display:flex;"><span>    epsilon<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.001</span> <span style="color:#75715e"># distance to stay away from bounds of the interval</span>
+</span></span><span style="display:flex;"><span>    x_grid <span style="color:#f92672">=</span> collect(range(x_min <span style="color:#f92672">+</span> epsilon, x_max <span style="color:#f92672">-</span> epsilon, length <span style="color:#f92672">=</span> nx))
+</span></span><span style="display:flex;"><span>    y_grid <span style="color:#f92672">=</span> collect(range(y_min <span style="color:#f92672">+</span> epsilon, y_max <span style="color:#f92672">-</span> epsilon, length <span style="color:#f92672">=</span> nx))
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># log of aggregate shocks are AR(1):</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ln(zt) = rho*ln(zt-1) + e_k</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># with e_k distributed as N(0,psi^2)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># and psi = sigma*sqrt(1-rho²)</span>
+</span></span><span style="display:flex;"><span>    rho<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.9997369438</span> <span style="color:#75715e">#persitence parameter</span>
+</span></span><span style="display:flex;"><span>    sigma<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0714488990</span> <span style="color:#75715e">#volatility parameter</span>
+</span></span><span style="display:flex;"><span>    psi<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> sigma<span style="color:#f92672">*</span>sqrt(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> rho<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#75715e">#std dev. of innovation term</span>
+</span></span><span style="display:flex;"><span>    distrib_innovation<span style="color:#f92672">::</span><span style="color:#66d9ef">Any</span> <span style="color:#f92672">=</span> Normal(<span style="color:#ae81ff">0</span>, psi) <span style="color:#75715e">#0 mean and std = psi</span>
+</span></span><span style="display:flex;"><span>    nb_nodes<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#75715e">#number nodes for the expectation</span>
+</span></span><span style="display:flex;"><span>    E<span style="color:#f92672">::</span><span style="color:#66d9ef">Any</span> <span style="color:#f92672">=</span> expectation(distrib_innovation, n <span style="color:#f92672">=</span> nb_nodes) <span style="color:#75715e">#expectation operator</span>
+</span></span><span style="display:flex;"><span>    nodes_E <span style="color:#f92672">=</span> nodes(E) <span style="color:#75715e">#nodes for expectation</span>
+</span></span><span style="display:flex;"><span>    weigths_E <span style="color:#f92672">=</span> weights(E) <span style="color:#75715e">#weights for expectation</span>
+</span></span><span style="display:flex;"><span>    f0<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#ae81ff">6.0873503685</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    f1<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#ae81ff">0.0025488557</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    f2<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#ae81ff">2.0529182143</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    f3<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#f92672">-</span><span style="color:#ae81ff">0.1400252578</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    f4<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#ae81ff">8.0349795180</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    f5<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#f92672">-</span><span style="color:#ae81ff">1.9072145913</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    f6<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span>    <span style="color:#ae81ff">6.5961298483</span> <span style="color:#75715e"># market production parameter</span>
+</span></span><span style="display:flex;"><span>    b0<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>     <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.7</span> <span style="color:#75715e"># home production parameter</span>
+</span></span><span style="display:flex;"><span>    p_xyz<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> (x, y, z) <span style="color:#f92672">-&gt;</span> f0<span style="color:#f92672">*</span>z<span style="color:#f92672">*</span>(f1 <span style="color:#f92672">+</span> f2<span style="color:#f92672">*</span>x <span style="color:#f92672">+</span> f3<span style="color:#f92672">*</span>y <span style="color:#f92672">+</span> f4<span style="color:#f92672">*</span>(x<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span> f5<span style="color:#f92672">*</span>(y<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span> f6<span style="color:#f92672">*</span>x<span style="color:#f92672">*</span>y)<span style="color:#f92672">*</span>dt <span style="color:#75715e">#value of market production</span>
+</span></span><span style="display:flex;"><span>    b_x<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> (x) <span style="color:#f92672">-&gt;</span> b0<span style="color:#f92672">*</span>p_xyz(x, x, <span style="color:#ae81ff">1.0</span>) <span style="color:#75715e">#value of market production</span>
+</span></span><span style="display:flex;"><span>    s_xyz<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> (x,y,z) <span style="color:#f92672">-&gt;</span> p_xyz(x,y,z) <span style="color:#f92672">-</span> b_x(x) <span style="color:#75715e">#surplus</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># VECTORIZED FUNCTIONS</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># input of the form:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># row: observation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># column: dimension</span>
+</span></span><span style="display:flex;"><span>    p_xyz_v<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> f0<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">3</span>]<span style="color:#f92672">.*</span>(f1 <span style="color:#f92672">.+</span> f2<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">.+</span> f3<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>] <span style="color:#f92672">.+</span> f4<span style="color:#f92672">.*</span>(x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f5<span style="color:#f92672">.*</span>(x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f6<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>])<span style="color:#f92672">.*</span>dt <span style="color:#75715e">#value of market production</span>
+</span></span><span style="display:flex;"><span>    b_x_v<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> b0<span style="color:#f92672">.*</span>f0<span style="color:#f92672">.*</span><span style="color:#ae81ff">1.0</span><span style="color:#f92672">.*</span>(f1 <span style="color:#f92672">.+</span> f2<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">.+</span> f3<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">.+</span> f4<span style="color:#f92672">.*</span>(x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f5<span style="color:#f92672">.*</span>(x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f6<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.*</span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>])<span style="color:#f92672">.*</span>dt <span style="color:#75715e">#value of market production</span>
+</span></span><span style="display:flex;"><span>    s_xyz_v<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> p_xyz_v(x) <span style="color:#f92672">.-</span> b_x_v(x) <span style="color:#75715e">#surplus</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># VECTORIZED FUNCTIONS</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># input of the form:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># row: dimension</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># column: observation</span>
+</span></span><span style="display:flex;"><span>    p_xyz_r<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> f0<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">3</span>, <span style="color:#f92672">:</span>]<span style="color:#f92672">.*</span>(f1 <span style="color:#f92672">.+</span> f2<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">1</span>, <span style="color:#f92672">:</span>] <span style="color:#f92672">.+</span> f3<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">2</span>,<span style="color:#f92672">:</span>] <span style="color:#f92672">.+</span> f4<span style="color:#f92672">.*</span>(x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f5<span style="color:#f92672">.*</span>(x[<span style="color:#ae81ff">2</span>,<span style="color:#f92672">:</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f6<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>]<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">2</span>,<span style="color:#f92672">:</span>])<span style="color:#f92672">.*</span>dt <span style="color:#75715e">#value of market production</span>
+</span></span><span style="display:flex;"><span>    b_x_r<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> b0<span style="color:#f92672">.*</span>f0<span style="color:#f92672">.*</span><span style="color:#ae81ff">1.0</span><span style="color:#f92672">.*</span>(f1 <span style="color:#f92672">.+</span> f2<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>] <span style="color:#f92672">.+</span> f3<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>] <span style="color:#f92672">.+</span> f4<span style="color:#f92672">.*</span>(x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f5<span style="color:#f92672">.*</span>(x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>]<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">.+</span> f6<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>]<span style="color:#f92672">.*</span>x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>])<span style="color:#f92672">.*</span>dt <span style="color:#75715e">#value of market production</span>
+</span></span><span style="display:flex;"><span>    s_xyz_r<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span> <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> p_xyz_r(x) <span style="color:#f92672">.-</span> b_x_r(x) <span style="color:#75715e">#surplus</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>p <span style="color:#f92672">=</span> Params();
+</span></span></code></pre></div><h3 id="ii-b-value-function-iteration">II. B. Value function iteration</h3>
+<p>To check the accuracy of the ANN approach, we will also use another &ldquo;legacy&rdquo; method to find another approximation for \(S(x,y,z)\). The traditional way is to use <strong>Value Function Iteration (VFI)</strong>. For a detailed treatment, the textbook of <a href="https://www.google.com/search?q=Recursive&#43;methods&#43;in&#43;economic&#43;dynamics&amp;client=ubuntu&amp;hs=q3T&amp;sa=X&amp;channel=fs&amp;sxsrf=AOaemvLsI7n9lOLie8RSVfOPi0l2weq7Pg:1641306887162&amp;tbm=isch&amp;source=iu&amp;ictx=1&amp;fir=GH2dBz2E9vFPDM%252CzAM-vlBogjsh7M%252C%252Fm%252F0cgvb6c&amp;vet=1&amp;usg=AI4_-kQJc5H3CV04Yfys38GSbnPN50KV5A&amp;ved=2ahUKEwi-xOfPqJj1AhWySvEDHWK1BeUQ_B16BAgbEAI&amp;biw=1232&amp;bih=626&amp;dpr=1.5#imgrc=GH2dBz2E9vFPDM" target="_blank" rel="noopener">Stockey and Lucas</a> is a must-read. For explanations with codes, I suggest <a href="https://julia.quantecon.org/dynamic_programming/optgrowth.html" target="_blank" rel="noopener">QuantEcon</a>.</p>
+<p>VFI, as suggested by the name, is an iterated procedure that converges to the true function. One starts by assuming a function \(V^{(0)}\). Then one applies the &ldquo;right-hand-side operator&rdquo; of the Bellman equation to get \(V^{(1)}\):</p>
+<p>\( V^{(1)}(x,y,z) = s(x,y,z) &#43; \frac{1 - \delta}{1 &#43; r} E_{z&#39;|z} [ max(V^{(0)}(x,y,z&#39;), 0) ]\)</p>
+<p>In practice, one must calculate \(V^{(n)}(x,y,z)\) on a grid. Off-grid points can be obtained by linear interpolation. After some time, the distance between \(V^{(n)}(x,y,z)\) and \(V^{(n-1)}(x,y,z)\) is small and the procedure may be stopped.</p>
 <h4 id="grid-considerations-unconditional-distribution-of-z">Grid considerations: unconditional distribution of z?</h4>
-
-<p>As explained above, to use VFI, one must define a grid. For the values of $x$ and $y$, representing workers&rsquo; and firms&rsquo; heterogeneity, any bounded interval could do the job. Let&rsquo;s follow the original paper and assume that both $x$ and $y$ are in $[0,1]$.</p>
-
-<p>Defining a good grid for $z$ requires a bit more work. In the model of <a href="https://www.aeaweb.org/articles?id=10.1257/aer.20131118" target="_blank">Lise and Robin 2017</a>, the log (natural logarithm) of the aggregate state $z$ follows an AR(1) process:</p>
-
-<p>$log(z_{t}) = \rho log(z_{t-1}) + \epsilon_{t}$</p>
-
-<p>with $\epsilon_{t}$ normally distributed with variance $\psi \equiv \sigma \times \sqrt(1.0 - \rho^2)$.</p>
-
-<p>This implies that the unconditional distribution of $log(z)$ is normally distributed with mean 0 and variance $\sigma$. Or said differently, $z$ is $Lognormal(0, \sigma)$. In the block of code below, we check this fact by comparing some simulated data and the pdf of a $Lognormal(0, \sigma)$.</p>
-
-<pre><code class="language-julia">Nt = 20000000 #number of draws
-d = Normal(0, p.psi)
-innov = rand(d, Nt)
-log_z = zeros(Nt)
-z = zeros(Nt)
-log_z[1] = 1.0
-for t=2:Nt
-    log_z[t] = p.rho*log_z[t-1] + innov[t]
-end
-z = exp.(log_z)
-d_log_normal = LogNormal(0.0, p.sigma)
-
-density(z, label=&quot;data&quot;)
-plot!(minimum(z):0.01:maximum(z), x -&gt; pdf(d_log_normal, x), label=&quot;LogNormal&quot;)
+<p>As explained above, to use VFI, one must define a grid. For the values of \(x\) and \(y\), representing workers&rsquo; and firms&rsquo; heterogeneity, any bounded interval could do the job. Let&rsquo;s follow the original paper and assume that both \(x\) and \(y\) are in \([0,1]\).</p>
+<p>Defining a good grid for \(z\) requires a bit more work. In the model of <a href="https://www.aeaweb.org/articles?id=10.1257/aer.20131118" target="_blank" rel="noopener">Lise and Robin 2017</a>, the log (natural logarithm) of the aggregate state \(z\) follows an AR(1) process:</p>
+<p>\(log(z_{t}) = \rho log(z_{t-1}) &#43; \epsilon_{t}\)</p>
+<p>with \(\epsilon_{t}\) normally distributed with variance \(\psi \equiv \sigma \times \sqrt(1.0 - \rho^2)\).</p>
+<p>This implies that the unconditional distribution of \(log(z)\) is normally distributed with mean 0 and variance \(\sigma\). Or said differently, \(z\) is \(Lognormal(0, \sigma)\). In the block of code below, we check this fact by comparing some simulated data and the pdf of a \(Lognormal(0, \sigma)\).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>Nt <span style="color:#f92672">=</span> <span style="color:#ae81ff">20000000</span> <span style="color:#75715e">#number of draws</span>
+</span></span><span style="display:flex;"><span>d <span style="color:#f92672">=</span> Normal(<span style="color:#ae81ff">0</span>, p<span style="color:#f92672">.</span>psi)
+</span></span><span style="display:flex;"><span>innov <span style="color:#f92672">=</span> rand(d, Nt)
+</span></span><span style="display:flex;"><span>log_z <span style="color:#f92672">=</span> zeros(Nt)
+</span></span><span style="display:flex;"><span>z <span style="color:#f92672">=</span> zeros(Nt)
+</span></span><span style="display:flex;"><span>log_z[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> t<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>Nt
+</span></span><span style="display:flex;"><span>    log_z[t] <span style="color:#f92672">=</span> p<span style="color:#f92672">.</span>rho<span style="color:#f92672">*</span>log_z[t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> innov[t]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>z <span style="color:#f92672">=</span> exp<span style="color:#f92672">.</span>(log_z)
+</span></span><span style="display:flex;"><span>d_log_normal <span style="color:#f92672">=</span> LogNormal(<span style="color:#ae81ff">0.0</span>, p<span style="color:#f92672">.</span>sigma)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>density(z, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;data&#34;</span>)
+</span></span><span style="display:flex;"><span>plot!(minimum(z)<span style="color:#f92672">:</span><span style="color:#ae81ff">0.01</span><span style="color:#f92672">:</span>maximum(z), x <span style="color:#f92672">-&gt;</span> pdf(d_log_normal, x), label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;LogNormal&#34;</span>)
+</span></span></code></pre></div><p><img src="/post/ann_2/ANN_2_11_0.svg" alt="svg"></p>
+<p>Most of the time, \(z\) is going to be between the 5th and the 95th percentile of \(Lognormal(0, \sigma)\). Hence, we define the grid for \(z\) to be \([P5, P95]\).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>P5 <span style="color:#f92672">=</span> quantile(d_log_normal, <span style="color:#ae81ff">0.05</span>)
+</span></span><span style="display:flex;"><span>P95 <span style="color:#f92672">=</span> quantile(d_log_normal, <span style="color:#ae81ff">0.95</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;P5: </span><span style="color:#e6db74">$</span>(P5)<span style="color:#e6db74">; P95: </span><span style="color:#e6db74">$</span>(P95)<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>P5: 0.8891200789438004; P95: 1.1247074761689282
 </code></pre>
-
-<p><img src="ANN_2_11_0.svg" alt="svg" /></p>
-
-<p>Most of the time, $z$ is going to be between the 5th and the 95th percentile of $Lognormal(0, \sigma)$. Hence, we define the grid for $z$ to be $[P5, P95]$.</p>
-
-<pre><code class="language-julia">P5 = quantile(d_log_normal, 0.05)
-P95 = quantile(d_log_normal, 0.95)
-println(&quot;P5: $(P5); P95: $(P95)&quot;)
-</code></pre>
-
-<pre><code>P5: 0.8891200789438004; P95: 1.1247074761689282
-</code></pre>
-
-<pre><code class="language-julia">#Sampling for training
-n_samples_xy = 10; #number of draws for the x and y dimensions
-n_samples_z = 10; #number of draws for the z dimension
-lower_bound = [0.0, 0.0, P5]
-upper_bound = [1.0, 1.0, P95]
-
-x_grid = collect(range(lower_bound[1], upper_bound[1], length=n_samples_xy))
-y_grid = collect(range(lower_bound[2], upper_bound[2], length=n_samples_xy))
-z_grid = collect(range(lower_bound[3], upper_bound[3], length=n_samples_z))
-
-nodes_xyz = (x_grid, y_grid, z_grid, ); #for package Interpolations
-</code></pre>
-
-<h4 id="value-function-iteration">Value function iteration</h4>
-
-<p>The following block of code uses the VFI algorithm and displays the final results. The value function $S(x,y,z)$ is a non-linear transformation of the value of net output of the job $s(x,y,z)$.</p>
-
-<pre><code class="language-julia">V_old = zeros(n_samples_xy, n_samples_xy, n_samples_z)
-V_new = zeros(n_samples_xy, n_samples_xy, n_samples_z)
-
-# Initial guess
-for (zIndex, zValue) in enumerate(z_grid)
-    for (yIndex, yValue) in enumerate(y_grid)
-        for (xIndex, xValue) in enumerate(x_grid)
-            V_old[xIndex, yIndex, zIndex] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r))*max(0.0, p.s_xyz(xValue, yValue, zValue))
-        end
-    end
-end
-
-itp = interpolate(nodes_xyz, V_old, Gridded(Linear()))
-etp = extrapolate(itp, Line())
-V_old_interpolated = (x) -&gt; etp(x[1], x[2], x[3])
-
-max_iter = 5000
-tol = 10^-8
-
-@time begin
-    # Initialize
-    for i = 1:max_iter
-
-        for (zIndex, zValue) in enumerate(z_grid)
-            for (yIndex, yValue) in enumerate(y_grid)
-                for (xIndex, xValue) in enumerate(x_grid)
-                    V_new[xIndex, yIndex, zIndex] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*[max.(0.0, V_old_interpolated([xValue; yValue; (zValue.^p.rho).*exp.(innovation)])) for innovation in p.nodes_E])
-                end
-            end
-        end
-
-        # DISTANCE
-        diff= maximum(abs.(V_new .- V_old))
-        if mod(i, 100) == 0
-            println(&quot;Iter $(i) Diff : $(diff)&quot;)
-        end
-
-        if diff &lt; tol
-            println(&quot;Iter $(i) Convergence reached&quot;)
-            break
-        end
-
-        #UPDATE
-        V_old = copy(V_new)
-        itp = interpolate(nodes_xyz, V_old, Gridded(Linear()))
-        etp = extrapolate(itp, Line())
-        V_old_interpolated = (x) -&gt; etp(x[1], x[2], x[3])
-
-    end
-end
-
-# Plot output for trained neural network
-p1 = plot(p.x_grid, p.y_grid, (x, y) -&gt; V_old_interpolated([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:surface)
-title!(L&quot;S(x,y,z=1)&quot;)
-xlabel!(L&quot;x&quot;)
-ylabel!(L&quot;y&quot;)
-
-# Initialization function
-p2 = plot(p.x_grid, p.y_grid, (x, y) -&gt; p.s_xyz(x, y, 1.0), label = &quot;f(x)&quot;, st=:surface)
-title!(L&quot;s(x,y,z=1)&quot;)
-xlabel!(L&quot;x&quot;)
-ylabel!(L&quot;y&quot;)
-
-p3 = plot(p.x_grid, p.y_grid, (x, y) -&gt; V_old_interpolated([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:contour)
-title!(L&quot;S(x,y,z=1)&quot;)
-xlabel!(L&quot;x&quot;)
-ylabel!(L&quot;y&quot;)
-
-p4 = plot(p.x_grid, p.y_grid, (x, y) -&gt; p.s_xyz(x, y, 1.0), label = &quot;f(x)&quot;, st=:contour)
-title!(L&quot;s(x,y,z=1)&quot;)
-xlabel!(L&quot;x&quot;)
-ylabel!(L&quot;y&quot;)
-
-ratio = 9/16
-width = 800
-pp = plot(p1, p2, p3, p4, size = (width, width*ratio))
-</code></pre>
-
-<pre><code>Iter 100 Diff : 0.18062930117157094
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#Sampling for training</span>
+</span></span><span style="display:flex;"><span>n_samples_xy <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>; <span style="color:#75715e">#number of draws for the x and y dimensions</span>
+</span></span><span style="display:flex;"><span>n_samples_z <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>; <span style="color:#75715e">#number of draws for the z dimension</span>
+</span></span><span style="display:flex;"><span>lower_bound <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, P5]
+</span></span><span style="display:flex;"><span>upper_bound <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">1.0</span>, P95]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>x_grid <span style="color:#f92672">=</span> collect(range(lower_bound[<span style="color:#ae81ff">1</span>], upper_bound[<span style="color:#ae81ff">1</span>], length<span style="color:#f92672">=</span>n_samples_xy))
+</span></span><span style="display:flex;"><span>y_grid <span style="color:#f92672">=</span> collect(range(lower_bound[<span style="color:#ae81ff">2</span>], upper_bound[<span style="color:#ae81ff">2</span>], length<span style="color:#f92672">=</span>n_samples_xy))
+</span></span><span style="display:flex;"><span>z_grid <span style="color:#f92672">=</span> collect(range(lower_bound[<span style="color:#ae81ff">3</span>], upper_bound[<span style="color:#ae81ff">3</span>], length<span style="color:#f92672">=</span>n_samples_z))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nodes_xyz <span style="color:#f92672">=</span> (x_grid, y_grid, z_grid, ); <span style="color:#75715e">#for package Interpolations</span>
+</span></span></code></pre></div><h4 id="value-function-iteration">Value function iteration</h4>
+<p>The following block of code uses the VFI algorithm and displays the final results. The value function \(S(x,y,z)\) is a non-linear transformation of the value of net output of the job \(s(x,y,z)\).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>V_old <span style="color:#f92672">=</span> zeros(n_samples_xy, n_samples_xy, n_samples_z)
+</span></span><span style="display:flex;"><span>V_new <span style="color:#f92672">=</span> zeros(n_samples_xy, n_samples_xy, n_samples_z)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initial guess</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (zIndex, zValue) <span style="color:#66d9ef">in</span> enumerate(z_grid)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (yIndex, yValue) <span style="color:#66d9ef">in</span> enumerate(y_grid)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (xIndex, xValue) <span style="color:#66d9ef">in</span> enumerate(x_grid)
+</span></span><span style="display:flex;"><span>            V_old[xIndex, yIndex, zIndex] <span style="color:#f92672">=</span> p<span style="color:#f92672">.</span>s_xyz(xValue, yValue, zValue) <span style="color:#f92672">+</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">*</span>max(<span style="color:#ae81ff">0.0</span>, p<span style="color:#f92672">.</span>s_xyz(xValue, yValue, zValue))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>itp <span style="color:#f92672">=</span> interpolate(nodes_xyz, V_old, Gridded(Linear()))
+</span></span><span style="display:flex;"><span>etp <span style="color:#f92672">=</span> extrapolate(itp, Line())
+</span></span><span style="display:flex;"><span>V_old_interpolated <span style="color:#f92672">=</span> (x) <span style="color:#f92672">-&gt;</span> etp(x[<span style="color:#ae81ff">1</span>], x[<span style="color:#ae81ff">2</span>], x[<span style="color:#ae81ff">3</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>max_iter <span style="color:#f92672">=</span> <span style="color:#ae81ff">5000</span>
+</span></span><span style="display:flex;"><span>tol <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span><span style="color:#f92672">^-</span><span style="color:#ae81ff">8</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Initialize</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>max_iter
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (zIndex, zValue) <span style="color:#66d9ef">in</span> enumerate(z_grid)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> (yIndex, yValue) <span style="color:#66d9ef">in</span> enumerate(y_grid)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> (xIndex, xValue) <span style="color:#66d9ef">in</span> enumerate(x_grid)
+</span></span><span style="display:flex;"><span>                    V_new[xIndex, yIndex, zIndex] <span style="color:#f92672">=</span> p<span style="color:#f92672">.</span>s_xyz(xValue, yValue, zValue) <span style="color:#f92672">+</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>sum(p<span style="color:#f92672">.</span>weigths_E<span style="color:#f92672">.*</span>[max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, V_old_interpolated([xValue; yValue; (zValue<span style="color:#f92672">.^</span>p<span style="color:#f92672">.</span>rho)<span style="color:#f92672">.*</span>exp<span style="color:#f92672">.</span>(innovation)])) <span style="color:#66d9ef">for</span> innovation <span style="color:#66d9ef">in</span> p<span style="color:#f92672">.</span>nodes_E])
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># DISTANCE</span>
+</span></span><span style="display:flex;"><span>        diff<span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(V_new <span style="color:#f92672">.-</span> V_old))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> mod(i, <span style="color:#ae81ff">100</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            println(<span style="color:#e6db74">&#34;Iter </span><span style="color:#e6db74">$</span>(i)<span style="color:#e6db74"> Diff : </span><span style="color:#e6db74">$</span>(diff)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> diff <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>            println(<span style="color:#e6db74">&#34;Iter </span><span style="color:#e6db74">$</span>(i)<span style="color:#e6db74"> Convergence reached&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#UPDATE</span>
+</span></span><span style="display:flex;"><span>        V_old <span style="color:#f92672">=</span> copy(V_new)
+</span></span><span style="display:flex;"><span>        itp <span style="color:#f92672">=</span> interpolate(nodes_xyz, V_old, Gridded(Linear()))
+</span></span><span style="display:flex;"><span>        etp <span style="color:#f92672">=</span> extrapolate(itp, Line())
+</span></span><span style="display:flex;"><span>        V_old_interpolated <span style="color:#f92672">=</span> (x) <span style="color:#f92672">-&gt;</span> etp(x[<span style="color:#ae81ff">1</span>], x[<span style="color:#ae81ff">2</span>], x[<span style="color:#ae81ff">3</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> V_old_interpolated([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;S(x,y,z=1)&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initialization function</span>
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> p<span style="color:#f92672">.</span>s_xyz(x, y, <span style="color:#ae81ff">1.0</span>), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;s(x,y,z=1)&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p3 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> V_old_interpolated([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:contour</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;S(x,y,z=1)&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p4 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> p<span style="color:#f92672">.</span>s_xyz(x, y, <span style="color:#ae81ff">1.0</span>), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:contour</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;s(x,y,z=1)&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ratio <span style="color:#f92672">=</span> <span style="color:#ae81ff">9</span><span style="color:#f92672">/</span><span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>width <span style="color:#f92672">=</span> <span style="color:#ae81ff">800</span>
+</span></span><span style="display:flex;"><span>pp <span style="color:#f92672">=</span> plot(p1, p2, p3, p4, size <span style="color:#f92672">=</span> (width, width<span style="color:#f92672">*</span>ratio))
+</span></span></code></pre></div><pre><code>Iter 100 Diff : 0.18062930117157094
 Iter 200 Diff : 0.04545706889411605
 Iter 300 Diff : 0.011441422819899572
 Iter 400 Diff : 0.002880196260427681
@@ -822,174 +761,149 @@ Iter 1300 Diff : 1.1763880536364013e-8
 Iter 1312 Convergence reached
  43.861711 seconds (266.61 M allocations: 12.326 GiB, 3.34% gc time, 0.15% compilation time)
 </code></pre>
-
-<p><img src="ANN_2_16_1.svg" alt="svg" /></p>
-
-<h3 id="ii-c-bellman-ann">II.C. Bellman - ANN</h3>
-
+<p><img src="/post/ann_2/ANN_2_16_1.svg" alt="svg"></p>
+<h3 id="iic-bellman---ann">II.C. Bellman - ANN</h3>
 <p>When doing value function iteration, one does not have to vectorize the code. However, I have learned the hard-way that it matters quite a lot when switching to the ANN approach, especially if you aim to use a GPU. So let&rsquo;s tackle this problem right now.</p>
-
 <p>The trick is to realize that the expectation operator is just a large weighted average, which can be represented by a matrix multiplication when grid points are chosen carefully.</p>
-
-<p>Let&rsquo;s consider all the value of $S(x,y,z)$ from the grid, arranged in a large row vector of dimension $(1; n_x \times n_y \times n_z)$ : $$ \small \begin{pmatrix}
-S(x_1,y_1, z_1) &amp; S(x_2,y_1, z_1) &amp; &hellip; &amp; S(x_{nx},y_1, z_1) &amp; S(x_{1},y_2, z_1) &amp; &hellip; &amp; S(x_{nx},y_{ny}, z_{nz}) \end{pmatrix}$$</p>
-
-<p>Using this convention, one can verify that the initial Bellman equation can be written as:</p>
-
-<p>$$ \small \begin{pmatrix}
-S(x_1,y_1, z_1) &amp; S(x_2,y_1, z_1) &amp; &hellip; &amp; S(x_{nx},y_{ny}, z_{nz})
-\end{pmatrix} = \begin{pmatrix}s(x_1,y_1, z_1) &amp; s(x_2,y_1, z_1) &amp; &hellip; &amp; s(x_{nx},y_{ny}, z_{nz}) \end{pmatrix} + \frac{1 - \delta}{1 + r} \begin{pmatrix}
-S(x_1,y_1, z_1&rsquo;|z_1) &amp; S(x_1,y_1, z_2&rsquo;|z_1) &amp; &hellip; &amp; S(x_1,y_1, z_{nz&rsquo;}|z_1) &amp; S(x_2,y_1, z_{1&rsquo;}|z_1) &amp; &hellip; &amp; S(x_{nx},y_{ny}, z_{nz&rsquo;}|z_{nz}) \end{pmatrix} \times W
-$$</p>
-
-<p>where $W$ is large (sparse) matrix of dimension $(n_x \times n_y \times n_z \times n_{z&rsquo;}; n_x \times n_y \times n_z)$ containing the weights to approximate the expectation operator:</p>
-
-<p>$$ \small
-W \equiv \begin{pmatrix} w1 &amp; w2 &amp; &hellip; &amp; w_{nz&rsquo;} &amp; 0 &amp; &hellip; &amp; 0 \\ 0 &amp; 0 &amp; &hellip; &amp; 0 &amp; w1 &amp; w2 &amp; &hellip; &amp; w_{nz&rsquo;} &amp; 0 &amp; &hellip; 0 \\ 0 &amp; 0 &amp; &hellip; &amp; 0 &amp; 0 &amp; 0 &amp; &hellip; &amp; 0 &amp; w1 &amp; w2 &amp; &hellip; &amp; w_{nz&rsquo;} \end{pmatrix}^T
-$$</p>
-
-<p>For this vectorized approach to work, we need to define two grids:</p>
-
+<p>Let&rsquo;s consider all the value of \(S(x,y,z)\) from the grid, arranged in a large row vector of dimension \((1; n_x \times n_y \times n_z)\) : </p>
+\[ \small \begin{pmatrix}
+S(x_1,y_1, z_1) &amp; S(x_2,y_1, z_1) &amp; ... &amp; S(x_{nx},y_1, z_1) &amp; S(x_{1},y_2, z_1) &amp; ... &amp; S(x_{nx},y_{ny}, z_{nz}) \end{pmatrix}\]<p>Using this convention, one can verify that the initial Bellman equation can be written as:</p>
+\[ \small \begin{pmatrix}
+S(x_1,y_1, z_1) &amp; S(x_2,y_1, z_1) &amp; ... &amp; S(x_{nx},y_{ny}, z_{nz})
+\end{pmatrix} = \begin{pmatrix}s(x_1,y_1, z_1) &amp; s(x_2,y_1, z_1) &amp; ... &amp; s(x_{nx},y_{ny}, z_{nz}) \end{pmatrix} &#43; \frac{1 - \delta}{1 &#43; r} \begin{pmatrix}
+S(x_1,y_1, z_1&#39;|z_1) &amp; S(x_1,y_1, z_2&#39;|z_1) &amp; ... &amp; S(x_1,y_1, z_{nz&#39;}|z_1) &amp; S(x_2,y_1, z_{1&#39;}|z_1) &amp; ... &amp; S(x_{nx},y_{ny}, z_{nz&#39;}|z_{nz}) \end{pmatrix} \times W
+\]<p>where \(W\) is large (sparse) matrix of dimension \((n_x \times n_y \times n_z \times n_{z&#39;}; n_x \times n_y \times n_z)\) containing the weights to approximate the expectation operator:</p>
+\[ \small
+W \equiv \begin{pmatrix} w1 &amp; w2 &amp; ... &amp; w_{nz&#39;} &amp; 0 &amp; ... &amp; 0 \\ 0 &amp; 0 &amp; ... &amp; 0 &amp; w1 &amp; w2 &amp; ... &amp; w_{nz&#39;} &amp; 0 &amp; ... 0 \\ 0 &amp; 0 &amp; ... &amp; 0 &amp; 0 &amp; 0 &amp; ... &amp; 0 &amp; w1 &amp; w2 &amp; ... &amp; w_{nz&#39;} \end{pmatrix}^T
+\]<p>For this vectorized approach to work, we need to define two grids:</p>
 <ul>
-<li><p>one grid for the &ldquo;today&rsquo;s part&rdquo;:
-$\small \begin{pmatrix} S(x_1,y_1, z_1) &amp; S(x_2,y_1, z_1) &amp; &hellip; &amp; S(x_{nx},y_{ny}, z_{nz}) \end{pmatrix} $ and $\begin{pmatrix}s(x_1,y_1, z_1) &amp; s(x_2,y_1, z_1) &amp; &hellip; &amp; s(x_{nx},y_{ny}, z_{nz}) \end{pmatrix}$</p></li>
-
-<li><p>one grid for the &ldquo;expectation part&rdquo; (the value of $z$ tomorrow depends on the value today) $\small \begin{pmatrix} S(x_1,y_1, z_1&rsquo;|z_1) &amp; S(x_1,y_1, z_2&rsquo;|z_1) &amp; &hellip; &amp; S(x_1,y_1, z_{nz&rsquo;}|z_1) &amp; S(x_2,y_1, z_{1&rsquo;}|z_1) &amp; &hellip; &amp; S(x_{nx},y_{ny}, z_{nz&rsquo;}|z_{nz}) \end{pmatrix}$</p></li>
+<li>
+<p>one grid for the &ldquo;today&rsquo;s part&rdquo;:
+\(\small \begin{pmatrix} S(x_1,y_1, z_1) &amp; S(x_2,y_1, z_1) &amp; ... &amp; S(x_{nx},y_{ny}, z_{nz}) \end{pmatrix} \) and \(\begin{pmatrix}s(x_1,y_1, z_1) &amp; s(x_2,y_1, z_1) &amp; ... &amp; s(x_{nx},y_{ny}, z_{nz}) \end{pmatrix}\)</p>
+</li>
+<li>
+<p>one grid for the &ldquo;expectation part&rdquo; (the value of \(z\) tomorrow depends on the value today) \(\small \begin{pmatrix} S(x_1,y_1, z_1&#39;|z_1) &amp; S(x_1,y_1, z_2&#39;|z_1) &amp; ... &amp; S(x_1,y_1, z_{nz&#39;}|z_1) &amp; S(x_2,y_1, z_{1&#39;}|z_1) &amp; ... &amp; S(x_{nx},y_{ny}, z_{nz&#39;}|z_{nz}) \end{pmatrix}\)</p>
+</li>
 </ul>
-
 <p>I also define some grid points that are not used for the gradient descent phase (the &ldquo;test set&rdquo;). These points allow us to verify that we are not overfitting the training sample.</p>
-
-<pre><code class="language-julia">nb_dim = 3
-
-#-------------------------------------------------------------
-# Train set
-#-------------------------------------------------------------
-# Grid for the LHS
-# Grid (1, nx * ny * nz )
-grid_1 = zeros(nb_dim, n_samples_xy*n_samples_xy*n_samples_z);
-
-index = 1
-for (xValue, yValue, zValue) in product(x_grid, y_grid, z_grid)
-    grid_1[1, index] = xValue
-    grid_1[2, index] = yValue
-    grid_1[3, index] = zValue
-    index+=1
-end
-
-# Grid for the RHS (calculate expectations)
-# Grid (1, nx * ny * nz * nz')
-grid_2 = zeros(nb_dim, n_samples_xy*n_samples_xy*n_samples_z*p.nb_nodes);
-
-# Populate grid_2
-index = 1
-for (xValue, yValue, zValue) in product(x_grid, y_grid, z_grid)
-    for (innovation_index, innovation) in enumerate(p.nodes_E)
-        grid_2[1, index] = xValue
-        grid_2[2, index] = yValue
-        grid_2[3, index] = (zValue.^p.rho).*exp.(innovation)
-        index+=1
-    end
-end
-
-#-------------------------------------------------------------
-# Test set
-#-------------------------------------------------------------
-# Sampling for test
-n_samples_test = 1000
-grid_test_1 = zeros(nb_dim, n_samples_test);
-
-index = 1
-for (xValue, yValue, zValue) in Surrogates.sample(n_samples_test, lower_bound, upper_bound, SobolSample())
-    grid_test_1[1, index] = xValue
-    grid_test_1[2, index] = yValue
-    grid_test_1[3, index] = zValue
-    index+=1
-end
-
-grid_test_2 = zeros(nb_dim, n_samples_xy*n_samples_xy*n_samples_z*p.nb_nodes);
-
-# Populate grid_test_2
-index = 1
-for (xValue, yValue, zValue) in zip(grid_test_1[1,:], grid_test_1[2,:], grid_test_1[3,:])
-    for (innovation_index, innovation) in enumerate(p.nodes_E)
-        grid_test_2[1, index] = xValue
-        grid_test_2[2, index] = yValue
-        grid_test_2[3, index] = (zValue.^p.rho).*exp.(innovation)
-        index+=1
-    end
-end
-
-# To calculate the expectation
-W = sparse(kronecker(Matrix(I, n_samples_xy*n_samples_xy*n_samples_z, n_samples_xy*n_samples_xy*n_samples_z), p.weigths_E));
-</code></pre>
-
-<pre><code class="language-julia"># Define the neural network layers
-# Specify our model
-dim_input = 3
-dim_ouptut = 1
-
-Q1 = 300;
-Q2 = 100;
-Q3 = 10;
-
-activation_f = relu;
-
-model = Chain(Dense(dim_input,Q1,activation_f),
-            Dense(Q1,Q2,activation_f),
-            Dense(Q2,Q3,activation_f),
-            Dense(Q3,dim_ouptut,identity));
-</code></pre>
-
-<p>Check one pass of the gradient:</p>
-
-<pre><code class="language-julia">ps = Flux.params(model)
-y = zeros(1, size(grid_1, 2))
-s_xyz_r = transpose(p.s_xyz_r(grid_1)) #precalculate net output on grid
-
-@time begin
-    gs = gradient(() -&gt; Flux.Losses.mse(model(grid_1) - s_xyz_r + ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_2))*W, y), ps)
-end
-</code></pre>
-
-<h4 id="initializing-the-model">Initializing the model</h4>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>nb_dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Train set</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Grid for the LHS</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Grid (1, nx * ny * nz )</span>
+</span></span><span style="display:flex;"><span>grid_1 <span style="color:#f92672">=</span> zeros(nb_dim, n_samples_xy<span style="color:#f92672">*</span>n_samples_xy<span style="color:#f92672">*</span>n_samples_z);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (xValue, yValue, zValue) <span style="color:#66d9ef">in</span> product(x_grid, y_grid, z_grid)
+</span></span><span style="display:flex;"><span>    grid_1[<span style="color:#ae81ff">1</span>, index] <span style="color:#f92672">=</span> xValue
+</span></span><span style="display:flex;"><span>    grid_1[<span style="color:#ae81ff">2</span>, index] <span style="color:#f92672">=</span> yValue
+</span></span><span style="display:flex;"><span>    grid_1[<span style="color:#ae81ff">3</span>, index] <span style="color:#f92672">=</span> zValue
+</span></span><span style="display:flex;"><span>    index<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Grid for the RHS (calculate expectations)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Grid (1, nx * ny * nz * nz&#39;)</span>
+</span></span><span style="display:flex;"><span>grid_2 <span style="color:#f92672">=</span> zeros(nb_dim, n_samples_xy<span style="color:#f92672">*</span>n_samples_xy<span style="color:#f92672">*</span>n_samples_z<span style="color:#f92672">*</span>p<span style="color:#f92672">.</span>nb_nodes);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Populate grid_2</span>
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (xValue, yValue, zValue) <span style="color:#66d9ef">in</span> product(x_grid, y_grid, z_grid)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (innovation_index, innovation) <span style="color:#66d9ef">in</span> enumerate(p<span style="color:#f92672">.</span>nodes_E)
+</span></span><span style="display:flex;"><span>        grid_2[<span style="color:#ae81ff">1</span>, index] <span style="color:#f92672">=</span> xValue
+</span></span><span style="display:flex;"><span>        grid_2[<span style="color:#ae81ff">2</span>, index] <span style="color:#f92672">=</span> yValue
+</span></span><span style="display:flex;"><span>        grid_2[<span style="color:#ae81ff">3</span>, index] <span style="color:#f92672">=</span> (zValue<span style="color:#f92672">.^</span>p<span style="color:#f92672">.</span>rho)<span style="color:#f92672">.*</span>exp<span style="color:#f92672">.</span>(innovation)
+</span></span><span style="display:flex;"><span>        index<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Test set</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sampling for test</span>
+</span></span><span style="display:flex;"><span>n_samples_test <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>grid_test_1 <span style="color:#f92672">=</span> zeros(nb_dim, n_samples_test);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (xValue, yValue, zValue) <span style="color:#66d9ef">in</span> Surrogates<span style="color:#f92672">.</span>sample(n_samples_test, lower_bound, upper_bound, SobolSample())
+</span></span><span style="display:flex;"><span>    grid_test_1[<span style="color:#ae81ff">1</span>, index] <span style="color:#f92672">=</span> xValue
+</span></span><span style="display:flex;"><span>    grid_test_1[<span style="color:#ae81ff">2</span>, index] <span style="color:#f92672">=</span> yValue
+</span></span><span style="display:flex;"><span>    grid_test_1[<span style="color:#ae81ff">3</span>, index] <span style="color:#f92672">=</span> zValue
+</span></span><span style="display:flex;"><span>    index<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>grid_test_2 <span style="color:#f92672">=</span> zeros(nb_dim, n_samples_xy<span style="color:#f92672">*</span>n_samples_xy<span style="color:#f92672">*</span>n_samples_z<span style="color:#f92672">*</span>p<span style="color:#f92672">.</span>nb_nodes);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Populate grid_test_2</span>
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (xValue, yValue, zValue) <span style="color:#66d9ef">in</span> zip(grid_test_1[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>], grid_test_1[<span style="color:#ae81ff">2</span>,<span style="color:#f92672">:</span>], grid_test_1[<span style="color:#ae81ff">3</span>,<span style="color:#f92672">:</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (innovation_index, innovation) <span style="color:#66d9ef">in</span> enumerate(p<span style="color:#f92672">.</span>nodes_E)
+</span></span><span style="display:flex;"><span>        grid_test_2[<span style="color:#ae81ff">1</span>, index] <span style="color:#f92672">=</span> xValue
+</span></span><span style="display:flex;"><span>        grid_test_2[<span style="color:#ae81ff">2</span>, index] <span style="color:#f92672">=</span> yValue
+</span></span><span style="display:flex;"><span>        grid_test_2[<span style="color:#ae81ff">3</span>, index] <span style="color:#f92672">=</span> (zValue<span style="color:#f92672">.^</span>p<span style="color:#f92672">.</span>rho)<span style="color:#f92672">.*</span>exp<span style="color:#f92672">.</span>(innovation)
+</span></span><span style="display:flex;"><span>        index<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># To calculate the expectation</span>
+</span></span><span style="display:flex;"><span>W <span style="color:#f92672">=</span> sparse(kronecker(<span style="color:#66d9ef">Matrix</span>(I, n_samples_xy<span style="color:#f92672">*</span>n_samples_xy<span style="color:#f92672">*</span>n_samples_z, n_samples_xy<span style="color:#f92672">*</span>n_samples_xy<span style="color:#f92672">*</span>n_samples_z), p<span style="color:#f92672">.</span>weigths_E));
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Define the neural network layers</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Specify our model</span>
+</span></span><span style="display:flex;"><span>dim_input <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>dim_ouptut <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Q1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">300</span>;
+</span></span><span style="display:flex;"><span>Q2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;
+</span></span><span style="display:flex;"><span>Q3 <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>activation_f <span style="color:#f92672">=</span> relu;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> Chain(Dense(dim_input,Q1,activation_f),
+</span></span><span style="display:flex;"><span>            Dense(Q1,Q2,activation_f),
+</span></span><span style="display:flex;"><span>            Dense(Q2,Q3,activation_f),
+</span></span><span style="display:flex;"><span>            Dense(Q3,dim_ouptut,identity));
+</span></span></code></pre></div><p>Check one pass of the gradient:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>ps <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>params(model)
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">1</span>, size(grid_1, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>s_xyz_r <span style="color:#f92672">=</span> transpose(p<span style="color:#f92672">.</span>s_xyz_r(grid_1)) <span style="color:#75715e">#precalculate net output on grid</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>    gs <span style="color:#f92672">=</span> gradient(() <span style="color:#f92672">-&gt;</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_1) <span style="color:#f92672">-</span> s_xyz_r <span style="color:#f92672">+</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, model(grid_2))<span style="color:#f92672">*</span>W, y), ps)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><h4 id="initializing-the-model">Initializing the model</h4>
 <p>We can start with random coefficients and try to solve for the function S(.) directly.
 However, it is better to initialize the coefficients of the ANN to match a not too far-fetched guess:</p>
-
-<pre><code class="language-julia">lr = 0.001 # learning rate when batchsize = 1000
-opt = ADAM(lr)
-
-epochs_training = 100 # Define the number of epochs
-trainingLosses = zeros(epochs_training); # Keep track of the training progress
-testLosses = zeros(epochs_training); # Test on data not used in the training
-
-ps = Flux.params(model) #initialize weigths
-p_bar = Progress(epochs_training; desc = &quot;Training in progress&quot;); # Creates a progress bar
-showProgress = true
-
-y = zeros(1, size(grid_1, 2))
-s_xyz_r = transpose(p.s_xyz_r(grid_1)) #precalculate net output on grid
-s_xyz_r_test = transpose(p.s_xyz_r(grid_test_1)) #precalculate net output on test grid
-
-# Training loop
-@time for ii in 1:epochs_training
-
-    gs = gradient(() -&gt; Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, s_xyz_r), y), ps)# compute gradient
-    Flux.Optimise.update!(opt, ps, gs) # update parameters
-
-
-    if showProgress
-        trainingLosses[ii] = Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, s_xyz_r), y)
-        testLosses[ii] = Flux.Losses.mse(model(grid_test_1) - s_xyz_r_test - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, s_xyz_r_test), y)
-        next!(p_bar; showvalues = [(:epochs, ii), (:logloss, log.(trainingLosses[ii])), (:loglosstest, log.(testLosses[ii]))], valuecolor = :grey)
-    end
-
-end
-
-
-</code></pre>
-
-<pre><code>┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>lr <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.001</span> <span style="color:#75715e"># learning rate when batchsize = 1000</span>
+</span></span><span style="display:flex;"><span>opt <span style="color:#f92672">=</span> ADAM(lr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>epochs_training <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span> <span style="color:#75715e"># Define the number of epochs</span>
+</span></span><span style="display:flex;"><span>trainingLosses <span style="color:#f92672">=</span> zeros(epochs_training); <span style="color:#75715e"># Keep track of the training progress</span>
+</span></span><span style="display:flex;"><span>testLosses <span style="color:#f92672">=</span> zeros(epochs_training); <span style="color:#75715e"># Test on data not used in the training</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ps <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>params(model) <span style="color:#75715e">#initialize weigths</span>
+</span></span><span style="display:flex;"><span>p_bar <span style="color:#f92672">=</span> Progress(epochs_training; desc <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Training in progress&#34;</span>); <span style="color:#75715e"># Creates a progress bar</span>
+</span></span><span style="display:flex;"><span>showProgress <span style="color:#f92672">=</span> true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">1</span>, size(grid_1, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>s_xyz_r <span style="color:#f92672">=</span> transpose(p<span style="color:#f92672">.</span>s_xyz_r(grid_1)) <span style="color:#75715e">#precalculate net output on grid</span>
+</span></span><span style="display:flex;"><span>s_xyz_r_test <span style="color:#f92672">=</span> transpose(p<span style="color:#f92672">.</span>s_xyz_r(grid_test_1)) <span style="color:#75715e">#precalculate net output on test grid</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Training loop</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> <span style="color:#66d9ef">for</span> ii <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>epochs_training
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    gs <span style="color:#f92672">=</span> gradient(() <span style="color:#f92672">-&gt;</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_1) <span style="color:#f92672">-</span> s_xyz_r <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, s_xyz_r), y), ps)<span style="color:#75715e"># compute gradient</span>
+</span></span><span style="display:flex;"><span>    Flux<span style="color:#f92672">.</span>Optimise<span style="color:#f92672">.</span>update!(opt, ps, gs) <span style="color:#75715e"># update parameters</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> showProgress
+</span></span><span style="display:flex;"><span>        trainingLosses[ii] <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_1) <span style="color:#f92672">-</span> s_xyz_r <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, s_xyz_r), y)
+</span></span><span style="display:flex;"><span>        testLosses[ii] <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_test_1) <span style="color:#f92672">-</span> s_xyz_r_test <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, s_xyz_r_test), y)
+</span></span><span style="display:flex;"><span>        next!(p_bar; showvalues <span style="color:#f92672">=</span> [(<span style="color:#e6db74">:epochs</span>, ii), (<span style="color:#e6db74">:logloss</span>, log<span style="color:#f92672">.</span>(trainingLosses[ii])), (<span style="color:#e6db74">:loglosstest</span>, log<span style="color:#f92672">.</span>(testLosses[ii]))], valuecolor <span style="color:#f92672">=</span> <span style="color:#e6db74">:grey</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
 │  - To prevent this behaviour, do `ProgressMeter.ijulia_behavior(:append)`.
 │  - To disable this warning message, do `ProgressMeter.ijulia_behavior(:clear)`.
 └ @ ProgressMeter /home/julien/.julia/packages/ProgressMeter/Vf8un/src/ProgressMeter.jl:620
@@ -1001,80 +915,72 @@ end
 
   7.398687 seconds (285.46 k allocations: 2.889 GiB, 5.29% gc time, 5.06% compilation time)
 </code></pre>
-
-<pre><code class="language-julia">init_f = (x,y,z) -&gt; p.s_xyz(x,y,z) .+ ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, p.s_xyz(x,y,z))
-
-gr()
-# Plot output for trained neural network
-p1 = plot(p.x_grid, p.y_grid, (x, y) -&gt; model([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:surface)
-title!(&quot;ANN&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-# Plot training loss
-p2 = plot(1:epochs_training, log.(trainingLosses), label = &quot;Train set&quot;, linewidth = 2)
-plot!(1:epochs_training, log.(testLosses), label = &quot;Test set&quot;, linewidth = 2)
-title!(&quot;Log Training Loss&quot;)
-xlabel!(&quot;Epoch&quot;)
-ylabel!(L&quot;\log(\textrm{Loss})&quot;)
-
-# Plot training loss
-# Plot output for trained neural network
-p3 = plot(p.x_grid, p.y_grid, (x, y) -&gt; init_f(x, y, 1.0), label = &quot;f(x)&quot;, st=:surface)
-title!(&quot;Initial Guess&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-# Plot training loss
-# Plot output for trained neural network
-p4 = plot(p.x_grid, p.y_grid, (x, y) -&gt; model([x; y; 1.0])[1] - init_f(x, y, 1.0), label = &quot;f(x)&quot;, st=:surface)
-title!(&quot;Initial Guess - VFI&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-
-ratio = 9/16
-width = 800
-pp = plot(p1, p2, p3, p4, size = (width, width*ratio))
-</code></pre>
-
-<p><img src="ANN_2_24_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>init_f <span style="color:#f92672">=</span> (x,y,z) <span style="color:#f92672">-&gt;</span> p<span style="color:#f92672">.</span>s_xyz(x,y,z) <span style="color:#f92672">.+</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, p<span style="color:#f92672">.</span>s_xyz(x,y,z))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>gr()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> model([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;ANN&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot training loss</span>
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> plot(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>epochs_training, log<span style="color:#f92672">.</span>(trainingLosses), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Train set&#34;</span>, linewidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>plot!(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>epochs_training, log<span style="color:#f92672">.</span>(testLosses), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Test set&#34;</span>, linewidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;Log Training Loss&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;Epoch&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;\log(</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">extrm{Loss})&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot training loss</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p3 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> init_f(x, y, <span style="color:#ae81ff">1.0</span>), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;Initial Guess&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot training loss</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p4 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> model([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">-</span> init_f(x, y, <span style="color:#ae81ff">1.0</span>), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;Initial Guess - VFI&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ratio <span style="color:#f92672">=</span> <span style="color:#ae81ff">9</span><span style="color:#f92672">/</span><span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>width <span style="color:#f92672">=</span> <span style="color:#ae81ff">800</span>
+</span></span><span style="display:flex;"><span>pp <span style="color:#f92672">=</span> plot(p1, p2, p3, p4, size <span style="color:#f92672">=</span> (width, width<span style="color:#f92672">*</span>ratio))
+</span></span></code></pre></div><p><img src="/post/ann_2/ANN_2_24_0.svg" alt="svg"></p>
 <h4 id="solving-the-real-problem">Solving the real problem</h4>
-
 <p>Now that the coefficients are initialized, let&rsquo;s tackle the real problem:</p>
-
-<pre><code class="language-julia">lr = 0.001 # learning rate
-opt = ADAM(lr)
-
-epochs_training = 1000 # Define the number of epochs
-trainingLosses = zeros(epochs_training); # Keep track of the training progress
-testLosses = zeros(epochs_training); # Test on data not used in the training
-
-ps = Flux.params(model) #initialize weigths
-p_bar = Progress(epochs_training; desc = &quot;Training in progress&quot;); # Creates a progress bar
-showProgress = true
-
-y = zeros(1, size(grid_1, 2))
-s_xyz_r = transpose(p.s_xyz_r(grid_1)) #precalculate net output on grid
-s_xyz_r_test = transpose(p.s_xyz_r(grid_test_1)) #precalculate net output on test grid
-
-# Training loop
-@time for ii in 1:epochs_training
-
-    gs = gradient(() -&gt; Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_2))*W, y), ps)# compute gradient
-    Flux.Optimise.update!(opt, ps, gs) # update parameters
-
-    if showProgress
-        trainingLosses[ii] = Flux.Losses.mse(model(grid_1) - s_xyz_r - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_2))*W, y)
-        testLosses[ii] = Flux.Losses.mse(model(grid_test_1) - s_xyz_r_test - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_test_2))*W, y)
-        next!(p_bar; showvalues = [(:epochs, ii), (:logloss, log.(trainingLosses[ii])), (:loglosstest, log.(testLosses[ii]))], valuecolor = :grey)
-    end
-
-end
-</code></pre>
-
-<pre><code>┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>lr <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.001</span> <span style="color:#75715e"># learning rate</span>
+</span></span><span style="display:flex;"><span>opt <span style="color:#f92672">=</span> ADAM(lr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>epochs_training <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span> <span style="color:#75715e"># Define the number of epochs</span>
+</span></span><span style="display:flex;"><span>trainingLosses <span style="color:#f92672">=</span> zeros(epochs_training); <span style="color:#75715e"># Keep track of the training progress</span>
+</span></span><span style="display:flex;"><span>testLosses <span style="color:#f92672">=</span> zeros(epochs_training); <span style="color:#75715e"># Test on data not used in the training</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ps <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>params(model) <span style="color:#75715e">#initialize weigths</span>
+</span></span><span style="display:flex;"><span>p_bar <span style="color:#f92672">=</span> Progress(epochs_training; desc <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Training in progress&#34;</span>); <span style="color:#75715e"># Creates a progress bar</span>
+</span></span><span style="display:flex;"><span>showProgress <span style="color:#f92672">=</span> true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">1</span>, size(grid_1, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>s_xyz_r <span style="color:#f92672">=</span> transpose(p<span style="color:#f92672">.</span>s_xyz_r(grid_1)) <span style="color:#75715e">#precalculate net output on grid</span>
+</span></span><span style="display:flex;"><span>s_xyz_r_test <span style="color:#f92672">=</span> transpose(p<span style="color:#f92672">.</span>s_xyz_r(grid_test_1)) <span style="color:#75715e">#precalculate net output on test grid</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Training loop</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> <span style="color:#66d9ef">for</span> ii <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>epochs_training
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    gs <span style="color:#f92672">=</span> gradient(() <span style="color:#f92672">-&gt;</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_1) <span style="color:#f92672">-</span> s_xyz_r <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, model(grid_2))<span style="color:#f92672">*</span>W, y), ps)<span style="color:#75715e"># compute gradient</span>
+</span></span><span style="display:flex;"><span>    Flux<span style="color:#f92672">.</span>Optimise<span style="color:#f92672">.</span>update!(opt, ps, gs) <span style="color:#75715e"># update parameters</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> showProgress
+</span></span><span style="display:flex;"><span>        trainingLosses[ii] <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_1) <span style="color:#f92672">-</span> s_xyz_r <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, model(grid_2))<span style="color:#f92672">*</span>W, y)
+</span></span><span style="display:flex;"><span>        testLosses[ii] <span style="color:#f92672">=</span> Flux<span style="color:#f92672">.</span>Losses<span style="color:#f92672">.</span>mse(model(grid_test_1) <span style="color:#f92672">-</span> s_xyz_r_test <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, model(grid_test_2))<span style="color:#f92672">*</span>W, y)
+</span></span><span style="display:flex;"><span>        next!(p_bar; showvalues <span style="color:#f92672">=</span> [(<span style="color:#e6db74">:epochs</span>, ii), (<span style="color:#e6db74">:logloss</span>, log<span style="color:#f92672">.</span>(trainingLosses[ii])), (<span style="color:#e6db74">:loglosstest</span>, log<span style="color:#f92672">.</span>(testLosses[ii]))], valuecolor <span style="color:#f92672">=</span> <span style="color:#e6db74">:grey</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>┌ Warning: ProgressMeter by default refresh meters with additional information in IJulia via `IJulia.clear_output`, which clears all outputs in the cell.
 │  - To prevent this behaviour, do `ProgressMeter.ijulia_behavior(:append)`.
 │  - To disable this warning message, do `ProgressMeter.ijulia_behavior(:clear)`.
 └ @ ProgressMeter /home/julien/.julia/packages/ProgressMeter/Vf8un/src/ProgressMeter.jl:620
@@ -1086,114 +992,95 @@ end
 
 527.918020 seconds (2.05 M allocations: 380.917 GiB, 0.84% gc time, 0.08% compilation time)
 </code></pre>
-
 <p>Training on the full problem is succesfull, as illustrated on the graphs below. It is hard to see meaningfull differences between
 VFI and the ANN methods.</p>
-
-<pre><code class="language-julia">gr()
-# Plot output for trained neural network
-p1 = plot(p.x_grid, p.y_grid, (x, y) -&gt; model([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:surface)
-title!(&quot;ANN&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-# Plot training loss
-p2 = plot(1:epochs_training, log.(trainingLosses), label = &quot;Train set&quot;, linewidth = 2)
-plot!(1:epochs_training, log.(testLosses), label = &quot;Test set&quot;, linewidth = 2)
-title!(&quot;Log Training Loss&quot;)
-xlabel!(&quot;Epoch&quot;)
-ylabel!(L&quot;\log(\textrm{Loss})&quot;)
-
-# Plot training loss
-# Plot output for trained neural network
-p3 = plot(p.x_grid, p.y_grid, (x, y) -&gt; V_old_interpolated([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:surface)
-title!(&quot;VFI&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-# Plot training loss
-# Plot output for trained neural network
-p4 = plot(p.x_grid, p.y_grid, (x, y) -&gt; model([x; y; 1.0])[1] - V_old_interpolated([x; y; 1.0])[1], label = &quot;f(x)&quot;, st=:surface)
-title!(&quot;ANN - VFI&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-
-ratio = 9/16
-width = 800
-pp = plot(p1, p2, p3, p4, size = (width, width*ratio))
-</code></pre>
-
-<p><img src="ANN_2_28_0.svg" alt="svg" /></p>
-
-<pre><code class="language-julia">zValue = 1.0
-
-p1 = plot(p.x_grid, p.y_grid, (x, y) -&gt; model([x; y; zValue])[1], label = &quot;f(x)&quot;, st=:contour)
-title!(&quot;ANN&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-p2 = plot(p.x_grid, p.y_grid, (x, y) -&gt; V_old_interpolated([x,y, zValue]), label = &quot;f(x)&quot;, st=:contour)
-title!(&quot;VFI&quot;)
-xlabel!(&quot;x&quot;)
-ylabel!(&quot;y&quot;)
-
-plot(p1, p2)
-</code></pre>
-
-<p><img src="ANN_2_29_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>gr()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> model([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;ANN&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot training loss</span>
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> plot(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>epochs_training, log<span style="color:#f92672">.</span>(trainingLosses), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Train set&#34;</span>, linewidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>plot!(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>epochs_training, log<span style="color:#f92672">.</span>(testLosses), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Test set&#34;</span>, linewidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;Log Training Loss&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;Epoch&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">L</span><span style="color:#e6db74">&#34;\log(</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">extrm{Loss})&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot training loss</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p3 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> V_old_interpolated([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;VFI&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot training loss</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot output for trained neural network</span>
+</span></span><span style="display:flex;"><span>p4 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> model([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">-</span> V_old_interpolated([x; y; <span style="color:#ae81ff">1.0</span>])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:surface</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;ANN - VFI&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ratio <span style="color:#f92672">=</span> <span style="color:#ae81ff">9</span><span style="color:#f92672">/</span><span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>width <span style="color:#f92672">=</span> <span style="color:#ae81ff">800</span>
+</span></span><span style="display:flex;"><span>pp <span style="color:#f92672">=</span> plot(p1, p2, p3, p4, size <span style="color:#f92672">=</span> (width, width<span style="color:#f92672">*</span>ratio))
+</span></span></code></pre></div><p><img src="/post/ann_2/ANN_2_28_0.svg" alt="svg"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>zValue <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> model([x; y; zValue])[<span style="color:#ae81ff">1</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:contour</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;ANN&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> plot(p<span style="color:#f92672">.</span>x_grid, p<span style="color:#f92672">.</span>y_grid, (x, y) <span style="color:#f92672">-&gt;</span> V_old_interpolated([x,y, zValue]), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;f(x)&#34;</span>, st<span style="color:#f92672">=</span><span style="color:#e6db74">:contour</span>)
+</span></span><span style="display:flex;"><span>title!(<span style="color:#e6db74">&#34;VFI&#34;</span>)
+</span></span><span style="display:flex;"><span>xlabel!(<span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span><span style="display:flex;"><span>ylabel!(<span style="color:#e6db74">&#34;y&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plot(p1, p2)
+</span></span></code></pre></div><p><img src="/post/ann_2/ANN_2_29_0.svg" alt="svg"></p>
 <h4 id="accuracy-tests">Accuracy tests</h4>
-
 <p>Accuracy of VFI versus ANN approaches can be assessed by looking at off-grid points.
 In the present setting, VFI outperforms the ANN approach. However, I conjecture that in a high-dimensional setting the opposite would be true (in a high-dimensional setting, VFI probably would not be possible in the first place). Also, one could increase the number of epochs and get better results.</p>
-
-<pre><code class="language-julia">#VFI
-#LHS
-LHS = zeros(size(grid_test_1, 2))
-index = 1
-for (xValue, yValue, zValue) in zip(grid_test_1[1, :], grid_test_1[2, :], grid_test_1[3,:])
-    LHS[index] = V_old_interpolated([xValue; yValue; zValue])
-    index+=1
-end
-
-
-#RHS
-RHS = zeros(size(grid_test_1, 2))
-index = 1
-for (xValue, yValue, zValue) in zip(grid_test_1[1, :], grid_test_1[2, :], grid_test_1[3,:])
-    RHS[index] = p.s_xyz(xValue, yValue, zValue) + ((1.0 - p.delta)/(1.0 + p.r)).*sum(p.weigths_E.*[max.(0.0, V_old_interpolated([xValue; yValue; (zValue.^p.rho).*exp.(innovation)])) for innovation in p.nodes_E])
-    index+=1
-end
-
-#ANN
-error_ANN = model(grid_test_1) - transpose(p.s_xyz_r(grid_test_1)) - ((1.0 - p.delta)/(1.0 + p.r)).*max.(0.0, model(grid_test_2)*W)
-error_ANN = transpose(error_ANN)
-p1 = histogram(LHS - RHS, label=&quot;errors VFI&quot;)
-p2 = histogram(error_ANN, label=&quot;errors ANN&quot;)
-plot(p1, p2)
-</code></pre>
-
-<p><img src="ANN_2_31_0.svg" alt="svg" /></p>
-
-<pre><code class="language-julia">df = DataFrame(Method = [&quot;VFI&quot;, &quot;ANN&quot;],
-                MSE = [mean(LHS .- RHS).^2, mean(error_ANN).^2],
-                MDSE = [median(LHS .- RHS).^2, median(error_ANN).^2],
-                MAXSE = [maximum(LHS .- RHS).^2, maximum(error_ANN).^2],
-                MINSE = [minimum(LHS .- RHS).^2, minimum(error_ANN).^2])
-
-df
-</code></pre>
-
-<table class="data-frame"><thead><tr><th></th><th>Method</th><th>MSE</th><th>MDSE</th><th>MAXSE</th><th>MINSE</th></tr><tr><th></th><th>String</th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>2 rows × 5 columns</p><tr><th>1</th><td>VFI</td><td>1.99895e-6</td><td>3.47266e-7</td><td>0.00288945</td><td>1.5217e-6</td></tr><tr><th>2</th><td>ANN</td><td>7.47681e-5</td><td>1.37991e-5</td><td>0.035538</td><td>0.00108539</td></tr></tbody></table>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#VFI</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#LHS</span>
+</span></span><span style="display:flex;"><span>LHS <span style="color:#f92672">=</span> zeros(size(grid_test_1, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (xValue, yValue, zValue) <span style="color:#66d9ef">in</span> zip(grid_test_1[<span style="color:#ae81ff">1</span>, <span style="color:#f92672">:</span>], grid_test_1[<span style="color:#ae81ff">2</span>, <span style="color:#f92672">:</span>], grid_test_1[<span style="color:#ae81ff">3</span>,<span style="color:#f92672">:</span>])
+</span></span><span style="display:flex;"><span>    LHS[index] <span style="color:#f92672">=</span> V_old_interpolated([xValue; yValue; zValue])
+</span></span><span style="display:flex;"><span>    index<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#RHS</span>
+</span></span><span style="display:flex;"><span>RHS <span style="color:#f92672">=</span> zeros(size(grid_test_1, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (xValue, yValue, zValue) <span style="color:#66d9ef">in</span> zip(grid_test_1[<span style="color:#ae81ff">1</span>, <span style="color:#f92672">:</span>], grid_test_1[<span style="color:#ae81ff">2</span>, <span style="color:#f92672">:</span>], grid_test_1[<span style="color:#ae81ff">3</span>,<span style="color:#f92672">:</span>])
+</span></span><span style="display:flex;"><span>    RHS[index] <span style="color:#f92672">=</span> p<span style="color:#f92672">.</span>s_xyz(xValue, yValue, zValue) <span style="color:#f92672">+</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>sum(p<span style="color:#f92672">.</span>weigths_E<span style="color:#f92672">.*</span>[max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, V_old_interpolated([xValue; yValue; (zValue<span style="color:#f92672">.^</span>p<span style="color:#f92672">.</span>rho)<span style="color:#f92672">.*</span>exp<span style="color:#f92672">.</span>(innovation)])) <span style="color:#66d9ef">for</span> innovation <span style="color:#66d9ef">in</span> p<span style="color:#f92672">.</span>nodes_E])
+</span></span><span style="display:flex;"><span>    index<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#ANN</span>
+</span></span><span style="display:flex;"><span>error_ANN <span style="color:#f92672">=</span> model(grid_test_1) <span style="color:#f92672">-</span> transpose(p<span style="color:#f92672">.</span>s_xyz_r(grid_test_1)) <span style="color:#f92672">-</span> ((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p<span style="color:#f92672">.</span>delta)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> p<span style="color:#f92672">.</span>r))<span style="color:#f92672">.*</span>max<span style="color:#f92672">.</span>(<span style="color:#ae81ff">0.0</span>, model(grid_test_2)<span style="color:#f92672">*</span>W)
+</span></span><span style="display:flex;"><span>error_ANN <span style="color:#f92672">=</span> transpose(error_ANN)
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> histogram(LHS <span style="color:#f92672">-</span> RHS, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;errors VFI&#34;</span>)
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> histogram(error_ANN, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;errors ANN&#34;</span>)
+</span></span><span style="display:flex;"><span>plot(p1, p2)
+</span></span></code></pre></div><p><img src="/post/ann_2/ANN_2_31_0.svg" alt="svg"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>df <span style="color:#f92672">=</span> DataFrame(<span style="color:#66d9ef">Method</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;VFI&#34;</span>, <span style="color:#e6db74">&#34;ANN&#34;</span>],
+</span></span><span style="display:flex;"><span>                MSE <span style="color:#f92672">=</span> [mean(LHS <span style="color:#f92672">.-</span> RHS)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>, mean(error_ANN)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>],
+</span></span><span style="display:flex;"><span>                MDSE <span style="color:#f92672">=</span> [median(LHS <span style="color:#f92672">.-</span> RHS)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>, median(error_ANN)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>],
+</span></span><span style="display:flex;"><span>                MAXSE <span style="color:#f92672">=</span> [maximum(LHS <span style="color:#f92672">.-</span> RHS)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>, maximum(error_ANN)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>],
+</span></span><span style="display:flex;"><span>                MINSE <span style="color:#f92672">=</span> [minimum(LHS <span style="color:#f92672">.-</span> RHS)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>, minimum(error_ANN)<span style="color:#f92672">.^</span><span style="color:#ae81ff">2</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>df
+</span></span></code></pre></div><table class="data-frame"><thead><tr><th></th><th>Method</th><th>MSE</th><th>MDSE</th><th>MAXSE</th><th>MINSE</th></tr><tr><th></th><th>String</th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>2 rows × 5 columns</p><tr><th>1</th><td>VFI</td><td>1.99895e-6</td><td>3.47266e-7</td><td>0.00288945</td><td>1.5217e-6</td></tr><tr><th>2</th><td>ANN</td><td>7.47681e-5</td><td>1.37991e-5</td><td>0.035538</td><td>0.00108539</td></tr></tbody></table>
 <h2 id="conclusion">Conclusion</h2>
-
 <p>In this blog post, I showed how ANN can be used to find unknown functions satisfying a Bellman equation.</p>
-
-<p>The code presented here is more a <strong>proof-of-concept than a production-ready release</strong>. A first obvious improvement is to train the ANN on a <strong>GPU instead of a CPU</strong>. Using the free version of <a href="https://colab.research.google.com/" target="_blank">Google Colab</a>, I am getting an almost 10x time improvement. A second improvement would be to use more diverse set of points for the ANN. While VFI requires a fixed grid to make sense, the ANN is a grid-less method. The training phase would benefit from more mixing in the input points.</p>
-
-<p>As a final remark, I chose on purpose a problem which is a bit simpler than the full general problem, in which one must also find the policy function that comes with the unknown value function. I am wondering if some of the insights described in the <a href="https://www.nature.com/articles/nature16961" target="_blank">Alpha Go paper</a> could apply in the present setting.</p>
+<p>The code presented here is more a <strong>proof-of-concept than a production-ready release</strong>. A first obvious improvement is to train the ANN on a <strong>GPU instead of a CPU</strong>. Using the free version of <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a>, I am getting an almost 10x time improvement. A second improvement would be to use more diverse set of points for the ANN. While VFI requires a fixed grid to make sense, the ANN is a grid-less method. The training phase would benefit from more mixing in the input points.</p>
+<p>As a final remark, I chose on purpose a problem which is a bit simpler than the full general problem, in which one must also find the policy function that comes with the unknown value function. I am wondering if some of the insights described in the <a href="https://www.nature.com/articles/nature16961" target="_blank" rel="noopener">Alpha Go paper</a> could apply in the present setting.</p>
 
     </div>
 
@@ -1230,7 +1117,7 @@ df
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -1370,7 +1257,7 @@ df
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1524,7 +1411,7 @@ df
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

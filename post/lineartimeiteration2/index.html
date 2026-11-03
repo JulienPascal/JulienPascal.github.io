@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,8 +28,18 @@
   
     
   
-  <meta name="description" content="In a previous post, I introduced the logic for the Linear Time Iteration (LTI) method (Pontus Rendahl (2017)). Now it&rsquo;s time to apply the technique to a &ldquo;real&rdquo; (yet simple) economic model: a stochastic growth model with endogenous labor supply. The implementation is in Julia and is based a Matlab code by Pontus Rendahl available here. We will use a three-step approach:
- [1] solve the non-stochastic steady-state of the model [2] differentiate the system around the non-stochastic steady-state to obtain a linear difference equation of the form $A x_{t-1} &#43; B x_{t} &#43; C E_{t} [x_{t&#43;1}] &#43; u_{t} = 0$ [3] apply the LTI method to find the law of motion $x_{t} = F x_{t-1} &#43; Q u_{t}$  Model We consider an economy populated by a representative household, deciding how much to work, save and consume at any given time.">
+  <meta name="description" content="In a previous post, I introduced the logic for the Linear Time Iteration (LTI) method (Pontus Rendahl (2017)).
+Now it&rsquo;s time to apply the technique to a &ldquo;real&rdquo; (yet simple) economic model:
+a stochastic growth model with endogenous labor supply.
+The implementation is in Julia and is based a Matlab code by Pontus Rendahl available here. We will use a three-step approach:
+
+[1] solve the non-stochastic steady-state of the model
+[2] differentiate the system around the non-stochastic steady-state to obtain a linear difference equation of the
+form \(A x_{t-1} &#43; B x_{t} &#43; C E_{t} [x_{t&#43;1}] &#43; u_{t} = 0\)
+[3] apply the LTI method to find the law of motion  \(x_{t} = F x_{t-1} &#43; Q u_{t}\)
+
+Model
+We consider an economy populated by a representative household, deciding how much to work, save and consume at any given time. Output \(y\) depends on the capital level \(k\) (inherited from period \(t-1\)), on the number of hours worked \(l\), and on the productivity level \(z\):">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/lineartimeiteration2/">
@@ -101,9 +111,6 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -126,8 +133,18 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/lineartimeiteration2/">
   <meta property="og:title" content="Linear Time Iteration (Part II) | Julien Pascal">
-  <meta property="og:description" content="In a previous post, I introduced the logic for the Linear Time Iteration (LTI) method (Pontus Rendahl (2017)). Now it&rsquo;s time to apply the technique to a &ldquo;real&rdquo; (yet simple) economic model: a stochastic growth model with endogenous labor supply. The implementation is in Julia and is based a Matlab code by Pontus Rendahl available here. We will use a three-step approach:
- [1] solve the non-stochastic steady-state of the model [2] differentiate the system around the non-stochastic steady-state to obtain a linear difference equation of the form $A x_{t-1} &#43; B x_{t} &#43; C E_{t} [x_{t&#43;1}] &#43; u_{t} = 0$ [3] apply the LTI method to find the law of motion $x_{t} = F x_{t-1} &#43; Q u_{t}$  Model We consider an economy populated by a representative household, deciding how much to work, save and consume at any given time."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="In a previous post, I introduced the logic for the Linear Time Iteration (LTI) method (Pontus Rendahl (2017)).
+Now it&rsquo;s time to apply the technique to a &ldquo;real&rdquo; (yet simple) economic model:
+a stochastic growth model with endogenous labor supply.
+The implementation is in Julia and is based a Matlab code by Pontus Rendahl available here. We will use a three-step approach:
+
+[1] solve the non-stochastic steady-state of the model
+[2] differentiate the system around the non-stochastic steady-state to obtain a linear difference equation of the
+form \(A x_{t-1} &#43; B x_{t} &#43; C E_{t} [x_{t&#43;1}] &#43; u_{t} = 0\)
+[3] apply the LTI method to find the law of motion  \(x_{t} = F x_{t-1} &#43; Q u_{t}\)
+
+Model
+We consider an economy populated by a representative household, deciding how much to work, save and consume at any given time. Output \(y\) depends on the capital level \(k\) (inherited from period \(t-1\)), on the number of hours worked \(l\), and on the productivity level \(z\):"><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2019-08-26T18:53:22&#43;01:00">
@@ -520,60 +537,30 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p>In a <a href="https://julienpascal.github.io/" target="_blank">previous post</a>, I introduced the logic for the Linear Time Iteration (LTI) method (Pontus Rendahl (2017)).
+      <p>In a <a href="https://julienpascal.github.io/" target="_blank" rel="noopener">previous post</a>, I introduced the logic for the Linear Time Iteration (LTI) method (Pontus Rendahl (2017)).
 Now it&rsquo;s time to apply the technique to a &ldquo;real&rdquo; (yet simple) economic model:
 a stochastic growth model with endogenous labor supply.
-The implementation is in Julia and is based a Matlab code by Pontus Rendahl available <a href="https://sites.google.com/site/pontusrendahl/Research" target="_blank">here</a>. We will use a three-step approach:</p>
-
+The implementation is in Julia and is based a Matlab code by Pontus Rendahl available <a href="https://sites.google.com/site/pontusrendahl/Research" target="_blank" rel="noopener">here</a>. We will use a three-step approach:</p>
 <ul>
 <li>[1] solve the non-stochastic steady-state of the model</li>
 <li>[2] differentiate the system around the non-stochastic steady-state to obtain a linear difference equation of the
-form $A x_{t-1} + B x_{t} + C E_{t} [x_{t+1}] + u_{t} = 0$</li>
-<li>[3] apply the LTI method to find the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$</li>
+form \(A x_{t-1} &#43; B x_{t} &#43; C E_{t} [x_{t&#43;1}] &#43; u_{t} = 0\)</li>
+<li>[3] apply the LTI method to find the law of motion  \(x_{t} = F x_{t-1} &#43; Q u_{t}\)</li>
 </ul>
-
 <h2 id="model">Model</h2>
-
-<p>We consider an economy populated by a representative household, deciding how much to work, save and consume at any given time. Output $y$ depends on the capital level $k$ (inherited from period $t-1$), on the number of hours worked $l$, and on the productivity level $z$:</p>
-
-<p>$$ y_t = z_t k_{t-1}^{\alpha} l_{t}^{1 - \alpha}$$</p>
-
-<p>Business cycles are driven by variations in productivity, that follows an AR(1) process, with $e_t$ a zero-mean stochastic variable:</p>
-
-<p>$$z_t = \rho z_{t-1} + e_{t} $$</p>
-
-<p>Capital at the end of period $t$ is equal to investment plus the non-depreciated capital stock inherited from last period:</p>
-
-<p>$$ k_{t} = I_{t} + (1 - \delta) k_{t-1} $$</p>
-
-<p>The representative household enjoys consumption and dislikes providing labor:</p>
-
-<p>$$ U(c,l) = \frac{C^{1-\sigma}}{1-\sigma} -  \frac{l^{1-\eta}}{1-\eta} $$</p>
-
-<p>Everything that is produced in the economy is either consumed or saved:</p>
-
-<p>$$ c_{t} + k_{t} = z_t k_{t-1}^{\alpha} l_{t}^{1 - \alpha} + (1 - \delta)k_{t-1}$$</p>
-
-<p>The optimal decision of the household is characterized by two equations:</p>
-
-<p>$$ c_{t}^{-\sigma} = \beta E_{t}(c_{t+1}^{-\sigma}(1 - \delta + \alpha z_{t+1} k_{t}^{\alpha -1} l_{t+1}^{1 - \alpha} ) )$$</p>
-
-<p>$$ l_{t}^{-\eta} = c_{t}^{-\gamma}(1 - \alpha) z_{t} k_{t-1}^\alpha l_{t}^{-\alpha} $$</p>
-
-<p>The first one states the gain of raising consumption today by one unit has to be equal to the expected gain from saving
+<p>We consider an economy populated by a representative household, deciding how much to work, save and consume at any given time. Output \(y\) depends on the capital level \(k\) (inherited from period \(t-1\)), on the number of hours worked \(l\), and on the productivity level \(z\):</p>
+\[ y_t = z_t k_{t-1}^{\alpha} l_{t}^{1 - \alpha}\]<p>Business cycles are driven by variations in productivity, that follows an AR(1) process, with \(e_t\) a zero-mean stochastic variable:</p>
+\[z_t = \rho z_{t-1} &#43; e_{t} \]<p>Capital at the end of period \(t\) is equal to investment plus the non-depreciated capital stock inherited from last period:</p>
+\[ k_{t} = I_{t} &#43; (1 - \delta) k_{t-1} \]<p>The representative household enjoys consumption and dislikes providing labor:</p>
+\[ U(c,l) = \frac{C^{1-\sigma}}{1-\sigma} -  \frac{l^{1-\eta}}{1-\eta} \]<p>Everything that is produced in the economy is either consumed or saved:</p>
+\[ c_{t} &#43; k_{t} = z_t k_{t-1}^{\alpha} l_{t}^{1 - \alpha} &#43; (1 - \delta)k_{t-1}\]<p>The optimal decision of the household is characterized by two equations:</p>
+\[ c_{t}^{-\sigma} = \beta E_{t}(c_{t&#43;1}^{-\sigma}(1 - \delta &#43; \alpha z_{t&#43;1} k_{t}^{\alpha -1} l_{t&#43;1}^{1 - \alpha} ) )\]\[ l_{t}^{-\eta} = c_{t}^{-\gamma}(1 - \alpha) z_{t} k_{t-1}^\alpha l_{t}^{-\alpha} \]<p>The first one states the gain of raising consumption today by one unit has to be equal to the expected gain from saving
 one extra unit today and consuming it tomorrow (inter-temporal FOC). The second equation states that the marginal cost of working one extra hour today has to be equal
 to the marginal gain of that extra hour worked (intra-temporal FOC).</p>
-
 <h2 id="solving-the-steady-state">Solving the steady-state</h2>
-
 <p>Calculating the steady-state of the model is a root finding problem. Let&rsquo;s use the package <code>NLsolve</code>:</p>
-
-<pre><code class="language-julia">versioninfo()
-</code></pre>
-
-<pre><code>Julia Version 1.0.3
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>versioninfo()
+</span></span></code></pre></div><pre><code>Julia Version 1.0.3
 Commit 099e826241 (2018-12-18 01:34 UTC)
 Platform Info:
   OS: Linux (x86_64-pc-linux-gnu)
@@ -582,341 +569,281 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-6.0.0 (ORCJIT, skylake)
 </code></pre>
-
-<pre><code class="language-julia"># Declare parameters
-const alpha = 1/3;        # Capital share of output
-const beta = 1.03^(-1/4); # Discount factor.
-const gamma = 2;          # Coefficient of risk aversion
-const eta = 2;            # Frisch elasticity of labor supply
-const delta = 0.025;      # Depreciation rate of capital
-const rho = 0.9;          # Persistence of TFP process.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Declare parameters</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">3</span>;        <span style="color:#75715e"># Capital share of output</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> beta <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.03</span><span style="color:#f92672">^</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">4</span>); <span style="color:#75715e"># Discount factor.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> gamma <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;          <span style="color:#75715e"># Coefficient of risk aversion</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> eta <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;            <span style="color:#75715e"># Frisch elasticity of labor supply</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> delta <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.025</span>;      <span style="color:#75715e"># Depreciation rate of capital</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> rho <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.9</span>;          <span style="color:#75715e"># Persistence of TFP process.</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> NLsolve
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Let&#39;s define a function for each equation of the model at the steady-state</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> Ee(x<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span>x[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>gamma) <span style="color:#f92672">+</span> beta<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> alpha<span style="color:#f92672">*</span>(x[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">^</span>(alpha <span style="color:#f92672">-</span> <span style="color:#ae81ff">1.0</span>))<span style="color:#f92672">*</span>(x[<span style="color:#ae81ff">3</span>]<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> alpha)) <span style="color:#f92672">-</span> delta)<span style="color:#f92672">*</span>(x[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>gamma))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> Rc(x<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span>x[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">-</span> x[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">+</span> (x[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">^</span>(alpha))<span style="color:#f92672">*</span>(x[<span style="color:#ae81ff">3</span>]<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> alpha)) <span style="color:#f92672">+</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> delta)<span style="color:#f92672">*</span>x[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> Ls(x<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    (<span style="color:#f92672">-</span>x[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>gamma))<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> alpha)<span style="color:#f92672">*</span>(x[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">^</span>(alpha))<span style="color:#f92672">*</span>(x[<span style="color:#ae81ff">3</span>]<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>alpha)) <span style="color:#f92672">+</span> x[<span style="color:#ae81ff">3</span>]<span style="color:#f92672">^</span>(eta)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The steady-state of the model is described by a system of three equations</span>
+</span></span><span style="display:flex;"><span>f! <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> (dx,x)
+</span></span><span style="display:flex;"><span>  dx[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> Ee(x)
+</span></span><span style="display:flex;"><span>  dx[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> Rc(x)
+</span></span><span style="display:flex;"><span>  dx[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> Ls(x)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> nlsolve(f!,[<span style="color:#ae81ff">1.0</span>; <span style="color:#ae81ff">20</span>; <span style="color:#ae81ff">0.7</span>])
+</span></span><span style="display:flex;"><span>xss <span style="color:#f92672">=</span> res<span style="color:#f92672">.</span>zero;
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>css <span style="color:#f92672">=</span> xss[<span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>kss <span style="color:#f92672">=</span> xss[<span style="color:#ae81ff">2</span>];
+</span></span><span style="display:flex;"><span>lss <span style="color:#f92672">=</span> xss[<span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># steady-state output and investment:</span>
+</span></span><span style="display:flex;"><span>yss <span style="color:#f92672">=</span> kss<span style="color:#f92672">^</span>(alpha)<span style="color:#f92672">*</span>lss<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha);
+</span></span><span style="display:flex;"><span>Iss <span style="color:#f92672">=</span> kss<span style="color:#f92672">-</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>delta)<span style="color:#f92672">*</span>kss;
+</span></span><span style="display:flex;"><span>XSS <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span>XSS[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">=</span>yss
+</span></span><span style="display:flex;"><span>XSS[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">=</span>Iss
+</span></span><span style="display:flex;"><span>XSS[<span style="color:#ae81ff">3</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>] <span style="color:#f92672">=</span> xss
+</span></span><span style="display:flex;"><span>XSS[<span style="color:#ae81ff">6</span>]<span style="color:#f92672">=</span><span style="color:#ae81ff">1.0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Steady-state value [css, kss, lss, yss, Iss, zss] = &#34;</span>, XSS)
+</span></span></code></pre></div><pre><code>Steady-state value [css, kss, lss, yss, Iss, zss] = [2.51213, 0.645783, 1.86634, 25.8313, 0.78341, 1.0]
 </code></pre>
-
-<pre><code class="language-julia">using NLsolve
-
-# Let's define a function for each equation of the model at the steady-state
-function Ee(x::Array{Float64,1})
-    -x[1]^(-gamma) + beta*(1.0 + alpha*(x[2]^(alpha - 1.0))*(x[3]^(1.0 - alpha)) - delta)*(x[1]^(-gamma))
-end
-
-function Rc(x::Array{Float64,1})
-    -x[1] - x[2] + (x[2]^(alpha))*(x[3]^(1.0 - alpha)) + (1.0 - delta)*x[2]
-end
-
-function Ls(x::Array{Float64,1})
-    (-x[1]^(-gamma))*(1.0 - alpha)*(x[2]^(alpha))*(x[3]^(-alpha)) + x[3]^(eta)
-end
-
-# The steady-state of the model is described by a system of three equations
-f! = function (dx,x)
-  dx[1] = Ee(x)
-  dx[2] = Rc(x)
-  dx[3] = Ls(x)
-end
-
-
-res = nlsolve(f!,[1.0; 20; 0.7])
-xss = res.zero;
-</code></pre>
-
-<pre><code class="language-julia">css = xss[1];
-kss = xss[2];
-lss = xss[3];
-# steady-state output and investment:
-yss = kss^(alpha)*lss^(1-alpha);
-Iss = kss-(1-delta)*kss;
-XSS = zeros(6)
-XSS[1]=yss
-XSS[2]=Iss
-XSS[3:5] = xss
-XSS[6]=1.0;
-
-print(&quot;Steady-state value [css, kss, lss, yss, Iss, zss] = &quot;, XSS)
-</code></pre>
-
-<pre><code>Steady-state value [css, kss, lss, yss, Iss, zss] = [2.51213, 0.645783, 1.86634, 25.8313, 0.78341, 1.0]
-</code></pre>
-
 <h2 id="solving-the-stochastic-model">Solving the stochastic model</h2>
-
 <p>To find a solution to the stochastic model,
-let&rsquo;s differentiate the system around the non-stochastic steady-state calculated above. Here, we will limit ourself to a first-order approximation since the goal is to obtain is a linear difference equation of the form $ A x_{t-1} + B x_{t} + C E_{t} [x_{t+1}] + u_{t} = 0 $, for which LTI is applicable. What is the rationale for the linear approximation? Fist of all, notice that the model can be put in the form of:</p>
-
-<p>$$E_t(f(Y_t, \sigma)) = 0 $$</p>
-
-<p>where $Y_t = [x_{t-1}, x_{t}, x_{t+1}]$ is  $3n × 1$ vector containing endogenous and exogenous variables and $\sigma$ is variable scaling the level of uncertainty in the model. For instance, if $v_{t}$ is a zero-mean normally distributed variable with variance $\sigma^2$:</p>
-
-<p>$$z_t = \rho z_{t-1} + \sigma v_{t} $$</p>
-
-<p>In the non-stochastic state, $\sigma = 0$. Let&rsquo;s take a first-order Taylor expansion around the non-stochastic steady-state:</p>
-
-<p>$$f(Y_t, \sigma) \approx f(Y_{SS}, 0) + \frac{Df}{DY_t}|Y_{SS}(Y_t - Y_{SS}) + \frac{Df}{D\sigma}|\sigma_{SS}(\sigma - 0) = 0$$</p>
-
-<p>where $\frac{Df}{DY_t}|Y_{SS}$ is the derivative of the vector-valued function $f$ with respect to the vector $Y_t$ evaluated at $Y_{SS}$</p>
-
-<p>Using $f(Y_{SS}, 0) = 0$ and that the last term disappears when we take the expectation:</p>
-
-<p>$$E_t(f(Y_t, \sigma)) \approx E_t(\frac{Df}{DY_t}|Y_{SS}(Y_t - Y_{SS})) = 0 $$</p>
-
-<p>Defining the matrices $A$, $B$ and $C$ such that $\frac{Df}{DY_t}|Y_{SS} = [A; B; C]$ we obtain a system of the form:</p>
-
-<p>$A \tilde{x}_{t-1} + B \tilde{x}_{t} + C E_{t} [\tilde{x}_{t+1}] = 0$</p>
-
-<p>with $\tilde{x}_{t} = x_{t} - x_{SS} $</p>
-
+let&rsquo;s differentiate the system around the non-stochastic steady-state calculated above. Here, we will limit ourself to a first-order approximation since the goal is to obtain is a linear difference equation of the form \( A x_{t-1} &#43; B x_{t} &#43; C E_{t} [x_{t&#43;1}] &#43; u_{t} = 0 \), for which LTI is applicable. What is the rationale for the linear approximation? Fist of all, notice that the model can be put in the form of:</p>
+\[E_t(f(Y_t, \sigma)) = 0 \]<p>where \(Y_t = [x_{t-1}, x_{t}, x_{t&#43;1}]\) is  \(3n × 1\) vector containing endogenous and exogenous variables and \(\sigma\) is variable scaling the level of uncertainty in the model. For instance, if \(v_{t}\) is a zero-mean normally distributed variable with variance \(\sigma^2\):</p>
+\[z_t = \rho z_{t-1} &#43; \sigma v_{t} \]<p>In the non-stochastic state, \(\sigma = 0\). Let&rsquo;s take a first-order Taylor expansion around the non-stochastic steady-state:</p>
+\[f(Y_t, \sigma) \approx f(Y_{SS}, 0) &#43; \frac{Df}{DY_t}|Y_{SS}(Y_t - Y_{SS}) &#43; \frac{Df}{D\sigma}|\sigma_{SS}(\sigma - 0) = 0\]<p>where \(\frac{Df}{DY_t}|Y_{SS}\) is the derivative of the vector-valued function \(f\) with respect to the vector \(Y_t\) evaluated at \(Y_{SS}\)</p>
+<p>Using \(f(Y_{SS}, 0) = 0\) and that the last term disappears when we take the expectation:</p>
+\[E_t(f(Y_t, \sigma)) \approx E_t(\frac{Df}{DY_t}|Y_{SS}(Y_t - Y_{SS})) = 0 \]<p>Defining the matrices \(A\), \(B\) and \(C\) such that \(\frac{Df}{DY_t}|Y_{SS} = [A; B; C]\) we obtain a system of the form:</p>
+<p>\(A \tilde{x}_{t-1} &#43; B \tilde{x}_{t} &#43; C E_{t} [\tilde{x}_{t&#43;1}] = 0\)</p>
+<p>with \(\tilde{x}_{t} = x_{t} - x_{SS} \)</p>
 <p>In practical terms, obtaining a linear approximation around the non-stochastic
 steady-state is easily done using the package <code>ForwardDiff</code></p>
-
-<pre><code class="language-julia">using ForwardDiff
-
-# Function defining the stochastic model
-# Each line is an equation
-# The input the vector x is [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]
-f! = (w, x) -&gt; begin
-    #naming the input variables:
-    ym, y, yp, Im, I, Ip, cm, c, cp, km, k, kp, lm, l, lp, zm, z, zp = x
-    w[1] = -y + z*km^(alpha)*l^(1.0 - alpha)
-    w[2] = -I+k-(1.0-delta)*km
-    w[3] = -c^(-gamma) + beta*(1+zp*alpha*k^(alpha-1)*lp^(1-alpha)-delta)*cp^(-gamma)
-    w[4] = c + k - (z*km^(alpha)*l^(1.0-alpha)+(1.0-delta)*km)
-    w[5] = c^(-gamma)*(1.0-alpha)*km^(alpha)*l^(-alpha)*z-l^(eta)
-    w[6] = -z+zm*rho
-    return nothing
-end
-
-f = x -&gt; (w = fill(zero(promote_type(eltype(x), Float64)), 6); f!(w, x); return w)
-
-# At the steady-state, the function f should be zero:
-Xss = [yss yss yss Iss Iss Iss css css css kss kss kss lss lss lss 1 1 1];
-#println(maximum(abs.(f(Xss))))
-
-Jac = ForwardDiff.jacobian(f, Xss);
-</code></pre>
-
-<h3 id="collecting-matrices-a-b-and-c">Collecting matrices A, B and C</h3>
-
-<p>Having successfully obtained $\frac{Df}{DY_t}|Y_{SS}$, we now need to collect the right elements to form the matrices A, B and C in order to apply the LTI algorithm. It is mainly a matter of bookkeeping:</p>
-
-<pre><code class="language-julia"># A is derivative of the function &quot;system&quot; f(Vars) w.r.t to Xm = [ym Im cm km lm zm]
-# with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]
-A = zeros(6,6)
-# Keeping track of indices:
-A[:,1] = Jac[:,1]
-A[:,2] = Jac[:,4]
-A[:,3] = Jac[:,7]
-A[:,4] = Jac[:,10]
-A[:,5] = Jac[:,13]
-A[:,6] = Jac[:,16];
-</code></pre>
-
-<pre><code class="language-julia"># B is derivative of the function &quot;system&quot; f(Vars) w.r.t to X = [y I c k l z];
-# with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]
-B = zeros(6,6)
-# Keeping track of indices:
-B[:,1] = Jac[:,2]
-B[:,2] = Jac[:,5]
-B[:,3] = Jac[:,8]
-B[:,4] = Jac[:,11]
-B[:,5] = Jac[:,14]
-B[:,6] = Jac[:,17];
-</code></pre>
-
-<pre><code class="language-julia"># C is derivative of the function &quot;system&quot; f(Vars) w.r.t to Xp = [yp Ip cp kp lp zp];
-# with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]
-C = zeros(6,6)
-# Keeping track of indices:
-C[:,1] = Jac[:,3]
-C[:,2] = Jac[:,6]
-C[:,3] = Jac[:,9]
-C[:,4] = Jac[:,13]
-C[:,5] = Jac[:,15]
-C[:,6] = Jac[:,18];
-</code></pre>
-
-<pre><code class="language-julia"># Convert to log-linear system:
-M = ones(6,1)*transpose(XSS)
-A = A.*M; B = B.*M; C = C.*M;
-</code></pre>
-
-<h3 id="solving-the-model">Solving the model</h3>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> ForwardDiff
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Function defining the stochastic model</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Each line is an equation</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The input the vector x is [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]</span>
+</span></span><span style="display:flex;"><span>f! <span style="color:#f92672">=</span> (w, x) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#naming the input variables:</span>
+</span></span><span style="display:flex;"><span>    ym, y, yp, Im, I, Ip, cm, c, cp, km, k, kp, lm, l, lp, zm, z, zp <span style="color:#f92672">=</span> x
+</span></span><span style="display:flex;"><span>    w[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>y <span style="color:#f92672">+</span> z<span style="color:#f92672">*</span>km<span style="color:#f92672">^</span>(alpha)<span style="color:#f92672">*</span>l<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> alpha)
+</span></span><span style="display:flex;"><span>    w[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>I<span style="color:#f92672">+</span>k<span style="color:#f92672">-</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">-</span>delta)<span style="color:#f92672">*</span>km
+</span></span><span style="display:flex;"><span>    w[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>c<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>gamma) <span style="color:#f92672">+</span> beta<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>zp<span style="color:#f92672">*</span>alpha<span style="color:#f92672">*</span>k<span style="color:#f92672">^</span>(alpha<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>lp<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha)<span style="color:#f92672">-</span>delta)<span style="color:#f92672">*</span>cp<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>gamma)
+</span></span><span style="display:flex;"><span>    w[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> c <span style="color:#f92672">+</span> k <span style="color:#f92672">-</span> (z<span style="color:#f92672">*</span>km<span style="color:#f92672">^</span>(alpha)<span style="color:#f92672">*</span>l<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">-</span>alpha)<span style="color:#f92672">+</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">-</span>delta)<span style="color:#f92672">*</span>km)
+</span></span><span style="display:flex;"><span>    w[<span style="color:#ae81ff">5</span>] <span style="color:#f92672">=</span> c<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>gamma)<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span><span style="color:#f92672">-</span>alpha)<span style="color:#f92672">*</span>km<span style="color:#f92672">^</span>(alpha)<span style="color:#f92672">*</span>l<span style="color:#f92672">^</span>(<span style="color:#f92672">-</span>alpha)<span style="color:#f92672">*</span>z<span style="color:#f92672">-</span>l<span style="color:#f92672">^</span>(eta)
+</span></span><span style="display:flex;"><span>    w[<span style="color:#ae81ff">6</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>z<span style="color:#f92672">+</span>zm<span style="color:#f92672">*</span>rho
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> nothing
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> (w <span style="color:#f92672">=</span> fill(zero(promote_type(eltype(x), <span style="color:#66d9ef">Float64</span>)), <span style="color:#ae81ff">6</span>); f!(w, x); <span style="color:#66d9ef">return</span> w)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># At the steady-state, the function f should be zero:</span>
+</span></span><span style="display:flex;"><span>Xss <span style="color:#f92672">=</span> [yss yss yss Iss Iss Iss css css css kss kss kss lss lss lss <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#println(maximum(abs.(f(Xss))))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Jac <span style="color:#f92672">=</span> ForwardDiff<span style="color:#f92672">.</span>jacobian(f, Xss);
+</span></span></code></pre></div><h3 id="collecting-matrices-a-b-and-c">Collecting matrices A, B and C</h3>
+<p>Having successfully obtained \(\frac{Df}{DY_t}|Y_{SS}\), we now need to collect the right elements to form the matrices A, B and C in order to apply the LTI algorithm. It is mainly a matter of bookkeeping:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># A is derivative of the function &#34;system&#34; f(Vars) w.r.t to Xm = [ym Im cm km lm zm]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]</span>
+</span></span><span style="display:flex;"><span>A <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Keeping track of indices:</span>
+</span></span><span style="display:flex;"><span>A[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>A[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">4</span>]
+</span></span><span style="display:flex;"><span>A[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">7</span>]
+</span></span><span style="display:flex;"><span>A[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">10</span>]
+</span></span><span style="display:flex;"><span>A[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">5</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">13</span>]
+</span></span><span style="display:flex;"><span>A[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">6</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">16</span>];
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># B is derivative of the function &#34;system&#34; f(Vars) w.r.t to X = [y I c k l z];</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]</span>
+</span></span><span style="display:flex;"><span>B <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Keeping track of indices:</span>
+</span></span><span style="display:flex;"><span>B[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>B[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">5</span>]
+</span></span><span style="display:flex;"><span>B[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">8</span>]
+</span></span><span style="display:flex;"><span>B[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">11</span>]
+</span></span><span style="display:flex;"><span>B[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">5</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">14</span>]
+</span></span><span style="display:flex;"><span>B[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">6</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">17</span>];
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># C is derivative of the function &#34;system&#34; f(Vars) w.r.t to Xp = [yp Ip cp kp lp zp];</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># with Vars = [ym y yp Im I Ip cm c cp km k kp lm l lp zm z zp]</span>
+</span></span><span style="display:flex;"><span>C <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Keeping track of indices:</span>
+</span></span><span style="display:flex;"><span>C[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>C[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">6</span>]
+</span></span><span style="display:flex;"><span>C[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">9</span>]
+</span></span><span style="display:flex;"><span>C[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">13</span>]
+</span></span><span style="display:flex;"><span>C[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">5</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">15</span>]
+</span></span><span style="display:flex;"><span>C[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">6</span>] <span style="color:#f92672">=</span> Jac[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">18</span>];
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Convert to log-linear system:</span>
+</span></span><span style="display:flex;"><span>M <span style="color:#f92672">=</span> ones(<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>transpose(XSS)
+</span></span><span style="display:flex;"><span>A <span style="color:#f92672">=</span> A<span style="color:#f92672">.*</span>M; B <span style="color:#f92672">=</span> B<span style="color:#f92672">.*</span>M; C <span style="color:#f92672">=</span> C<span style="color:#f92672">.*</span>M;
+</span></span></code></pre></div><h3 id="solving-the-model">Solving the model</h3>
 <p>We are now in good place to find the law of motion of the economy using the LTI approach.</p>
-
-<pre><code class="language-julia">using LinearAlgebra
-
-# Source: adapted from the matlab version made available by Pontus Rendahl on his website
-# https://sites.google.com/site/pontusrendahl/Research
-# This function solves the model Ax_{t-1}+Bx_{t}+CE_t[x_{t+1}]+u_t=0, and
-# finds the solution x_t=Fx_{t-1}+Qu_t. The parameter mu should be set
-# equal to a small number, e.g. mu=1e-6;
-
-function t_iteration(A::Array{Float64,2},
-                    B::Array{Float64,2},
-                    C::Array{Float64,2},
-                    mu::Float64;
-                    tol::Float64=1e-12,
-                    max_iter::Int64 = 1000,
-                    F0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
-                    S0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
-                    verbose::Bool=false)
-
-# success flag:
-flag = 0
-
-# Initialization
-dim = size(A,2)
-if isempty(F0) == true
-    F = zeros(dim,dim)
-else
-    F = F0
-end
-if isempty(S0) == true
-    S = zeros(dim,dim)
-else
-    S = S0
-end
-
-eye = zeros(dim,dim)
-for i = 1:dim
-    eye[i,i] = 1.0
-end
-
-I = eye*mu
-Ch = C
-Bh = (B+C*2*I)
-Ah = (C*I^2+B*I+A)
-
-#Check the reciprocal condition number
-#if rcond(Ah)&lt;1e-16
-#    disp('Matrix Ah is singular')
-#end
-
-metric = 1;
-nb_iter = 0
-
-while metric&gt;tol
-    nb_iter+=1
-    #\(x, y)
-    #Left division operator:
-    #multiplication of y by the inverse of x on the left.
-    F = -(Bh+Ch*F)\Ah
-    S = -(Bh+Ah*S)\Ch;
-
-    metric1 = maximum(abs.(Ah+Bh*F+Ch*F*F))
-    metric2 = maximum(abs.(Ah*S*S+Bh*S+Ch))
-    metric = max(metric1, metric2)
-
-    if nb_iter == max_iter
-        if verbose == true
-            print(&quot;Maximum number of iterations reached. Convergence not reached.&quot;)
-            print(&quot;metric = $metric&quot;)
-        end
-        break
-    end
-end
-
-
-eig_F = maximum(abs.(eigvals(F)));
-eig_S = maximum(abs.(eigvals(S)));
-
-if eig_F&gt;1 || eig_S&gt;1 || mu&gt;1-eig_S
-    if verbose == true
-        println(&quot;Conditions of Proposition 3 violated&quot;)
-    end
-else
-    flag = 1
-end
-
-F = F+I;
-Q = -inv(B+C*F);
-
-return F, Q, flag
-
-end
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> LinearAlgebra
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Source: adapted from the matlab version made available by Pontus Rendahl on his website</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># https://sites.google.com/site/pontusrendahl/Research</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># This function solves the model Ax_{t-1}+Bx_{t}+CE_t[x_{t+1}]+u_t=0, and</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># finds the solution x_t=Fx_{t-1}+Qu_t. The parameter mu should be set</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># equal to a small number, e.g. mu=1e-6;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> t_iteration(A<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>},
+</span></span><span style="display:flex;"><span>                    B<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>},
+</span></span><span style="display:flex;"><span>                    C<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>},
+</span></span><span style="display:flex;"><span>                    mu<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>;
+</span></span><span style="display:flex;"><span>                    tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1e-12</span>,
+</span></span><span style="display:flex;"><span>                    max_iter<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>,
+</span></span><span style="display:flex;"><span>                    F0<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>} <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>}(undef, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>),
+</span></span><span style="display:flex;"><span>                    S0<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>} <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>}(undef, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>),
+</span></span><span style="display:flex;"><span>                    verbose<span style="color:#f92672">::</span><span style="color:#66d9ef">Bool</span><span style="color:#f92672">=</span>false)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># success flag:</span>
+</span></span><span style="display:flex;"><span>flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initialization</span>
+</span></span><span style="display:flex;"><span>dim <span style="color:#f92672">=</span> size(A,<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> isempty(F0) <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>    F <span style="color:#f92672">=</span> zeros(dim,dim)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    F <span style="color:#f92672">=</span> F0
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> isempty(S0) <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>    S <span style="color:#f92672">=</span> zeros(dim,dim)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    S <span style="color:#f92672">=</span> S0
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>eye <span style="color:#f92672">=</span> zeros(dim,dim)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>dim
+</span></span><span style="display:flex;"><span>    eye[i,i] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>I <span style="color:#f92672">=</span> eye<span style="color:#f92672">*</span>mu
+</span></span><span style="display:flex;"><span>Ch <span style="color:#f92672">=</span> C
+</span></span><span style="display:flex;"><span>Bh <span style="color:#f92672">=</span> (B<span style="color:#f92672">+</span>C<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>I)
+</span></span><span style="display:flex;"><span>Ah <span style="color:#f92672">=</span> (C<span style="color:#f92672">*</span>I<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">+</span>B<span style="color:#f92672">*</span>I<span style="color:#f92672">+</span>A)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#Check the reciprocal condition number</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#if rcond(Ah)&lt;1e-16</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#    disp(&#39;Matrix Ah is singular&#39;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>metric <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>nb_iter <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> metric<span style="color:#f92672">&gt;</span>tol
+</span></span><span style="display:flex;"><span>    nb_iter<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#\(x, y)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Left division operator:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#multiplication of y by the inverse of x on the left.</span>
+</span></span><span style="display:flex;"><span>    F <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>(Bh<span style="color:#f92672">+</span>Ch<span style="color:#f92672">*</span>F)<span style="color:#f92672">\</span>Ah
+</span></span><span style="display:flex;"><span>    S <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>(Bh<span style="color:#f92672">+</span>Ah<span style="color:#f92672">*</span>S)<span style="color:#f92672">\</span>Ch;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    metric1 <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(Ah<span style="color:#f92672">+</span>Bh<span style="color:#f92672">*</span>F<span style="color:#f92672">+</span>Ch<span style="color:#f92672">*</span>F<span style="color:#f92672">*</span>F))
+</span></span><span style="display:flex;"><span>    metric2 <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(Ah<span style="color:#f92672">*</span>S<span style="color:#f92672">*</span>S<span style="color:#f92672">+</span>Bh<span style="color:#f92672">*</span>S<span style="color:#f92672">+</span>Ch))
+</span></span><span style="display:flex;"><span>    metric <span style="color:#f92672">=</span> max(metric1, metric2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> nb_iter <span style="color:#f92672">==</span> max_iter
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> verbose <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;Maximum number of iterations reached. Convergence not reached.&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;metric = </span><span style="color:#e6db74">$metric</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>eig_F <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(eigvals(F)));
+</span></span><span style="display:flex;"><span>eig_S <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(eigvals(S)));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> eig_F<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">||</span> eig_S<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">||</span> mu<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>eig_S
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> verbose <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;Conditions of Proposition 3 violated&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>F <span style="color:#f92672">=</span> F<span style="color:#f92672">+</span>I;
+</span></span><span style="display:flex;"><span>Q <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>inv(B<span style="color:#f92672">+</span>C<span style="color:#f92672">*</span>F);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">return</span> F, Q, flag
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>t_iteration (generic function with 1 method)
 </code></pre>
-
-<pre><code>t_iteration (generic function with 1 method)
-</code></pre>
-
-<pre><code class="language-julia">@time F, Q, flag = t_iteration(A, B, C, 0.01)
-</code></pre>
-
-<pre><code>  0.018310 seconds (11.04 k allocations: 3.390 MiB, 56.25% gc time)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> F, Q, flag <span style="color:#f92672">=</span> t_iteration(A, B, C, <span style="color:#ae81ff">0.01</span>)
+</span></span></code></pre></div><pre><code>  0.018310 seconds (11.04 k allocations: 3.390 MiB, 56.25% gc time)
 
 ([0.0 0.0 … -1.38108e-18 1.04589; 0.0 0.0 … -8.16878e-18 3.50588; … ; 0.0 0.0 … -1.73472e-18 0.218832; 0.0 0.0 … 0.0 0.9], [0.398069 0.0 … 0.455811 1.1621; -0.0 1.54851 … 1.72393 3.89542; … ; -0.0 -0.0 … 0.683716 0.243147; -0.0 -0.0 … -0.0 1.0], 1)
 </code></pre>
-
 <h2 id="impulse-response-function">Impulse Response Function</h2>
-
 <p>Let&rsquo;s now simulate the response of the economy to a positive productivity shock.
 The IRF plots show that this shock leads to a positive response in output, investment, consumption, capital and hours. These variables slowly converge to their steady-state values, as productivity goes back to its steady-state level.</p>
-
-<pre><code class="language-julia">using Plots
-pyplot()
-
-nb_periods = 40
-x = zeros(6, nb_periods)
-u = zeros(6, nb_periods)
-#initialization
-u[:,1] = [0.0 0.0 0.0 0.0 0.0 1.0]
-
-for t=2:nb_periods
-    # Law of motion
-    x[:,t] = F * x[:,t-1] + Q * u[:,t-1]
-end
-
-p1 = plot(x[1,2:end], label = &quot;output gap xt&quot;)
-p2 = plot(x[2,2:end], label = &quot;Investment&quot;)
-p3 = plot(x[3,2:end], label = &quot;Consumption&quot;)
-p4 = plot(x[4,2:end], label = &quot;Capital&quot;)
-p5 = plot(x[5,2:end], label = &quot;Hours&quot;)
-p6 = plot(x[6,2:end], label = &quot;Prod.&quot;)
-p = plot(p1,p2, p3, p4, p5, p6)
-</code></pre>
-
-<p><img src="Linear%20Time%20Iteration%20Stochastic%20Growth%20Model_33_0.png" alt="png" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Plots
+</span></span><span style="display:flex;"><span>pyplot()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nb_periods <span style="color:#f92672">=</span> <span style="color:#ae81ff">40</span>
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>, nb_periods)
+</span></span><span style="display:flex;"><span>u <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>, nb_periods)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#initialization</span>
+</span></span><span style="display:flex;"><span>u[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0.0</span> <span style="color:#ae81ff">0.0</span> <span style="color:#ae81ff">0.0</span> <span style="color:#ae81ff">0.0</span> <span style="color:#ae81ff">0.0</span> <span style="color:#ae81ff">1.0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> t<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>nb_periods
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Law of motion</span>
+</span></span><span style="display:flex;"><span>    x[<span style="color:#f92672">:</span>,t] <span style="color:#f92672">=</span> F <span style="color:#f92672">*</span> x[<span style="color:#f92672">:</span>,t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> Q <span style="color:#f92672">*</span> u[<span style="color:#f92672">:</span>,t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;output gap xt&#34;</span>)
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Investment&#34;</span>)
+</span></span><span style="display:flex;"><span>p3 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Consumption&#34;</span>)
+</span></span><span style="display:flex;"><span>p4 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Capital&#34;</span>)
+</span></span><span style="display:flex;"><span>p5 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hours&#34;</span>)
+</span></span><span style="display:flex;"><span>p6 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Prod.&#34;</span>)
+</span></span><span style="display:flex;"><span>p <span style="color:#f92672">=</span> plot(p1,p2, p3, p4, p5, p6)
+</span></span></code></pre></div><p><img src="/post/lineartimeiteration2/Linear%20Time%20Iteration%20Stochastic%20Growth%20Model_33_0.png" alt="png"></p>
 <h2 id="stochastic-simulation">Stochastic Simulation</h2>
-
-<p>We can also generate a series of draws from $e_t$ to simulate an economy and calculate moments on the simulated
+<p>We can also generate a series of draws from \(e_t\) to simulate an economy and calculate moments on the simulated
 series:</p>
-
-<pre><code class="language-julia"># Calculate a stochastic simulation
-using Distributions
-d = Normal()
-
-nb_periods = 1000
-x = zeros(6, nb_periods)
-u = zeros(6, nb_periods)
-#initialization
-u[6,:] = rand(d, nb_periods) #series of shocks
-
-for t=2:nb_periods
-    # Law of motion
-    x[:,t] = F * x[:,t-1] + Q * u[:,t-1]
-end
-
-p1 = plot(x[1,2:end], label = &quot;output gap xt&quot;)
-p2 = plot(x[2,2:end], label = &quot;Investment&quot;)
-p3 = plot(x[3,2:end], label = &quot;Consumption&quot;)
-p4 = plot(x[4,2:end], label = &quot;Capital&quot;)
-p5 = plot(x[5,2:end], label = &quot;Hours&quot;)
-p6 = plot(x[6,2:end], label = &quot;Prod.&quot;)
-p = plot(p1,p2, p3, p4, p5, p6)
-</code></pre>
-
-<pre><code>┌ Info: Precompiling Distributions [31c24e10-a181-5473-b8eb-7969acd0382f]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Calculate a stochastic simulation</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Distributions
+</span></span><span style="display:flex;"><span>d <span style="color:#f92672">=</span> Normal()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nb_periods <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>, nb_periods)
+</span></span><span style="display:flex;"><span>u <span style="color:#f92672">=</span> zeros(<span style="color:#ae81ff">6</span>, nb_periods)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#initialization</span>
+</span></span><span style="display:flex;"><span>u[<span style="color:#ae81ff">6</span>,<span style="color:#f92672">:</span>] <span style="color:#f92672">=</span> rand(d, nb_periods) <span style="color:#75715e">#series of shocks</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> t<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>nb_periods
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Law of motion</span>
+</span></span><span style="display:flex;"><span>    x[<span style="color:#f92672">:</span>,t] <span style="color:#f92672">=</span> F <span style="color:#f92672">*</span> x[<span style="color:#f92672">:</span>,t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> Q <span style="color:#f92672">*</span> u[<span style="color:#f92672">:</span>,t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;output gap xt&#34;</span>)
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Investment&#34;</span>)
+</span></span><span style="display:flex;"><span>p3 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Consumption&#34;</span>)
+</span></span><span style="display:flex;"><span>p4 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Capital&#34;</span>)
+</span></span><span style="display:flex;"><span>p5 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hours&#34;</span>)
+</span></span><span style="display:flex;"><span>p6 <span style="color:#f92672">=</span> plot(x[<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Prod.&#34;</span>)
+</span></span><span style="display:flex;"><span>p <span style="color:#f92672">=</span> plot(p1,p2, p3, p4, p5, p6)
+</span></span></code></pre></div><pre><code>┌ Info: Precompiling Distributions [31c24e10-a181-5473-b8eb-7969acd0382f]
 └ @ Base loading.jl:1192
 </code></pre>
-
-<p><img src="Linear%20Time%20Iteration%20Stochastic%20Growth%20Model_36_1.png" alt="png" /></p>
-
-<pre><code class="language-julia">#correlation matrix
-cor(transpose(x[:,2:end]),transpose(x[:,2:end]))
-</code></pre>
-
-<pre><code>6×6 Array{Float64,2}:
+<p><img src="/post/lineartimeiteration2/Linear%20Time%20Iteration%20Stochastic%20Growth%20Model_36_1.png" alt="png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#correlation matrix</span>
+</span></span><span style="display:flex;"><span>cor(transpose(x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>]),transpose(x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>]))
+</span></span></code></pre></div><pre><code>6×6 Array{Float64,2}:
  1.0       0.954544   0.842972   0.712213   0.200527  0.979622
  0.954544  1.0        0.644305   0.470603   0.483428  0.99496
  0.842972  0.644305   1.0        0.978002  -0.357991  0.717745
@@ -924,18 +851,14 @@ cor(transpose(x[:,2:end]),transpose(x[:,2:end]))
  0.200527  0.483428  -0.357991  -0.544888   1.0       0.393212
  0.979622  0.99496    0.717745   0.556709   0.393212  1.0     
 </code></pre>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>This post illustrated how one can solve the neoclassical growth model from scratch, using Linear Time
 Iteration. While the model presented here is quite simple, the three-step approach discussed is quite general.</p>
-
 <h2 id="references">References</h2>
-
 <ul>
 <li>Rendahl, Pontus. Linear time iteration. No. 330. IHS Economics Series, 2017.
-(<a href="https://www.ihs.ac.at/publications/eco/es-330.pdf" target="_blank">https://www.ihs.ac.at/publications/eco/es-330.pdf</a>)</li>
-<li>The original Matlab code is available <a href="https://sites.google.com/site/pontusrendahl/Research" target="_blank">here</a></li>
+(<a href="https://www.ihs.ac.at/publications/eco/es-330.pdf" target="_blank" rel="noopener">https://www.ihs.ac.at/publications/eco/es-330.pdf</a>)</li>
+<li>The original Matlab code is available <a href="https://sites.google.com/site/pontusrendahl/Research" target="_blank" rel="noopener">here</a></li>
 </ul>
 
     </div>
@@ -965,7 +888,7 @@ Iteration. While the model presented here is quite simple, the three-step approa
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -1095,7 +1018,7 @@ Iteration. While the model presented here is quite simple, the three-step approa
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1249,7 +1172,7 @@ Iteration. While the model presented here is quite simple, the three-step approa
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

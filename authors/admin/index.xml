@@ -1,15 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>admin on Julien Pascal</title>
+    <title>Admin on Julien Pascal</title>
     <link>https://julienpascal.github.io/authors/admin/</link>
-    <description>Recent content in admin on Julien Pascal</description>
+    <description>Recent content in Admin on Julien Pascal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    
-	<atom:link href="https://julienpascal.github.io/authors/admin/index.xml" rel="self" type="application/rss+xml" />
-    
+    <atom:link href="https://julienpascal.github.io/authors/admin/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title></title>
@@ -17,8 +14,9 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/author/admin/</guid>
-      <description>I am an Economist at the Central Bank of Luxembourg. I hold a PhD in Economics from Sciences Po.
-The views expressed on this website are my own and do not necessarily represent the views of my employer.</description>
+      <description>&lt;p&gt;I am an Economist at the &lt;a href=&#34;http://www.bcl.lu/en/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Central Bank of Luxembourg&lt;/a&gt;. I hold a PhD in Economics from &lt;a href=&#34;http://econ.sciences-po.fr/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Sciences Po&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The views expressed on this website are my own and do not necessarily represent the views of my employer.&lt;/p&gt;
+</description>
     </item>
     
   </channel>

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Slides on Julien Pascal</title>
@@ -7,73 +6,1039 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
+    <lastBuildDate>Wed, 26 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://julienpascal.github.io/slides/index.xml" rel="self" type="application/rss+xml" />
     
-	<atom:link href="https://julienpascal.github.io/slides/index.xml" rel="self" type="application/rss+xml" />
-    
+    <item>
+      <title>Econometrics II: Lecture I OLS</title>
+      <link>https://julienpascal.github.io/slides/lectures-econo-2-1/</link>
+      <pubDate>Wed, 26 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://julienpascal.github.io/slides/lectures-econo-2-1/</guid>
+      <description>&lt;h1 id=&#34;econometrics-ii&#34;&gt;Econometrics II&lt;/h1&gt;
+&lt;h2 id=&#34;lecture-i---ols&#34;&gt;Lecture I - OLS&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;
+&lt;h4 id=&#34;motivation&#34;&gt;Motivation&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Econometrics is the science of making &lt;strong&gt;causal&lt;/strong&gt; statements using both &lt;strong&gt;theory&lt;/strong&gt; and &lt;strong&gt;data&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Constraints: the world is probabilistic, the data we have is messy, theories are incomplete, etc&amp;hellip; We have to take these constraints into consideration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;looks-causal&#34;&gt;Looks causal&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Econometrics-2/CO2_temp_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;obvious-spurious-correlation&#34;&gt;Obvious spurious correlation&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Econometrics-2/NC_Drownings.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;looks-causal-but-careful-see-the-lecture-on-instrumental-variables-&#34;&gt;Looks causal, but careful (see the lecture on Instrumental Variables )&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Econometrics-2/Futlon_Fish_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;the-linear-model&#34;&gt;The Linear Model&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;A building block to model and assess causality is the linear model&lt;/li&gt;
+&lt;/ul&gt;
+\[ y = X \beta &amp;#43; \varepsilon \]&lt;ul&gt;
+&lt;li&gt;\(y\) is a column vector containing the endogenous (explained) variable. 1 row = 1 observation.&lt;/li&gt;
+&lt;li&gt;\(X\) is the &amp;ldquo;data matrix&amp;rdquo;: 1 row = 1 observation; 1 column = 1 variable.&lt;/li&gt;
+&lt;li&gt;\(\varepsilon\)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+</description>
+    </item>
     
     <item>
       <title>A crash course on Git and Gitlab</title>
       <link>https://julienpascal.github.io/slides/intro_git/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 29 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/slides/intro_git/</guid>
-      <description>A crash course on Git and Gitlab What? Version control
- version control (also known as revision control, source control, or source code management) is a class of systems responsible for managing changes to computer programs, documents, large web sites, or other collections of information.
- source: https://en.wikipedia.org/wiki/Version_control
-Why? (1&amp;frasl;2) Other people are using Git (network effect)
-Notes: Open source repositories registered on Ohloh Source
-Why? (2&amp;frasl;2) Advantages  Keep an organized history of a project.</description>
+      <description>&lt;h2 id=&#34;a-crash-course-on-git-and-gitlab&#34;&gt;A crash course on Git and Gitlab&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;what&#34;&gt;What?&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Version control&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;version control (also known as revision control, source control, or source code management) is a class of systems responsible for &lt;strong&gt;managing changes&lt;/strong&gt; to &lt;strong&gt;computer programs, documents, large web sites, or other collections of information&lt;/strong&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;source: &lt;a href=&#34;https://en.wikipedia.org/wiki/Version_control&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://en.wikipedia.org/wiki/Version_control&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;why-12&#34;&gt;Why? (1/2)&lt;/h3&gt;
+&lt;p&gt;Other people are using Git (network effect)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/Git_SVN.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Notes: Open source repositories registered on Ohloh
+&lt;a href=&#34;https://softwareengineering.stackexchange.com/questions/136079/are-there-any-statistics-that-show-the-popularity-of-git-versus-svn/136136#136136&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Source&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/meme_git.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;why-22&#34;&gt;Why? (2/2)&lt;/h3&gt;
+&lt;h4 id=&#34;advantages&#34;&gt;Advantages&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Keep an &lt;strong&gt;organized history&lt;/strong&gt; of a project. No more:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/several_versions.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Easy to &lt;strong&gt;collaborate&lt;/strong&gt;: working simultaneously with the same file(s)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/dropbox_crossed.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;how&#34;&gt;How?&lt;/h3&gt;
+&lt;h4 id=&#34;git&#34;&gt;Git&lt;/h4&gt;
+&lt;p&gt;Software that handles source code versioning&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://git-scm.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://git-scm.com/&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;gitlab&#34;&gt;Gitlab&lt;/h4&gt;
+&lt;p&gt;A cloud service for remote hosting of git repositories + makes your life easier&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://about.gitlab.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://about.gitlab.com/&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Have Git installed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;see: &lt;a href=&#34;https://git-scm.com/book/en/v2/Getting-Started-Installing-Git&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://git-scm.com/book/en/v2/Getting-Started-Installing-Git&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Have a Gitlab account&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;see: &lt;a href=&#34;https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Basic knowledge of the terminal (cd, ls, &amp;hellip;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;see: &lt;a href=&#34;https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;git-101&#34;&gt;Git 101&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;the-big-picture&#34;&gt;the big picture&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Each &amp;ldquo;commit&amp;rdquo; is a snapshot of the state of the project&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/commits.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;you-first-local-repository-12&#34;&gt;You first local repository (1/2)&lt;/h3&gt;
+&lt;p&gt;Create a local repository&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mkdir my_repo
+cd my_repo
+git init #Initialized empty Git repository  
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a file your first commit&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;#34;Some line&amp;#34; &amp;gt; file1.txt
+git status #Look at the changes within your repository
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create your first commit&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git add file1.txt
+git commit -m &amp;#34;my first commit&amp;#34;
+git status
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;you-first-local-repository-22&#34;&gt;You first local repository (2/2)&lt;/h3&gt;
+&lt;p&gt;See the changes&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See the changes on a graph&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline --graph
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-1-undo-some-changes-12&#34;&gt;Case study 1: Undo some changes (1/2)&lt;/h3&gt;
+&lt;p&gt;Introduce a bug in our &amp;ldquo;code&amp;rdquo;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;#34;A bug&amp;#34; &amp;gt;&amp;gt; file1.txt
+git status
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Look at the differences with the previous version&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git diff file1.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Commit the bug&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git add file1.txt
+git commit -m &amp;#34;commit with a bug&amp;#34;
+git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-1-undo-some-changes-22&#34;&gt;Case study 1: Undo some changes (2/2)&lt;/h3&gt;
+&lt;p&gt;Undo the bug&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git revert &amp;lt;commit&amp;gt; #Find &amp;lt;commit&amp;gt; with git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;You should see &amp;ldquo;Revert &amp;ldquo;commit with a bug&amp;rdquo;&amp;rdquo;:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.atlassian.com/git/tutorials/undoing-changes/git-revert&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/undoing-changes/git-revert&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.atlassian.com/git/tutorials/undoing-changes/git-reset&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/undoing-changes/git-reset&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;the-concept-of-branches&#34;&gt;The concept of branches&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;You may want to &lt;strong&gt;experiment&lt;/strong&gt; with a new feature&lt;/li&gt;
+&lt;li&gt;You don&amp;rsquo;t want to mess with the current state of the project
+-&amp;gt; Create a new &lt;strong&gt;branch&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/branch.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;feature-branch-workflow&#34;&gt;Feature Branch Workflow&lt;/h2&gt;
+&lt;h3 id=&#34;philosophy&#34;&gt;Philosophy&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;The latest state of the project&lt;/strong&gt; (&amp;ldquo;production-ready&amp;rdquo;) is on the branch &lt;strong&gt;&amp;ldquo;master&amp;rdquo;&lt;/strong&gt; (also called &amp;ldquo;main&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;new features&lt;/strong&gt; -&amp;gt; create a new &lt;strong&gt;&amp;ldquo;feature branch&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;When new feature is ready -&amp;gt; &lt;strong&gt;merge&lt;/strong&gt; the feature into the branch &amp;ldquo;master&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See: &lt;a href=&#34;https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-2-create-and-merge-a-feature-branch-12&#34;&gt;Case study 2: Create and merge a feature branch (1/2)&lt;/h3&gt;
+&lt;p&gt;Create a new branch from the master/main branch&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch #Look at the existing branches
+git checkout master #Go to branch master (or main)
+git checkout -b new-feature # Create a new branch called &amp;#34;new-feature&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Introduce a new feature&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;#34;A new feature&amp;#34; &amp;gt;&amp;gt; file1.txt
+git status #Look at the changes within your repo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a commit&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git add -A #add changes from all tracked and untracked files
+git commit -m &amp;#34;my new feature&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-2-create-and-merge-a-feature-branch-22&#34;&gt;Case study 2: Create and merge a feature branch (2/2)&lt;/h3&gt;
+&lt;p&gt;Merge the feature branch into the master branch.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master #Go to branch master (or main)
+git merge new-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See the changes&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline --graph
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(Optional) Delete the feature branch&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -d new-feature #delete branch &amp;#34;new-feature&amp;#34;
+git branch #You should see only one branch
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id=&#34;gitlab-101&#34;&gt;Gitlab 101&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;why&#34;&gt;Why?&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;So far, everything on your local machine&lt;/li&gt;
+&lt;li&gt;Collaboration made easier with Gitlab&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Truth&amp;rdquo; repo hosted by Gitlab&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Git/centr-decent.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Source: &lt;a href=&#34;https://nvie.com/posts/a-successful-git-branching-model/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://nvie.com/posts/a-successful-git-branching-model/&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;setup&#34;&gt;Setup&lt;/h3&gt;
+&lt;h4 id=&#34;general-setup&#34;&gt;General Setup&lt;/h4&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git config --global user.name &amp;#34;Your Username&amp;#34;
+git config --global user.email &amp;#34;your.email@email.com&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;optional-specific-setup&#34;&gt;(Optional) Specific Setup&lt;/h4&gt;
+&lt;p&gt;See &lt;code&gt;installationgit.pdf&lt;/code&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-3-sync-repository-with-gitlab&#34;&gt;Case study 3: Sync repository with Gitlab&lt;/h3&gt;
+&lt;p&gt;Create a new repository on Gitlab:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Go to &lt;a href=&#34;https://gitlab.com/users/sign_in&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://gitlab.com/users/sign_in&lt;/a&gt; and login&lt;/li&gt;
+&lt;li&gt;Create a new repository &amp;ldquo;tuto&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Clone&lt;/strong&gt; the repository:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git clone git@gitlab.com:&amp;lt;your_username&amp;gt;/tuto.git
+cd tuto
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a README file and &lt;strong&gt;push&lt;/strong&gt;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;touch README.md
+git add README.md
+git commit -m &amp;#34;add README&amp;#34;
+git push -u origin master
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;important-the-gitignore-file&#34;&gt;Important: the .gitignore file&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You don&amp;rsquo;t want to track every single file in your repository (.i.e. large output files)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;At the root of your repository, create a file &lt;code&gt;.gitignore&lt;/code&gt;. Add the following:&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# ignore all logs
+*.log
+# ignore file text2.txt
+text2.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See: &lt;a href=&#34;https://www.atlassian.com/git/tutorials/saving-changes/gitignore&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/saving-changes/gitignore&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-14&#34;&gt;Case study 4: Feature workflow on Gitlab (1/4)&lt;/h3&gt;
+&lt;p&gt;Same as previously. But this time, need to &amp;ldquo;synchronize&amp;rdquo; with the central repository (on Gitlab)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Go to the master branch and delete local changes (careful)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master &lt;span style=&#34;color:#75715e&#34;&gt;#Go to the branch master on your local machine&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch origin &lt;span style=&#34;color:#75715e&#34;&gt;#Update info on the remote branch master (from Gitlab)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset --hard origin/master &lt;span style=&#34;color:#75715e&#34;&gt;#Remove your local modifications and use the latest version from Gitlab&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Create a new branch&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout -b new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-24&#34;&gt;Case study 4: Feature workflow on Gitlab (2/4)&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Add a feature&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Cool new feature&amp;#34;&lt;/span&gt; &amp;gt; file1.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Create a new commit and synchronize with Gitlab&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A &lt;span style=&#34;color:#75715e&#34;&gt;#Add all files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Message describing the commit&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;#Create a commit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push -u origin new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-34&#34;&gt;Case study 4: Feature workflow on Gitlab (3/4)&lt;/h3&gt;
+&lt;h4 id=&#34;merge-request&#34;&gt;Merge Request&lt;/h4&gt;
+&lt;p&gt;This step is done directly on Gitlab:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;On the top bar, select Menu -&amp;gt; Projects and find your project&lt;/li&gt;
+&lt;li&gt;On the left menu, select &lt;strong&gt;Merge requests&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;In the top right, select &lt;strong&gt;New merge request&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Select a source (new-feature) and target branch (master) and then Compare branches and continue.&lt;/li&gt;
+&lt;li&gt;Fill out the fields and select Create merge request&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See: &lt;a href=&#34;https://docs.gitlab.com/ee/topics/git/feature_branch_development.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.gitlab.com/ee/topics/git/feature_branch_development.html&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-44&#34;&gt;Case study 4: Feature workflow on Gitlab (4/4)&lt;/h3&gt;
+&lt;h4 id=&#34;merge-request-1&#34;&gt;Merge Request&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;When everyone is satisfied the merge request: Click on &lt;strong&gt;Merge&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;On your local machine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git pull
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;See the merge in the log&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-14&#34;&gt;Case study 5: Resolving a merge conflict (1/4)&lt;/h3&gt;
+&lt;h4 id=&#34;setting&#34;&gt;Setting&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;You are working on a new feature, you are ready to create a pull request, but
+the master branch has changed since&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout -b feature2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Feature 1 different&amp;#34;&lt;/span&gt; &amp;gt; file1.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Another new feature&amp;#34;&lt;/span&gt; &amp;gt; file2.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A &lt;span style=&#34;color:#75715e&#34;&gt;#Add all files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Feature 2&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push -u origin feature2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Change feature 1 as well&amp;#34;&lt;/span&gt; &amp;gt; file1.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A &lt;span style=&#34;color:#75715e&#34;&gt;#Add all files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;master branch changing&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-24&#34;&gt;Case study 5: Resolving a merge conflict (2/4)&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Create a merge commit on Gitlab&lt;/li&gt;
+&lt;li&gt;You should see &lt;strong&gt;&amp;ldquo;There are merge conflicts&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;option-1-resolve-conflict-using-gitlab&#34;&gt;Option 1: Resolve conflict using Gitlab&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Click on &amp;ldquo;Resolve Conflicts&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-34&#34;&gt;Case study 5: Resolving a merge conflict (3/4)&lt;/h3&gt;
+&lt;h3 id=&#34;option-2-resolve-conflict-using-the-command-line&#34;&gt;Option 2: Resolve conflict using the command line&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Click on &amp;ldquo;Merge locally&amp;rdquo; on follow the instructions:&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Step 1. Fetch and check out the branch for this merge request&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch origin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;feature2&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Step 2. Merge the branch and fix any conflicts that come up&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch origin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;master&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git merge --no-ff &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;feature2&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;#merge feature2 into master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-44&#34;&gt;Case study 5: Resolving a merge conflict (4/4)&lt;/h3&gt;
+&lt;p&gt;You should see:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Auto-merging file1.txt
+CONFLICT (content): Merge conflict in file1.txt
+Automatic merge failed; fix conflicts and then commit the result.
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Step 3. Edit manually the files with merge conflicts:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt;&amp;lt; HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Change feature &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; as well
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=======&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Feature &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; different
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; feature2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Step 4. Push the result of the merge to GitLab&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;resolving merge conflicts&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push origin &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;master&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;readings&#34;&gt;Readings&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/book/en/v2&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://git-scm.com/book/en/v2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.atlassian.com/git/tutorials/what-is-version-control&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/what-is-version-control&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.gitlab.com/ee/topics/gitlab_flow.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.gitlab.com/ee/topics/gitlab_flow.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
     <item>
       <title>A crash course on Git and Gitlab</title>
       <link>https://julienpascal.github.io/slides/intro_git_local/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 29 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/slides/intro_git_local/</guid>
-      <description>A crash course on Git and Gitlab What? Version control
- version control (also known as revision control, source control, or source code management) is a class of systems responsible for managing changes to computer programs, documents, large web sites, or other collections of information.
- source: https://en.wikipedia.org/wiki/Version_control
-Why? Advantages  Keep an organized history of a project. No more:   Easy to collaborate: working simultaneously with the same file(s)  How?</description>
+      <description>&lt;h2 id=&#34;a-crash-course-on-git-and-gitlab&#34;&gt;A crash course on Git and Gitlab&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;what&#34;&gt;What?&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Version control&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;version control (also known as revision control, source control, or source code management) is a class of systems responsible for &lt;strong&gt;managing changes&lt;/strong&gt; to &lt;strong&gt;computer programs, documents, large web sites, or other collections of information&lt;/strong&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;source: &lt;a href=&#34;https://en.wikipedia.org/wiki/Version_control&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://en.wikipedia.org/wiki/Version_control&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;why&#34;&gt;Why?&lt;/h3&gt;
+&lt;h4 id=&#34;advantages&#34;&gt;Advantages&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Keep an &lt;strong&gt;organized history&lt;/strong&gt; of a project. No more:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/home/julien/Documents/REPOSITORIES/JulienPascal.github.io.Hugo/static/img/Git/several_versions.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Easy to &lt;strong&gt;collaborate&lt;/strong&gt;: working simultaneously with the same file(s)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/home/julien/Documents/REPOSITORIES/JulienPascal.github.io.Hugo/static/img/Git/dropbox_crossed.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;how&#34;&gt;How?&lt;/h3&gt;
+&lt;h4 id=&#34;git&#34;&gt;Git&lt;/h4&gt;
+&lt;p&gt;Software that handles source code versioning&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://git-scm.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://git-scm.com/&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;gitlab&#34;&gt;Gitlab&lt;/h4&gt;
+&lt;p&gt;A cloud service for remote hosting of git repositories + makes your life easier&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://about.gitlab.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://about.gitlab.com/&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Have Git installed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;see: &lt;a href=&#34;https://git-scm.com/book/en/v2/Getting-Started-Installing-Git&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://git-scm.com/book/en/v2/Getting-Started-Installing-Git&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Have a Gitlab account&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;see: &lt;a href=&#34;https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Basic knowledge of the terminal (cd, ls, &amp;hellip;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;see: &lt;a href=&#34;https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;git-101&#34;&gt;Git 101&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;the-big-picture&#34;&gt;the big picture&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Each &amp;ldquo;commit&amp;rdquo; is a snapshot of the state of the project&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/home/julien/Documents/REPOSITORIES/JulienPascal.github.io.Hugo/static/img/Git/commits.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;you-first-local-repository-12&#34;&gt;You first local repository (1/2)&lt;/h3&gt;
+&lt;p&gt;Create a local repository&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;mkdir my_repo
+cd my_repo
+git init #Initialized empty Git repository  
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a file your first commit&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;#34;Some line&amp;#34; &amp;gt; file1.txt
+git status #Look at the changes within your repository
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create your first commit&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git add file1.txt
+git commit -m &amp;#34;my first commit&amp;#34;
+git status
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;you-first-local-repository-22&#34;&gt;You first local repository (2/2)&lt;/h3&gt;
+&lt;p&gt;See the changes&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See the changes on a graph&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline --graph
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-1-undo-some-changes-12&#34;&gt;Case study 1: Undo some changes (1/2)&lt;/h3&gt;
+&lt;p&gt;Introduce a bug in our &amp;ldquo;code&amp;rdquo;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;#34;A bug&amp;#34; &amp;gt;&amp;gt; file1.txt
+git status
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Look at the differences with the previous version&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git diff file1.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Commit the bug&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git add file1.txt
+git commit -m &amp;#34;commit with a bug&amp;#34;
+git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-1-undo-some-changes-22&#34;&gt;Case study 1: Undo some changes (2/2)&lt;/h3&gt;
+&lt;p&gt;Undo the bug&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git revert &amp;lt;commit&amp;gt; #Find &amp;lt;commit&amp;gt; with git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;You should see &amp;ldquo;Revert &amp;ldquo;commit with a bug&amp;rdquo;&amp;rdquo;:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.atlassian.com/git/tutorials/undoing-changes/git-revert&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/undoing-changes/git-revert&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.atlassian.com/git/tutorials/undoing-changes/git-reset&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/undoing-changes/git-reset&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;the-concept-of-branches&#34;&gt;The concept of branches&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;You may want to &lt;strong&gt;experiment&lt;/strong&gt; with a new feature&lt;/li&gt;
+&lt;li&gt;You don&amp;rsquo;t want to mess with the current state of the project
+-&amp;gt; Create a new &lt;strong&gt;branch&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/home/julien/Documents/REPOSITORIES/JulienPascal.github.io.Hugo/static/img/Git/branch.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;feature-branch-workflow&#34;&gt;Feature Branch Workflow&lt;/h2&gt;
+&lt;h3 id=&#34;philosophy&#34;&gt;Philosophy&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;The latest state of the project&lt;/strong&gt; (&amp;ldquo;production-ready&amp;rdquo;) is on the branch &lt;strong&gt;&amp;ldquo;master&amp;rdquo;&lt;/strong&gt; (also called &amp;ldquo;main&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;new features&lt;/strong&gt; -&amp;gt; create a new &lt;strong&gt;&amp;ldquo;feature branch&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;When new feature is ready -&amp;gt; &lt;strong&gt;merge&lt;/strong&gt; the feature into the branch &amp;ldquo;master&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See: &lt;a href=&#34;https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-2-create-and-merge-a-feature-branch-12&#34;&gt;Case study 2: Create and merge a feature branch (1/2)&lt;/h3&gt;
+&lt;p&gt;Create a new branch from the master/main branch&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch #Look at the existing branches
+git checkout master #Go to branch master (or main)
+git checkout -b new-feature # Create a new branch called &amp;#34;new-feature&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Introduce a new feature&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;#34;A new feature&amp;#34; &amp;gt;&amp;gt; file1.txt
+git status #Look at the changes within your repo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a commit&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git add -A #add changes from all tracked and untracked files
+git commit -m &amp;#34;my new feature&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-2-create-and-merge-a-feature-branch-22&#34;&gt;Case study 2: Create and merge a feature branch (2/2)&lt;/h3&gt;
+&lt;p&gt;Merge the feature branch into the master branch.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master #Go to branch master (or main)
+git merge new-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See the changes&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline --graph
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;(Optional) Delete the feature branch&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -d new-feature #delete branch &amp;#34;new-feature&amp;#34;
+git branch #You should see only one branch
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h2 id=&#34;gitlab-101&#34;&gt;Gitlab 101&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;why-1&#34;&gt;Why?&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;So far, everything on your local machine&lt;/li&gt;
+&lt;li&gt;Collaboration made easier with Gitlab&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Truth&amp;rdquo; repo hosted by Gitlab&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/home/julien/Documents/REPOSITORIES/JulienPascal.github.io.Hugo/static/img/Git/centr-decent.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Source: &lt;a href=&#34;https://nvie.com/posts/a-successful-git-branching-model/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://nvie.com/posts/a-successful-git-branching-model/&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;setup&#34;&gt;Setup&lt;/h3&gt;
+&lt;h4 id=&#34;general-setup&#34;&gt;General Setup&lt;/h4&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git config --global user.name &amp;#34;Your Username&amp;#34;
+git config --global user.email &amp;#34;your.email@email.com&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;optional-specific-setup&#34;&gt;(Optional) Specific Setup&lt;/h4&gt;
+&lt;p&gt;See &lt;code&gt;installationgit.pdf&lt;/code&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-3-sync-repository-with-gitlab&#34;&gt;Case study 3: Sync repository with Gitlab&lt;/h3&gt;
+&lt;p&gt;Create a new repository on Gitlab:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Go to &lt;a href=&#34;https://gitlab.com/users/sign_in&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://gitlab.com/users/sign_in&lt;/a&gt; and login&lt;/li&gt;
+&lt;li&gt;Create a new repository &amp;ldquo;tuto&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Clone&lt;/strong&gt; the repository:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git clone git@gitlab.com:&amp;lt;your_username&amp;gt;/tuto.git
+cd tuto
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a README file and &lt;strong&gt;push&lt;/strong&gt;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;touch README.md
+git add README.md
+git commit -m &amp;#34;add README&amp;#34;
+git push -u origin master
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h3 id=&#34;important-the-gitignore-file&#34;&gt;Important: the .gitignore file&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You don&amp;rsquo;t want to track every single file in your repository (.i.e. large output files)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;At the root of your repository, create a file &lt;code&gt;.gitignore&lt;/code&gt;. Add the following:&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# ignore all logs
+*.log
+# ignore file text2.txt
+text2.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See: &lt;a href=&#34;https://www.atlassian.com/git/tutorials/saving-changes/gitignore&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/saving-changes/gitignore&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-14&#34;&gt;Case study 4: Feature workflow on Gitlab (1/4)&lt;/h3&gt;
+&lt;p&gt;Same as previously. But this time, need to &amp;ldquo;synchronize&amp;rdquo; with the central repository (on Gitlab)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Go to the master branch and delete local changes (careful)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master &lt;span style=&#34;color:#75715e&#34;&gt;#Go to the branch master on your local machine&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch origin &lt;span style=&#34;color:#75715e&#34;&gt;#Update info on the remote branch master (from Gitlab)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset --hard origin/master &lt;span style=&#34;color:#75715e&#34;&gt;#Remove your local modifications and use the latest version from Gitlab&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Create a new branch&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout -b new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-24&#34;&gt;Case study 4: Feature workflow on Gitlab (2/4)&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Add a feature&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Cool new feature&amp;#34;&lt;/span&gt; &amp;gt; file1.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Create a new commit and synchronize with Gitlab&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A &lt;span style=&#34;color:#75715e&#34;&gt;#Add all files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Message describing the commit&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;#Create a commit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push -u origin new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-34&#34;&gt;Case study 4: Feature workflow on Gitlab (3/4)&lt;/h3&gt;
+&lt;h4 id=&#34;merge-request&#34;&gt;Merge Request&lt;/h4&gt;
+&lt;p&gt;This step is done directly on Gitlab:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;On the top bar, select Menu -&amp;gt; Projects and find your project&lt;/li&gt;
+&lt;li&gt;On the left menu, select &lt;strong&gt;Merge requests&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;In the top right, select &lt;strong&gt;New merge request&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Select a source (new-feature) and target branch (master) and then Compare branches and continue.&lt;/li&gt;
+&lt;li&gt;Fill out the fields and select Create merge request&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See: &lt;a href=&#34;https://docs.gitlab.com/ee/topics/git/feature_branch_development.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.gitlab.com/ee/topics/git/feature_branch_development.html&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-4-feature-workflow-on-gitlab-44&#34;&gt;Case study 4: Feature workflow on Gitlab (4/4)&lt;/h3&gt;
+&lt;h4 id=&#34;merge-request-1&#34;&gt;Merge Request&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;When everyone is satisfied the merge request: Click on &lt;strong&gt;Merge&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;On your local machine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git pull
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;See the merge in the log&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-14&#34;&gt;Case study 5: Resolving a merge conflict (1/4)&lt;/h3&gt;
+&lt;h4 id=&#34;setting&#34;&gt;Setting&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;You are working on a new feature, you are ready to create a pull request, but
+the master branch has changed since&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout -b feature2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Feature 1 different&amp;#34;&lt;/span&gt; &amp;gt; file1.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Another new feature&amp;#34;&lt;/span&gt; &amp;gt; file2.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A &lt;span style=&#34;color:#75715e&#34;&gt;#Add all files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Feature 2&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push -u origin feature2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Change feature 1 as well&amp;#34;&lt;/span&gt; &amp;gt; file1.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A &lt;span style=&#34;color:#75715e&#34;&gt;#Add all files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;master branch changing&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-24&#34;&gt;Case study 5: Resolving a merge conflict (2/4)&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Create a merge commit on Gitlab&lt;/li&gt;
+&lt;li&gt;You should see &lt;strong&gt;&amp;ldquo;There are merge conflicts&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;option-1-resolve-conflict-using-gitlab&#34;&gt;Option 1: Resolve conflict using Gitlab&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Click on &amp;ldquo;Resolve Conflicts&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-34&#34;&gt;Case study 5: Resolving a merge conflict (3/4)&lt;/h3&gt;
+&lt;h3 id=&#34;option-2-resolve-conflict-using-the-command-line&#34;&gt;Option 2: Resolve conflict using the command line&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Click on &amp;ldquo;Merge locally&amp;rdquo; on follow the instructions:&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Step 1. Fetch and check out the branch for this merge request&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch origin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;feature2&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Step 2. Merge the branch and fix any conflicts that come up&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch origin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;master&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git merge --no-ff &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;feature2&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;#merge feature2 into master&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id=&#34;case-study-5-resolving-a-merge-conflict-44&#34;&gt;Case study 5: Resolving a merge conflict (4/4)&lt;/h3&gt;
+&lt;p&gt;You should see:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Auto-merging file1.txt
+CONFLICT (content): Merge conflict in file1.txt
+Automatic merge failed; fix conflicts and then commit the result.
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Step 3. Edit manually the files with merge conflicts:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt;&amp;lt; HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Change feature &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; as well
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=======&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Feature &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; different
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; feature2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Step 4. Push the result of the merge to GitLab&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add -A
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;resolving merge conflicts&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push origin &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;master&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;readings&#34;&gt;Readings&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/book/en/v2&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://git-scm.com/book/en/v2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.atlassian.com/git/tutorials/what-is-version-control&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.atlassian.com/git/tutorials/what-is-version-control&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.gitlab.com/ee/topics/gitlab_flow.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.gitlab.com/ee/topics/gitlab_flow.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
     <item>
       <title>Capstone Project - The Battle of Neighborhoods</title>
       <link>https://julienpascal.github.io/slides/neighbourhoods_paris/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 21 Feb 2020 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/slides/neighbourhoods_paris/</guid>
-      <description>Introduction  Which neighborhoods to visit when in Paris? Where to live in Paris?  Answers depend on your preferences
-This project  Cluster neighborhoods in Paris and analyze cluster properties  Data and Methodology Data Sources  Foursquare: geolocalized data on venues Wikipedia: data on neighborhoods (called &amp;ldquo;arrondissements&amp;rdquo;)  Methodology  Similarity based on venue types (restaurants, cafés, hotels, etc.) k-means clustering using scikit-learn  Results Five clusters identified Five clusters identified  cluster 1 (in red): 5th, 7th, 8th, 14th, 15th, 16th and 17th arrondissements cluster 2 (in purple): 12th arrondissement cluster 3 (in blue): 1st, 2nd, 3rd, 4th, 6th, 9th and 10th cluster 4 (in light green): 11th, 18th, 19th, and 20th cluster 5 (in orange): 13th arrondissement  Cluster properties Cluster 1 Cluster 2 Cluster 3 Cluster 4 Cluster 5 Suggestions based on preferences  cluster 1: for a “French” experience, in a mostly quiet and residential area cluster 2: for fresh air and sport (near the Bois de Vincennes) cluster 3: a mix of art, museums and diverse cuisine cluster 4: for the best bars and pizza experience in town cluster 5: Asian cuisine aficionados  Conclusion  Which neighborhoods to visit when in Paris?</description>
-    </item>
-    
-    <item>
-      <title>Econometrics II: Lecture I OLS</title>
-      <link>https://julienpascal.github.io/slides/lectures-econo-2-1/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://julienpascal.github.io/slides/lectures-econo-2-1/</guid>
-      <description>Econometrics II Lecture I - OLS Introduction Motivation  Econometrics is the science of making causal statements using both theory and data Constraints: the world is probabilistic, the data we have is messy, theories are incomplete, etc&amp;hellip; We have to take these constraints into consideration  Looks causal Obvious spurious correlation Looks causal, but careful (see the lecture on Instrumental Variables ) The Linear Model  A building block to model and assess causality is the linear model  $$ y = X \beta + \varepsilon $$</description>
+      <description>&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/paris.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Which neighborhoods to visit when in Paris?&lt;/li&gt;
+&lt;li&gt;Where to live in Paris?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Answers depend on &lt;strong&gt;your preferences&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;this-project&#34;&gt;This project&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Cluster neighborhoods in Paris and analyze cluster properties&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;data-and-methodology&#34;&gt;Data and Methodology&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;data-sources&#34;&gt;Data Sources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.foursquare.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Foursquare&lt;/a&gt;: geolocalized data on venues&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Arrondissements_of_Paris&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wikipedia&lt;/a&gt;: data on neighborhoods (called &amp;ldquo;arrondissements&amp;rdquo;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;methodology&#34;&gt;Methodology&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Similarity based on venue types (restaurants, cafés, hotels, etc.)&lt;/li&gt;
+&lt;li&gt;k-means clustering using &lt;a href=&#34;https://scikit-learn.org/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;scikit-learn&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;results&#34;&gt;Results&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;five-clusters-identified&#34;&gt;Five clusters identified&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/map_paris_clusters.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;five-clusters-identified-1&#34;&gt;Five clusters identified&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;cluster 1 (in red): 5th, 7th, 8th, 14th, 15th, 16th and 17th arrondissements&lt;/li&gt;
+&lt;li&gt;cluster 2 (in purple): 12th arrondissement&lt;/li&gt;
+&lt;li&gt;cluster 3 (in blue): 1st, 2nd, 3rd, 4th, 6th, 9th and 10th&lt;/li&gt;
+&lt;li&gt;cluster 4 (in light green): 11th, 18th, 19th, and 20th&lt;/li&gt;
+&lt;li&gt;cluster 5 (in orange): 13th arrondissement&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;cluster-properties&#34;&gt;Cluster properties&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;cluster-1&#34;&gt;Cluster 1&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/cluster1.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;cluster-2&#34;&gt;Cluster 2&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/cluster2.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;cluster-3&#34;&gt;Cluster 3&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/cluster3.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;cluster-4&#34;&gt;Cluster 4&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/cluster4.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;cluster-5&#34;&gt;Cluster 5&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/ClusteringParis/cluster5.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;suggestions-based-on-preferences&#34;&gt;Suggestions based on preferences&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;cluster 1: for a “French” experience, in a mostly quiet and residential area&lt;/li&gt;
+&lt;li&gt;cluster 2: for fresh air and sport (near the Bois de Vincennes)&lt;/li&gt;
+&lt;li&gt;cluster 3: a mix of art, museums and diverse cuisine&lt;/li&gt;
+&lt;li&gt;cluster 4: for the best bars and pizza experience in town&lt;/li&gt;
+&lt;li&gt;cluster 5: Asian cuisine aficionados&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Which neighborhoods to visit when in Paris? Where to live in Paris?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;k-means clustering combined with Fousquare API generates new insights&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
     <item>
       <title>LOCAL EMPLOYMENT DYNAMICS AND COMMUTING COSTS</title>
       <link>https://julienpascal.github.io/slides/spatial-eq/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 26 Sep 2019 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/slides/spatial-eq/</guid>
-      <description>LOCAL EMPLOYMENT DYNAMICS AND COMMUTING COSTS Introduction  The &amp;ldquo;Forfait Toutes Zones&amp;rdquo; (FTZ) entered into force on Sept. 2015 in the Paris area metropolitan The costs of using public transport decreased for workers living in the outskirts of Paris The costs of using public transport was (almost) unchanged in the city center A nice setting to analyze the effects of a change in commuting costs on other variables  Context: Grand Paris Express source: https://www.</description>
+      <description>&lt;h2 id=&#34;local-employment-dynamics-and-commuting-costs&#34;&gt;LOCAL EMPLOYMENT DYNAMICS AND COMMUTING COSTS&lt;/h2&gt;
+&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;The &amp;ldquo;Forfait Toutes Zones&amp;rdquo; (FTZ) entered into force on Sept. 2015 in the Paris area metropolitan&lt;/li&gt;
+&lt;li&gt;The costs of using public transport &lt;strong&gt;decreased&lt;/strong&gt; for workers living in the outskirts of Paris&lt;/li&gt;
+&lt;li&gt;The costs of using public transport was (almost) &lt;strong&gt;unchanged&lt;/strong&gt; in the city center&lt;/li&gt;
+&lt;li&gt;A nice setting to analyze the effects of a change in commuting costs on
+other variables&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;context-grand-paris-express&#34;&gt;Context: Grand Paris Express&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Navigo/carte-gpe_feb2018_en_c_societe_du_grand_paris.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;source: &lt;a href=&#34;https://www.societedugrandparis.fr/gpe/carte#lignes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.societedugrandparis.fr/gpe/carte#lignes&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;context-grand-paris-express-1&#34;&gt;Context: Grand Paris Express&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Navigo/Grand_Paris_Express.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;source: &lt;a href=&#34;https://www.societedugrandparis.fr/emploi&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.societedugrandparis.fr/emploi&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;data&#34;&gt;Data&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;data-sources&#34;&gt;Data Sources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Monthly # of workers registered to Pole Emploi at the municipality level: Pole Emploi&lt;/li&gt;
+&lt;li&gt;Demographic and economic characteristics of municipalities and IRIS: INSEE&lt;/li&gt;
+&lt;li&gt;House prices: DVF&lt;/li&gt;
+&lt;li&gt;Fare area at the IRIS level: Vianavigo&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;cost-change-by-fare-area&#34;&gt;Cost change by fare area&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Navigo/winners_losers.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;fare-area-at-the-iris-level&#34;&gt;Fare area at the IRIS level&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/Navigo/map_fare_areas_IRIS_sharp.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;econometrics&#34;&gt;Econometrics&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;main-specification&#34;&gt;Main specification&lt;/h3&gt;
+\[y_{it} = \alpha_i &amp;#43; \gamma_t &amp;#43; \beta \times \delta_{i,t}  &amp;#43; \eta_i t &amp;#43; \varepsilon_{i,t}\]&lt;ul&gt;
+&lt;li&gt;\(\alpha_i\): area fixed effect&lt;/li&gt;
+&lt;li&gt;\(\gamma_t\): time fixed effects&lt;/li&gt;
+&lt;li&gt;\(\delta_{i,t}\): indicator = 1 if treated and post-reform&lt;/li&gt;
+&lt;li&gt;\(\eta_i\): area-specific linear trend&lt;/li&gt;
+&lt;li&gt;\(\varepsilon_{i,t}\): error term&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;results&#34;&gt;Results&lt;/h1&gt;
+&lt;p&gt;For areas benefiting from the reform (zone 3):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;0.25 percentage point decline in the unemployment rate&lt;/li&gt;
+&lt;li&gt;0.60 percentage point increase in the share of employed workers commuting using public transport&lt;/li&gt;
+&lt;li&gt;1.4% increase in the price of residential real estate&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
     <item>
       <title>Rental Housing Market and Directed Search</title>
       <link>https://julienpascal.github.io/slides/rental-market/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 26 Jan 2019 00:00:00 +0000</pubDate>
       
       <guid>https://julienpascal.github.io/slides/rental-market/</guid>
-      <description>Rental Housing Market and Directed Search Introduction Context  Housing shortages in many major cities Rents have surged in big cities worldwide 36% households renters in the US (2019) (source), 30% in Euro area (2020) (source)  Housing costs have outpaced household disposable income worldwide % change in selected household items and median income, OECD average, 1995-2018: Source: OECD
-Why this paper?  Rental property market is understudied
- Lack of data?</description>
+      <description>&lt;h2 id=&#34;rental-housing-market-and-directed-search&#34;&gt;Rental Housing Market and Directed Search&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;
+&lt;h4 id=&#34;context&#34;&gt;Context&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Housing shortages in many major cities&lt;/li&gt;
+&lt;li&gt;Rents have surged in big cities worldwide&lt;/li&gt;
+&lt;li&gt;36% households renters in the US (2019) (&lt;a href=&#34;https://www.pewresearch.org/short-reads/2021/08/02/as-national-eviction-ban-expires-a-look-at-who-rents-and-who-owns-in-the-u-s/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;source&lt;/a&gt;), 30% in Euro area (2020) (&lt;a href=&#34;https://ec.europa.eu/eurostat/databrowser/view/ILC_LVHO02__custom_137548/bookmark/table?lang=en&amp;amp;bookmarkId=1f26f568-0301-45d0-a454-86bad3f5ce64&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;source&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;housing-costs-have-outpaced-household-disposable-income-worldwide&#34;&gt;Housing costs have outpaced household disposable income worldwide&lt;/h4&gt;
+&lt;p&gt;% change in selected household items and median income, OECD average, 1995-2018:
+&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/house_costs_OECD_1.png&#34; alt=&#34;&#34;&gt;
+Source: OECD&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;why-this-paper&#34;&gt;Why this paper?&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Rental property market is understudied&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Lack of data?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;New stylized facts for the rental property market&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Random versus directed search:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table style=&#34;border-collapse:collapse;border-spacing:0&#34; class=&#34;tg&#34;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;&lt;/th&gt;&lt;th style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Random search&lt;/th&gt;&lt;th style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Directed search&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Information&lt;/td&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Low&lt;/td&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;High&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Uncertainty&lt;/td&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;High&lt;/td&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Low&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Efficiency&lt;/td&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Inefficient&lt;br&gt;(Hosios condition)&lt;br&gt;&lt;/td&gt;&lt;td style=&#34;border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal&#34;&gt;Efficient&lt;br&gt;(2nd best)&lt;br&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;Implications for policy designs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;contributions&#34;&gt;Contributions&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Build and utilize a novel dataset showing evidence of &lt;strong&gt;directed search&lt;/strong&gt; on the rental property market&lt;/li&gt;
+&lt;li&gt;New evidence of &lt;strong&gt;rent setting dynamics&lt;/strong&gt; (&amp;ldquo;slow Dutch auction&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;Show how to integrate &lt;strong&gt;photos&lt;/strong&gt; in a hedonic pricing model using a &lt;strong&gt;Convolutional Neural Network (CNN)&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;data&#34;&gt;Data&lt;/h1&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;data-sources&#34;&gt;Data Sources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Web scraping: online platform that collects online ads for the Paris market
+between April and May 2019&lt;/li&gt;
+&lt;li&gt;I have data on the &lt;strong&gt;two sides&lt;/strong&gt; of the rental housing market:
+&lt;ul&gt;
+&lt;li&gt;supply: apartment features, text description and photos&lt;/li&gt;
+&lt;li&gt;demand: number of contacts received by landlords (through the online platform)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;descriptive-statistics&#34;&gt;Descriptive statistics&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;ads-per-city&#34;&gt;Ads per city&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/obs_per_city.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;apartment-features&#34;&gt;Apartment features&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/table_descriptive_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;apartment-features-by-city&#34;&gt;Apartment features by city&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/descriptive_by_city.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;population-2017&#34;&gt;Population (2017)&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/population_2017_cropped.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;number-of-ads&#34;&gt;Number of ads&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/number_adds_cropped.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;median-rent-per-m&#34;&gt;Median rent per m²&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/median_price_per_m2_cropped.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;aesthetic-score&#34;&gt;Aesthetic score&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Aesthetic score calculated based on photos&lt;/li&gt;
+&lt;li&gt;I use a convolutional neural network (CNN) based on the work of &lt;a href=&#34;https://arxiv.org/abs/1709.05424&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Talebi and Milanfar (2018)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;CNN assigns a score to each photo&lt;/li&gt;
+&lt;li&gt;Ad aesthetic score = median score&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;a-primer-on-cnn-couchot-et-al-2016&#34;&gt;A primer on CNN, &lt;a href=&#34;https://www.semanticscholar.org/paper/Steganalysis-via-a-Convolutional-Neural-Network-Couchot-Couturier/7e9708d9dc8b0a4ac2fa52eb384d67f52d7cbbe4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Couchot et al (2016)&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/convolution.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;a-cnn-trained-to-recognize-aesthetic-qualities-in-images-talebi-and-milanfar-2018&#34;&gt;A CNN trained to recognize aesthetic qualities in images, &lt;a href=&#34;https://arxiv.org/pdf/1709.05424.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Talebi and Milanfar (2018)&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/NIMA.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Predicted and human scores (in parenthesis) shown below each image.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;number-of-photos-per-ad&#34;&gt;Number of photos per ad&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/distribution_nb_images.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;density-aesthetic-score&#34;&gt;Density aesthetic score&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/distribution_aesthetic.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;selected-sample-of-photos-in-the-top-1&#34;&gt;Selected sample of photos in the top 1%&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/thumbnail_top1.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;selected-sample-of-photos-in-the-bottom-1&#34;&gt;Selected sample of photos in the bottom 1%&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/thumbnail_bottom1.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;what-features-are-important-to-predict-rent&#34;&gt;What features are important to predict rent?&lt;/h3&gt;
+&lt;h4 id=&#34;linear-model&#34;&gt;Linear model&lt;/h4&gt;
+\[y_{i} = \alpha &amp;#43; \boldsymbol{x_{i}}^{&amp;#39;} \boldsymbol{\beta} &amp;#43; \varepsilon_{i}\]&lt;ul&gt;
+&lt;li&gt;\(\boldsymbol{y_{i}}\): rent (in €)&lt;/li&gt;
+&lt;li&gt;\(\boldsymbol{x_{i}}\): apartment features&lt;/li&gt;
+&lt;li&gt;\(\alpha\): constant&lt;/li&gt;
+&lt;li&gt;\(\varepsilon_{i}\): error term&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;rent-and-apartment-characteristics&#34;&gt;Rent and apartment characteristics&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/reg_table_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;residual-price-dispersion-and-number-of-contacts&#34;&gt;Residual price dispersion and number of contacts&lt;/h2&gt;
+&lt;p&gt;residual price dispersion = predicted price - actual price&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;residual price dispersion &amp;lt; 0: More expensive than expected&lt;/li&gt;
+&lt;li&gt;residual price dispersion &amp;gt; 0: Cheaper than expected&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;number-of-contacts-per-ad&#34;&gt;Number of contacts per ad&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;I have data on the number of contacts per ad (through the online platform)&lt;/li&gt;
+&lt;li&gt;Data is truncated: # of contacts observed only when number of contacts \(\geq\) 10&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;percentage-of-ads-with-more-than-10-contacts&#34;&gt;Percentage of ads with more than 10 contacts&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/nb_contacts_threshold.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;number-of-contacts-per-ad-1&#34;&gt;Number of contacts per ad&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/nb_contacts.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;deviation-from-predicted-price-and-number-of-contacts-per-ad&#34;&gt;Deviation from predicted price and number of contacts per ad&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/density_deviation_predicted_price_AND_contacts_posttrim.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;truncated-regression&#34;&gt;Truncated regression&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/truncated_reg.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Interpretation: ↓ monthly rent by 10 euro → number contacts ↑ by approximately 1.8%.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;rent-movements&#34;&gt;Rent movements&lt;/h2&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;rent-decreases&#34;&gt;Rent decreases&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Data on rent decreases&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;5&lt;/strong&gt;% of ads in the sample decreased their &lt;strong&gt;advertised&lt;/strong&gt; rent&lt;/li&gt;
+&lt;li&gt;Common strategy for landlords:
+&lt;ol&gt;
+&lt;li&gt;set a price above the market price&lt;/li&gt;
+&lt;li&gt;decrease to market price after a &amp;ldquo;wait and see&amp;rdquo; period (&amp;ldquo;slow Dutch auction&amp;rdquo;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;rent-decreases-1&#34;&gt;Rent decreases&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/price_change_percentage_after_trim_resized.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;days-before-a-rent-decrease&#34;&gt;Days before a rent decrease&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/img/RentalMarket/days_before_price_change_after_trim_resized.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;t-tests&#34;&gt;T-tests&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;discounted listings were:
+&lt;ul&gt;
+&lt;li&gt;more likely to be &lt;strong&gt;overpriced&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;received &lt;strong&gt;less contacts&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;more likely to be managed by &lt;strong&gt;real estate agencies&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;links-with-literature-13&#34;&gt;Links with literature (1/3)&lt;/h4&gt;
+&lt;h5 id=&#34;search-and-matching&#34;&gt;Search-and-matching&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;file:///home/julien/Downloads/35264051-MIT.pdf&#34;&gt;Shimer (1996)&lt;/a&gt;, &lt;a href=&#34;https://www.jstor.org/stable/10.1086/262077?typeAccessWorkflow=login&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Moen (1997)&lt;/a&gt;, &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/abs/10.1111/1468-2354.00043&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Acemoglu and Shimer (2001)&lt;/a&gt;,
+&lt;a href=&#34;https://web-facstaff.sas.upenn.edu/~gmenzio/linkies/MS2.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Menzio and Shi (2011)&lt;/a&gt;, &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S1094202515000368&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Albrecht, Gautier and Vroman (2016)&lt;/a&gt;, &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA10557&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Schaal (2017)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Takeaway: directed search -&amp;gt; constrained efficiency&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;intertemporal-price-discrimination&#34;&gt;Intertemporal price discrimination&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://econpapers.repec.org/article/oupqjecon/v_3a93_3ay_3a1979_3ai_3a3_3ap_3a355-371..htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Stockey (1979)&lt;/a&gt;,
+&lt;a href=&#34;https://www.jstor.org/stable/2555568?typeAccessWorkflow=login&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Landsberger and Meilijson (1985)&lt;/a&gt;
+&lt;a href=&#34;https://www.aeaweb.org/articles?id=10.1257/aer.103.7.2722&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hendel and Nevo (2013)&lt;/a&gt;,
+&lt;a href=&#34;https://www.aeaweb.org/articles?id=10.1257/aer.20130564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Garrett (2016)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Takeaway: IPD -&amp;gt; market power&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;links-with-literature-23&#34;&gt;Links with literature (2/3)&lt;/h4&gt;
+&lt;h5 id=&#34;auction&#34;&gt;Auction&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;Empirics: &lt;a href=&#34;https://www.jstor.org/stable/2117452?typeAccessWorkflow=login&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ashenfelter and Genesove (1992)&lt;/a&gt;, &lt;a href=&#34;https://www.jstor.org/stable/117047?typeAccessWorkflow=login&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lucking-Reiley (1999)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Theory: &lt;a href=&#34;https://link.springer.com/article/10.1007/BF02341912&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Adams, Kluger and Wyatt (1992)&lt;/a&gt;, &lt;a href=&#34;https://www.jstor.org/stable/2118262?typeAccessWorkflow=login&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bulow Klemperer (1996)&lt;/a&gt;, &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/abs/10.1111/1540-6229.00043&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Quan (2002)&lt;/a&gt;, &lt;a href=&#34;https://papers.ssrn.com/sol3/papers.cfm?abstract_id=358820&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Carare and Rothkopf (2005)&lt;/a&gt;, [Fuchs and Skrzypacz (2010)](Bargaining with Arrival of New Traders), &lt;a href=&#34;https://link.springer.com/article/10.1007/s00199-014-0825-z&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Shneyerov (2012)&lt;/a&gt;, &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0022053120300685&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Auster and Kellner (2022)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Takeaway: a slow Dutch auction may be optimal in a seller&amp;rsquo;s market and/or with more
+impatient buyers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;links-with-literature-33&#34;&gt;Links with literature (3/3)&lt;/h4&gt;
+&lt;h5 id=&#34;optimal-dynamic-price-setting&#34;&gt;Optimal Dynamic price setting&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://link.springer.com/article/10.1007/bf00173122&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Salant (1991)&lt;/a&gt;, &lt;a href=&#34;https://onlinelibrary.wiley.com/doi/abs/10.1111/iere.12111&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Merlo, Ortalo-Magné, Rust (2015)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Takeaway: decreasing sequence of posted price is optimal&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;New evidence of &lt;strong&gt;directed search&lt;/strong&gt; on the rental property market&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;slow Dutch auction&amp;rdquo; rent setting by some market participants, especially from
+real estate agencies&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Novel approach to use &lt;strong&gt;photos&lt;/strong&gt; in hedonic pricing models using a interpretable &lt;strong&gt;(CNN)&lt;/strong&gt; results&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
   </channel>

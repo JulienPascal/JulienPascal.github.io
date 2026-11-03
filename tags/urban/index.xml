@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Urban on Julien Pascal</title>
@@ -8,9 +7,7 @@
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
     <lastBuildDate>Wed, 26 Jul 2023 15:51:54 +0100</lastBuildDate>
-    
-	<atom:link href="https://julienpascal.github.io/tags/urban/index.xml" rel="self" type="application/rss+xml" />
-    
+    <atom:link href="https://julienpascal.github.io/tags/urban/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>(In)efficient commuting and migration choices: Theory and policy in an urban search model</title>

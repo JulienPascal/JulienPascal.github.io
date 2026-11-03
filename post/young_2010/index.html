@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,7 +28,8 @@
   
     
   
-  <meta name="description" content="Introduction Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&rsquo;s method (2010) to simulate a large number (infinity) of individuals.">
+  <meta name="description" content="Introduction
+Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&rsquo;s method (2010) to simulate a large number (infinity) of individuals. The code can be downloaded here.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/young_2010/">
@@ -100,9 +101,6 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -125,7 +123,8 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/young_2010/">
   <meta property="og:title" content="Young&#39;s method (2010) to simulate a cross-section | Julien Pascal">
-  <meta property="og:description" content="Introduction Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&rsquo;s method (2010) to simulate a large number (infinity) of individuals."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="Introduction
+Solving economic models involves (i) finding the optimal response of individuals given the state of the economy (the policy functions); (ii) given the policy functions, simulating the model. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe Young&rsquo;s method (2010) to simulate a large number (infinity) of individuals. The code can be downloaded here."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2021-01-18T18:53:22&#43;01:00">
@@ -518,333 +517,271 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<h2 id="introduction">Introduction</h2>
-
-<p>Solving economic models involves (i) finding the <strong>optimal response of individuals</strong> given the state of the economy (the policy functions); (ii) given the policy functions, <strong>simulating the model</strong>. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> to simulate a large number (infinity) of individuals. The code can be downloaded <a href="https://github.com/JulienPascal/Simulate_Cross-section" target="_blank">here</a>.</p>
-
+      <h2 id="introduction">Introduction</h2>
+<p>Solving economic models involves (i) finding the <strong>optimal response of individuals</strong> given the state of the economy (the policy functions); (ii) given the policy functions, <strong>simulating the model</strong>. While usually one must show great ingenuity and creativity for the former, the latter is often seen as trivial and not even mentioned. However, in this notebook I describe a simulation procedure that deserves to be advertised. Namely, I describe <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank" rel="noopener">Young&rsquo;s method (2010)</a> to simulate a large number (infinity) of individuals. The code can be downloaded <a href="https://github.com/JulienPascal/Simulate_Cross-section" target="_blank" rel="noopener">here</a>.</p>
 <h2 id="why-should-we-care">Why should we care?</h2>
-
-<p>In economies with heterogeneous agents, often there is no such thing as a <a href="https://en.wikipedia.org/wiki/Representative_agent#:~:text=Economists%20use%20the%20term%20representative,the%20same%20type%20are%20identical." target="_blank">representative agent</a>. Generally, one must follow a large number of individuals. For instance, one may be interested in knowing how the average wage responds to an increase in labor productivity. If workers are different (in terms of skills, experience, firms in which they work, etc.), one must take into consideration changes in individuals&rsquo; wages to determine how the average wage moves.</p>
-
+<p>In economies with heterogeneous agents, often there is no such thing as a <a href="https://en.wikipedia.org/wiki/Representative_agent#:~:text=Economists%20use%20the%20term%20representative,the%20same%20type%20are%20identical." target="_blank" rel="noopener">representative agent</a>. Generally, one must follow a large number of individuals. For instance, one may be interested in knowing how the average wage responds to an increase in labor productivity. If workers are different (in terms of skills, experience, firms in which they work, etc.), one must take into consideration changes in individuals&rsquo; wages to determine how the average wage moves.</p>
 <h2 id="the-method">The method</h2>
-
 <p>The method avoids simulating a panel of agents. Instead, the idea is to simulate directly the distribution.
-In practice, one chooses a grid $[w_1, w_2, &hellip;, w_N]$</p>
-
-<p>If a measure $m$ of workers choose to consume $w$, with $w \in [w_{n}, w_{n+1}]$, then the mass assigned to the grid point $w_{n}$ is equal to $m \times p$ and the mass assigned to the grid point $w_{n+1}$ is $m \times (1 - p)$ with</p>
-
-<p>$$ p = 1 - \frac{w - w_{n}}{w_{n+1} - w_{n}} $$</p>
-
-<p>If $w$ is very close to $w_{n}$, then most of the mass $m$ will be assigned to this point. In the limit case, if $w$ is equal to $w_{n}$, $100$ percent of the mass is assigned to $w_{n}$.</p>
-
-<p>Simple, right? The code below is an implementation of <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> using <a href="https://julialang.org/" target="_blank">Julia</a>.</p>
-
+In practice, one chooses a grid \([w_1, w_2, ..., w_N]\)</p>
+<p>If a measure \(m\) of workers choose to consume \(w\), with \(w \in [w_{n}, w_{n&#43;1}]\), then the mass assigned to the grid point \(w_{n}\) is equal to \(m \times p\) and the mass assigned to the grid point \(w_{n&#43;1}\) is \(m \times (1 - p)\) with</p>
+\[ p = 1 - \frac{w - w_{n}}{w_{n&#43;1} - w_{n}} \]<p>If \(w\) is very close to \(w_{n}\), then most of the mass \(m\) will be assigned to this point. In the limit case, if \(w\) is equal to \(w_{n}\), \(100\) percent of the mass is assigned to \(w_{n}\).</p>
+<p>Simple, right? The code below is an implementation of <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank" rel="noopener">Young&rsquo;s method (2010)</a> using <a href="https://julialang.org/" target="_blank" rel="noopener">Julia</a>.</p>
 <h2 id="implementation">Implementation</h2>
-
 <h3 id="preliminaries">Preliminaries</h3>
-
-<p>Let&rsquo;s first start by loading a few packages and declaring auxiliaries functions. In particular, given a value $w$ we need a function that returns the closest value $w_k$, where $w_k$ is picked from given grid $w_1, w_2, &hellip;, w_N$</p>
-
-<pre><code class="language-julia">using Plots
-using Distributions
-using StatsBase
-
-# Matlab like function
-function linspace(z_start::Real, z_end::Real, z_n::Int64)
-    return collect(range(z_start,stop=z_end,length=z_n))
-end
-
-# Not my function. Credit to: https://discourse.julialang.org/t/findnearest-function/4143/4
-function closest_index(a::Vector,x::Real)
-
-    if isempty(a) == true
-      error(&quot;xGrid is empty in function closest_index.&quot;)
-    end
-
-    if isnan(x) == true
-      error(&quot;val is NaN in function closest_index.&quot;)
-    end
-
-   idx = searchsortedfirst(a,x)
-   if (idx==1); return idx; end
-   if (idx&gt;length(a)); return length(a); end
-   if (a[idx]==x); return idx; end
-   if (abs(a[idx]-x) &lt; abs(a[idx-1]-x))
-      return idx
-   else
-      return idx-1
-   end
-end
-
-# Returns best index and best value
-function closest_value_and_index(xGrid::Vector, val::Real)
-
-    # get index
-    ibest = closest_index(xGrid, val)
-
-    # Return best value on grid, and the corresponding index
-    return xGrid[ibest], ibest
-
-end
-
-</code></pre>
-
-<h3 id="approximate-a-distribution-with-a-single-mass-point">Approximate a distribution with a single mass point</h3>
-
+<p>Let&rsquo;s first start by loading a few packages and declaring auxiliaries functions. In particular, given a value \(w\) we need a function that returns the closest value \(w_k\), where \(w_k\) is picked from given grid \(w_1, w_2, ..., w_N\)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Plots
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Distributions
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> StatsBase
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Matlab like function</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> linspace(z_start<span style="color:#f92672">::</span><span style="color:#66d9ef">Real</span>, z_end<span style="color:#f92672">::</span><span style="color:#66d9ef">Real</span>, z_n<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> collect(range(z_start,stop<span style="color:#f92672">=</span>z_end,length<span style="color:#f92672">=</span>z_n))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Not my function. Credit to: https://discourse.julialang.org/t/findnearest-function/4143/4</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> closest_index(a<span style="color:#f92672">::</span><span style="color:#66d9ef">Vector</span>,x<span style="color:#f92672">::</span><span style="color:#66d9ef">Real</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isempty(a) <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>      error(<span style="color:#e6db74">&#34;xGrid is empty in function closest_index.&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isnan(x) <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>      error(<span style="color:#e6db74">&#34;val is NaN in function closest_index.&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   idx <span style="color:#f92672">=</span> searchsortedfirst(a,x)
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">if</span> (idx<span style="color:#f92672">==</span><span style="color:#ae81ff">1</span>); <span style="color:#66d9ef">return</span> idx; <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">if</span> (idx<span style="color:#f92672">&gt;</span>length(a)); <span style="color:#66d9ef">return</span> length(a); <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">if</span> (a[idx]<span style="color:#f92672">==</span>x); <span style="color:#66d9ef">return</span> idx; <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">if</span> (abs(a[idx]<span style="color:#f92672">-</span>x) <span style="color:#f92672">&lt;</span> abs(a[idx<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]<span style="color:#f92672">-</span>x))
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> idx
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> idx<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Returns best index and best value</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> closest_value_and_index(xGrid<span style="color:#f92672">::</span><span style="color:#66d9ef">Vector</span>, val<span style="color:#f92672">::</span><span style="color:#66d9ef">Real</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># get index</span>
+</span></span><span style="display:flex;"><span>    ibest <span style="color:#f92672">=</span> closest_index(xGrid, val)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Return best value on grid, and the corresponding index</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> xGrid[ibest], ibest
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><h3 id="approximate-a-distribution-with-a-single-mass-point">Approximate a distribution with a single mass point</h3>
 <p>To warm up, let&rsquo;s see how the method works when the true underlying distribution is constituted of <strong>a single mass point</strong>.</p>
-
-<pre><code class="language-julia">## True Value
-w = 2.5    #True value
-mass = 1.0 #Mass at the true value
-
-## Approximation
-nW=10 #Number of grid points
-w_grid=linspace(0.0, 4.0, nW) #Location of grid points
-hw_grid=zeros(nW); #Initialization
-
-w_min = minimum(w_grid) #Upper bound for the grid
-w_max = maximum(w_grid) #Lower bound for the grid
-nW = length(w_grid) #Number of points on the grid
-
-# Project true value on the grid:
-(wValue_proj, wIndex_proj) = closest_value_and_index(w_grid, w)
-
-# To store the location of the value below and above the true value:
-wIndex_below = 0
-wIndex_above = 0
-
-# If the true value is above the projection
-if w &gt;= wValue_proj
-    wIndex_below = wIndex_proj
-    wIndex_above = wIndex_proj + 1
-# If the true value is below the projection
-elseif w &lt; wValue_proj
-    wIndex_below = wIndex_proj -1
-    wIndex_above = wIndex_proj
-end
-
-# Boundary cases
-if wIndex_proj == 1
-    wIndex_below = 1
-    wIndex_above = 2
-elseif wIndex_proj == nW
-    wIndex_below = nW - 1
-    wIndex_above = nW
-end
-
-# Special case 1: w &lt; w_min
-if w &lt;= w_min
-    p = 1
-elseif w &gt;= w_max
-# Special case 2: w &gt; w_max
-    p = 0
-else
-    p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
-    p = min(1.0, max(0.0, p))
-end
-
-# Spread the mass:
-# 1. Point below
-hw_grid[wIndex_below] += p*mass
-
-# 2. Point above:
-hw_grid[wIndex_above] += (1.0 - p)*mass;
-
-p0 =bar(w_grid, hw_grid, label = &quot;Mass on grid&quot;)
-plot!(p0, [w], seriestype = :vline, label=&quot;True value&quot;, linewidth = 4)
-</code></pre>
-
-<p><img src="Young_2010_12_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">## True Value</span>
+</span></span><span style="display:flex;"><span>w <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>    <span style="color:#75715e">#True value</span>
+</span></span><span style="display:flex;"><span>mass <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#75715e">#Mass at the true value</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Approximation</span>
+</span></span><span style="display:flex;"><span>nW<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> <span style="color:#75715e">#Number of grid points</span>
+</span></span><span style="display:flex;"><span>w_grid<span style="color:#f92672">=</span>linspace(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">4.0</span>, nW) <span style="color:#75715e">#Location of grid points</span>
+</span></span><span style="display:flex;"><span>hw_grid<span style="color:#f92672">=</span>zeros(nW); <span style="color:#75715e">#Initialization</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>w_min <span style="color:#f92672">=</span> minimum(w_grid) <span style="color:#75715e">#Upper bound for the grid</span>
+</span></span><span style="display:flex;"><span>w_max <span style="color:#f92672">=</span> maximum(w_grid) <span style="color:#75715e">#Lower bound for the grid</span>
+</span></span><span style="display:flex;"><span>nW <span style="color:#f92672">=</span> length(w_grid) <span style="color:#75715e">#Number of points on the grid</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Project true value on the grid:</span>
+</span></span><span style="display:flex;"><span>(wValue_proj, wIndex_proj) <span style="color:#f92672">=</span> closest_value_and_index(w_grid, w)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># To store the location of the value below and above the true value:</span>
+</span></span><span style="display:flex;"><span>wIndex_below <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>wIndex_above <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If the true value is above the projection</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> w <span style="color:#f92672">&gt;=</span> wValue_proj
+</span></span><span style="display:flex;"><span>    wIndex_below <span style="color:#f92672">=</span> wIndex_proj
+</span></span><span style="display:flex;"><span>    wIndex_above <span style="color:#f92672">=</span> wIndex_proj <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If the true value is below the projection</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">elseif</span> w <span style="color:#f92672">&lt;</span> wValue_proj
+</span></span><span style="display:flex;"><span>    wIndex_below <span style="color:#f92672">=</span> wIndex_proj <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    wIndex_above <span style="color:#f92672">=</span> wIndex_proj
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Boundary cases</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> wIndex_proj <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    wIndex_below <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    wIndex_above <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">elseif</span> wIndex_proj <span style="color:#f92672">==</span> nW
+</span></span><span style="display:flex;"><span>    wIndex_below <span style="color:#f92672">=</span> nW <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    wIndex_above <span style="color:#f92672">=</span> nW
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Special case 1: w &lt; w_min</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> w <span style="color:#f92672">&lt;=</span> w_min
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">elseif</span> w <span style="color:#f92672">&gt;=</span> w_max
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Special case 2: w &gt; w_max</span>
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> ((w <span style="color:#f92672">-</span> w_grid[wIndex_below])<span style="color:#f92672">/</span>(w_grid[wIndex_above] <span style="color:#f92672">-</span> w_grid[wIndex_below]))
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> min(<span style="color:#ae81ff">1.0</span>, max(<span style="color:#ae81ff">0.0</span>, p))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Spread the mass:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. Point below</span>
+</span></span><span style="display:flex;"><span>hw_grid[wIndex_below] <span style="color:#f92672">+=</span> p<span style="color:#f92672">*</span>mass
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Point above:</span>
+</span></span><span style="display:flex;"><span>hw_grid[wIndex_above] <span style="color:#f92672">+=</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p)<span style="color:#f92672">*</span>mass;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p0 <span style="color:#f92672">=</span>bar(w_grid, hw_grid, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Mass on grid&#34;</span>)
+</span></span><span style="display:flex;"><span>plot!(p0, [w], seriestype <span style="color:#f92672">=</span> <span style="color:#e6db74">:vline</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;True value&#34;</span>, linewidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>)
+</span></span></code></pre></div><p><img src="/post/young_2010/Young_2010_12_0.svg" alt="svg"></p>
 <p><em>Notes: This graph shows the true distribution (in orange) and the approximation (in blue).</em></p>
-
 <p>Because the true value is not a point of our grid (that would be a miracle), the mass is spread between the two closest points. However, we still get the mean right. We will see below that this property extends to distributions with supports constituted of several points:</p>
-
-<pre><code class="language-julia">println(&quot;True mean $(w)&quot;)
-println(&quot;Approximate mean $(round(mean(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&quot;)
-</code></pre>
-
-<pre><code>True mean 2.5
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True mean </span><span style="color:#e6db74">$</span>(w)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate mean </span><span style="color:#e6db74">$</span>(round(mean(w_grid, weights(hw_grid<span style="color:#f92672">./</span>sum(hw_grid))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>True mean 2.5
 Approximate mean 2.5
 </code></pre>
-
 <h3 id="approximate-a-multi-point-distribution">Approximate a multi-point distribution</h3>
-
-<p>Now, let&rsquo;s see how well <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> works when the true underlying distribution has positive mass for <strong>a finite number of points</strong>. To keep things pretty, let&rsquo;s assume that the true distribution has the shape of a Normal distribution, but we truncate the tails.</p>
-
-<pre><code class="language-julia">Nw_true = 10 #Number of points with positive mass
-w_true_lb = 1.0 #lower bound
-w_true_ub = 3.0 #upper bound
-w_true = linspace(w_true_lb, w_true_ub, Nw_true)
-d = truncated(Normal((w_true_lb + w_true_ub)/2), w_true_lb, w_true_ub)
-mass_true = pdf.(d, w_true)
-mass_true = mass_true./sum(mass_true);
-p0 = bar(w_true, mass_true, label=&quot;Mass true value&quot;)
-display(p0)
-</code></pre>
-
-<p><img src="Young_2010_17_0.svg" alt="svg" /></p>
-
+<p>Now, let&rsquo;s see how well <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank" rel="noopener">Young&rsquo;s method (2010)</a> works when the true underlying distribution has positive mass for <strong>a finite number of points</strong>. To keep things pretty, let&rsquo;s assume that the true distribution has the shape of a Normal distribution, but we truncate the tails.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>Nw_true <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#75715e">#Number of points with positive mass</span>
+</span></span><span style="display:flex;"><span>w_true_lb <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#75715e">#lower bound</span>
+</span></span><span style="display:flex;"><span>w_true_ub <span style="color:#f92672">=</span> <span style="color:#ae81ff">3.0</span> <span style="color:#75715e">#upper bound</span>
+</span></span><span style="display:flex;"><span>w_true <span style="color:#f92672">=</span> linspace(w_true_lb, w_true_ub, Nw_true)
+</span></span><span style="display:flex;"><span>d <span style="color:#f92672">=</span> truncated(Normal((w_true_lb <span style="color:#f92672">+</span> w_true_ub)<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>), w_true_lb, w_true_ub)
+</span></span><span style="display:flex;"><span>mass_true <span style="color:#f92672">=</span> pdf<span style="color:#f92672">.</span>(d, w_true)
+</span></span><span style="display:flex;"><span>mass_true <span style="color:#f92672">=</span> mass_true<span style="color:#f92672">./</span>sum(mass_true);
+</span></span><span style="display:flex;"><span>p0 <span style="color:#f92672">=</span> bar(w_true, mass_true, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Mass true value&#34;</span>)
+</span></span><span style="display:flex;"><span>display(p0)
+</span></span></code></pre></div><p><img src="/post/young_2010/Young_2010_17_0.svg" alt="svg"></p>
 <p><em>Notes: This graph shows the mass for each point on the (true) grid.</em></p>
-
-<pre><code class="language-julia">w_min = minimum(w_grid)
-w_max = maximum(w_grid)
-nW = length(w_grid)
-
-hw_grid=zeros(nW);
-
-
-for (wIndexTrue, w) in enumerate(w_true)
-
-    mass = mass_true[wIndexTrue] #mass
-
-    # Project true value on the grid:
-    (wValue_proj, wIndex_proj) = closest_value_and_index(w_grid, w)
-
-    # To store the location of the value below and above the true value:
-    wIndex_below = 0
-    wIndex_above = 0
-
-    # If the true value is above the projection
-    if w &gt;= wValue_proj
-        wIndex_below = wIndex_proj
-        wIndex_above = wIndex_proj + 1
-    # If the true value is below the projection
-    elseif w &lt; wValue_proj
-        wIndex_below = wIndex_proj -1
-        wIndex_above = wIndex_proj
-    end
-
-    # Boundary cases
-    if wIndex_proj == 1
-        wIndex_below = 1
-        wIndex_above = 2
-    elseif wIndex_proj == nW
-        wIndex_below = nW - 1
-        wIndex_above = nW
-    end
-
-    # Special case 1: w &lt; w_min
-    if w &lt;= w_min
-        p = 1
-    elseif w &gt;= w_max
-    # Special case 2: w &gt; w_max
-        p = 0
-    else
-        p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
-        p = min(1.0, max(0.0, p))
-    end
-
-    p = 1.0 - ((w - w_grid[wIndex_below])/(w_grid[wIndex_above] - w_grid[wIndex_below]))
-    p = min(1.0, max(0.0, p))
-
-    # Spread the mass:
-    # 1. Point below
-    hw_grid[wIndex_below] += p*mass
-
-    # 2. Point above:
-    hw_grid[wIndex_above] += (1.0 - p)*mass
-
-end
-
-bar(w_grid, hw_grid, label=&quot;Mass on grid&quot;)
-bar!(w_true, mass_true, label=&quot;Mass true value&quot;)
-</code></pre>
-
-<p><img src="Young_2010_18_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>w_min <span style="color:#f92672">=</span> minimum(w_grid)
+</span></span><span style="display:flex;"><span>w_max <span style="color:#f92672">=</span> maximum(w_grid)
+</span></span><span style="display:flex;"><span>nW <span style="color:#f92672">=</span> length(w_grid)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>hw_grid<span style="color:#f92672">=</span>zeros(nW);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (wIndexTrue, w) <span style="color:#66d9ef">in</span> enumerate(w_true)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    mass <span style="color:#f92672">=</span> mass_true[wIndexTrue] <span style="color:#75715e">#mass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Project true value on the grid:</span>
+</span></span><span style="display:flex;"><span>    (wValue_proj, wIndex_proj) <span style="color:#f92672">=</span> closest_value_and_index(w_grid, w)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># To store the location of the value below and above the true value:</span>
+</span></span><span style="display:flex;"><span>    wIndex_below <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    wIndex_above <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># If the true value is above the projection</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> w <span style="color:#f92672">&gt;=</span> wValue_proj
+</span></span><span style="display:flex;"><span>        wIndex_below <span style="color:#f92672">=</span> wIndex_proj
+</span></span><span style="display:flex;"><span>        wIndex_above <span style="color:#f92672">=</span> wIndex_proj <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># If the true value is below the projection</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elseif</span> w <span style="color:#f92672">&lt;</span> wValue_proj
+</span></span><span style="display:flex;"><span>        wIndex_below <span style="color:#f92672">=</span> wIndex_proj <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        wIndex_above <span style="color:#f92672">=</span> wIndex_proj
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Boundary cases</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> wIndex_proj <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        wIndex_below <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        wIndex_above <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elseif</span> wIndex_proj <span style="color:#f92672">==</span> nW
+</span></span><span style="display:flex;"><span>        wIndex_below <span style="color:#f92672">=</span> nW <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        wIndex_above <span style="color:#f92672">=</span> nW
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Special case 1: w &lt; w_min</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> w <span style="color:#f92672">&lt;=</span> w_min
+</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elseif</span> w <span style="color:#f92672">&gt;=</span> w_max
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Special case 2: w &gt; w_max</span>
+</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> ((w <span style="color:#f92672">-</span> w_grid[wIndex_below])<span style="color:#f92672">/</span>(w_grid[wIndex_above] <span style="color:#f92672">-</span> w_grid[wIndex_below]))
+</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> min(<span style="color:#ae81ff">1.0</span>, max(<span style="color:#ae81ff">0.0</span>, p))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> ((w <span style="color:#f92672">-</span> w_grid[wIndex_below])<span style="color:#f92672">/</span>(w_grid[wIndex_above] <span style="color:#f92672">-</span> w_grid[wIndex_below]))
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> min(<span style="color:#ae81ff">1.0</span>, max(<span style="color:#ae81ff">0.0</span>, p))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Spread the mass:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 1. Point below</span>
+</span></span><span style="display:flex;"><span>    hw_grid[wIndex_below] <span style="color:#f92672">+=</span> p<span style="color:#f92672">*</span>mass
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 2. Point above:</span>
+</span></span><span style="display:flex;"><span>    hw_grid[wIndex_above] <span style="color:#f92672">+=</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> p)<span style="color:#f92672">*</span>mass
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>bar(w_grid, hw_grid, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Mass on grid&#34;</span>)
+</span></span><span style="display:flex;"><span>bar!(w_true, mass_true, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Mass true value&#34;</span>)
+</span></span></code></pre></div><p><img src="/post/young_2010/Young_2010_18_0.svg" alt="svg"></p>
 <p><em>Notes: This graph shows the true distribution (in orange) and the approximation (in blue).</em></p>
-
-<p>A good property of <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a> is that, <strong>as long as the grid is wide enough</strong> to so that true values fall within it, <strong>the mean of the true underlying distribution is preserved</strong>:</p>
-
-<pre><code class="language-julia">println(&quot;True mean $(round(mean(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
-println(&quot;Approximate mean $(round(mean(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&quot;)
-</code></pre>
-
-<pre><code>True mean 2.0
+<p>A good property of <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank" rel="noopener">Young&rsquo;s method (2010)</a> is that, <strong>as long as the grid is wide enough</strong> to so that true values fall within it, <strong>the mean of the true underlying distribution is preserved</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True mean </span><span style="color:#e6db74">$</span>(round(mean(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate mean </span><span style="color:#e6db74">$</span>(round(mean(w_grid, weights(hw_grid<span style="color:#f92672">./</span>sum(hw_grid))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>True mean 2.0
 Approximate mean 2.0
 </code></pre>
-
 <p>However, there are some <strong>approximation errors</strong> when <strong>higher moments</strong> are involved such as the variance, or when calculating <strong>percentiles</strong>. But the finest the grid, the better the approximation gets.</p>
-
-<pre><code class="language-julia">println(&quot;True median $(round(quantile(w_true, weights(mass_true./sum(mass_true)), 0.5), digits = 4))&quot;)
-println(&quot;Approximate median $(round(quantile(w_grid, weights(hw_grid./sum(hw_grid)), 0.5), digits = 4))&quot;)
-
-println(&quot;True variance $(round(var(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
-println(&quot;Approximate variance $(round(var(w_grid, weights(hw_grid./sum(hw_grid))), digits = 4))&quot;)
-</code></pre>
-
-<pre><code>True median 1.9567
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True median </span><span style="color:#e6db74">$</span>(round(quantile(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true)), <span style="color:#ae81ff">0.5</span>), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate median </span><span style="color:#e6db74">$</span>(round(quantile(w_grid, weights(hw_grid<span style="color:#f92672">./</span>sum(hw_grid)), <span style="color:#ae81ff">0.5</span>), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True variance </span><span style="color:#e6db74">$</span>(round(var(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate variance </span><span style="color:#e6db74">$</span>(round(var(w_grid, weights(hw_grid<span style="color:#f92672">./</span>sum(hw_grid))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>True median 1.9567
 Approximate median 1.8519
 True variance 0.3465
 Approximate variance 0.3836
 </code></pre>
-
 <h3 id="using-a-panel-of-agents">Using a panel of agents</h3>
-
-<p>Alternatively, one may use a large number of agents to approximate the true underlying distribution. The idea is that if the number of agents is large enough, the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a> will kick in. The issue is that we need a large number of agents to get the approximation right, as illustrated below:</p>
-
-<pre><code class="language-julia">nb_agents = 1000
-w_agents = rand(d, nb_agents);
-
-println(&quot;True mean $(round(mean(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
-println(&quot;Approximate mean $(round(mean(w_agents), digits = 4))&quot;)
-
-println(&quot;True median $(round(quantile(w_true, weights(mass_true./sum(mass_true)), 0.5), digits = 4))&quot;)
-println(&quot;Approximate median $(round(quantile(w_agents, 0.5), digits = 4))&quot;)
-
-println(&quot;True variance $(round(var(w_true, weights(mass_true./sum(mass_true))), digits = 4))&quot;)
-println(&quot;Approximate variance $(round(var(w_agents), digits = 4))&quot;)
-
-p0 = bar(w_true, mass_true, label=&quot;Mass true value&quot;)
-p1 = histogram(w_agents, label=&quot;Mass panel&quot;)
-plot(p0,p1)
-</code></pre>
-
-<pre><code>True mean 2.0
+<p>Alternatively, one may use a large number of agents to approximate the true underlying distribution. The idea is that if the number of agents is large enough, the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank" rel="noopener">central limit theorem</a> will kick in. The issue is that we need a large number of agents to get the approximation right, as illustrated below:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>nb_agents <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>w_agents <span style="color:#f92672">=</span> rand(d, nb_agents);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True mean </span><span style="color:#e6db74">$</span>(round(mean(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate mean </span><span style="color:#e6db74">$</span>(round(mean(w_agents), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True median </span><span style="color:#e6db74">$</span>(round(quantile(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true)), <span style="color:#ae81ff">0.5</span>), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate median </span><span style="color:#e6db74">$</span>(round(quantile(w_agents, <span style="color:#ae81ff">0.5</span>), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;True variance </span><span style="color:#e6db74">$</span>(round(var(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true))), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Approximate variance </span><span style="color:#e6db74">$</span>(round(var(w_agents), digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>p0 <span style="color:#f92672">=</span> bar(w_true, mass_true, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Mass true value&#34;</span>)
+</span></span><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> histogram(w_agents, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Mass panel&#34;</span>)
+</span></span><span style="display:flex;"><span>plot(p0,p1)
+</span></span></code></pre></div><pre><code>True mean 2.0
 Approximate mean 1.9955
 True median 1.9567
 Approximate median 1.9971
 True variance 0.3465
 Approximate variance 0.2754
 </code></pre>
-
-<p><img src="Young_2010_25_1.svg" alt="svg" /></p>
-
+<p><img src="/post/young_2010/Young_2010_25_1.svg" alt="svg"></p>
 <p><em>Notes: This graph shows the true distribution (on the left) and the approximation (on the right).</em></p>
-
 <p>With 1000 agents, the approximation is not exceptional. Let&rsquo;s try to increase the number of agents. The following plot shows that the approximation gets better as we increase the number of agents, but a very
 large number of agents is needed:</p>
-
-<pre><code class="language-julia">w_agents = []
-grid_agents = collect(1000:1000:100000)
-mean_agents = zeros(length(grid_agents))
-std_agents = zeros(length(grid_agents))
-
-for (i, nb_agents) in enumerate(grid_agents)
-    push!(w_agents, rand(d, nb_agents))
-    mean_agents[i] = mean(w_agents[i])
-    std_agents[i] = std(w_agents[i])
-end
-
-CI = 1.960.*std_agents./sqrt.(grid_agents); #95% confidence interval. t-test is approximately a z-test because large number of agents.
-p0 = plot(grid_agents, mean_agents, ribbon = CI, label = &quot;approximate mean&quot;)
-plot!(p0,[mean(w_true, weights(mass_true./sum(mass_true)))], linetype = :hline, label = &quot;true mean&quot;, linestyle = :dash)
-</code></pre>
-
-<p><img src="Young_2010_27_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>w_agents <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>grid_agents <span style="color:#f92672">=</span> collect(<span style="color:#ae81ff">1000</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1000</span><span style="color:#f92672">:</span><span style="color:#ae81ff">100000</span>)
+</span></span><span style="display:flex;"><span>mean_agents <span style="color:#f92672">=</span> zeros(length(grid_agents))
+</span></span><span style="display:flex;"><span>std_agents <span style="color:#f92672">=</span> zeros(length(grid_agents))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (i, nb_agents) <span style="color:#66d9ef">in</span> enumerate(grid_agents)
+</span></span><span style="display:flex;"><span>    push!(w_agents, rand(d, nb_agents))
+</span></span><span style="display:flex;"><span>    mean_agents[i] <span style="color:#f92672">=</span> mean(w_agents[i])
+</span></span><span style="display:flex;"><span>    std_agents[i] <span style="color:#f92672">=</span> std(w_agents[i])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CI <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.960</span><span style="color:#f92672">.*</span>std_agents<span style="color:#f92672">./</span>sqrt<span style="color:#f92672">.</span>(grid_agents); <span style="color:#75715e">#95% confidence interval. t-test is approximately a z-test because large number of agents.</span>
+</span></span><span style="display:flex;"><span>p0 <span style="color:#f92672">=</span> plot(grid_agents, mean_agents, ribbon <span style="color:#f92672">=</span> CI, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;approximate mean&#34;</span>)
+</span></span><span style="display:flex;"><span>plot!(p0,[mean(w_true, weights(mass_true<span style="color:#f92672">./</span>sum(mass_true)))], linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">:hline</span>, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true mean&#34;</span>, linestyle <span style="color:#f92672">=</span> <span style="color:#e6db74">:dash</span>)
+</span></span></code></pre></div><p><img src="/post/young_2010/Young_2010_27_0.svg" alt="svg"></p>
 <p><em>Notes: This graph shows the empirical mean calculated using the panel and the true value, for different sizes of the panel.</em></p>
-
 <h2 id="conclusion">Conclusion</h2>
-
-<p>When possible, simulating directly a distribution instead of using a panel is a good idea. <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank">Young&rsquo;s method (2010)</a>
+<p>When possible, simulating directly a distribution instead of using a panel is a good idea. <a href="https://ideas.repec.org/a/eee/dyncon/v34y2010i1p36-41.html" target="_blank" rel="noopener">Young&rsquo;s method (2010)</a>
 allows to do that, while preserving the mean of the true distribution.</p>
-
 <h3 id="references">References</h3>
-
 <ul>
 <li>Young, Eric R. &ldquo;Solving the incomplete markets model with aggregate uncertainty using the Krusell–Smith algorithm and non-stochastic simulations.&rdquo; Journal of Economic Dynamics and Control 34.1 (2010): 36-41.</li>
 </ul>
@@ -884,7 +821,7 @@ allows to do that, while preserving the mean of the true distribution.</p>
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -1026,7 +963,7 @@ allows to do that, while preserving the mean of the true distribution.</p>
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1180,7 +1117,7 @@ allows to do that, while preserving the mean of the true distribution.</p>
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

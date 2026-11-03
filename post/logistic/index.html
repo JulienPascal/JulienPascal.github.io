@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,7 +28,11 @@
   
     
   
-  <meta name="description" content="The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election).">
+  <meta name="description" content="The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo;
+means the probability of winning an election. In that case, it would be sub-optimal
+to use a linear regression model to see what factors are associated with successful
+politicians, as the outcome variable is binary (a politician either wins or loses an election).
+The linear model is built around the idea that the outcome variable is continuous.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/logistic/">
@@ -100,9 +104,6 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -125,7 +126,11 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/logistic/">
   <meta property="og:title" content="Logistic Regression from Scratch | Julien Pascal">
-  <meta property="og:description" content="The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo; means the probability of winning an election. In that case, it would be sub-optimal to use a linear regression model to see what factors are associated with successful politicians, as the outcome variable is binary (a politician either wins or loses an election)."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="The logistic model (also called logit model) is a natural candidate when one is interested in a binary outcome. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo;
+means the probability of winning an election. In that case, it would be sub-optimal
+to use a linear regression model to see what factors are associated with successful
+politicians, as the outcome variable is binary (a politician either wins or loses an election).
+The linear model is built around the idea that the outcome variable is continuous."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2019-11-22T18:53:22&#43;01:00">
@@ -518,360 +523,226 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p>The <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank">logistic model</a> (also called logit model) is a natural candidate when one is interested in a <strong>binary outcome</strong>. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo;
+      <p>The <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank" rel="noopener">logistic model</a> (also called logit model) is a natural candidate when one is interested in a <strong>binary outcome</strong>. For instance, a researcher might be interested in knowing what makes a politician successful or not. For the purpose of this blog post, &ldquo;success&rdquo;
 means the probability of winning an election. In that case, it would be sub-optimal
 to use a linear regression model to see what factors are associated with successful
 politicians, as the outcome variable is binary (a politician either wins or loses an election).
 The linear model is built around the idea that the outcome variable is continuous.</p>
-
 <p>What if the statistician tries to identify what factors are influencing the <strong>probability</strong> of
-winning? This strategy naturally lends itself to using a <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank">logistic model</a> (or a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank">probit</a>).
+winning? This strategy naturally lends itself to using a <a href="https://en.wikipedia.org/wiki/Logistic_regression" target="_blank" rel="noopener">logistic model</a> (or a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank" rel="noopener">probit</a>).
 In this blog post, I derive the <strong>logistic model from scratch</strong> and show how one
 can estimate its parameters using <strong>gradient descent</strong> or <strong>Newton-Raphson</strong> algorithms. I also use data on <strong>NBA players</strong> to see what factors are influencing the <strong>success of a shot</strong>. The GitHub repository for this post can be
-found <a href="https://github.com/JulienPascal/LogisticRegression" target="_blank">here</a>.</p>
-
+found <a href="https://github.com/JulienPascal/LogisticRegression" target="_blank" rel="noopener">here</a>.</p>
 <h2 id="the-logistic-model">The logistic model</h2>
-
-<p>The outcome variable $y_i$ is either $1$ (&ldquo;winning&rdquo;) or $0$ (&ldquo;losing&rdquo;). The logistic
+<p>The outcome variable \(y_i\) is either \(1\) (&ldquo;winning&rdquo;) or \(0\) (&ldquo;losing&rdquo;). The logistic
 model makes the assumption that the probability of winning is given by the logistic
 function :</p>
-
-<p>$$ f(y_i = 1| x_{i}, \theta_{i}) =  \sigma(x_{i} &lsquo;\theta)$$</p>
-
-<p>with $\sigma(v) = \frac{exp(v)}{1+exp(v)}$</p>
-
+\[ f(y_i = 1| x_{i}, \theta_{i}) =  \sigma(x_{i} &#39;\theta)\]<p>with \(\sigma(v) = \frac{exp(v)}{1&#43;exp(v)}\)</p>
 <p>The probability of losing is 1 minus the probability of wining:</p>
-
-<p>$$ f(y_i = 0| x_{i}, \theta) =  1 - \sigma(x_{i} &lsquo;\theta)$$</p>
-
-<h2 id="a-latent-variable-formulation">A latent variable formulation</h2>
-
+\[ f(y_i = 0| x_{i}, \theta) =  1 - \sigma(x_{i} &#39;\theta)\]<h2 id="a-latent-variable-formulation">A latent variable formulation</h2>
 <p>A powerful way of interpreting the logistic model is to see it as the outcome of a latent variable model.
-An unobservable latent variable $z_{i}$ depends linearly on $x_{i}$ plus a noise term $\varepsilon_{i}$:</p>
-
-<p>$$ z_{i} = x_{i} &lsquo;\theta + \varepsilon_{i} $$</p>
-
-<p>We only observe $y_i$, which is equal to 1 when $z_{i}$ is strictly positive, and 0 otherwise. If the error term is distributed according to the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">logistic distribution</a>, we end up with the logistic model described above. If the error term is normally distributed, the model is a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank">probit model</a>. To see that, simply express the probability of the latent variable to be bigger than 0:</p>
-
-<p>$$ f(y_i = 1| x_{i}, \theta_{i}) = P( x_{i} &lsquo;\theta + \varepsilon_{i} &gt; 0) $$
-$$  = 1 - P( x_{i} &lsquo;\theta + \varepsilon_{i} \leq 0) $$
-$$  = 1 - P(\varepsilon_{i} \leq - x_{i} &lsquo;\theta ) $$
-$$  = 1 - \frac{1}{1+exp(x_{i} &lsquo;\theta )} $$
-$$  = \frac{exp(x_{i} &lsquo;\theta )}{1+exp(x_{i} &lsquo;\theta )} $$</p>
-
-<p>where the last line comes from using the expression for the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank">cdf of the logistic distribution</a> with zero mean and scale parameter equal to 1.</p>
-
+An unobservable latent variable \(z_{i}\) depends linearly on \(x_{i}\) plus a noise term \(\varepsilon_{i}\):</p>
+\[ z_{i} = x_{i} &#39;\theta &#43; \varepsilon_{i} \]<p>We only observe \(y_i\), which is equal to 1 when \(z_{i}\) is strictly positive, and 0 otherwise. If the error term is distributed according to the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank" rel="noopener">logistic distribution</a>, we end up with the logistic model described above. If the error term is normally distributed, the model is a <a href="https://en.wikipedia.org/wiki/Probit_model" target="_blank" rel="noopener">probit model</a>. To see that, simply express the probability of the latent variable to be bigger than 0:</p>
+\[ f(y_i = 1| x_{i}, \theta_{i}) = P( x_{i} &#39;\theta &#43; \varepsilon_{i} &gt; 0) \]<p>
+</p>
+\[  = 1 - P( x_{i} &#39;\theta &#43; \varepsilon_{i} \leq 0) \]<p>
+</p>
+\[  = 1 - P(\varepsilon_{i} \leq - x_{i} &#39;\theta ) \]<p>
+</p>
+\[  = 1 - \frac{1}{1&#43;exp(x_{i} &#39;\theta )} \]<p>
+</p>
+\[  = \frac{exp(x_{i} &#39;\theta )}{1&#43;exp(x_{i} &#39;\theta )} \]<p>where the last line comes from using the expression for the <a href="https://en.wikipedia.org/wiki/Logistic_distribution" target="_blank" rel="noopener">cdf of the logistic distribution</a> with zero mean and scale parameter equal to 1.</p>
 <h2 id="interpretation-of-coefficients">Interpretation of coefficients</h2>
-
-<p>How can we read the coefficients from a logistic model? The marginal effect of a change in $x_{ij}$ (the $jth$ component of $x_i$) on the probability that $y_i = 1$ is given by:</p>
-
-<p>$$ \frac{\partial f(y_i = 1| x_{i}, \theta)}{\partial x_{ij}} = \sigma(x_{i} &lsquo;\theta)(1-\sigma(x_{i} &lsquo;\theta))\theta_j$$</p>
-
-<p>A first observation is that the marginal effect depends on $x_i$, unlike in the linear regression model. A second observation is that the first two terms are always positive, so we do have that the interpretation that if $\theta_j$ is positive, an increase in the $jth$ component of $x_i$ leads to a bigger probability of obtaining a success (holding everything else constant).</p>
-
+<p>How can we read the coefficients from a logistic model? The marginal effect of a change in \(x_{ij}\) (the \(jth\) component of \(x_i\)) on the probability that \(y_i = 1\) is given by:</p>
+\[ \frac{\partial f(y_i = 1| x_{i}, \theta)}{\partial x_{ij}} = \sigma(x_{i} &#39;\theta)(1-\sigma(x_{i} &#39;\theta))\theta_j\]<p>A first observation is that the marginal effect depends on \(x_i\), unlike in the linear regression model. A second observation is that the first two terms are always positive, so we do have that the interpretation that if \(\theta_j\) is positive, an increase in the \(jth\) component of \(x_i\) leads to a bigger probability of obtaining a success (holding everything else constant).</p>
 <p>Another way to read the results from a logistic model is to realize that it implies that the log of odd ratio is linear:</p>
-
-<p>$$ log\Big(\frac{f(y_i =1 | x_{i}, \theta)}{1 - f(y_i =1| x_{i}, \theta)}\Big) = x_{i} &lsquo;\theta$$</p>
-
-<p>Going back to what makes a politician successful in an election, if the coefficient $\theta_j$ is equal to 0.1, it means that a one unit increase in $x_{ij}$ rises the <strong>relative</strong> probability of winning an election by approximately $10\%$.</p>
-
+\[ log\Big(\frac{f(y_i =1 | x_{i}, \theta)}{1 - f(y_i =1| x_{i}, \theta)}\Big) = x_{i} &#39;\theta\]<p>Going back to what makes a politician successful in an election, if the coefficient \(\theta_j\) is equal to 0.1, it means that a one unit increase in \(x_{ij}\) rises the <strong>relative</strong> probability of winning an election by approximately \(10\%\).</p>
 <h2 id="log-likelihood-function">Log-likelihood function</h2>
-
-<p>To predict who is going to win the next elections, one must estimate the value of $\theta$ using the information contained in the sample $(y_i, x_i)_{i=1}^{N}$. One &ldquo;natural&rdquo; criterion is to find the value for $\theta$ that <strong>maximizes the probability of observing the
-sample</strong>. This procedure is called <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation" target="_blank">Maximum likelihood estimation</a>. Let us assume that sample is <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables" target="_blank">i.i.d</a>. If the i.i.d assumption holds, the probability of observing the sample $(y_i, x_i)_{i=1}^{N}$ is the product of the probability of observing each observation. Instead of maximizing the likelihood, it is more convenient to maximize the log-likelihood, which transforms the product of probabilities into a sum:</p>
-
-<p>$$ L((y_i, x_i)_{i=1}^{N};\theta) = log( \prod_{i=1}^{N}f(y_i | x_{i}, \theta)) = \sum_{i=1}^{N} log(f(y_i | x_{i}, \theta_{i}))$$</p>
-
-<p>The probability of observing $y_i$  can compactly be written as</p>
-
-<p>$$ f(y_i | x_{i}, \theta_{i}) = \sigma(x_{i} &lsquo;\theta)^{y_i}(1 - \sigma(x_{i} &lsquo;\theta))^{1 - y_i} $$</p>
-
-<p>Hence, the log-likelihood function writes:</p>
-
-<p>$$L((y_i, x_i)_{i=1}^{N};\theta) = \sum_{i=1}^{N} y_i log(\sigma(x_{i} &lsquo;\theta)) + (1 - y_i)log(1 - \sigma(x_{i} &lsquo;\theta))$$</p>
-
-<h2 id="maximum-likelihood-estimation">Maximum Likelihood Estimation</h2>
-
-<p>Taking the derivative of $f(y_i | x_{i}, \theta)$ with respect to the parameter $\theta$ gives:</p>
-
-<p>$$ f_{\theta}(y_i | x_{i}, \theta) = [y_i - \sigma(x_{i} &lsquo;\theta)] x_{i} $$</p>
-
-<p>and the derivative of the log-likelihood function with respect to $\theta$ is:</p>
-
-<p>$$ L_{\theta}((y_i, x_i)_{i=1}^{N};\theta) = \sum_{i=1}^{N}[y_i - \sigma(x_{i} &lsquo;\theta)] x_{i} $$</p>
-
-<h2 id="gradient-descent">Gradient descent</h2>
-
-<p>To make the link with this <a href="https://julienpascal.github.io/post/ols_ml/" target="_blank">blog post</a>, we can use gradient descent to find the MLE estimate:</p>
-
-<p>$$ \theta_{i+1} = \theta_{i} - \gamma \Big(- L_{\theta}((y_i, x_i)_{i=1}^{N};\theta_{i}) \Big)$$</p>
-
-<p>The <a href="https://en.wikipedia.org/wiki/Gradient_descent" target="_blank">gradient descent</a> algorithm is an iterative procedure to find a minimizer of a function. At each step, the algorithm takes a step of length $\gamma$ towards the direction of steepest descent. Note that I reformulated the problem of finding the maximum of a function $f$ (the log-likelihood) as the problem of finding the minimum of $-f$.</p>
-
-<h2 id="newton-raphson-method">Newton–Raphson method</h2>
-
-<p>Roughly speaking, the Newton-Raphson method is a &ldquo;smart&rdquo; gradient descent which uses the information contained in the Hessian of the log-likelihood $HL((y_i, x_i)_{i=1}^{N};\theta_{i})$ (on top of the gradient) to make a right move toward the minimizer. This iterative algorithm proceeds as follows:</p>
-
-<p>$$ \theta_{i+1} = \theta_{i} - (HL((y_i, x_i)_{i=1}^{N};\theta_{i}) )^{-1}  \Big(- L_{\theta}((y_i, x_i)_{i=1}^{N};\theta_{i}) \Big)$$</p>
-
-<p>The next plot shows how the Newton-Raphson method works for a one dimensional root-finding problem:</p>
-
-<p><img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/NewtonIteration_Ani.gif" alt="Alt Text" /></p>
-
-<p>source: <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">https://en.wikipedia.org/wiki/Newton%27s_method</a></p>
-
+<p>To predict who is going to win the next elections, one must estimate the value of \(\theta\) using the information contained in the sample \((y_i, x_i)_{i=1}^{N}\). One &ldquo;natural&rdquo; criterion is to find the value for \(\theta\) that <strong>maximizes the probability of observing the
+sample</strong>. This procedure is called <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation" target="_blank" rel="noopener">Maximum likelihood estimation</a>. Let us assume that sample is <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables" target="_blank" rel="noopener">i.i.d</a>. If the i.i.d assumption holds, the probability of observing the sample \((y_i, x_i)_{i=1}^{N}\) is the product of the probability of observing each observation. Instead of maximizing the likelihood, it is more convenient to maximize the log-likelihood, which transforms the product of probabilities into a sum:</p>
+\[ L((y_i, x_i)_{i=1}^{N};\theta) = log( \prod_{i=1}^{N}f(y_i | x_{i}, \theta)) = \sum_{i=1}^{N} log(f(y_i | x_{i}, \theta_{i}))\]<p>The probability of observing \(y_i\)  can compactly be written as</p>
+\[ f(y_i | x_{i}, \theta_{i}) = \sigma(x_{i} &#39;\theta)^{y_i}(1 - \sigma(x_{i} &#39;\theta))^{1 - y_i} \]<p>Hence, the log-likelihood function writes:</p>
+\[L((y_i, x_i)_{i=1}^{N};\theta) = \sum_{i=1}^{N} y_i log(\sigma(x_{i} &#39;\theta)) &#43; (1 - y_i)log(1 - \sigma(x_{i} &#39;\theta))\]<h2 id="maximum-likelihood-estimation">Maximum Likelihood Estimation</h2>
+<p>Taking the derivative of \(f(y_i | x_{i}, \theta)\) with respect to the parameter \(\theta\) gives:</p>
+\[ f_{\theta}(y_i | x_{i}, \theta) = [y_i - \sigma(x_{i} &#39;\theta)] x_{i} \]<p>and the derivative of the log-likelihood function with respect to \(\theta\) is:</p>
+\[ L_{\theta}((y_i, x_i)_{i=1}^{N};\theta) = \sum_{i=1}^{N}[y_i - \sigma(x_{i} &#39;\theta)] x_{i} \]<h2 id="gradient-descent">Gradient descent</h2>
+<p>To make the link with this <a href="https://julienpascal.github.io/post/ols_ml/" target="_blank" rel="noopener">blog post</a>, we can use gradient descent to find the MLE estimate:</p>
+\[ \theta_{i&#43;1} = \theta_{i} - \gamma \Big(- L_{\theta}((y_i, x_i)_{i=1}^{N};\theta_{i}) \Big)\]<p>The <a href="https://en.wikipedia.org/wiki/Gradient_descent" target="_blank" rel="noopener">gradient descent</a> algorithm is an iterative procedure to find a minimizer of a function. At each step, the algorithm takes a step of length \(\gamma\) towards the direction of steepest descent. Note that I reformulated the problem of finding the maximum of a function \(f\) (the log-likelihood) as the problem of finding the minimum of \(-f\).</p>
+<h2 id="newtonraphson-method">Newton–Raphson method</h2>
+<p>Roughly speaking, the Newton-Raphson method is a &ldquo;smart&rdquo; gradient descent which uses the information contained in the Hessian of the log-likelihood \(HL((y_i, x_i)_{i=1}^{N};\theta_{i})\) (on top of the gradient) to make a right move toward the minimizer. This iterative algorithm proceeds as follows:</p>
+\[ \theta_{i&#43;1} = \theta_{i} - (HL((y_i, x_i)_{i=1}^{N};\theta_{i}) )^{-1}  \Big(- L_{\theta}((y_i, x_i)_{i=1}^{N};\theta_{i}) \Big)\]<p>The next plot shows how the Newton-Raphson method works for a one dimensional root-finding problem:</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/NewtonIteration_Ani.gif" alt="Alt Text"></p>
+<p>source: <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Newton%27s_method</a></p>
 <p>Should we use gradient descent or Newton-Raphson? I let the following extract
-from the <a href="https://en.wikipedia.org/wiki/Newton%27s_method_in_optimization" target="_blank">Wikipedia article</a> on Newton-Raphson speak for itself:</p>
-
+from the <a href="https://en.wikipedia.org/wiki/Newton%27s_method_in_optimization" target="_blank" rel="noopener">Wikipedia article</a> on Newton-Raphson speak for itself:</p>
 <blockquote>
 <p><strong>Where applicable</strong>, Newton&rsquo;s method <strong>converges much faster</strong> towards a local maximum or minimum than gradient descent. In fact, every local minimum has a neighborhood N such that, if we start with x0 ∈ N, Newton&rsquo;s method with step size γ = 1 <strong>converges quadratically</strong> (if the Hessian is invertible and a Lipschitz continuous function of x in that neighborhood).</p>
 </blockquote>
-
 <p>For the logistic model, the Newton-Raphson algorithm is easily applicable because there exists a closed-form formula for the Hessian:</p>
-
-<p>$$ HL((y_i, x_i)_{i=1}^{N};\theta_{i}) = \sum_{i=1}^{N} - \sigma(x_{i} &lsquo;\theta)[1 - \sigma(x_{i} &lsquo;\theta)] x_{i} x_{i}&lsquo;$$</p>
-
-<h2 id="implementation-in-julia">Implementation in Julia</h2>
-
+\[ HL((y_i, x_i)_{i=1}^{N};\theta_{i}) = \sum_{i=1}^{N} - \sigma(x_{i} &#39;\theta)[1 - \sigma(x_{i} &#39;\theta)] x_{i} x_{i}&#39;\]<h2 id="implementation-in-julia">Implementation in Julia</h2>
 <h2 id="i-working-with-simulated-data">I. Working with simulated data</h2>
-
 <p>Let&rsquo;s first work with simulated data. Can we actually recover the true parameter values using a manual implementation of the logistic model?</p>
-
 <p>Let&rsquo;s load a few dependencies:</p>
-
-<pre><code class="language-julia">using Distributions
-using Plots
-pyplot()
-using DataFrames
-using GLM
-using Optim
-using CSV
-using GLM
-</code></pre>
-
-<p>Let&rsquo;s create the logistic function:</p>
-
-<pre><code class="language-julia"># Logistic function for a scalar input:
-function sigma(x::Float64)
-    exp(x)/(1.0 + exp(x))
-end
-
-# Logistic function for a vector input:
-function sigma(x::Array{Float64,1})
-    exp.(x) ./ (1.0 .+ exp.(x))
-end
-</code></pre>
-
-<p>Let&rsquo;s create a function that calculates the likelihood:</p>
-
-<pre><code class="language-julia">function log_likelihood(y::Array{Float64,1}, X::Array{Float64,2}, theta::Array{Float64,1})
-    sum = 0.0
-    #Loop over individuals in the sample
-    for i=1:size(X,1)
-        sum += y[i]*log(sigma(transpose(X[i,:])*theta)) + (1.0 - y[i])*log(1.0 - sigma(transpose(X[i,:])*theta))
-    end
-    return sum
-end
-</code></pre>
-
-<p>Let&rsquo;s create a function that returns the derivative of the log-likelihood of the sample, which we need for the gradient descent algorithm:</p>
-
-<pre><code class="language-julia"># Function to calculate the gradient of the log-likelihood of the sample:
-function derivative_log_likelihood(y::Array{Float64,1}, X::Array{Float64,2}, theta::Array{Float64,1})
-    sum = zeros(size(X,2))
-    #Loop over individuals in the sample
-    for i=1:size(X,1)
-        sum .+= (y[i] - sigma(transpose(X[i,:])*theta))*X[i,:]
-    end
-    return sum
-end
-</code></pre>
-
-<p>Let&rsquo;s create a function that returns the Hessian of the log-likelihood of the sample, which we need for the Newthon-Raphson algorithm:</p>
-
-<pre><code class="language-julia"># Function to calculate the hessian of the log-likelihood of the sample:
-function hessian_log_likelihood(y::Array{Float64,1}, X::Array{Float64,2}, theta::Array{Float64,1})
-    hessian = zeros(size(X,2), size(X,2))
-    #Loop over individuals in the sample
-    for i=1:size(X,1)
-        hessian .+= - sigma(transpose(X[i,:])*theta)*(1.0 - sigma(transpose(X[i,:])*theta))*(X[i,:]*transpose(X[i,:]))
-    end
-    return hessian
-end
-</code></pre>
-
-<p>Let&rsquo;s simulate a sample of individuals:</p>
-
-<pre><code class="language-julia">#Generation of a sample:
-#----------------------
-N_individuals = 10000 #how many individuals in the sample?
-dim_X = 3 #How many dimensions for x
-d = Normal(0.0, 1.0)
-d_logistic = Logistic(0.0, 1.0)
-# Generate true parameter values:
-theta0 = [0.0; 1.0; 2.0];
-</code></pre>
-
-<pre><code class="language-julia"># Generate X:
-X = rand(d, N_individuals, dim_X)
-# The first column is full one ones (to have a constant)
-X[:,1] = ones(N_individuals);
-</code></pre>
-
-<pre><code class="language-julia"># Convert y to a binary outcome using the latent variabe representation:
-proba_success = X*theta0 .+ rand(d_logistic, N_individuals)
-y = ifelse.(proba_success .&gt; 0.0, 1.0, 0.0);
-</code></pre>
-
-<pre><code class="language-julia">p1 = histogram(proba_success, bins=20, normalize=true, title=&quot;Pdf probability of success&quot;, legend=false)
-p2 = histogram(y, title=&quot;Nb of successes vs failures&quot;, legend=false)
-plot(p1,p2)
-</code></pre>
-
-<p><img src="Logistic_regression_29_0.png" alt="png" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Distributions
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Plots
+</span></span><span style="display:flex;"><span>pyplot()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> DataFrames
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> GLM
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Optim
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> CSV
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> GLM
+</span></span></code></pre></div><p>Let&rsquo;s create the logistic function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Logistic function for a scalar input:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> sigma(x<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>)
+</span></span><span style="display:flex;"><span>    exp(x)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> exp(x))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Logistic function for a vector input:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> sigma(x<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    exp<span style="color:#f92672">.</span>(x) <span style="color:#f92672">./</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">.+</span> exp<span style="color:#f92672">.</span>(x))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><p>Let&rsquo;s create a function that calculates the likelihood:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> log_likelihood(y<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}, X<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>}, theta<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    sum <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Loop over individuals in the sample</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>size(X,<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        sum <span style="color:#f92672">+=</span> y[i]<span style="color:#f92672">*</span>log(sigma(transpose(X[i,<span style="color:#f92672">:</span>])<span style="color:#f92672">*</span>theta)) <span style="color:#f92672">+</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> y[i])<span style="color:#f92672">*</span>log(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> sigma(transpose(X[i,<span style="color:#f92672">:</span>])<span style="color:#f92672">*</span>theta))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sum
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><p>Let&rsquo;s create a function that returns the derivative of the log-likelihood of the sample, which we need for the gradient descent algorithm:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Function to calculate the gradient of the log-likelihood of the sample:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> derivative_log_likelihood(y<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}, X<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>}, theta<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    sum <span style="color:#f92672">=</span> zeros(size(X,<span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Loop over individuals in the sample</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>size(X,<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        sum <span style="color:#f92672">.+=</span> (y[i] <span style="color:#f92672">-</span> sigma(transpose(X[i,<span style="color:#f92672">:</span>])<span style="color:#f92672">*</span>theta))<span style="color:#f92672">*</span>X[i,<span style="color:#f92672">:</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sum
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><p>Let&rsquo;s create a function that returns the Hessian of the log-likelihood of the sample, which we need for the Newthon-Raphson algorithm:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Function to calculate the hessian of the log-likelihood of the sample:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> hessian_log_likelihood(y<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}, X<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>}, theta<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>    hessian <span style="color:#f92672">=</span> zeros(size(X,<span style="color:#ae81ff">2</span>), size(X,<span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Loop over individuals in the sample</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>size(X,<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        hessian <span style="color:#f92672">.+=</span> <span style="color:#f92672">-</span> sigma(transpose(X[i,<span style="color:#f92672">:</span>])<span style="color:#f92672">*</span>theta)<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> sigma(transpose(X[i,<span style="color:#f92672">:</span>])<span style="color:#f92672">*</span>theta))<span style="color:#f92672">*</span>(X[i,<span style="color:#f92672">:</span>]<span style="color:#f92672">*</span>transpose(X[i,<span style="color:#f92672">:</span>]))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> hessian
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><p>Let&rsquo;s simulate a sample of individuals:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#Generation of a sample:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#----------------------</span>
+</span></span><span style="display:flex;"><span>N_individuals <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span> <span style="color:#75715e">#how many individuals in the sample?</span>
+</span></span><span style="display:flex;"><span>dim_X <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span> <span style="color:#75715e">#How many dimensions for x</span>
+</span></span><span style="display:flex;"><span>d <span style="color:#f92672">=</span> Normal(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>)
+</span></span><span style="display:flex;"><span>d_logistic <span style="color:#f92672">=</span> Logistic(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Generate true parameter values:</span>
+</span></span><span style="display:flex;"><span>theta0 <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0.0</span>; <span style="color:#ae81ff">1.0</span>; <span style="color:#ae81ff">2.0</span>];
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Generate X:</span>
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> rand(d, N_individuals, dim_X)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The first column is full one ones (to have a constant)</span>
+</span></span><span style="display:flex;"><span>X[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> ones(N_individuals);
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Convert y to a binary outcome using the latent variabe representation:</span>
+</span></span><span style="display:flex;"><span>proba_success <span style="color:#f92672">=</span> X<span style="color:#f92672">*</span>theta0 <span style="color:#f92672">.+</span> rand(d_logistic, N_individuals)
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> ifelse<span style="color:#f92672">.</span>(proba_success <span style="color:#f92672">.&gt;</span> <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>);
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>p1 <span style="color:#f92672">=</span> histogram(proba_success, bins<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>, normalize<span style="color:#f92672">=</span>true, title<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Pdf probability of success&#34;</span>, legend<span style="color:#f92672">=</span>false)
+</span></span><span style="display:flex;"><span>p2 <span style="color:#f92672">=</span> histogram(y, title<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Nb of successes vs failures&#34;</span>, legend<span style="color:#f92672">=</span>false)
+</span></span><span style="display:flex;"><span>plot(p1,p2)
+</span></span></code></pre></div><p><img src="/post/logistic/Logistic_regression_29_0.png" alt="png"></p>
 <h3 id="maximization-with-optim">Maximization with Optim</h3>
-
-<p>As a first pass, we can maximize the log-likelihood using the package Optim. I use the the <a href="https://en.wikipedia.org/wiki/Limited-memory_BFGS" target="_blank">LBFGS</a>
+<p>As a first pass, we can maximize the log-likelihood using the package Optim. I use the the <a href="https://en.wikipedia.org/wiki/Limited-memory_BFGS" target="_blank" rel="noopener">LBFGS</a>
 algorithm:</p>
-
-<pre><code class="language-julia">theta_guess = ones(dim_X)
-@time res = optimize(theta -&gt; - log_likelihood(y, X, theta), theta_guess, LBFGS())
-</code></pre>
-
-<p>0.409340 seconds (3.79 M allocations: 396.250 MiB, 15.73% gc time)</p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>theta_guess <span style="color:#f92672">=</span> ones(dim_X)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> res <span style="color:#f92672">=</span> optimize(theta <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">-</span> log_likelihood(y, X, theta), theta_guess, LBFGS())
+</span></span></code></pre></div><p>0.409340 seconds (3.79 M allocations: 396.250 MiB, 15.73% gc time)</p>
 <p>We successfully recover the true parameter values (see <code>theta0</code>):</p>
-
-<pre><code class="language-julia">print(&quot;Estimate for theta using Optim is $(res.minimizer)&quot;)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Estimate for theta using Optim is </span><span style="color:#e6db74">$</span>(res<span style="color:#f92672">.</span>minimizer)<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Estimate for theta using Optim is [-0.0312666, 0.996344, 1.96038]
 </code></pre>
-
-<pre><code>Estimate for theta using Optim is [-0.0312666, 0.996344, 1.96038]
-</code></pre>
-
 <h3 id="minimization-with-gradient-descent">Minimization with gradient descent</h3>
-
 <p>Let&rsquo;s implement the gradient descent algorithm within a function:</p>
-
-<pre><code class="language-julia">function gradient_descent_probit(y, X , theta_initial::Array{Float64,1}; max_iter::Int64 = 1000,
-                                learning_rate::Float64 = 0.000001, tol::Float64=0.01)
-    #initial value for theta:
-    theta_old = theta_initial
-    theta_new = similar(theta_old)
-    #convergence reached?
-    success_flag = 0
-    #Let's store the convergence history
-    history= fill!(zeros(max_iter), NaN)
-    for i=1:max_iter
-        theta_new = theta_old + learning_rate*derivative_log_likelihood(y, X, theta_old)
-        diff = maximum(abs, theta_new .- theta_old)
-        history[i] = diff
-        if diff &lt; tol
-            success_flag = 1
-            break
-        end
-        theta_old = theta_new
-    end
-
-    return theta_new, success_flag, history[isnan.(history) .== false]
-
-end
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> gradient_descent_probit(y, X , theta_initial<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}; max_iter<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>,
+</span></span><span style="display:flex;"><span>                                learning_rate<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.000001</span>, tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#initial value for theta:</span>
+</span></span><span style="display:flex;"><span>    theta_old <span style="color:#f92672">=</span> theta_initial
+</span></span><span style="display:flex;"><span>    theta_new <span style="color:#f92672">=</span> similar(theta_old)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#convergence reached?</span>
+</span></span><span style="display:flex;"><span>    success_flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Let&#39;s store the convergence history</span>
+</span></span><span style="display:flex;"><span>    history<span style="color:#f92672">=</span> fill!(zeros(max_iter), NaN)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>max_iter
+</span></span><span style="display:flex;"><span>        theta_new <span style="color:#f92672">=</span> theta_old <span style="color:#f92672">+</span> learning_rate<span style="color:#f92672">*</span>derivative_log_likelihood(y, X, theta_old)
+</span></span><span style="display:flex;"><span>        diff <span style="color:#f92672">=</span> maximum(abs, theta_new <span style="color:#f92672">.-</span> theta_old)
+</span></span><span style="display:flex;"><span>        history[i] <span style="color:#f92672">=</span> diff
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> diff <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>            success_flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>        theta_old <span style="color:#f92672">=</span> theta_new
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> theta_new, success_flag, history[isnan<span style="color:#f92672">.</span>(history) <span style="color:#f92672">.==</span> false]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>theta_guess <span style="color:#f92672">=</span> zeros(dim_X)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> theta, flag, history <span style="color:#f92672">=</span> gradient_descent_probit(y, X, theta_guess, max_iter<span style="color:#f92672">=</span><span style="color:#ae81ff">100000</span>, learning_rate<span style="color:#f92672">=</span><span style="color:#ae81ff">0.0001</span>, tol<span style="color:#f92672">=</span><span style="color:#ae81ff">0.00001</span>);
+</span></span></code></pre></div><pre><code>  0.252281 seconds (4.89 M allocations: 523.159 MiB, 29.08% gc time)
 </code></pre>
-
-<pre><code class="language-julia">theta_guess = zeros(dim_X)
-@time theta, flag, history = gradient_descent_probit(y, X, theta_guess, max_iter=100000, learning_rate=0.0001, tol=0.00001);
-</code></pre>
-
-<pre><code>  0.252281 seconds (4.89 M allocations: 523.159 MiB, 29.08% gc time)
-</code></pre>
-
 <p>The following graph shows the error as a function of the number of iterations. After a few iterations of the gradient descent algorithm, the error is quite small.</p>
-
-<pre><code class="language-julia">plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradient descent algorithm&quot;)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>plot(history, label<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;error&#34;</span>, title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Convergence of the gradient descent algorithm&#34;</span>)
+</span></span></code></pre></div><p><img src="/post/logistic/Logistic_regression_40_0.png" alt="png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Estimate for theta using gradient descent is </span><span style="color:#e6db74">$</span>(theta)<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Estimate for theta using gradient descent is [0.0581777, 1.00105, 1.97901]
 </code></pre>
-
-<p><img src="Logistic_regression_40_0.png" alt="png" /></p>
-
-<pre><code class="language-julia">print(&quot;Estimate for theta using gradient descent is $(theta)&quot;)
-</code></pre>
-
-<pre><code>Estimate for theta using gradient descent is [0.0581777, 1.00105, 1.97901]
-</code></pre>
-
 <h3 id="minimization-with-newton-raphson">Minimization with Newton-Raphson</h3>
-
 <p>Let&rsquo;s implement the Newton-Raphson algorithm within a function:</p>
-
-<pre><code class="language-julia">function nr_probit(y, X , theta_initial::Array{Float64,1};
-                    max_iter::Int64 = 1000, tol::Float64=0.01)
-    #initial value for theta:
-    theta_old = theta_initial
-    theta_new = similar(theta_old)
-    #convergence reached?
-    success_flag = 0
-    #Let's store the convergence history
-    history= fill!(zeros(max_iter), NaN)
-    for i=1:max_iter
-        theta_new = theta_old - inv(hessian_log_likelihood(y, X, theta_old))*derivative_log_likelihood(y, X, theta_old)
-        diff = maximum(abs, theta_new .- theta_old)
-        history[i] = diff
-        if diff &lt; tol
-            success_flag = 1
-            break
-        end
-        theta_old = theta_new
-    end
-
-    return theta_new, success_flag, history[isnan.(history) .== false]
-
-end
-</code></pre>
-
-<p>The following graph shows that we find the minimizer in only 5 steps! The Newton-Raphson algorithm clearly outperforms gradient descent. Of course, everything works well because the
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> nr_probit(y, X , theta_initial<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>};
+</span></span><span style="display:flex;"><span>                    max_iter<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>, tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#initial value for theta:</span>
+</span></span><span style="display:flex;"><span>    theta_old <span style="color:#f92672">=</span> theta_initial
+</span></span><span style="display:flex;"><span>    theta_new <span style="color:#f92672">=</span> similar(theta_old)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#convergence reached?</span>
+</span></span><span style="display:flex;"><span>    success_flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Let&#39;s store the convergence history</span>
+</span></span><span style="display:flex;"><span>    history<span style="color:#f92672">=</span> fill!(zeros(max_iter), NaN)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>max_iter
+</span></span><span style="display:flex;"><span>        theta_new <span style="color:#f92672">=</span> theta_old <span style="color:#f92672">-</span> inv(hessian_log_likelihood(y, X, theta_old))<span style="color:#f92672">*</span>derivative_log_likelihood(y, X, theta_old)
+</span></span><span style="display:flex;"><span>        diff <span style="color:#f92672">=</span> maximum(abs, theta_new <span style="color:#f92672">.-</span> theta_old)
+</span></span><span style="display:flex;"><span>        history[i] <span style="color:#f92672">=</span> diff
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> diff <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>            success_flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>        theta_old <span style="color:#f92672">=</span> theta_new
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> theta_new, success_flag, history[isnan<span style="color:#f92672">.</span>(history) <span style="color:#f92672">.==</span> false]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><p>The following graph shows that we find the minimizer in only 5 steps! The Newton-Raphson algorithm clearly outperforms gradient descent. Of course, everything works well because the
 problem is well-behaved and a nice formula for the Hessian is available.</p>
-
-<pre><code class="language-julia">theta_guess = ones(dim_X)
-@time theta, flag, history = nr_probit(y, X, theta_guess, max_iter=1000, tol=0.00001);
-plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradient descent algorithm&quot;)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>theta_guess <span style="color:#f92672">=</span> ones(dim_X)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> theta, flag, history <span style="color:#f92672">=</span> nr_probit(y, X, theta_guess, max_iter<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>, tol<span style="color:#f92672">=</span><span style="color:#ae81ff">0.00001</span>);
+</span></span><span style="display:flex;"><span>plot(history, label<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;error&#34;</span>, title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Convergence of the gradient descent algorithm&#34;</span>)
+</span></span></code></pre></div><pre><code>  0.037832 seconds (500.07 k allocations: 53.431 MiB, 35.44% gc time)
 </code></pre>
-
-<pre><code>  0.037832 seconds (500.07 k allocations: 53.431 MiB, 35.44% gc time)
+<p><img src="/post/logistic/Logistic_regression_46_1.png" alt="png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Estimate for theta using Newton-Raphson is </span><span style="color:#e6db74">$</span>(theta)<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Estimate for theta using Newton-Raphson is [0.0581789, 1.00114, 1.97919]
 </code></pre>
-
-<p><img src="Logistic_regression_46_1.png" alt="png" /></p>
-
-<pre><code class="language-julia">print(&quot;Estimate for theta using Newton-Raphson is $(theta)&quot;)
-</code></pre>
-
-<pre><code>Estimate for theta using Newton-Raphson is [0.0581789, 1.00114, 1.97919]
-</code></pre>
-
 <h3 id="using-glm">Using GLM</h3>
-
-<p>We can also use the package <a href="https://github.com/JuliaStats/GLM.jl" target="_blank">GLM</a> to estimate the logistic model. We first need to put the data into a dataframe. In the <code>glm()</code> function, we should use the <code>LogitLink()</code></p>
-
-<pre><code class="language-julia">df = DataFrame(X1=X[:,1],X2=X[:,2], X3=X[:,3], y=y);
-first(df,6)
+<p>We can also use the package <a href="https://github.com/JuliaStats/GLM.jl" target="_blank" rel="noopener">GLM</a> to estimate the logistic model. We first need to put the data into a dataframe. In the <code>glm()</code> function, we should use the <code>LogitLink()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>df <span style="color:#f92672">=</span> DataFrame(X1<span style="color:#f92672">=</span>X[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>],X2<span style="color:#f92672">=</span>X[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">2</span>], X3<span style="color:#f92672">=</span>X[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">3</span>], y<span style="color:#f92672">=</span>y);
+</span></span><span style="display:flex;"><span>first(df,<span style="color:#ae81ff">6</span>)
+</span></span></code></pre></div><table class="data-frame"><thead><tr><th></th><th>X1</th><th>X2</th><th>X3</th><th>y</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>6 rows × 4 columns</p><tr><th>1</th><td>1.0</td><td>0.215315</td><td>1.29817</td><td>1.0</td></tr><tr><th>2</th><td>1.0</td><td>-0.0714749</td><td>0.586886</td><td>1.0</td></tr><tr><th>3</th><td>1.0</td><td>0.0463648</td><td>-0.145116</td><td>1.0</td></tr><tr><th>4</th><td>1.0</td><td>1.95096</td><td>0.26349</td><td>1.0</td></tr><tr><th>5</th><td>1.0</td><td>-0.162081</td><td>1.34871</td><td>1.0</td></tr><tr><th>6</th><td>1.0</td><td>0.00214326</td><td>-0.271835</td><td>1.0</td></tr></tbody></table>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>fittedmodel <span style="color:#f92672">=</span> glm(<span style="color:#a6e22e">@formula</span>(y <span style="color:#f92672">~</span> X2 <span style="color:#f92672">+</span> X3), df, Binomial(), LogitLink(), verbose<span style="color:#f92672">=</span>true);
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Estimate for theta using GLM is </span><span style="color:#e6db74">$</span>(coef(fittedmodel))<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Estimate for theta using GLM is [-0.0312666, 0.996344, 1.96038]
 </code></pre>
-
-<table class="data-frame"><thead><tr><th></th><th>X1</th><th>X2</th><th>X3</th><th>y</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>6 rows × 4 columns</p><tr><th>1</th><td>1.0</td><td>0.215315</td><td>1.29817</td><td>1.0</td></tr><tr><th>2</th><td>1.0</td><td>-0.0714749</td><td>0.586886</td><td>1.0</td></tr><tr><th>3</th><td>1.0</td><td>0.0463648</td><td>-0.145116</td><td>1.0</td></tr><tr><th>4</th><td>1.0</td><td>1.95096</td><td>0.26349</td><td>1.0</td></tr><tr><th>5</th><td>1.0</td><td>-0.162081</td><td>1.34871</td><td>1.0</td></tr><tr><th>6</th><td>1.0</td><td>0.00214326</td><td>-0.271835</td><td>1.0</td></tr></tbody></table>
-
-<pre><code class="language-julia">fittedmodel = glm(@formula(y ~ X2 + X3), df, Binomial(), LogitLink(), verbose=true);
-</code></pre>
-
-<pre><code class="language-julia">print(&quot;Estimate for theta using GLM is $(coef(fittedmodel))&quot;)
-</code></pre>
-
-<pre><code>Estimate for theta using GLM is [-0.0312666, 0.996344, 1.96038]
-</code></pre>
-
 <h2 id="ii-what-makes-a-successful-nba-player">II. What makes a successful NBA player?</h2>
-
 <p>For an example involving real data, I use the data set on <strong>NBA shots</strong> taken during the 2014-2015 season.
 It contains information on:</p>
-
 <ul>
 <li>who took the shot</li>
 <li>where on the floor was the shot taken from</li>
@@ -880,35 +751,24 @@ It contains information on:</p>
 <li>time on the shot clock</li>
 <li>etc.</li>
 </ul>
-
-<p>The data is available on <strong>Kaggle</strong> <a href="https://www.kaggle.com/dansbecker/nba-shot-logs" target="_blank">here</a></p>
-
-<pre><code class="language-julia">df_nba = CSV.read(&quot;/home/julien/Documents/REPOSITORIES/LogisticRegression/data/shot_logs.csv&quot;);
-names(df_nba)
-</code></pre>
-
-<p>The dataset is quite extensive. Let&rsquo;s select whether or not the shot was successful, <strong>the shot clock, the shot distance, and the proximity with the closest defender</strong>:</p>
-
-<pre><code class="language-julia">df_nba = df_nba[[:SHOT_RESULT, :SHOT_CLOCK, :SHOT_DIST, :CLOSE_DEF_DIST]]
-# Drop rows with missings:
-df_nba = dropmissing(df_nba);
-# Drop rows with NaN:
-df_nba = df_nba[completecases(df_nba), :]
-# Convert SHOT_RESULT to a binary variable (1 for success, 0 for missed)
-df_nba[:, :SHOT_RESULT] = ifelse.(df_nba[:, :SHOT_RESULT] .== &quot;made&quot;, 1.0, 0.0);
-# Show the first few rows of df_nba:
-first(df_nba, 4)
-</code></pre>
-
-<table class="data-frame"><thead><tr><th></th><th>SHOT_RESULT</th><th>SHOT_CLOCK</th><th>SHOT_DIST</th><th>CLOSE_DEF_DIST</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>4 rows × 4 columns</p><tr><th>1</th><td>1.0</td><td>10.8</td><td>7.7</td><td>1.3</td></tr><tr><th>2</th><td>0.0</td><td>3.4</td><td>28.2</td><td>6.1</td></tr><tr><th>3</th><td>0.0</td><td>10.3</td><td>17.2</td><td>3.4</td></tr><tr><th>4</th><td>0.0</td><td>10.9</td><td>3.7</td><td>1.1</td></tr></tbody></table>
-
+<p>The data is available on <strong>Kaggle</strong> <a href="https://www.kaggle.com/dansbecker/nba-shot-logs" target="_blank" rel="noopener">here</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>df_nba <span style="color:#f92672">=</span> CSV<span style="color:#f92672">.</span>read(<span style="color:#e6db74">&#34;/home/julien/Documents/REPOSITORIES/LogisticRegression/data/shot_logs.csv&#34;</span>);
+</span></span><span style="display:flex;"><span>names(df_nba)
+</span></span></code></pre></div><p>The dataset is quite extensive. Let&rsquo;s select whether or not the shot was successful, <strong>the shot clock, the shot distance, and the proximity with the closest defender</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>df_nba <span style="color:#f92672">=</span> df_nba[[<span style="color:#e6db74">:SHOT_RESULT</span>, <span style="color:#e6db74">:SHOT_CLOCK</span>, <span style="color:#e6db74">:SHOT_DIST</span>, <span style="color:#e6db74">:CLOSE_DEF_DIST</span>]]
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Drop rows with missings:</span>
+</span></span><span style="display:flex;"><span>df_nba <span style="color:#f92672">=</span> dropmissing(df_nba);
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Drop rows with NaN:</span>
+</span></span><span style="display:flex;"><span>df_nba <span style="color:#f92672">=</span> df_nba[completecases(df_nba), <span style="color:#f92672">:</span>]
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Convert SHOT_RESULT to a binary variable (1 for success, 0 for missed)</span>
+</span></span><span style="display:flex;"><span>df_nba[<span style="color:#f92672">:</span>, <span style="color:#e6db74">:SHOT_RESULT</span>] <span style="color:#f92672">=</span> ifelse<span style="color:#f92672">.</span>(df_nba[<span style="color:#f92672">:</span>, <span style="color:#e6db74">:SHOT_RESULT</span>] <span style="color:#f92672">.==</span> <span style="color:#e6db74">&#34;made&#34;</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Show the first few rows of df_nba:</span>
+</span></span><span style="display:flex;"><span>first(df_nba, <span style="color:#ae81ff">4</span>)
+</span></span></code></pre></div><table class="data-frame"><thead><tr><th></th><th>SHOT_RESULT</th><th>SHOT_CLOCK</th><th>SHOT_DIST</th><th>CLOSE_DEF_DIST</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>4 rows × 4 columns</p><tr><th>1</th><td>1.0</td><td>10.8</td><td>7.7</td><td>1.3</td></tr><tr><th>2</th><td>0.0</td><td>3.4</td><td>28.2</td><td>6.1</td></tr><tr><th>3</th><td>0.0</td><td>10.3</td><td>17.2</td><td>3.4</td></tr><tr><th>4</th><td>0.0</td><td>10.9</td><td>3.7</td><td>1.1</td></tr></tbody></table>
 <p>Let&rsquo;s first use GLM:</p>
-
-<pre><code class="language-julia">fittedmodel = glm(@formula(SHOT_RESULT ~ SHOT_CLOCK + SHOT_DIST + CLOSE_DEF_DIST), df_nba, Binomial(), LogitLink(), verbose=true);
-fittedmodel
-</code></pre>
-
-<pre><code>SHOT_RESULT ~ 1 + SHOT_CLOCK + SHOT_DIST + CLOSE_DEF_DIST
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>fittedmodel <span style="color:#f92672">=</span> glm(<span style="color:#a6e22e">@formula</span>(SHOT_RESULT <span style="color:#f92672">~</span> SHOT_CLOCK <span style="color:#f92672">+</span> SHOT_DIST <span style="color:#f92672">+</span> CLOSE_DEF_DIST), df_nba, Binomial(), LogitLink(), verbose<span style="color:#f92672">=</span>true);
+</span></span><span style="display:flex;"><span>fittedmodel
+</span></span></code></pre></div><pre><code>SHOT_RESULT ~ 1 + SHOT_CLOCK + SHOT_DIST + CLOSE_DEF_DIST
 
 Coefficients:
 ────────────────────────────────────────────────────────────────────────────────────
@@ -920,49 +780,32 @@ SHOT_DIST       -0.059745   0.000858282  -69.61       &lt;1e-99  -0.0614272  -0.
 CLOSE_DEF_DIST   0.108392   0.00279232    38.8179     &lt;1e-99   0.102919    0.113865
 ────────────────────────────────────────────────────────────────────────────────────
 </code></pre>
-
 <p>How can we interpret those results?</p>
-
 <ul>
 <li>time pressure makes NBA players more successful: the higher the shot clock, the more likely to score</li>
 <li>shots from further away are more likely to be missed</li>
 <li>the further away the closest defender is, the more likely the shot will be a success</li>
 </ul>
-
 <p>Can we find similar results &ldquo;manually&rdquo;? The answer is <strong>yes</strong>. To see that, let&rsquo;s first create the binary variable <code>y</code> and put the explanatory variables into <code>X</code> and then use Newton-Raphson:</p>
-
-<pre><code class="language-julia">y = convert(Array, df_nba[:SHOT_RESULT]);
-X = convert(Matrix, df_nba[[:SHOT_CLOCK, :SHOT_DIST, :CLOSE_DEF_DIST]])
-X = hcat(ones(size(X,1)), X);
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>y <span style="color:#f92672">=</span> convert(<span style="color:#66d9ef">Array</span>, df_nba[<span style="color:#e6db74">:SHOT_RESULT</span>]);
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> convert(<span style="color:#66d9ef">Matrix</span>, df_nba[[<span style="color:#e6db74">:SHOT_CLOCK</span>, <span style="color:#e6db74">:SHOT_DIST</span>, <span style="color:#e6db74">:CLOSE_DEF_DIST</span>]])
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> hcat(ones(size(X,<span style="color:#ae81ff">1</span>)), X);
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>theta_guess <span style="color:#f92672">=</span> zeros(size(X,<span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> theta, flag, history <span style="color:#f92672">=</span> nr_probit(y, X, theta_guess, max_iter<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>, tol<span style="color:#f92672">=</span><span style="color:#ae81ff">0.0001</span>);
+</span></span><span style="display:flex;"><span>plot(history, label<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;error&#34;</span>, title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Convergence of the gradient descent algorithm&#34;</span>)
+</span></span></code></pre></div><pre><code>  0.301748 seconds (4.90 M allocations: 568.272 MiB, 29.93% gc time)
 </code></pre>
-
-<pre><code class="language-julia">theta_guess = zeros(size(X,2))
-@time theta, flag, history = nr_probit(y, X, theta_guess, max_iter=1000, tol=0.0001);
-plot(history, label= &quot;error&quot;, title = &quot;Convergence of the gradient descent algorithm&quot;)
-</code></pre>
-
-<pre><code>  0.301748 seconds (4.90 M allocations: 568.272 MiB, 29.93% gc time)
-</code></pre>
-
-<p><img src="Logistic_regression_63_1.png" alt="png" /></p>
-
+<p><img src="/post/logistic/Logistic_regression_63_1.png" alt="png"></p>
 <p>Our implementation of the logistic model gives us parameter values that are almost
 identical to the ones we get using the package <code>GLM</code>:</p>
-
-<pre><code class="language-julia">print(&quot;Estimate for theta using Optim is $(res.minimizer)&quot;)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Estimate for theta using Optim is </span><span style="color:#e6db74">$</span>(res<span style="color:#f92672">.</span>minimizer)<span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Estimate for theta using Optim is [-0.057513, 0.0185199, -0.0597451, 0.108392]
 </code></pre>
-
-<pre><code>Estimate for theta using Optim is [-0.057513, 0.0185199, -0.0597451, 0.108392]
-</code></pre>
-
 <h2 id="conclusion">Conclusion</h2>
-
-<p>The logistic model, often used in social sciences and in machine learning for classification purposes is a powerful tool. This blog post shows how the logistic model can be derived from first principles (latent variable interpretation) and how it can be implemented in just a few lines of codes. A few extensions to this blog post could be to calculate the <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic" target="_blank">ROC curve</a> and to calculate the standard errors.</p>
-
+<p>The logistic model, often used in social sciences and in machine learning for classification purposes is a powerful tool. This blog post shows how the logistic model can be derived from first principles (latent variable interpretation) and how it can be implemented in just a few lines of codes. A few extensions to this blog post could be to calculate the <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic" target="_blank" rel="noopener">ROC curve</a> and to calculate the standard errors.</p>
 <h2 id="references">References</h2>
-
 <ul>
-<li><a href="https://rpubs.com/junworks/Understanding-Logistic-Regression-from-Scratch" target="_blank">https://rpubs.com/junworks/Understanding-Logistic-Regression-from-Scratch</a></li>
+<li><a href="https://rpubs.com/junworks/Understanding-Logistic-Regression-from-Scratch" target="_blank" rel="noopener">https://rpubs.com/junworks/Understanding-Logistic-Regression-from-Scratch</a></li>
 </ul>
 
     </div>
@@ -1000,7 +843,7 @@ identical to the ones we get using the package <code>GLM</code>:</p>
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -1130,7 +973,7 @@ identical to the ones we get using the package <code>GLM</code>:</p>
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1284,7 +1127,7 @@ identical to the ones we get using the package <code>GLM</code>:</p>
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -29,7 +29,9 @@
     
   
   <meta name="description" content="Dynare is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see Winberry and Ragot for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.
-A simple model The economy is composed of a representative agent who maximizes his expected discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&hellip;,\infty$ $$ \sum_{t=1}^{&#43;\infty}\big(\frac{1}{1&#43;\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1&#43;\gamma}}{1&#43;\gamma}\Big] $$">
+A simple model
+The economy is composed of a representative agent who maximizes his expected
+discounted sum of utility by choosing consumption \(C_t\) and labor \(L_t\) for \(t=1,...,\infty\) ">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/rbc_dynare/">
@@ -101,9 +103,6 @@ A simple model The economy is composed of a representative agent who maximizes h
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -127,7 +126,9 @@ A simple model The economy is composed of a representative agent who maximizes h
   <meta property="og:url" content="https://julienpascal.github.io/post/rbc_dynare/">
   <meta property="og:title" content="Solving a simple RBC model in Dynare | Julien Pascal">
   <meta property="og:description" content="Dynare is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see Winberry and Ragot for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.
-A simple model The economy is composed of a representative agent who maximizes his expected discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&hellip;,\infty$ $$ \sum_{t=1}^{&#43;\infty}\big(\frac{1}{1&#43;\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1&#43;\gamma}}{1&#43;\gamma}\Big] $$"><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+A simple model
+The economy is composed of a representative agent who maximizes his expected
+discounted sum of utility by choosing consumption \(C_t\) and labor \(L_t\) for \(t=1,...,\infty\) "><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2017-07-29T13:44:23&#43;01:00">
@@ -541,128 +542,86 @@ A simple model The economy is composed of a representative agent who maximizes h
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p><a href="http://www.dynare.org/" target="_blank">Dynare</a> is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see <a href="http://faculty.chicagobooth.edu/thomas.winberry/research/winberryAlgorithm.pdf" target="_blank">Winberry</a> and <a href="http://xavier-ragot.fr/pdf/progress/Ragot_chapter.pdf" target="_blank">Ragot</a> for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.</p>
-
+      <p><a href="http://www.dynare.org/" target="_blank" rel="noopener">Dynare</a> is a rich software to solve, estimate and analyse rational expectation models. While it was originally designed to solve and estimate DSGE models, Dynare has also recently been used to solve and simulate heterogeneous agents models (see <a href="http://faculty.chicagobooth.edu/thomas.winberry/research/winberryAlgorithm.pdf" target="_blank" rel="noopener">Winberry</a> and <a href="http://xavier-ragot.fr/pdf/progress/Ragot_chapter.pdf" target="_blank" rel="noopener">Ragot</a> for two very different approaches). Below is a simple example on how to solve and simulate a simple RBC model using Dynare.</p>
 <h2 id="a-simple-model">A simple model</h2>
-
 <p>The economy is composed of a representative agent who maximizes his expected
-discounted sum of utility by choosing consumption $C_t$ and labor $L_t$ for $t=1,&hellip;,\infty$ <br></p>
-
-<p>$$  \sum_{t=1}^{+\infty}\big(\frac{1}{1+\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1+\gamma}}{1+\gamma}\Big] $$</p>
-
-<p>subject to the constraint</p>
-
-<p>$$ K_t = K_t{-_1} (1-\delta) + w_t L_t + r_t K_t-_1 - C_t $$</p>
-
-<p>where</p>
-
+discounted sum of utility by choosing consumption \(C_t\) and labor \(L_t\) for \(t=1,...,\infty\) <br></p>
+\[  \sum_{t=1}^{&#43;\infty}\big(\frac{1}{1&#43;\rho}\big)^{t-1} E_t\Big[log(C_t)-\frac{L_t^{1&#43;\gamma}}{1&#43;\gamma}\Big] \]<p>subject to the constraint</p>
+\[ K_t = K_t{-_1} (1-\delta) &#43; w_t L_t &#43; r_t K_t-_1 - C_t \]<p>where</p>
 <ul>
-<li>$\rho \in (0,\infty)$ is the rate of time preference</li>
-<li>$\gamma \in (0,\infty)$ is a labor supply parameter</li>
-<li>$w_t$ is real wage</li>
-<li>$r_t$ is the real rental rate</li>
-<li>$K_t$ is capital at the end of the period</li>
-<li>$\delta \in (0,1)$ is the capital depreciation rate</li>
+<li>\(\rho \in (0,\infty)\) is the rate of time preference</li>
+<li>\(\gamma \in (0,\infty)\) is a labor supply parameter</li>
+<li>\(w_t\) is real wage</li>
+<li>\(r_t\) is the real rental rate</li>
+<li>\(K_t\) is capital at the end of the period</li>
+<li>\(\delta \in (0,1)\) is the capital depreciation rate</li>
 </ul>
-
 <p>The production function writes
 \begin{equation} Y_t = A_t K_t-_1^\alpha \Big((1+g)^t \Big)^{1-\alpha} \end{equation}</p>
-
 <p>where</p>
-
 <ul>
-<li>$g \in (0,\infty)$ is the growth rate of production</li>
-<li>$\alpha$ and $\beta$ are technology parameters</li>
-<li>$A_t$ is a technological shock that follows and $AR(1)$ process</li>
+<li>\(g \in (0,\infty)\) is the growth rate of production</li>
+<li>\(\alpha\) and \(\beta\) are technology parameters</li>
+<li>\(A_t\) is a technological shock that follows and \(AR(1)\) process</li>
 </ul>
-
 <p>\begin{equation} \log(A_t) = \lambda log(A_t-_1) + e_t\end{equation}</p>
-
-<p>with $e_t$ an i.i.d zero-mean normally distributed error term with standard deviation
-$\sigma_1$ and $\lambda \in (0,1)$ a parameter governing the persistence of shocks.</p>
-
+<p>with \(e_t\) an i.i.d zero-mean normally distributed error term with standard deviation
+\(\sigma_1\) and \(\lambda \in (0,1)\) a parameter governing the persistence of shocks.</p>
 <h2 id="first-order-conditions">First Order conditions</h2>
-
 <p>The F.O.C.s of the (stationarized) model are</p>
-
-<p>$$ \frac{1}{\hat{C_t}} = \frac{1}{1+\rho} E_t \Big( \frac{r_t+_1 + 1 - \delta}{\hat{C}_t+_1 (1+g)} \Big)$$</p>
-
-<p>$$ L_t^\gamma = \frac{\hat{w}_t}{\hat{C}_t}$$</p>
-
-<p>$$ r_t = \alpha A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha-1}L_t^{1-\alpha}$$</p>
-
-<p>$$ \hat{w}_t = (1-\alpha) A_t \Big(\frac{\hat{K}_t-_1}{1+g}\Big)^{\alpha}L_t^{-\alpha} $$</p>
-
-<p>$$ \hat{K}_t + \hat{C}_t = \frac{\hat{K}_t-_1}{1+g} (1-\delta) + A_t \Big( \frac{\hat{K}_t-_1}{1+g} \Big)^{\alpha} L_t^{1-\alpha} $$</p>
-
-<p>with
-$$ \hat{C}_t = \frac{C_t}{(1+g)^t}$$
-$$ \hat{K}_t = \frac{K_t}{(1+g)^t}$$
-$$ \hat{w}_t = \frac{w_t}{(1+g)^t}$$</p>
-
-<h2 id="solving-and-simulating-the-model-in-dynare">Solving and simulating the model in Dynare</h2>
-
+\[ \frac{1}{\hat{C_t}} = \frac{1}{1&#43;\rho} E_t \Big( \frac{r_t&#43;_1 &#43; 1 - \delta}{\hat{C}_t&#43;_1 (1&#43;g)} \Big)\]\[ L_t^\gamma = \frac{\hat{w}_t}{\hat{C}_t}\]\[ r_t = \alpha A_t \Big(\frac{\hat{K}_t-_1}{1&#43;g}\Big)^{\alpha-1}L_t^{1-\alpha}\]\[ \hat{w}_t = (1-\alpha) A_t \Big(\frac{\hat{K}_t-_1}{1&#43;g}\Big)^{\alpha}L_t^{-\alpha} \]\[ \hat{K}_t &#43; \hat{C}_t = \frac{\hat{K}_t-_1}{1&#43;g} (1-\delta) &#43; A_t \Big( \frac{\hat{K}_t-_1}{1&#43;g} \Big)^{\alpha} L_t^{1-\alpha} \]<p>with
+</p>
+\[ \hat{C}_t = \frac{C_t}{(1&#43;g)^t}\]<p>
+</p>
+\[ \hat{K}_t = \frac{K_t}{(1&#43;g)^t}\]<p>
+</p>
+\[ \hat{w}_t = \frac{w_t}{(1&#43;g)^t}\]<h2 id="solving-and-simulating-the-model-in-dynare">Solving and simulating the model in Dynare</h2>
 <p>In Dynare, one has first to specify the endogenous variables (<code>var</code>), exogenous variables (<code>varexo</code>),
 and the parameters</p>
-
-<pre><code class="language-matlab">var C K L w r A;
-varexo e;
-
-parameters rho delta gamma alpha lambda g;
-alpha = 0.33;
-delta = 0.1;
-rho = 0.03;
-lambda = 0.97;
-gamma = 0;
-g = 0.015;
-</code></pre>
-
-<p>In a second step, the F.O.C.s of the model has to be expressed using the command <code>model</code></p>
-
-<pre><code class="language-matlab">model;
-1/C=1/(1+rho)*(1/(C(+1)*(1+g)))*(r(+1)+1-delta);
-L^gamma = w/C;
-r = alpha*A*(K(-1)/(1+g))^(alpha-1)*L^(1-alpha);
-w = (1-alpha)*A*(K(-1)/(1+g))^alpha*L^(-alpha);
-K+C = (K(-1)/(1+g))*(1-delta)
-+A*(K(-1)/(1+g))^alpha*L^(1-alpha);
-log(A) = lambda*log(A(-1))+e;
-end;
-</code></pre>
-
-<p>The user must provide the analytical solution for the steady state of the model using the command <code>steady_state_model</code>.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-matlab" data-lang="matlab"><span style="display:flex;"><span>var C K L w r A;
+</span></span><span style="display:flex;"><span>varexo e;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>parameters rho delta gamma alpha lambda g;
+</span></span><span style="display:flex;"><span>alpha = <span style="color:#ae81ff">0.33</span>;
+</span></span><span style="display:flex;"><span>delta = <span style="color:#ae81ff">0.1</span>;
+</span></span><span style="display:flex;"><span>rho = <span style="color:#ae81ff">0.03</span>;
+</span></span><span style="display:flex;"><span>lambda = <span style="color:#ae81ff">0.97</span>;
+</span></span><span style="display:flex;"><span>gamma = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>g = <span style="color:#ae81ff">0.015</span>;
+</span></span></code></pre></div><p>In a second step, the F.O.C.s of the model has to be expressed using the command <code>model</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-matlab" data-lang="matlab"><span style="display:flex;"><span>model;
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>C=<span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>rho)<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>(C(<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g)))<span style="color:#f92672">*</span>(r(<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>delta);
+</span></span><span style="display:flex;"><span>L^gamma = w<span style="color:#f92672">/</span>C;
+</span></span><span style="display:flex;"><span>r = alpha<span style="color:#f92672">*</span>A<span style="color:#f92672">*</span>(K(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g))^(alpha<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>L^(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha);
+</span></span><span style="display:flex;"><span>w = (<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha)<span style="color:#f92672">*</span>A<span style="color:#f92672">*</span>(K(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g))^alpha<span style="color:#f92672">*</span>L^(<span style="color:#f92672">-</span>alpha);
+</span></span><span style="display:flex;"><span>K<span style="color:#f92672">+</span>C = (K(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g))<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>delta)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">+</span>A<span style="color:#f92672">*</span>(K(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g))^alpha<span style="color:#f92672">*</span>L^(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha);
+</span></span><span style="display:flex;"><span>log(A) = lambda<span style="color:#f92672">*</span>log(A(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">+</span>e;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>;
+</span></span></code></pre></div><p>The user must provide the analytical solution for the steady state of the model using the command <code>steady_state_model</code>.
 The command <code>steady</code> solves for the steady state values of the model</p>
-
-<pre><code class="language-matlab">steady_state_model;
-A = 1;
-r = (1+g)*(1+rho)+delta-1;
-L = ((1-alpha)/(r/alpha-delta-g))*r/alpha;
-K = (1+g)*(r/alpha)^(1/(alpha-1))*L;
-C = (1-delta)*K/(1+g)
-+(K/(1+g))^alpha*L^(1-alpha)-K;
-w = C;
-end;
-
-steady;
-</code></pre>
-
-<p>The command <code>shocks</code> defines the type of shock to be simulated</p>
-
-<pre><code class="language-matlab">shocks;
-var e; stderr 0.01;
-end;
-
-check;
-</code></pre>
-
-<p>A first order expansion around the steady state is obtained using the command
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-matlab" data-lang="matlab"><span style="display:flex;"><span>steady_state_model;
+</span></span><span style="display:flex;"><span>A = <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>r = (<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g)<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>rho)<span style="color:#f92672">+</span>delta<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>L = ((<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha)<span style="color:#f92672">/</span>(r<span style="color:#f92672">/</span>alpha<span style="color:#f92672">-</span>delta<span style="color:#f92672">-</span>g))<span style="color:#f92672">*</span>r<span style="color:#f92672">/</span>alpha;
+</span></span><span style="display:flex;"><span>K = (<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g)<span style="color:#f92672">*</span>(r<span style="color:#f92672">/</span>alpha)^(<span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>(alpha<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">*</span>L;
+</span></span><span style="display:flex;"><span>C = (<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>delta)<span style="color:#f92672">*</span>K<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">+</span>(K<span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>g))^alpha<span style="color:#f92672">*</span>L^(<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>alpha)<span style="color:#f92672">-</span>K;
+</span></span><span style="display:flex;"><span>w = C;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>steady;
+</span></span></code></pre></div><p>The command <code>shocks</code> defines the type of shock to be simulated</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-matlab" data-lang="matlab"><span style="display:flex;"><span>shocks;
+</span></span><span style="display:flex;"><span>var e; stderr <span style="color:#ae81ff">0.01</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>check;
+</span></span></code></pre></div><p>A first order expansion around the steady state is obtained using the command
 <code>stoch_simul(order=1)</code>
 This function computes impulse response functions (IRF) and returns various descriptive statistics (moments, variance decomposition, correlation and autocorrelation coefficients)</p>
-
 <p>The IRF produced by Dynare should be pretty similar to the following graph:
-<img src="/img/rbc1_IRF_e.png" alt="IRF simple RBC" /></p>
+<img src="/img/rbc1_IRF_e.png" alt="IRF simple RBC"></p>
 
     </div>
 
@@ -709,7 +668,7 @@ This function computes impulse response functions (IRF) and returns various desc
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -863,7 +822,7 @@ This function computes impulse response functions (IRF) and returns various desc
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

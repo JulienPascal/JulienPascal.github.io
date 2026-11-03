@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,8 +28,10 @@
   
     
   
-  <meta name="description" content="A large class of economic models involves solving for functional equations of the form:
-A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.">
+  <meta name="description" content="A large class of economic models involves solving for functional equations of the
+form:
+
+A well known example is the stochastic optimal growth model. An agent owns a consumption good \(y\) at time \(t\), which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time \(t\) and on a shock \(z\) realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/collocation/">
@@ -101,9 +103,6 @@ A well known example is the stochastic optimal growth model. An agent owns a con
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -126,8 +125,10 @@ A well known example is the stochastic optimal growth model. An agent owns a con
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/collocation/">
   <meta property="og:title" content="Solving Bellman Equations by the Collocation Method | Julien Pascal">
-  <meta property="og:description" content="A large class of economic models involves solving for functional equations of the form:
-A well known example is the stochastic optimal growth model. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="A large class of economic models involves solving for functional equations of the
+form:
+
+A well known example is the stochastic optimal growth model. An agent owns a consumption good \(y\) at time \(t\), which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time \(t\) and on a shock \(z\) realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2017-12-07T13:50:29&#43;01:00">
@@ -541,1119 +542,1084 @@ A well known example is the stochastic optimal growth model. An agent owns a con
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p>A large class of economic models involves solving for functional equations of the
+      <p>A large class of economic models involves solving for functional equations of the
 form:</p>
-
-<p><img src="/img/equation1.png" alt="equation1" /></p>
-
-<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank">stochastic optimal growth model</a>. An agent owns a consumption good $y$ at time $t$, which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time $t$ and on a shock $z$ realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.</p>
-
+<p><img src="/img/equation1.png" alt="equation1"></p>
+<p>A well known example is the <a href="https://lectures.quantecon.org/jl/optgrowth.html" target="_blank" rel="noopener">stochastic optimal growth model</a>. An agent owns a consumption good \(y\) at time \(t\), which can be consumed or invested. Next period&rsquo;s output depends on how much is invested at time \(t\) and on a shock \(z\) realized at the end of the current period. One can think of a farmer deciding the quantity of seeds to be planted during the spring, taking into account weather forecast for the growing season.</p>
 <p>A common technique for solving this class of problem is value function iteration. While value function
 iteration is quite intuitive, it is not the only one available.
 In this post, I describe the collocation method, which transforms the problem of finding
-a <em>function</em> into a problem of finding a <em>vector</em> that satisfies a given set of conditions. The gain from this change of perspective is that any <a href="https://en.wikipedia.org/wiki/Root-finding_algorithm" target="_blank">root-finding algorithm</a> can then be used. In particular, one may use the <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton method</a>,
+a <em>function</em> into a problem of finding a <em>vector</em> that satisfies a given set of conditions. The gain from this change of perspective is that any <a href="https://en.wikipedia.org/wiki/Root-finding_algorithm" target="_blank" rel="noopener">root-finding algorithm</a> can then be used. In particular, one may use the <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank" rel="noopener">Newton method</a>,
 which converges at a quadratic rate in the neighborhood of the solution if the function is smooth enough.</p>
-
 <h2 id="value-function-iteration">Value function iteration</h2>
-
-<p>Value function iteration takes advantage of the fact that the Bellman operator $T$ is a <a href="https://en.wikipedia.org/wiki/Contraction_mapping" target="_blank">contraction  mapping</a> on the set of continuous bounded functions on $\mathbb R_+$ under the supremum distance</p>
-
-<p><img src="/img/equation2.png" alt="equation2" />
- An immediate consequence if that the sequence $w,Tw,T^2w$,… converges uniformly to  $w$ (starting with any bounded and continuous function $w$). The following code in <code>Julia v0.6.4</code> illustrates the convergence of the series ${T^nw}$.</p>
-
-<pre><code class="language-julia"> #=
-Julien Pascal
-Code heavily based on:
-----------------------
-https://lectures.quantecon.org/jl/optgrowth.html
-by Spencer Lyon, John Stachurski
-I have only made minor modifications:
-#------------------------------------
-* I added a type optGrowth
-* I use the package Interpolations
-* I calculate the expectation w.r.t the aggregate
-  shock using a Gauss-Legendre quadrature scheme
-  instead of Monte-Carlo
-=#
-
-using QuantEcon
-using Optim
-using CompEcon
-using PyPlot
-using Interpolations
-using FileIO
-
-
-type optGrowth
-
-  w::Array{Float64,1}
-  β::AbstractFloat
-  grid::Array{Float64,1}
-  u::Function
-  f::Function
-  shocks::Array{Float64,1}
-  Tw::Array{Float64,1}
-  σ::Array{Float64,1}
-  el_k::Array{Float64,1}
-  wl_k::Array{Float64,1}
-  compute_policy::Bool
-  w_func::Function
-
-end
-
-function optGrowth(;w = Array{Float64,1}[],
-                    α = 0.4,
-                    β = 0.96,
-                    μ = 0,
-                    s = 0.1,
-                    grid_max = 4,         # Largest grid point
-                    grid_size = 200,      # Number of grid points
-                    shock_size = 250,     # Number of shock draws in Monte Carlo integral
-                    Tw = Array{Float64,1}[],
-                    σ = Array{Float64,1}[],
-                    el_k = Array{Float64,1}[],
-                    wl_k = Array{Float64,1}[],
-                    compute_policy = true
-                  )
-
-
-  grid_y = collect(linspace(1e-5, grid_max, grid_size))
-  shocks = exp.(μ + s * randn(shock_size))
-
-  # Utility
-  u(c) = log(c)
-  # Production
-  f(k) = k^α
-
-  w = 5 * log.(grid_y)
-  Tw = 5 * log.(grid_y)
-  σ = 5 * log.(grid_y)
-
-  el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
-
-  w_func = x -&gt; x
-  optGrowth(
-    w,
-    β,
-    grid_y,
-    u,
-    f,
-    shocks,
-    Tw,
-    σ,
-    el_k,
-    wl_k,
-    compute_policy,
-    w_func
-    )
-end
-
-&quot;&quot;&quot;
-The approximate Bellman operator, which computes and returns the
-updated value function Tw on the grid points.
-#### Arguments
-`model` : a model of type optGrowth
-`Modifies model.σ, model.w and model.Tw
-&quot;&quot;&quot;
-function bellman_operator!(model::optGrowth)
-
-    # === Apply linear interpolation to w === #
-    knots = (model.grid,)
-    itp = interpolate(knots, model.w, Gridded(Linear()))
-
-    #w_func(x) = itp[x]
-
-    model.w_func = x -&gt; itp[x]
-
-    if model.compute_policy
-        model.σ = similar(model.w)
-    end
-
-    # == set Tw[i] = max_c { u(c) + β E w(f(y  - c) z)} == #
-    for (i, y) in enumerate(model.grid)
-
-        #Monte Carlo
-        #-----------
-        #objective(c) = - model.u(c) - model.β * mean(w_func(model.f(y - c) .* model.shocks))
-
-        #Gauss-Legendre
-        #--------------
-        function objective(c)
-
-          expectation = 0.0
-
-          for k = 1:length(model.wl_k)
-            expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
-          end
-
-          - model.u(c) - model.β * expectation
-
-        end
-
-        res = optimize(objective, 1e-10, y)
-
-        if model.compute_policy
-            model.σ[i] = Optim.minimizer(res)
-        end
-
-        model.Tw[i] = - Optim.minimum(res)
-        model.w[i] = - Optim.minimum(res)
-    end
-
-
-end
-
-
-model = optGrowth()
-
-function solve_optgrowth!(model::optGrowth;
-                         tol::AbstractFloat=1e-6,
-                         max_iter::Integer=500)
-
-    w_old = copy(model.w)  # Set initial condition
-    error = tol + 1
-    i = 0
-
-
-    # Iterate to find solution
-    while i &lt; max_iter
-
-        #update model.w
-        bellman_operator!(model)
-        error = maximum(abs, model.w - w_old)
-
-        if error &lt; tol
-          break
-        end
-
-        w_old = copy(model.w)
-        i += 1
-    end
-
-end
-
-#-----------------------------------
-# Solve by value function iteration
-#-----------------------------------
-@time solve_optgrowth!(model)
-# 3.230501 seconds (118.18 M allocations: 1.776 GiB, 3.51% gc time)
-
-
-#-------------------------------
-# Compare with the true solution
-#-------------------------------
-α = 0.4
-β = 0.96
-μ = 0
-s = 0.1
-
-c1 = log(1 - α * β) / (1 - β)
-c2 = (μ + α * log(α * β)) / (1 - α)
-c3 = 1 / (1 - β)
-c4 = 1 / (1 - α * β)
-
-
-# True optimal policy
-c_star(y) = (1 - α * β) * y
-
-# True value function
-v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
-
-fig, ax = subplots(figsize=(9, 5))
-ax[:set_ylim](-35, -24)
-ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&quot;Approximated (VFI)&quot;, linestyle=&quot;--&quot;)
-ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&quot;Exact value&quot;)
-ax[:legend](loc=&quot;lower right&quot;)
-savefig(&quot;value_function_iteration.png&quot;)
-
-fig, ax = subplots(figsize=(9, 5))
-ax[:set_xlim](0.1, 4.0)
-ax[:set_ylim](0.00, 0.008)
-ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&quot;error&quot;)
-ax[:legend](loc=&quot;lower right&quot;)
-savefig(&quot;error_value_function_iteration.png&quot;)
-</code></pre>
-
-<h3 id="output">Output</h3>
-
-<p>The following figure shows the exact function, which we know in this very specific case, and the one calculated using VFI. Both quantities are almost indistinguishable. As the illustrated in the next figure, the (absolute value) of the distance between the true and the approximated values is bounded above by $0.006$. The accuracy of the current approximation could be improved by iterating the process further.
-<img src="/img/value_function_iteration.png" alt="VFI" />
-<img src="/img/error_value_function_iteration.png" alt="VFI" /></p>
-
+<p>Value function iteration takes advantage of the fact that the Bellman operator \(T\) is a <a href="https://en.wikipedia.org/wiki/Contraction_mapping" target="_blank" rel="noopener">contraction  mapping</a> on the set of continuous bounded functions on \(\mathbb R_&#43;\) under the supremum distance</p>
+<p><img src="/img/equation2.png" alt="equation2">
+An immediate consequence if that the sequence \(w,Tw,T^2w\),… converges uniformly to  \(w\) (starting with any bounded and continuous function \(w\)). The following code in <code>Julia v0.6.4</code> illustrates the convergence of the series \({T^nw}\).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#=
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">Julien Pascal
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">Code heavily based on:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">----------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">https://lectures.quantecon.org/jl/optgrowth.html
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">by Spencer Lyon, John Stachurski
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">I have only made minor modifications:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#------------------------------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">* I added a type optGrowth
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">* I use the package Interpolations
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">* I calculate the expectation w.r.t the aggregate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> shock using a Gauss-Legendre quadrature scheme
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> instead of Monte-Carlo
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">=#</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> QuantEcon
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Optim
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> CompEcon
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> PyPlot
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Interpolations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> FileIO
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>type optGrowth
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> w<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> β<span style="color:#f92672">::</span><span style="color:#66d9ef">AbstractFloat</span>
+</span></span><span style="display:flex;"><span> grid<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> u<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span> f<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span> shocks<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> Tw<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> σ<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> el_k<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> wl_k<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span> compute_policy<span style="color:#f92672">::</span><span style="color:#66d9ef">Bool</span>
+</span></span><span style="display:flex;"><span> w_func<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> optGrowth(;w <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                   α <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>,
+</span></span><span style="display:flex;"><span>                   β <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.96</span>,
+</span></span><span style="display:flex;"><span>                   μ <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                   s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>,
+</span></span><span style="display:flex;"><span>                   grid_max <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,         <span style="color:#75715e"># Largest grid point</span>
+</span></span><span style="display:flex;"><span>                   grid_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>,      <span style="color:#75715e"># Number of grid points</span>
+</span></span><span style="display:flex;"><span>                   shock_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">250</span>,     <span style="color:#75715e"># Number of shock draws in Monte Carlo integral</span>
+</span></span><span style="display:flex;"><span>                   Tw <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                   σ <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                   el_k <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                   wl_k <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                   compute_policy <span style="color:#f92672">=</span> true
+</span></span><span style="display:flex;"><span>                 )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> grid_y <span style="color:#f92672">=</span> collect(linspace(<span style="color:#ae81ff">1e-5</span>, grid_max, grid_size))
+</span></span><span style="display:flex;"><span> shocks <span style="color:#f92672">=</span> exp<span style="color:#f92672">.</span>(μ <span style="color:#f92672">+</span> s <span style="color:#f92672">*</span> randn(shock_size))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># Utility</span>
+</span></span><span style="display:flex;"><span> u(c) <span style="color:#f92672">=</span> log(c)
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># Production</span>
+</span></span><span style="display:flex;"><span> f(k) <span style="color:#f92672">=</span> k<span style="color:#f92672">^</span>α
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> w <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(grid_y)
+</span></span><span style="display:flex;"><span> Tw <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(grid_y)
+</span></span><span style="display:flex;"><span> σ <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(grid_y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> el_k, wl_k <span style="color:#f92672">=</span> qnwlogn(<span style="color:#ae81ff">10</span>, μ, s<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#75715e">#10 weights and nodes for LOG(e_t) distributed N(μ,s^2)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> w_func <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> x
+</span></span><span style="display:flex;"><span> optGrowth(
+</span></span><span style="display:flex;"><span>   w,
+</span></span><span style="display:flex;"><span>   β,
+</span></span><span style="display:flex;"><span>   grid_y,
+</span></span><span style="display:flex;"><span>   u,
+</span></span><span style="display:flex;"><span>   f,
+</span></span><span style="display:flex;"><span>   shocks,
+</span></span><span style="display:flex;"><span>   Tw,
+</span></span><span style="display:flex;"><span>   σ,
+</span></span><span style="display:flex;"><span>   el_k,
+</span></span><span style="display:flex;"><span>   wl_k,
+</span></span><span style="display:flex;"><span>   compute_policy,
+</span></span><span style="display:flex;"><span>   w_func
+</span></span><span style="display:flex;"><span>   )
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">The approximate Bellman operator, which computes and returns the
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">updated value function Tw on the grid points.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">#### Arguments
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">`model` : a model of type optGrowth
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">`Modifies model.σ, model.w and model.Tw
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> bellman_operator!(model<span style="color:#f92672">::</span><span style="color:#66d9ef">optGrowth</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e"># === Apply linear interpolation to w === #</span>
+</span></span><span style="display:flex;"><span>   knots <span style="color:#f92672">=</span> (model<span style="color:#f92672">.</span>grid,)
+</span></span><span style="display:flex;"><span>   itp <span style="color:#f92672">=</span> interpolate(knots, model<span style="color:#f92672">.</span>w, Gridded(Linear()))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e">#w_func(x) = itp[x]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   model<span style="color:#f92672">.</span>w_func <span style="color:#f92672">=</span> x <span style="color:#f92672">-&gt;</span> itp[x]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">if</span> model<span style="color:#f92672">.</span>compute_policy
+</span></span><span style="display:flex;"><span>       model<span style="color:#f92672">.</span>σ <span style="color:#f92672">=</span> similar(model<span style="color:#f92672">.</span>w)
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e"># == set Tw[i] = max_c { u(c) + β E w(f(y  - c) z)} == #</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">for</span> (i, y) <span style="color:#66d9ef">in</span> enumerate(model<span style="color:#f92672">.</span>grid)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">#Monte Carlo</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">#-----------</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">#objective(c) = - model.u(c) - model.β * mean(w_func(model.f(y - c) .* model.shocks))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">#Gauss-Legendre</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">#--------------</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">function</span> objective(c)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         expectation <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">for</span> k <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(model<span style="color:#f92672">.</span>wl_k)
+</span></span><span style="display:flex;"><span>           expectation <span style="color:#f92672">+=</span> model<span style="color:#f92672">.</span>wl_k[k]<span style="color:#f92672">*</span>(model<span style="color:#f92672">.</span>w_func(model<span style="color:#f92672">.</span>f(y <span style="color:#f92672">-</span> c) <span style="color:#f92672">*</span> model<span style="color:#f92672">.</span>el_k[k]))
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>u(c) <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>β <span style="color:#f92672">*</span> expectation
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       res <span style="color:#f92672">=</span> optimize(objective, <span style="color:#ae81ff">1e-10</span>, y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> model<span style="color:#f92672">.</span>compute_policy
+</span></span><span style="display:flex;"><span>           model<span style="color:#f92672">.</span>σ[i] <span style="color:#f92672">=</span> Optim<span style="color:#f92672">.</span>minimizer(res)
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       model<span style="color:#f92672">.</span>Tw[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span> Optim<span style="color:#f92672">.</span>minimum(res)
+</span></span><span style="display:flex;"><span>       model<span style="color:#f92672">.</span>w[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span> Optim<span style="color:#f92672">.</span>minimum(res)
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> optGrowth()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> solve_optgrowth!(model<span style="color:#f92672">::</span><span style="color:#66d9ef">optGrowth</span>;
+</span></span><span style="display:flex;"><span>                        tol<span style="color:#f92672">::</span><span style="color:#66d9ef">AbstractFloat</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>,
+</span></span><span style="display:flex;"><span>                        max_iter<span style="color:#f92672">::</span><span style="color:#66d9ef">Integer</span><span style="color:#f92672">=</span><span style="color:#ae81ff">500</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   w_old <span style="color:#f92672">=</span> copy(model<span style="color:#f92672">.</span>w)  <span style="color:#75715e"># Set initial condition</span>
+</span></span><span style="display:flex;"><span>   error <span style="color:#f92672">=</span> tol <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>   i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e"># Iterate to find solution</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">while</span> i <span style="color:#f92672">&lt;</span> max_iter
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">#update model.w</span>
+</span></span><span style="display:flex;"><span>       bellman_operator!(model)
+</span></span><span style="display:flex;"><span>       error <span style="color:#f92672">=</span> maximum(abs, model<span style="color:#f92672">.</span>w <span style="color:#f92672">-</span> w_old)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> error <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       w_old <span style="color:#f92672">=</span> copy(model<span style="color:#f92672">.</span>w)
+</span></span><span style="display:flex;"><span>       i <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-----------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Solve by value function iteration</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-----------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> solve_optgrowth!(model)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3.230501 seconds (118.18 M allocations: 1.776 GiB, 3.51% gc time)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Compare with the true solution</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------</span>
+</span></span><span style="display:flex;"><span>α <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>
+</span></span><span style="display:flex;"><span>β <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.96</span>
+</span></span><span style="display:flex;"><span>μ <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>c1 <span style="color:#f92672">=</span> log(<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> β)
+</span></span><span style="display:flex;"><span>c2 <span style="color:#f92672">=</span> (μ <span style="color:#f92672">+</span> α <span style="color:#f92672">*</span> log(α <span style="color:#f92672">*</span> β)) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α)
+</span></span><span style="display:flex;"><span>c3 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> β)
+</span></span><span style="display:flex;"><span>c4 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># True optimal policy</span>
+</span></span><span style="display:flex;"><span>c_star(y) <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β) <span style="color:#f92672">*</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># True value function</span>
+</span></span><span style="display:flex;"><span>v_star(y) <span style="color:#f92672">=</span> c1 <span style="color:#f92672">+</span> c2 <span style="color:#f92672">*</span> (c3 <span style="color:#f92672">-</span> c4) <span style="color:#f92672">+</span> c4 <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">5</span>))
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_ylim</span>](<span style="color:#f92672">-</span><span style="color:#ae81ff">35</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">24</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Approximated (VFI)&#34;</span>, linestyle<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;--&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, v_star<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Exact value&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:legend</span>](loc<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lower right&#34;</span>)
+</span></span><span style="display:flex;"><span>savefig(<span style="color:#e6db74">&#34;value_function_iteration.png&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">5</span>))
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_xlim</span>](<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">4.0</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_ylim</span>](<span style="color:#ae81ff">0.00</span>, <span style="color:#ae81ff">0.008</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid) <span style="color:#f92672">-</span>v_star<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid)), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;error&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:legend</span>](loc<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lower right&#34;</span>)
+</span></span><span style="display:flex;"><span>savefig(<span style="color:#e6db74">&#34;error_value_function_iteration.png&#34;</span>)
+</span></span></code></pre></div><h3 id="output">Output</h3>
+<p>The following figure shows the exact function, which we know in this very specific case, and the one calculated using VFI. Both quantities are almost indistinguishable. As the illustrated in the next figure, the (absolute value) of the distance between the true and the approximated values is bounded above by \(0.006\). The accuracy of the current approximation could be improved by iterating the process further.
+<img src="/img/value_function_iteration.png" alt="VFI">
+<img src="/img/error_value_function_iteration.png" alt="VFI"></p>
 <h2 id="the-collocation-method">The collocation method</h2>
-
-<p>The collocation method takes a different route. Let us remember that we are looking for a <em>function</em> $w$. Instead of solving for the values of $w$ on a grid and then interpolating, why not looking for a function directly? To do so, let us assume that $w$ can reasonably be approximated by a function $\hat{w}$:</p>
-
-<p><img src="/img/equation3.png" alt="equation3" /></p>
-
+<p>The collocation method takes a different route. Let us remember that we are looking for a <em>function</em> \(w\). Instead of solving for the values of \(w\) on a grid and then interpolating, why not looking for a function directly? To do so, let us assume that \(w\) can reasonably be approximated by a function \(\hat{w}\):</p>
+<p><img src="/img/equation3.png" alt="equation3"></p>
 <p>with
-$ \phi_1(x) $ , $ \phi_2(x) $,&hellip;, $ \phi_n(x) $  a set of linearly independent basis functions and $c_1$, $c_2$, &hellip;, $c_n$  $n$ coefficient to be found. Replacing $w(x)$ with $\hat{w(x)}$ into the functional equation and reorganizing gives:</p>
-
-<p><img src="/img/equation4.png" alt="equation4" /></p>
-
-<p>This equation has to hold (almost) exactly at $n$ points (also called nodes): $y_1$, $y_2$, &hellip;, $y_n$:</p>
-
-<p><img src="/img/equation5.png" alt="equation5" /></p>
-
-<p>The equation above defines a system of $n$ equation with as many unknown, which can be compactly written as:
-$$ f(\boldsymbol{c}) = \boldsymbol{0} $$</p>
-
-<p><a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton</a> or <a href="https://en.wikipedia.org/wiki/Quasi-Newton_method" target="_blank">quasi-Newton</a> can be used to solve for the root of $f$. In the code that follows, I use <a href="https://en.wikipedia.org/wiki/Broyden%27s_method" target="_blank">Broyden&rsquo;s</a> method. Let us illustrate this technique using a Chebychev polynomial basis and Chebychev nodes. In doing so, we avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon" target="_blank">Runge&rsquo;s phenomenon</a> associated with a uniform grid.</p>
-
+\( \phi_1(x) \) , \( \phi_2(x) \),&hellip;, \( \phi_n(x) \)  a set of linearly independent basis functions and \(c_1\), \(c_2\), &hellip;, \(c_n\)  \(n\) coefficient to be found. Replacing \(w(x)\) with \(\hat{w(x)}\) into the functional equation and reorganizing gives:</p>
+<p><img src="/img/equation4.png" alt="equation4"></p>
+<p>This equation has to hold (almost) exactly at \(n\) points (also called nodes): \(y_1\), \(y_2\), &hellip;, \(y_n\):</p>
+<p><img src="/img/equation5.png" alt="equation5"></p>
+<p>The equation above defines a system of \(n\) equation with as many unknown, which can be compactly written as:
+</p>
+\[ f(\boldsymbol{c}) = \boldsymbol{0} \]<p><a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank" rel="noopener">Newton</a> or <a href="https://en.wikipedia.org/wiki/Quasi-Newton_method" target="_blank" rel="noopener">quasi-Newton</a> can be used to solve for the root of \(f\). In the code that follows, I use <a href="https://en.wikipedia.org/wiki/Broyden%27s_method" target="_blank" rel="noopener">Broyden&rsquo;s</a> method. Let us illustrate this technique using a Chebychev polynomial basis and Chebychev nodes. In doing so, we avoid <a href="https://en.wikipedia.org/wiki/Runge%27s_phenomenon" target="_blank" rel="noopener">Runge&rsquo;s phenomenon</a> associated with a uniform grid.</p>
 <h3 id="implementation-using-compecon">Implementation using CompEcon</h3>
-
-<pre><code class="language-julia"> #---------------------------------------------
- # Julien Pascal
- # Solve the stochastic optimal growth problem
- # using the collocation method
- #---------------------------------------------
- using QuantEcon
- using Optim
- using CompEcon
- using PyPlot
- using Interpolations
-
-
- type optGrowthCollocation
-
-   w::Array{Float64,1}
-   β::AbstractFloat
-   grid::Array{Float64,1}
-   u::Function
-   f::Function
-   shocks::Array{Float64,1}
-   Tw::Array{Float64,1}
-   σ::Array{Float64,1}
-   el_k::Array{Float64,1}
-   wl_k::Array{Float64,1}
-   compute_policy::Bool
-   order_approximation::Int64 #number of element in the functional basis along each dimension
-   functional_basis_type::String #type of functional basis
-   fspace::Dict{Symbol,Any} #functional basis
-   fnodes::Array{Float64,1} #collocation nodes
-   residual::Array{Float64,1} #vector of residual. Should be close to zero
-   a::Array{Float64,1} #polynomial coefficients
-   w_func::Function
-
- end
-
-
-   #####################################
-   # Function that finds a solution
-   # to f(x) = 0
-   # using Broyden's &quot;good&quot; method
-   # and a simple backstepping procedure as described
-   # in Miranda and Fackler (2009)
-   #
-   # input :
-   # --------
-   # * x0:                 initial guess for the root
-   # * f:                  function in f(x) = 0
-   # * maxit:              maximum number of iterations
-   # * tol:                tolerance level for the zero
-   # * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the
-   #                       Jacobian is calculated by finite differences
-   # * maxsteps:           maximum number of backsteps
-   # * recaculateJacobian: number of iterations in-between two calculations of the Jacobian
-   #
-   # output :
-   # --------
-   # * x: one zero of f
-   # * it: number of iterations necessary to reached the solution
-   # * fjacinv: pseudo jacobian at the last iteration
-   # * fnorm: norm f(x) at the last iteration
-   #
-   #######################################
-   function find_broyden(x0::Vector, f::Function, maxit::Int64, tol::Float64, fjacinv = eye(length(x0));
-                         maxsteps = 5, recaculateJacobian = 1)
-
-       println(&quot;a0 = $(x0)&quot;)
-       fnorm = tol*2
-       it2 = 0 #to re-initialize the jacobian
-
-       ################################
-       #initialize guess for the matrix
-       ################################
-       fjacinv_function = x-&gt; Calculus.finite_difference_jacobian(f, x)
-       #fjacinv_function = x -&gt; ForwardDiff.gradient(f, x)
-
-       # If the user do not provide an initial guess for the jacobian
-       # One is calculated using finite differences.
-       if fjacinv == eye(length(x0))
-           ################################################
-           # finite differences to approximate the Jacobian
-           # at the initial value
-           # this is slow. Seems to improve performances
-           # when x0 is of high dimension.
-           println(&quot;Calculating the Jacobian by finite differences&quot;)
-           #@time fjacinv = Calculus.finite_difference_jacobian(f, x0)
-           @time fjacinv = fjacinv_function(x0)
-
-           println(&quot;Inverting the Jacobian&quot;)
-           try
-               fjacinv = inv(fjacinv)
-           catch
-               try
-                   println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
-                   fjacinv = pinv(A)
-               catch
-                   println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
-                   fjacinv = eye(length(x0))
-               end
-           end
-           println(&quot;Done&quot;)
-       else
-           println(&quot;Using User's input as a guess for the Jacobian.&quot;)
-       end
-
-       fval = f(x0)
-
-       for it=1:maxit
-
-           it2 +=1
-
-           #every 30 iterations, reinitilize the jacobian
-           if mod(it2, recaculateJacobian) == 0
-
-               println(&quot;Re-calculating the Jacobian&quot;)
-
-               fjacinv = fjacinv_function(x0)
-
-               try
-                   fjacinv = inv(fjacinv)
-               catch
-                   try
-                       println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
-                       fjacinv = pinv(A)
-                   catch
-                       println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
-                       fjacinv = eye(length(x0))
-                   end
-               end
-
-           end
-
-
-           println(&quot;it = $(it)&quot;)
-
-           fnorm = norm(fval)
-
-           if fnorm &lt; tol
-               println(&quot;fnorm = $(fnorm)&quot;)
-               return x0, it, fjacinv, fnorm
-           end
-
-           d = -(fjacinv*fval)
-
-           fnormold = Inf
-           ########################
-           # Backstepping procedure
-           ########################
-           for backstep = 1:maxsteps
-
-               if backstep &gt; 1
-                   println(&quot;backstep = $(backstep-1)&quot;)
-               end
-
-               fvalnew = f(x0 + d)
-               fnormnew = norm(fvalnew)
-
-               if fnormnew &lt; fnorm
-                   break
-               end
-
-               if fnormold &lt; fnormnew
-                   d=2*d
-                   break
-               end
-
-               fnormold = fnormnew
-
-               d = d/2
-
-           end
-           ####################
-           ####################
-
-           x0 = x0 + d
-
-           fold = fval
-           fval = f(x0)
-
-           u = fjacinv*(fval - fold)
-
-           #Update the pseudo Jacobian:
-           fjacinv = fjacinv + ((d-u)*(transpose(d)*fjacinv))/(dot(d,u))
-
-           println(&quot;a$(it) = $(x0)&quot;)
-           println(&quot;fnorm = $(fnorm)&quot;)
-
-           if isnan.(x0) == trues(length(x0))
-               println(&quot;Error. a$(it) = NaN for each component&quot;)
-               x0 = zeros(length(x0))
-               return x0, it, fjacinv, fnorm
-           end
-       end
-
-       println(&quot;In function find_broyden\n&quot;)
-       println(&quot;Maximum number of iterations reached.\n&quot;)
-       println(&quot;No convergence.&quot;)
-       println(&quot;Returning fnorm = NaN as a solution&quot;)
-       fnorm = NaN
-       return x0, maxit, fjacinv, fnorm
-
-   end
-
- function optGrowthCollocation(;w = Array{Float64,1}[],
-                               α = 0.4,
-                               β = 0.96,
-                               μ = 0,
-                               s = 0.1,
-                               grid_max = 4,         # Largest grid point
-                               grid_size = 200,      # Number of grid points
-                               shock_size = 250,     # Number of shock draws in Monte Carlo integral
-                               Tw = Array{Float64,1}[],
-                               σ = Array{Float64,1}[],
-                               el_k = Array{Float64,1}[],
-                               wl_k = Array{Float64,1}[],
-                               compute_policy = true,
-                               order_approximation = 40,
-                               functional_basis_type = &quot;chebychev&quot;,
-                             )
-
-
-   grid_y = collect(linspace(1e-5, grid_max, grid_size))
-   shocks = exp.(μ + s * randn(shock_size))
-
-   # Utility
-   u(c) = log.(c)
-   # Production
-   f(k) = k^α
-
-   el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
-
-   lower_bound_support = minimum(grid_y)
-   upper_bound_support = maximum(grid_y)
-
-   n_functional_basis = [order_approximation]
-
-   if functional_basis_type == &quot;chebychev&quot;
-       fspace = fundefn(:cheb, n_functional_basis, lower_bound_support, upper_bound_support)
-   elseif functional_basis_type == &quot;splines&quot;
-       fspace = fundefn(:spli, n_functional_basis, lower_bound_support, upper_bound_support, 1)
-   elseif functional_basis_type == &quot;linear&quot;
-       fspace = fundefn(:lin, n_functional_basis, lower_bound_support, upper_bound_support)
-   else
-       error(&quot;functional_basis_type has to be either chebychev, splines or linear.&quot;)
-   end
-
-
-   fnodes = funnode(fspace)[1]
-   residual = zeros(size(fnodes)[1])
-   a = ones(size(fnodes)[1])
-
-   w = ones(size(fnodes)[1])
-   Tw = ones(size(fnodes)[1])
-   σ = ones(size(fnodes)[1])
-
-   w_func = x-&gt; x
-
-   optGrowthCollocation(
-     w,
-     β,
-     grid_y,
-     u,
-     f,
-     shocks,
-     Tw,
-     σ,
-     el_k,
-     wl_k,
-     compute_policy,
-     order_approximation,
-     functional_basis_type,
-     fspace,
-     fnodes,
-     residual,
-     a,
-     w_func
-     )
- end
-
-
-
- function residual!(model::optGrowthCollocation)
-
-
-     model.w_func = y -&gt; funeval(model.a, model.fspace, [y])[1][1]   
-
-
-     function objective(c, y)
-
-       expectation = 0.0
-
-       for k = 1:length(model.wl_k)
-         expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
-       end
-
-       - model.u(c) - model.β * expectation
-
-     end
-
-     # Loop over nodes
-     for i in 1:size(model.fnodes)[1]
-
-         y = model.fnodes[i,1]
-
-         res = optimize(c -&gt; objective(c, y), 1e-10, y)
-
-         if model.compute_policy
-             model.σ[i] = Optim.minimizer(res)
-         end
-
-         model.Tw[i] = - Optim.minimum(res)
-         model.w[i] = model.w_func(y)
-
-         model.residual[i] = - model.w[i] + model.Tw[i]
-     end
-
- end
-
-
- model = optGrowthCollocation(functional_basis_type = &quot;chebychev&quot;)
-
- residual!(model)
-
- function solve_optgrowth!(model::optGrowthCollocation;
-                          tol=1e-6,
-                          max_iter=500)
-
-     # Initialize guess for coefficients
-     # by giving the &quot;right shape&quot;
-     # ---------------------------------
-     function objective_initialize!(x, model)
-
-       #update polynomial coeffficients
-       model.a = copy(x)
-
-       model.w_func = y -&gt; funeval(model.a, model.fspace, [y])[1][1]
-
-       return abs.(model.w_func.(model.fnodes[:,1]) - 5.0 * log.(model.fnodes[:,1]))
-
-     end
-
-
-     minx, iterations, Jac0, fnorm = find_broyden(model.a, x -&gt; objective_initialize!(x, model), max_iter, tol)
-
-
-     # Solving the model by collocation
-     # using the initial guess calculated above
-     #-----------------------------------------
-     function objective_residual!(x, model)
-
-       #update polynomial coeffficients
-       model.a = copy(x)
-
-       #calculate residual
-       residual!(model)
-
-       return abs.(model.residual)
-
-     end
-
-     minx, iterations, Jac, fnorm = find_broyden(model.a, x -&gt; objective_residual!(x, model), max_iter, tol)
-
-
- end
-
- #-----------------------------------
- # Solve by collocation
- #-----------------------------------
- @time solve_optgrowth!(model)
-
-
- #-------------------------------
- # Compare with the true solution
- #-------------------------------
- α = 0.4
- β = 0.96
- μ = 0
- s = 0.1
-
- c1 = log(1 - α * β) / (1 - β)
- c2 = (μ + α * log(α * β)) / (1 - α)
- c3 = 1 / (1 - β)
- c4 = 1 / (1 - α * β)
-
-
- # True optimal policy
- c_star(y) = (1 - α * β) * y
-
- # True value function
- v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
-
- fig, ax = subplots(figsize=(9, 5))
- ax[:set_ylim](-35, -24)
- ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&quot;Approximated (collocation)&quot;, linestyle = &quot;--&quot;)
- ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&quot;Exact value&quot;)
- ax[:legend](loc=&quot;lower right&quot;)
- savefig(&quot;collocation.png&quot;)
-
-
- fig, ax = subplots(figsize=(9, 5))
- ax[:set_xlim](0.1, 4.0)
- ax[:set_ylim](-0.05, 0.05)
- ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&quot;error&quot;)
- ax[:legend](loc=&quot;lower right&quot;)
- savefig(&quot;error_collocation.png&quot;)
-</code></pre>
-
-<h3 id="output-1">Output</h3>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Julien Pascal</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Solve the stochastic optimal growth problem</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># using the collocation method</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> QuantEcon
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Optim
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> CompEcon
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> PyPlot
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Interpolations
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>type optGrowthCollocation
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  w<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  β<span style="color:#f92672">::</span><span style="color:#66d9ef">AbstractFloat</span>
+</span></span><span style="display:flex;"><span>  grid<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  u<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  f<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  shocks<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  Tw<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  σ<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  el_k<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  wl_k<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  compute_policy<span style="color:#f92672">::</span><span style="color:#66d9ef">Bool</span>
+</span></span><span style="display:flex;"><span>  order_approximation<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#75715e">#number of element in the functional basis along each dimension</span>
+</span></span><span style="display:flex;"><span>  functional_basis_type<span style="color:#f92672">::</span><span style="color:#66d9ef">String</span> <span style="color:#75715e">#type of functional basis</span>
+</span></span><span style="display:flex;"><span>  fspace<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Symbol</span>,<span style="color:#66d9ef">Any</span>} <span style="color:#75715e">#functional basis</span>
+</span></span><span style="display:flex;"><span>  fnodes<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>} <span style="color:#75715e">#collocation nodes</span>
+</span></span><span style="display:flex;"><span>  residual<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>} <span style="color:#75715e">#vector of residual. Should be close to zero</span>
+</span></span><span style="display:flex;"><span>  a<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>} <span style="color:#75715e">#polynomial coefficients</span>
+</span></span><span style="display:flex;"><span>  w_func<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#####################################</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Function that finds a solution</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># to f(x) = 0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># using Broyden&#39;s &#34;good&#34; method</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># and a simple backstepping procedure as described</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># in Miranda and Fackler (2009)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># input :</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># --------</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * x0:                 initial guess for the root</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * f:                  function in f(x) = 0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * maxit:              maximum number of iterations</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * tol:                tolerance level for the zero</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#                       Jacobian is calculated by finite differences</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * maxsteps:           maximum number of backsteps</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * recaculateJacobian: number of iterations in-between two calculations of the Jacobian</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># output :</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># --------</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * x: one zero of f</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * it: number of iterations necessary to reached the solution</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * fjacinv: pseudo jacobian at the last iteration</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * fnorm: norm f(x) at the last iteration</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#######################################</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> find_broyden(x0<span style="color:#f92672">::</span><span style="color:#66d9ef">Vector</span>, f<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>, maxit<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span>, tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>, fjacinv <span style="color:#f92672">=</span> eye(length(x0));
+</span></span><span style="display:flex;"><span>                        maxsteps <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, recaculateJacobian <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;a0 = </span><span style="color:#e6db74">$</span>(x0)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>      fnorm <span style="color:#f92672">=</span> tol<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>      it2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#75715e">#to re-initialize the jacobian</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">################################</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#initialize guess for the matrix</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">################################</span>
+</span></span><span style="display:flex;"><span>      fjacinv_function <span style="color:#f92672">=</span> x<span style="color:#f92672">-&gt;</span> Calculus<span style="color:#f92672">.</span>finite_difference_jacobian(f, x)
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#fjacinv_function = x -&gt; ForwardDiff.gradient(f, x)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># If the user do not provide an initial guess for the jacobian</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># One is calculated using finite differences.</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> fjacinv <span style="color:#f92672">==</span> eye(length(x0))
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">################################################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># finite differences to approximate the Jacobian</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># at the initial value</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># this is slow. Seems to improve performances</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># when x0 is of high dimension.</span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Calculating the Jacobian by finite differences&#34;</span>)
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">#@time fjacinv = Calculus.finite_difference_jacobian(f, x0)</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">@time</span> fjacinv <span style="color:#f92672">=</span> fjacinv_function(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Inverting the Jacobian&#34;</span>)
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>              fjacinv <span style="color:#f92672">=</span> inv(fjacinv)
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                  println(<span style="color:#e6db74">&#34;Jacobian non-invertible</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74"> calculating pseudo-inverse&#34;</span>)
+</span></span><span style="display:flex;"><span>                  fjacinv <span style="color:#f92672">=</span> pinv(A)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>                  println(<span style="color:#e6db74">&#34;Failing Calculating the pseudo-inverse. Initializing with In&#34;</span>)
+</span></span><span style="display:flex;"><span>                  fjacinv <span style="color:#f92672">=</span> eye(length(x0))
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Done&#34;</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Using User&#39;s input as a guess for the Jacobian.&#34;</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      fval <span style="color:#f92672">=</span> f(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> it<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>maxit
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          it2 <span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">#every 30 iterations, reinitilize the jacobian</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> mod(it2, recaculateJacobian) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              println(<span style="color:#e6db74">&#34;Re-calculating the Jacobian&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              fjacinv <span style="color:#f92672">=</span> fjacinv_function(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                  fjacinv <span style="color:#f92672">=</span> inv(fjacinv)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                      println(<span style="color:#e6db74">&#34;Jacobian non-invertible</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74"> calculating pseudo-inverse&#34;</span>)
+</span></span><span style="display:flex;"><span>                      fjacinv <span style="color:#f92672">=</span> pinv(A)
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>                      println(<span style="color:#e6db74">&#34;Failing Calculating the pseudo-inverse. Initializing with In&#34;</span>)
+</span></span><span style="display:flex;"><span>                      fjacinv <span style="color:#f92672">=</span> eye(length(x0))
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;it = </span><span style="color:#e6db74">$</span>(it)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          fnorm <span style="color:#f92672">=</span> norm(fval)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> fnorm <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>              println(<span style="color:#e6db74">&#34;fnorm = </span><span style="color:#e6db74">$</span>(fnorm)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">return</span> x0, it, fjacinv, fnorm
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          d <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>(fjacinv<span style="color:#f92672">*</span>fval)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          fnormold <span style="color:#f92672">=</span> Inf
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># Backstepping procedure</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">for</span> backstep <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>maxsteps
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> backstep <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                  println(<span style="color:#e6db74">&#34;backstep = </span><span style="color:#e6db74">$</span>(backstep<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              fvalnew <span style="color:#f92672">=</span> f(x0 <span style="color:#f92672">+</span> d)
+</span></span><span style="display:flex;"><span>              fnormnew <span style="color:#f92672">=</span> norm(fvalnew)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> fnormnew <span style="color:#f92672">&lt;</span> fnorm
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> fnormold <span style="color:#f92672">&lt;</span> fnormnew
+</span></span><span style="display:flex;"><span>                  d<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>d
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              fnormold <span style="color:#f92672">=</span> fnormnew
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              d <span style="color:#f92672">=</span> d<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">####################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">####################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          x0 <span style="color:#f92672">=</span> x0 <span style="color:#f92672">+</span> d
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          fold <span style="color:#f92672">=</span> fval
+</span></span><span style="display:flex;"><span>          fval <span style="color:#f92672">=</span> f(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          u <span style="color:#f92672">=</span> fjacinv<span style="color:#f92672">*</span>(fval <span style="color:#f92672">-</span> fold)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">#Update the pseudo Jacobian:</span>
+</span></span><span style="display:flex;"><span>          fjacinv <span style="color:#f92672">=</span> fjacinv <span style="color:#f92672">+</span> ((d<span style="color:#f92672">-</span>u)<span style="color:#f92672">*</span>(transpose(d)<span style="color:#f92672">*</span>fjacinv))<span style="color:#f92672">/</span>(dot(d,u))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;a</span><span style="color:#e6db74">$</span>(it)<span style="color:#e6db74"> = </span><span style="color:#e6db74">$</span>(x0)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;fnorm = </span><span style="color:#e6db74">$</span>(fnorm)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> isnan<span style="color:#f92672">.</span>(x0) <span style="color:#f92672">==</span> trues(length(x0))
+</span></span><span style="display:flex;"><span>              println(<span style="color:#e6db74">&#34;Error. a</span><span style="color:#e6db74">$</span>(it)<span style="color:#e6db74"> = NaN for each component&#34;</span>)
+</span></span><span style="display:flex;"><span>              x0 <span style="color:#f92672">=</span> zeros(length(x0))
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">return</span> x0, it, fjacinv, fnorm
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;In function find_broyden</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;Maximum number of iterations reached.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;No convergence.&#34;</span>)
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;Returning fnorm = NaN as a solution&#34;</span>)
+</span></span><span style="display:flex;"><span>      fnorm <span style="color:#f92672">=</span> NaN
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> x0, maxit, fjacinv, fnorm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> optGrowthCollocation(;w <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              α <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>,
+</span></span><span style="display:flex;"><span>                              β <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.96</span>,
+</span></span><span style="display:flex;"><span>                              μ <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                              s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>,
+</span></span><span style="display:flex;"><span>                              grid_max <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,         <span style="color:#75715e"># Largest grid point</span>
+</span></span><span style="display:flex;"><span>                              grid_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>,      <span style="color:#75715e"># Number of grid points</span>
+</span></span><span style="display:flex;"><span>                              shock_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">250</span>,     <span style="color:#75715e"># Number of shock draws in Monte Carlo integral</span>
+</span></span><span style="display:flex;"><span>                              Tw <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              σ <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              el_k <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              wl_k <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              compute_policy <span style="color:#f92672">=</span> true,
+</span></span><span style="display:flex;"><span>                              order_approximation <span style="color:#f92672">=</span> <span style="color:#ae81ff">40</span>,
+</span></span><span style="display:flex;"><span>                              functional_basis_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;chebychev&#34;</span>,
+</span></span><span style="display:flex;"><span>                            )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  grid_y <span style="color:#f92672">=</span> collect(linspace(<span style="color:#ae81ff">1e-5</span>, grid_max, grid_size))
+</span></span><span style="display:flex;"><span>  shocks <span style="color:#f92672">=</span> exp<span style="color:#f92672">.</span>(μ <span style="color:#f92672">+</span> s <span style="color:#f92672">*</span> randn(shock_size))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Utility</span>
+</span></span><span style="display:flex;"><span>  u(c) <span style="color:#f92672">=</span> log<span style="color:#f92672">.</span>(c)
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Production</span>
+</span></span><span style="display:flex;"><span>  f(k) <span style="color:#f92672">=</span> k<span style="color:#f92672">^</span>α
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  el_k, wl_k <span style="color:#f92672">=</span> qnwlogn(<span style="color:#ae81ff">10</span>, μ, s<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#75715e">#10 weights and nodes for LOG(e_t) distributed N(μ,s^2)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  lower_bound_support <span style="color:#f92672">=</span> minimum(grid_y)
+</span></span><span style="display:flex;"><span>  upper_bound_support <span style="color:#f92672">=</span> maximum(grid_y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  n_functional_basis <span style="color:#f92672">=</span> [order_approximation]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> functional_basis_type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;chebychev&#34;</span>
+</span></span><span style="display:flex;"><span>      fspace <span style="color:#f92672">=</span> fundefn(<span style="color:#e6db74">:cheb</span>, n_functional_basis, lower_bound_support, upper_bound_support)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">elseif</span> functional_basis_type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;splines&#34;</span>
+</span></span><span style="display:flex;"><span>      fspace <span style="color:#f92672">=</span> fundefn(<span style="color:#e6db74">:spli</span>, n_functional_basis, lower_bound_support, upper_bound_support, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">elseif</span> functional_basis_type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;linear&#34;</span>
+</span></span><span style="display:flex;"><span>      fspace <span style="color:#f92672">=</span> fundefn(<span style="color:#e6db74">:lin</span>, n_functional_basis, lower_bound_support, upper_bound_support)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>      error(<span style="color:#e6db74">&#34;functional_basis_type has to be either chebychev, splines or linear.&#34;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  fnodes <span style="color:#f92672">=</span> funnode(fspace)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>  residual <span style="color:#f92672">=</span> zeros(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>  a <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  w <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>  Tw <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>  σ <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  w_func <span style="color:#f92672">=</span> x<span style="color:#f92672">-&gt;</span> x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  optGrowthCollocation(
+</span></span><span style="display:flex;"><span>    w,
+</span></span><span style="display:flex;"><span>    β,
+</span></span><span style="display:flex;"><span>    grid_y,
+</span></span><span style="display:flex;"><span>    u,
+</span></span><span style="display:flex;"><span>    f,
+</span></span><span style="display:flex;"><span>    shocks,
+</span></span><span style="display:flex;"><span>    Tw,
+</span></span><span style="display:flex;"><span>    σ,
+</span></span><span style="display:flex;"><span>    el_k,
+</span></span><span style="display:flex;"><span>    wl_k,
+</span></span><span style="display:flex;"><span>    compute_policy,
+</span></span><span style="display:flex;"><span>    order_approximation,
+</span></span><span style="display:flex;"><span>    functional_basis_type,
+</span></span><span style="display:flex;"><span>    fspace,
+</span></span><span style="display:flex;"><span>    fnodes,
+</span></span><span style="display:flex;"><span>    residual,
+</span></span><span style="display:flex;"><span>    a,
+</span></span><span style="display:flex;"><span>    w_func
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> residual!(model<span style="color:#f92672">::</span><span style="color:#66d9ef">optGrowthCollocation</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>w_func <span style="color:#f92672">=</span> y <span style="color:#f92672">-&gt;</span> funeval(model<span style="color:#f92672">.</span>a, model<span style="color:#f92672">.</span>fspace, [y])[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]   
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> objective(c, y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      expectation <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> k <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(model<span style="color:#f92672">.</span>wl_k)
+</span></span><span style="display:flex;"><span>        expectation <span style="color:#f92672">+=</span> model<span style="color:#f92672">.</span>wl_k[k]<span style="color:#f92672">*</span>(model<span style="color:#f92672">.</span>w_func(model<span style="color:#f92672">.</span>f(y <span style="color:#f92672">-</span> c) <span style="color:#f92672">*</span> model<span style="color:#f92672">.</span>el_k[k]))
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>u(c) <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>β <span style="color:#f92672">*</span> expectation
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Loop over nodes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>size(model<span style="color:#f92672">.</span>fnodes)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>fnodes[i,<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        res <span style="color:#f92672">=</span> optimize(c <span style="color:#f92672">-&gt;</span> objective(c, y), <span style="color:#ae81ff">1e-10</span>, y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> model<span style="color:#f92672">.</span>compute_policy
+</span></span><span style="display:flex;"><span>            model<span style="color:#f92672">.</span>σ[i] <span style="color:#f92672">=</span> Optim<span style="color:#f92672">.</span>minimizer(res)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span>Tw[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span> Optim<span style="color:#f92672">.</span>minimum(res)
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span>w[i] <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>w_func(y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span>residual[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>w[i] <span style="color:#f92672">+</span> model<span style="color:#f92672">.</span>Tw[i]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> optGrowthCollocation(functional_basis_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;chebychev&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>residual!(model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> solve_optgrowth!(model<span style="color:#f92672">::</span><span style="color:#66d9ef">optGrowthCollocation</span>;
+</span></span><span style="display:flex;"><span>                         tol<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>,
+</span></span><span style="display:flex;"><span>                         max_iter<span style="color:#f92672">=</span><span style="color:#ae81ff">500</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Initialize guess for coefficients</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># by giving the &#34;right shape&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ---------------------------------</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> objective_initialize!(x, model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#update polynomial coeffficients</span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>a <span style="color:#f92672">=</span> copy(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>w_func <span style="color:#f92672">=</span> y <span style="color:#f92672">-&gt;</span> funeval(model<span style="color:#f92672">.</span>a, model<span style="color:#f92672">.</span>fspace, [y])[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>fnodes[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">-</span> <span style="color:#ae81ff">5.0</span> <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>fnodes[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    minx, iterations, Jac0, fnorm <span style="color:#f92672">=</span> find_broyden(model<span style="color:#f92672">.</span>a, x <span style="color:#f92672">-&gt;</span> objective_initialize!(x, model), max_iter, tol)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Solving the model by collocation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># using the initial guess calculated above</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#-----------------------------------------</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> objective_residual!(x, model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#update polynomial coeffficients</span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>a <span style="color:#f92672">=</span> copy(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#calculate residual</span>
+</span></span><span style="display:flex;"><span>      residual!(model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>residual)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    minx, iterations, Jac, fnorm <span style="color:#f92672">=</span> find_broyden(model<span style="color:#f92672">.</span>a, x <span style="color:#f92672">-&gt;</span> objective_residual!(x, model), max_iter, tol)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-----------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Solve by collocation</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-----------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> solve_optgrowth!(model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Compare with the true solution</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------</span>
+</span></span><span style="display:flex;"><span>α <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>
+</span></span><span style="display:flex;"><span>β <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.96</span>
+</span></span><span style="display:flex;"><span>μ <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>c1 <span style="color:#f92672">=</span> log(<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> β)
+</span></span><span style="display:flex;"><span>c2 <span style="color:#f92672">=</span> (μ <span style="color:#f92672">+</span> α <span style="color:#f92672">*</span> log(α <span style="color:#f92672">*</span> β)) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α)
+</span></span><span style="display:flex;"><span>c3 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> β)
+</span></span><span style="display:flex;"><span>c4 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># True optimal policy</span>
+</span></span><span style="display:flex;"><span>c_star(y) <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β) <span style="color:#f92672">*</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># True value function</span>
+</span></span><span style="display:flex;"><span>v_star(y) <span style="color:#f92672">=</span> c1 <span style="color:#f92672">+</span> c2 <span style="color:#f92672">*</span> (c3 <span style="color:#f92672">-</span> c4) <span style="color:#f92672">+</span> c4 <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">5</span>))
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_ylim</span>](<span style="color:#f92672">-</span><span style="color:#ae81ff">35</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">24</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Approximated (collocation)&#34;</span>, linestyle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;--&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, v_star<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Exact value&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:legend</span>](loc<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lower right&#34;</span>)
+</span></span><span style="display:flex;"><span>savefig(<span style="color:#e6db74">&#34;collocation.png&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">5</span>))
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_xlim</span>](<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">4.0</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_ylim</span>](<span style="color:#f92672">-</span><span style="color:#ae81ff">0.05</span>, <span style="color:#ae81ff">0.05</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid) <span style="color:#f92672">-</span>v_star<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid)), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;error&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:legend</span>](loc<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lower right&#34;</span>)
+</span></span><span style="display:flex;"><span>savefig(<span style="color:#e6db74">&#34;error_collocation.png&#34;</span>)
+</span></span></code></pre></div><h3 id="output-1">Output</h3>
 <p>The following figure shows the exact function and the one calculated using the collocation method. In terms of accuracy, both VFI and the collocation method generate reliable results.</p>
-
-<p><img src="/img/collocation.png" alt="VFI" />
- <img src="/img/error_collocation.png" alt="VFI" /></p>
-
-<p>In terms of speed, it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package <a href="https://github.com/JuliaMath/Interpolations.jl" target="_blank">Interpolations</a>: it is more than 20 times faster to evaluate $w$ using the package Interpolations rather than using the package <a href="https://github.com/QuantEcon/CompEcon.jl" target="_blank">CompEcon</a>:</p>
-
-<pre><code class="language-julia">  #using Interpolations
-  #--------------------
-  @time for i=1:1000000
-   model.w_func.(model.grid[1])
-  end
-  #0.230861 seconds (2.00 M allocations: 30.518 MiB, 1.28% gc time)
-
-  #using CompEcon
-  #--------------
-  @time for i=1:1000000
-   model.w_func.(model.grid[1])
-  end
-  # 4.998902 seconds (51.00 M allocations: 3.546 GiB, 13.39% gc time)
-</code></pre>
-
-<h3 id="implementation-using-approxfun">Implementation using ApproxFun</h3>
-
-<p>Significant speed-gains can be obtained by using the package <a href="https://github.com/JuliaApproximation/ApproxFun.jl" target="_blank">ApproxFun</a>, as illustrated by the code below. Computing time is divided by approximately $5$ compared to the implementation using CompEcon. Yet, the value function iteration implementation is still the fastest one. One bottleneck seems to be the calculation of the Jacobian by finite differences when using Broyden&rsquo;s method. It is likely that using <a href="https://github.com/JuliaDiff/ForwardDiff.jl" target="_blank">automatic differentiation</a> would further improve results.</p>
-
-<pre><code class="language-julia">#---------------------------------------------
-# Julien Pascal
-# Solve the stochastic optimal growth problem
-# using the collocation method
-# Implementation using ApproxFun
-#---------------------------------------------
-using QuantEcon
-using Optim
-using CompEcon
-using PyPlot
-using Interpolations
-using FileIO
-using ApproxFun
-using ProfileView
-
-
-type optGrowthCollocation
-
-  w::Array{Float64,1}
-  β::AbstractFloat
-  grid::Array{Float64,1}
-  u::Function
-  f::Function
-  shocks::Array{Float64,1}
-  Tw::Array{Float64,1}
-  σ::Array{Float64,1}
-  el_k::Array{Float64,1}
-  wl_k::Array{Float64,1}
-  compute_policy::Bool
-  order_approximation::Int64 #number of element in the functional basis along each dimension
-  functional_basis_type::String #type of functional basis
-  fspace::Dict{Symbol,Any} #functional basis
-  fnodes::Array{Float64,1} #collocation nodes
-  residual::Array{Float64,1} #vector of residual. Should be close to zero
-  a::Array{Float64,1} #polynomial coefficients
-  fApprox::ApproxFun.Fun{ApproxFun.Chebyshev{ApproxFun.Segment{Float64},Float64},Float64,Array{Float64,1}}
-  w_func::Function
-  tol::Float64
-
-end
-
-
-  #####################################
-  # Function that find a solution
-  # to f(x) = 0
-  # using Broyden's &quot;good&quot; method
-  # and simple backstepping procedure as described
-  # in Miranda and Fackler (2009)
-  #
-  # input :
-  # --------
-  # * x0:                 initial guess for the root
-  # * f:                  function in f(x) = 0
-  # * maxit:              maximum number of iterations
-  # * tol:                tolerance level for the zero
-  # * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the
-  #                       Jacobian is calculated by finite differences
-  # * maxsteps:           maximum number of backsteps
-  # * recaculateJacobian: number of iterations in-between two calculations of the Jacobian
-  #
-  # output :
-  # --------
-  # * x: one zero of f
-  # * it: number of iterations necessary to reached the solution
-  # * fjacinv: pseudo jacobian at the last iteration
-  # * fnorm: norm f(x) at the last iteration
-  #
-  #######################################
-  function find_broyden(x0::Vector, f::Function, maxit::Int64, tol::Float64, fjacinv = eye(length(x0));
-                        maxsteps = 5, recaculateJacobian = 1)
-
-      println(&quot;a0 = $(x0)&quot;)
-      fnorm = tol*2
-      it2 = 0 #to re-initialize the jacobian
-
-      ################################
-      #initialize guess for the matrix
-      ################################
-      # with Calculus
-      #--------------
-      fjacinv_function = x-&gt; Calculus.finite_difference_jacobian(f, x)
-
-
-      # If the user do not provide an initial guess for the jacobian
-      # One is calculated using finite differences.
-      if fjacinv == eye(length(x0))
-          ################################################
-          # finite differences to approximate the Jacobian
-          # at the initial value
-          # this is slow. Seems to improve performances
-          # when x0 is of high dimension.
-          println(&quot;Calculating the Jacobian by finite differences&quot;)
-          #@time fjacinv = Calculus.finite_difference_jacobian(f, x0)
-          @time fjacinv = fjacinv_function(x0)
-
-          println(&quot;Inverting the Jacobian&quot;)
-          try
-              fjacinv = inv(fjacinv)
-          catch
-              try
-                  println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
-                  fjacinv = pinv(A)
-              catch
-                  println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
-                  fjacinv = eye(length(x0))
-              end
-          end
-          println(&quot;Done&quot;)
-      else
-          println(&quot;Using User's input as a guess for the Jacobian.&quot;)
-      end
-
-      fval = f(x0)
-
-      for it=1:maxit
-
-          it2 +=1
-
-          #every 30 iterations, reinitilize the jacobian
-          if mod(it2, recaculateJacobian) == 0
-
-              println(&quot;Re-calculating the Jacobian&quot;)
-
-              fjacinv = fjacinv_function(x0)
-
-              try
-                  fjacinv = inv(fjacinv)
-              catch
-                  try
-                      println(&quot;Jacobian non-invertible\n calculating pseudo-inverse&quot;)
-                      fjacinv = pinv(A)
-                  catch
-                      println(&quot;Failing Calculating the pseudo-inverse. Initializing with In&quot;)
-                      fjacinv = eye(length(x0))
-                  end
-              end
-
-          end
-
-
-          println(&quot;it = $(it)&quot;)
-
-          fnorm = norm(fval)
-
-          if fnorm &lt; tol
-              println(&quot;fnorm = $(fnorm)&quot;)
-              return x0, it, fjacinv, fnorm
-          end
-
-          d = -(fjacinv*fval)
-
-          fnormold = Inf
-          ########################
-          # Backstepping procedure
-          ########################
-          for backstep = 1:maxsteps
-
-              if backstep &gt; 1
-                  println(&quot;backstep = $(backstep-1)&quot;)
-              end
-
-              fvalnew = f(x0 + d)
-              fnormnew = norm(fvalnew)
-
-              if fnormnew &lt; fnorm
-                  break
-              end
-
-              if fnormold &lt; fnormnew
-                  d=2*d
-                  break
-              end
-
-              fnormold = fnormnew
-
-              d = d/2
-
-          end
-          ####################
-          ####################
-
-          x0 = x0 + d
-
-          fold = fval
-          fval = f(x0)
-
-          u = fjacinv*(fval - fold)
-
-          #Update the pseudo Jacobian:
-          fjacinv = fjacinv + ((d-u)*(transpose(d)*fjacinv))/(dot(d,u))
-
-          println(&quot;a$(it) = $(x0)&quot;)
-          println(&quot;fnorm = $(fnorm)&quot;)
-
-          if isnan.(x0) == trues(length(x0))
-              println(&quot;Error. a$(it) = NaN for each component&quot;)
-              x0 = zeros(length(x0))
-              return x0, it, fjacinv, fnorm
-          end
-      end
-
-      println(&quot;In function find_broyden\n&quot;)
-      println(&quot;Maximum number of iterations reached.\n&quot;)
-      println(&quot;No convergence.&quot;)
-      println(&quot;Returning fnorm = NaN as a solution&quot;)
-      fnorm = NaN
-      return x0, maxit, fjacinv, fnorm
-
-  end
-
-function optGrowthCollocation(;w = Array{Float64,1}[],
-                              α = 0.4,
-                              β = 0.96,
-                              μ = 0,
-                              s = 0.1,
-                              grid_max = 4,         # Largest grid point
-                              grid_size = 200,      # Number of grid points
-                              shock_size = 250,     # Number of shock draws in Monte Carlo integral
-                              Tw = Array{Float64,1}[],
-                              σ = Array{Float64,1}[],
-                              el_k = Array{Float64,1}[],
-                              wl_k = Array{Float64,1}[],
-                              compute_policy = true,
-                              order_approximation = 40,
-                              functional_basis_type = &quot;chebychev&quot;,
-                            )
-
-
-  grid_y = collect(linspace(1e-4, grid_max, grid_size))
-  shocks = exp.(μ + s * randn(shock_size))
-
-  # Utility
-  u(c) = log.(c)
-  # Production
-  f(k) = k^α
-
-  el_k, wl_k = qnwlogn(10, μ, s^2) #10 weights and nodes for LOG(e_t) distributed N(μ,s^2)
-
-  lower_bound_support = minimum(grid_y)
-  upper_bound_support = maximum(grid_y)
-
-  n_functional_basis = [order_approximation]
-
-  if functional_basis_type == &quot;chebychev&quot;
-      fspace = fundefn(:cheb, n_functional_basis, lower_bound_support, upper_bound_support)
-  else
-      error(&quot;functional_basis_type has to be \&quot;chebychev\&quot; &quot;)
-  end
-
-
-  fnodes = funnode(fspace)[1]
-  residual = zeros(size(fnodes)[1])
-  a = ones(size(fnodes)[1])
-
-  tol = 0.001
-
-  fApprox = (Fun(Chebyshev((minimum(grid_y))..(maximum(grid_y))), a))
-  #fApprox = (Fun(Chebyshev(0..maximum(model.grid)), a))
-
-  w_func = x-&gt; fApprox(x)
-
-  w = ones(size(fnodes)[1])
-  Tw = ones(size(fnodes)[1])
-  σ = ones(size(fnodes)[1])
-
-
-
-  optGrowthCollocation(
-    w,
-    β,
-    grid_y,
-    u,
-    f,
-    shocks,
-    Tw,
-    σ,
-    el_k,
-    wl_k,
-    compute_policy,
-    order_approximation,
-    functional_basis_type,
-    fspace,
-    fnodes,
-    residual,
-    a,
-    fApprox,
-    w_func,
-    tol
-    )
-end
-
-
-
-function residual!(model::optGrowthCollocation)
-
-
-    model.fApprox = (Fun(Chebyshev((minimum(model.grid))..(maximum(model.grid))), model.a))
-    model.w_func = x-&gt; model.fApprox(x)
-
-    function objective(c, y)
-
-      expectation = 0.0
-
-      for k = 1:length(model.wl_k)
-        expectation += model.wl_k[k]*(model.w_func(model.f(y - c) * model.el_k[k]))
-      end
-
-      - model.u(c) - model.β * expectation
-
-    end
-
-    # Loop over nodes
-    for i in 1:size(model.fnodes)[1]
-
-        y = model.fnodes[i,1]
-
-        res = optimize(c -&gt; objective(c, y), 1e-10, y)
-
-        if model.compute_policy
-            model.σ[i] = Optim.minimizer(res)
-        end
-
-        model.Tw[i] = - Optim.minimum(res)
-        model.w[i] = model.w_func(y)
-
-        model.residual[i] = - model.w[i] + model.Tw[i]
-    end
-
-end
-
-
-function solve_optgrowth!(model::optGrowthCollocation;
-                         tol=1e-6,
-                         max_iter=500)
-
-    # Initialize guess for coefficients
-    # by giving the &quot;right shape&quot;
-    # ---------------------------------
-    function objective_initialize!(x, model)
-
-      #update polynomial coeffficients
-      model.a = copy(x)
-
-      model.fApprox = (Fun(Chebyshev((minimum(model.grid))..(maximum(model.grid))), model.a))
-
-      model.w_func = x-&gt; model.fApprox(x)
-
-      return abs.(model.w_func.(model.fnodes[:,1]) - 5.0 * log.(model.fnodes[:,1]))
-
-    end
-
-
-    minx, iterations, Jac0, fnorm = find_broyden(model.a, x -&gt; objective_initialize!(x, model), max_iter, tol)
-
-
-    # Solving the model by collocation
-    # using the initial guess calculated above
-    #-----------------------------------------
-    function objective_residual!(x, model)
-
-      #update polynomial coeffficients
-      model.a = copy(x)
-
-      #calculate residual
-      residual!(model)
-
-      return abs.(model.residual)
-
-    end
-
-    minx, iterations, Jac, fnorm = find_broyden(model.a, x -&gt; objective_residual!(x, model), max_iter, tol,  recaculateJacobian = 1)
-
-
-end
-
-#-----------------------------------
-# Solve by collocation
-#-----------------------------------
-model = optGrowthCollocation(functional_basis_type = &quot;chebychev&quot;)
-@time solve_optgrowth!(model)
-# 15.865923 seconds (329.12 M allocations: 4.977 GiB, 5.55% gc time)
-
-
-#-------------------------------
-# Compare with the true solution
-#-------------------------------
-α = 0.4
-β = 0.96
-μ = 0
-s = 0.1
-
-c1 = log(1 - α * β) / (1 - β)
-c2 = (μ + α * log(α * β)) / (1 - α)
-c3 = 1 / (1 - β)
-c4 = 1 / (1 - α * β)
-
-
-# True optimal policy
-c_star(y) = (1 - α * β) * y
-
-# True value function
-v_star(y) = c1 + c2 * (c3 - c4) + c4 * log.(y)
-
-fig, ax = subplots(figsize=(9, 5))
-ax[:set_ylim](-35, -24)
-ax[:plot](model.grid, model.w_func.(model.grid), lw=2, alpha=0.6, label=&quot;approximate value function&quot;)
-ax[:plot](model.grid, v_star.(model.grid), lw=2, alpha=0.6, label=&quot;true value function&quot;)
-
-fig, ax = subplots(figsize=(9, 5))
-ax[:set_xlim](0.1, 4.0)
-ax[:set_ylim](- 0.05, 0.05)
-ax[:plot](model.grid, abs.(model.w_func.(model.grid) -v_star.(model.grid)), lw=2, alpha=0.6, label=&quot;error&quot;)
-ax[:legend](loc=&quot;lower right&quot;)
-
-</code></pre>
-
+<p><img src="/img/collocation.png" alt="VFI">
+<img src="/img/error_collocation.png" alt="VFI"></p>
+<p>In terms of speed, it turns out that the value function iteration implementation is much faster. One reason seems to be the efficiency associated with the package <a href="https://github.com/JuliaMath/Interpolations.jl" target="_blank" rel="noopener">Interpolations</a>: it is more than 20 times faster to evaluate \(w\) using the package Interpolations rather than using the package <a href="https://github.com/QuantEcon/CompEcon.jl" target="_blank" rel="noopener">CompEcon</a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#using Interpolations</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#--------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1000000</span>
+</span></span><span style="display:flex;"><span> model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#0.230861 seconds (2.00 M allocations: 30.518 MiB, 1.28% gc time)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#using CompEcon</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#--------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1000000</span>
+</span></span><span style="display:flex;"><span> model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4.998902 seconds (51.00 M allocations: 3.546 GiB, 13.39% gc time)</span>
+</span></span></code></pre></div><h3 id="implementation-using-approxfun">Implementation using ApproxFun</h3>
+<p>Significant speed-gains can be obtained by using the package <a href="https://github.com/JuliaApproximation/ApproxFun.jl" target="_blank" rel="noopener">ApproxFun</a>, as illustrated by the code below. Computing time is divided by approximately \(5\) compared to the implementation using CompEcon. Yet, the value function iteration implementation is still the fastest one. One bottleneck seems to be the calculation of the Jacobian by finite differences when using Broyden&rsquo;s method. It is likely that using <a href="https://github.com/JuliaDiff/ForwardDiff.jl" target="_blank" rel="noopener">automatic differentiation</a> would further improve results.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Julien Pascal</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Solve the stochastic optimal growth problem</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># using the collocation method</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Implementation using ApproxFun</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#---------------------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> QuantEcon
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Optim
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> CompEcon
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> PyPlot
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Interpolations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> FileIO
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> ApproxFun
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> ProfileView
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>type optGrowthCollocation
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  w<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  β<span style="color:#f92672">::</span><span style="color:#66d9ef">AbstractFloat</span>
+</span></span><span style="display:flex;"><span>  grid<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  u<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  f<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  shocks<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  Tw<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  σ<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  el_k<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  wl_k<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>  compute_policy<span style="color:#f92672">::</span><span style="color:#66d9ef">Bool</span>
+</span></span><span style="display:flex;"><span>  order_approximation<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#75715e">#number of element in the functional basis along each dimension</span>
+</span></span><span style="display:flex;"><span>  functional_basis_type<span style="color:#f92672">::</span><span style="color:#66d9ef">String</span> <span style="color:#75715e">#type of functional basis</span>
+</span></span><span style="display:flex;"><span>  fspace<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Symbol</span>,<span style="color:#66d9ef">Any</span>} <span style="color:#75715e">#functional basis</span>
+</span></span><span style="display:flex;"><span>  fnodes<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>} <span style="color:#75715e">#collocation nodes</span>
+</span></span><span style="display:flex;"><span>  residual<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>} <span style="color:#75715e">#vector of residual. Should be close to zero</span>
+</span></span><span style="display:flex;"><span>  a<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>} <span style="color:#75715e">#polynomial coefficients</span>
+</span></span><span style="display:flex;"><span>  fApprox<span style="color:#f92672">::</span><span style="color:#66d9ef">ApproxFun</span><span style="color:#f92672">.</span><span style="color:#66d9ef">Fun</span>{<span style="color:#66d9ef">ApproxFun</span><span style="color:#f92672">.</span><span style="color:#66d9ef">Chebyshev</span>{<span style="color:#66d9ef">ApproxFun</span><span style="color:#f92672">.</span><span style="color:#66d9ef">Segment</span>{<span style="color:#66d9ef">Float64</span>},<span style="color:#66d9ef">Float64</span>},<span style="color:#66d9ef">Float64</span>,<span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}}
+</span></span><span style="display:flex;"><span>  w_func<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>
+</span></span><span style="display:flex;"><span>  tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#####################################</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Function that find a solution</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># to f(x) = 0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># using Broyden&#39;s &#34;good&#34; method</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># and simple backstepping procedure as described</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># in Miranda and Fackler (2009)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># input :</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># --------</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * x0:                 initial guess for the root</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * f:                  function in f(x) = 0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * maxit:              maximum number of iterations</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * tol:                tolerance level for the zero</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * fjavinc:            initial inverse of the jacobian. If not provided, then inverse of the</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#                       Jacobian is calculated by finite differences</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * maxsteps:           maximum number of backsteps</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * recaculateJacobian: number of iterations in-between two calculations of the Jacobian</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># output :</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># --------</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * x: one zero of f</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * it: number of iterations necessary to reached the solution</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * fjacinv: pseudo jacobian at the last iteration</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># * fnorm: norm f(x) at the last iteration</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#######################################</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> find_broyden(x0<span style="color:#f92672">::</span><span style="color:#66d9ef">Vector</span>, f<span style="color:#f92672">::</span><span style="color:#66d9ef">Function</span>, maxit<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span>, tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>, fjacinv <span style="color:#f92672">=</span> eye(length(x0));
+</span></span><span style="display:flex;"><span>                        maxsteps <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, recaculateJacobian <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;a0 = </span><span style="color:#e6db74">$</span>(x0)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>      fnorm <span style="color:#f92672">=</span> tol<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>      it2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#75715e">#to re-initialize the jacobian</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">################################</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#initialize guess for the matrix</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">################################</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># with Calculus</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#--------------</span>
+</span></span><span style="display:flex;"><span>      fjacinv_function <span style="color:#f92672">=</span> x<span style="color:#f92672">-&gt;</span> Calculus<span style="color:#f92672">.</span>finite_difference_jacobian(f, x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># If the user do not provide an initial guess for the jacobian</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># One is calculated using finite differences.</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> fjacinv <span style="color:#f92672">==</span> eye(length(x0))
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">################################################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># finite differences to approximate the Jacobian</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># at the initial value</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># this is slow. Seems to improve performances</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># when x0 is of high dimension.</span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Calculating the Jacobian by finite differences&#34;</span>)
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">#@time fjacinv = Calculus.finite_difference_jacobian(f, x0)</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">@time</span> fjacinv <span style="color:#f92672">=</span> fjacinv_function(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Inverting the Jacobian&#34;</span>)
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>              fjacinv <span style="color:#f92672">=</span> inv(fjacinv)
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                  println(<span style="color:#e6db74">&#34;Jacobian non-invertible</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74"> calculating pseudo-inverse&#34;</span>)
+</span></span><span style="display:flex;"><span>                  fjacinv <span style="color:#f92672">=</span> pinv(A)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>                  println(<span style="color:#e6db74">&#34;Failing Calculating the pseudo-inverse. Initializing with In&#34;</span>)
+</span></span><span style="display:flex;"><span>                  fjacinv <span style="color:#f92672">=</span> eye(length(x0))
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Done&#34;</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;Using User&#39;s input as a guess for the Jacobian.&#34;</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      fval <span style="color:#f92672">=</span> f(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> it<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>maxit
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          it2 <span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">#every 30 iterations, reinitilize the jacobian</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> mod(it2, recaculateJacobian) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              println(<span style="color:#e6db74">&#34;Re-calculating the Jacobian&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              fjacinv <span style="color:#f92672">=</span> fjacinv_function(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                  fjacinv <span style="color:#f92672">=</span> inv(fjacinv)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                      println(<span style="color:#e6db74">&#34;Jacobian non-invertible</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74"> calculating pseudo-inverse&#34;</span>)
+</span></span><span style="display:flex;"><span>                      fjacinv <span style="color:#f92672">=</span> pinv(A)
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">catch</span>
+</span></span><span style="display:flex;"><span>                      println(<span style="color:#e6db74">&#34;Failing Calculating the pseudo-inverse. Initializing with In&#34;</span>)
+</span></span><span style="display:flex;"><span>                      fjacinv <span style="color:#f92672">=</span> eye(length(x0))
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;it = </span><span style="color:#e6db74">$</span>(it)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          fnorm <span style="color:#f92672">=</span> norm(fval)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> fnorm <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>              println(<span style="color:#e6db74">&#34;fnorm = </span><span style="color:#e6db74">$</span>(fnorm)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">return</span> x0, it, fjacinv, fnorm
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          d <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>(fjacinv<span style="color:#f92672">*</span>fval)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          fnormold <span style="color:#f92672">=</span> Inf
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># Backstepping procedure</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">for</span> backstep <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>maxsteps
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> backstep <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                  println(<span style="color:#e6db74">&#34;backstep = </span><span style="color:#e6db74">$</span>(backstep<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              fvalnew <span style="color:#f92672">=</span> f(x0 <span style="color:#f92672">+</span> d)
+</span></span><span style="display:flex;"><span>              fnormnew <span style="color:#f92672">=</span> norm(fvalnew)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> fnormnew <span style="color:#f92672">&lt;</span> fnorm
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> fnormold <span style="color:#f92672">&lt;</span> fnormnew
+</span></span><span style="display:flex;"><span>                  d<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>d
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              fnormold <span style="color:#f92672">=</span> fnormnew
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>              d <span style="color:#f92672">=</span> d<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">####################</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">####################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          x0 <span style="color:#f92672">=</span> x0 <span style="color:#f92672">+</span> d
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          fold <span style="color:#f92672">=</span> fval
+</span></span><span style="display:flex;"><span>          fval <span style="color:#f92672">=</span> f(x0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          u <span style="color:#f92672">=</span> fjacinv<span style="color:#f92672">*</span>(fval <span style="color:#f92672">-</span> fold)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">#Update the pseudo Jacobian:</span>
+</span></span><span style="display:flex;"><span>          fjacinv <span style="color:#f92672">=</span> fjacinv <span style="color:#f92672">+</span> ((d<span style="color:#f92672">-</span>u)<span style="color:#f92672">*</span>(transpose(d)<span style="color:#f92672">*</span>fjacinv))<span style="color:#f92672">/</span>(dot(d,u))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;a</span><span style="color:#e6db74">$</span>(it)<span style="color:#e6db74"> = </span><span style="color:#e6db74">$</span>(x0)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>          println(<span style="color:#e6db74">&#34;fnorm = </span><span style="color:#e6db74">$</span>(fnorm)<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> isnan<span style="color:#f92672">.</span>(x0) <span style="color:#f92672">==</span> trues(length(x0))
+</span></span><span style="display:flex;"><span>              println(<span style="color:#e6db74">&#34;Error. a</span><span style="color:#e6db74">$</span>(it)<span style="color:#e6db74"> = NaN for each component&#34;</span>)
+</span></span><span style="display:flex;"><span>              x0 <span style="color:#f92672">=</span> zeros(length(x0))
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">return</span> x0, it, fjacinv, fnorm
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;In function find_broyden</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;Maximum number of iterations reached.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;No convergence.&#34;</span>)
+</span></span><span style="display:flex;"><span>      println(<span style="color:#e6db74">&#34;Returning fnorm = NaN as a solution&#34;</span>)
+</span></span><span style="display:flex;"><span>      fnorm <span style="color:#f92672">=</span> NaN
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> x0, maxit, fjacinv, fnorm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> optGrowthCollocation(;w <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              α <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>,
+</span></span><span style="display:flex;"><span>                              β <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.96</span>,
+</span></span><span style="display:flex;"><span>                              μ <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                              s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>,
+</span></span><span style="display:flex;"><span>                              grid_max <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,         <span style="color:#75715e"># Largest grid point</span>
+</span></span><span style="display:flex;"><span>                              grid_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>,      <span style="color:#75715e"># Number of grid points</span>
+</span></span><span style="display:flex;"><span>                              shock_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">250</span>,     <span style="color:#75715e"># Number of shock draws in Monte Carlo integral</span>
+</span></span><span style="display:flex;"><span>                              Tw <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              σ <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              el_k <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              wl_k <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">1</span>}[],
+</span></span><span style="display:flex;"><span>                              compute_policy <span style="color:#f92672">=</span> true,
+</span></span><span style="display:flex;"><span>                              order_approximation <span style="color:#f92672">=</span> <span style="color:#ae81ff">40</span>,
+</span></span><span style="display:flex;"><span>                              functional_basis_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;chebychev&#34;</span>,
+</span></span><span style="display:flex;"><span>                            )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  grid_y <span style="color:#f92672">=</span> collect(linspace(<span style="color:#ae81ff">1e-4</span>, grid_max, grid_size))
+</span></span><span style="display:flex;"><span>  shocks <span style="color:#f92672">=</span> exp<span style="color:#f92672">.</span>(μ <span style="color:#f92672">+</span> s <span style="color:#f92672">*</span> randn(shock_size))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Utility</span>
+</span></span><span style="display:flex;"><span>  u(c) <span style="color:#f92672">=</span> log<span style="color:#f92672">.</span>(c)
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Production</span>
+</span></span><span style="display:flex;"><span>  f(k) <span style="color:#f92672">=</span> k<span style="color:#f92672">^</span>α
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  el_k, wl_k <span style="color:#f92672">=</span> qnwlogn(<span style="color:#ae81ff">10</span>, μ, s<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#75715e">#10 weights and nodes for LOG(e_t) distributed N(μ,s^2)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  lower_bound_support <span style="color:#f92672">=</span> minimum(grid_y)
+</span></span><span style="display:flex;"><span>  upper_bound_support <span style="color:#f92672">=</span> maximum(grid_y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  n_functional_basis <span style="color:#f92672">=</span> [order_approximation]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> functional_basis_type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;chebychev&#34;</span>
+</span></span><span style="display:flex;"><span>      fspace <span style="color:#f92672">=</span> fundefn(<span style="color:#e6db74">:cheb</span>, n_functional_basis, lower_bound_support, upper_bound_support)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>      error(<span style="color:#e6db74">&#34;functional_basis_type has to be </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">chebychev</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> &#34;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  fnodes <span style="color:#f92672">=</span> funnode(fspace)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>  residual <span style="color:#f92672">=</span> zeros(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>  a <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  tol <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.001</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  fApprox <span style="color:#f92672">=</span> (Fun(Chebyshev((minimum(grid_y))<span style="color:#f92672">..</span>(maximum(grid_y))), a))
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#fApprox = (Fun(Chebyshev(0..maximum(model.grid)), a))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  w_func <span style="color:#f92672">=</span> x<span style="color:#f92672">-&gt;</span> fApprox(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  w <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>  Tw <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>  σ <span style="color:#f92672">=</span> ones(size(fnodes)[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  optGrowthCollocation(
+</span></span><span style="display:flex;"><span>    w,
+</span></span><span style="display:flex;"><span>    β,
+</span></span><span style="display:flex;"><span>    grid_y,
+</span></span><span style="display:flex;"><span>    u,
+</span></span><span style="display:flex;"><span>    f,
+</span></span><span style="display:flex;"><span>    shocks,
+</span></span><span style="display:flex;"><span>    Tw,
+</span></span><span style="display:flex;"><span>    σ,
+</span></span><span style="display:flex;"><span>    el_k,
+</span></span><span style="display:flex;"><span>    wl_k,
+</span></span><span style="display:flex;"><span>    compute_policy,
+</span></span><span style="display:flex;"><span>    order_approximation,
+</span></span><span style="display:flex;"><span>    functional_basis_type,
+</span></span><span style="display:flex;"><span>    fspace,
+</span></span><span style="display:flex;"><span>    fnodes,
+</span></span><span style="display:flex;"><span>    residual,
+</span></span><span style="display:flex;"><span>    a,
+</span></span><span style="display:flex;"><span>    fApprox,
+</span></span><span style="display:flex;"><span>    w_func,
+</span></span><span style="display:flex;"><span>    tol
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> residual!(model<span style="color:#f92672">::</span><span style="color:#66d9ef">optGrowthCollocation</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>fApprox <span style="color:#f92672">=</span> (Fun(Chebyshev((minimum(model<span style="color:#f92672">.</span>grid))<span style="color:#f92672">..</span>(maximum(model<span style="color:#f92672">.</span>grid))), model<span style="color:#f92672">.</span>a))
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>w_func <span style="color:#f92672">=</span> x<span style="color:#f92672">-&gt;</span> model<span style="color:#f92672">.</span>fApprox(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> objective(c, y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      expectation <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> k <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(model<span style="color:#f92672">.</span>wl_k)
+</span></span><span style="display:flex;"><span>        expectation <span style="color:#f92672">+=</span> model<span style="color:#f92672">.</span>wl_k[k]<span style="color:#f92672">*</span>(model<span style="color:#f92672">.</span>w_func(model<span style="color:#f92672">.</span>f(y <span style="color:#f92672">-</span> c) <span style="color:#f92672">*</span> model<span style="color:#f92672">.</span>el_k[k]))
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>u(c) <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>β <span style="color:#f92672">*</span> expectation
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Loop over nodes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>size(model<span style="color:#f92672">.</span>fnodes)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>fnodes[i,<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        res <span style="color:#f92672">=</span> optimize(c <span style="color:#f92672">-&gt;</span> objective(c, y), <span style="color:#ae81ff">1e-10</span>, y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> model<span style="color:#f92672">.</span>compute_policy
+</span></span><span style="display:flex;"><span>            model<span style="color:#f92672">.</span>σ[i] <span style="color:#f92672">=</span> Optim<span style="color:#f92672">.</span>minimizer(res)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span>Tw[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span> Optim<span style="color:#f92672">.</span>minimum(res)
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span>w[i] <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>w_func(y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span>residual[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span> model<span style="color:#f92672">.</span>w[i] <span style="color:#f92672">+</span> model<span style="color:#f92672">.</span>Tw[i]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> solve_optgrowth!(model<span style="color:#f92672">::</span><span style="color:#66d9ef">optGrowthCollocation</span>;
+</span></span><span style="display:flex;"><span>                         tol<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-6</span>,
+</span></span><span style="display:flex;"><span>                         max_iter<span style="color:#f92672">=</span><span style="color:#ae81ff">500</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Initialize guess for coefficients</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># by giving the &#34;right shape&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ---------------------------------</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> objective_initialize!(x, model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#update polynomial coeffficients</span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>a <span style="color:#f92672">=</span> copy(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>fApprox <span style="color:#f92672">=</span> (Fun(Chebyshev((minimum(model<span style="color:#f92672">.</span>grid))<span style="color:#f92672">..</span>(maximum(model<span style="color:#f92672">.</span>grid))), model<span style="color:#f92672">.</span>a))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>w_func <span style="color:#f92672">=</span> x<span style="color:#f92672">-&gt;</span> model<span style="color:#f92672">.</span>fApprox(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>fnodes[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">-</span> <span style="color:#ae81ff">5.0</span> <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>fnodes[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>]))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    minx, iterations, Jac0, fnorm <span style="color:#f92672">=</span> find_broyden(model<span style="color:#f92672">.</span>a, x <span style="color:#f92672">-&gt;</span> objective_initialize!(x, model), max_iter, tol)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Solving the model by collocation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># using the initial guess calculated above</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#-----------------------------------------</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> objective_residual!(x, model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#update polynomial coeffficients</span>
+</span></span><span style="display:flex;"><span>      model<span style="color:#f92672">.</span>a <span style="color:#f92672">=</span> copy(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#calculate residual</span>
+</span></span><span style="display:flex;"><span>      residual!(model)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>residual)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    minx, iterations, Jac, fnorm <span style="color:#f92672">=</span> find_broyden(model<span style="color:#f92672">.</span>a, x <span style="color:#f92672">-&gt;</span> objective_residual!(x, model), max_iter, tol,  recaculateJacobian <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-----------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Solve by collocation</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-----------------------------------</span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> optGrowthCollocation(functional_basis_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;chebychev&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time</span> solve_optgrowth!(model)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 15.865923 seconds (329.12 M allocations: 4.977 GiB, 5.55% gc time)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Compare with the true solution</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#-------------------------------</span>
+</span></span><span style="display:flex;"><span>α <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>
+</span></span><span style="display:flex;"><span>β <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.96</span>
+</span></span><span style="display:flex;"><span>μ <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>c1 <span style="color:#f92672">=</span> log(<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> β)
+</span></span><span style="display:flex;"><span>c2 <span style="color:#f92672">=</span> (μ <span style="color:#f92672">+</span> α <span style="color:#f92672">*</span> log(α <span style="color:#f92672">*</span> β)) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α)
+</span></span><span style="display:flex;"><span>c3 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> β)
+</span></span><span style="display:flex;"><span>c4 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># True optimal policy</span>
+</span></span><span style="display:flex;"><span>c_star(y) <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> α <span style="color:#f92672">*</span> β) <span style="color:#f92672">*</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># True value function</span>
+</span></span><span style="display:flex;"><span>v_star(y) <span style="color:#f92672">=</span> c1 <span style="color:#f92672">+</span> c2 <span style="color:#f92672">*</span> (c3 <span style="color:#f92672">-</span> c4) <span style="color:#f92672">+</span> c4 <span style="color:#f92672">*</span> log<span style="color:#f92672">.</span>(y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">5</span>))
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_ylim</span>](<span style="color:#f92672">-</span><span style="color:#ae81ff">35</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">24</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;approximate value function&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, v_star<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;true value function&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">5</span>))
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_xlim</span>](<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">4.0</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:set_ylim</span>](<span style="color:#f92672">-</span> <span style="color:#ae81ff">0.05</span>, <span style="color:#ae81ff">0.05</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:plot</span>](model<span style="color:#f92672">.</span>grid, abs<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>w_func<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid) <span style="color:#f92672">-</span>v_star<span style="color:#f92672">.</span>(model<span style="color:#f92672">.</span>grid)), lw<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;error&#34;</span>)
+</span></span><span style="display:flex;"><span>ax[<span style="color:#e6db74">:legend</span>](loc<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;lower right&#34;</span>)
+</span></span></code></pre></div>
     </div>
 
     
@@ -1699,7 +1665,7 @@ ax[:legend](loc=&quot;lower right&quot;)
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1853,7 +1819,7 @@ ax[:legend](loc=&quot;lower right&quot;)
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

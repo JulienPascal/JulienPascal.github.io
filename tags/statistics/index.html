@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -425,7 +425,8 @@
       
       Introduction Recently, I came across a simple question that led me through a quite interesting rabbit hole. The question is very simple (and very niche), but the analysis involves key results from statistical theory and numerical analysis (the Central Limit Theorem, the Delta method, and the second-order Delta method, Monte Carlo integration).
 Here is the seemingly innocent (and slightly bizarre) question:
- Context: One is interested in evaluating the square of an expectation $E\Big[g(X) \Big]^2 = \big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2 = \mu^2$, where $\mu$ is an unknown quantity &ldquo;close to zero&rdquo;.
+Context: One is interested in evaluating the square of an expectation \(E\Big[g(X) \Big]^2 = \big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2 = \mu^2\), where \(\mu\) is an unknown quantity &ldquo;close to zero&rdquo;. Note that the integral squared can be rewritten as \(\big(\int_{a}^{b} g(x) f_X(x) dx \Big)^2 = \int_{a}^{b} \int_{a}^{b} g(x) g(y) f_X(x) f_Y(y) dx dy \). Transforming the square of an integral into a double integral is a standard trick, that is for instance used when calculating the Gaussian integral. Let&rsquo;s say one want to numerically approximate \(\mu^2\) using Monte Carlo integration. Question: Is it better to approximate \(\mu^2\) using the square of the Monte Carlo estimator \(\big(\frac{1}{N} \sum_{i=1}^{N} f(x_i) \Big)^2\), or the Monte Carlo estimator based on the double integral: \(\frac{1}{N} \sum_{i=1}^{N} f(x_i) f(y_i) \)? Here the sample \({x_i}\) and \({y_i}\) are i.i.d random variables with density f(.). The random variables \({x_i}\) and \({y_i}\) have the same density function, but they are drawn independently from each other. I. Consistency Notice that both estimators are consistent. That is, as we increase \(N\), the estimators converges in probability to the true value of the parameter \(\mu^2\).
+
       
     </div>
   </div>
@@ -439,7 +440,7 @@ Here is the seemingly innocent (and slightly bizarre) question:
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -588,7 +589,7 @@ Here is the seemingly innocent (and slightly bizarre) question:
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

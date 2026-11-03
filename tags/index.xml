@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Julien Pascal</title>
@@ -7,82 +6,8 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
-    <lastBuildDate>Mon, 03 Jan 2022 18:00:00 +0100</lastBuildDate>
-    
-	<atom:link href="https://julienpascal.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>AI</title>
-      <link>https://julienpascal.github.io/tags/ai/</link>
-      <pubDate>Mon, 03 Jan 2022 18:00:00 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/ai/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Adaptive Sparse Grids</title>
-      <link>https://julienpascal.github.io/tags/adaptive-sparse-grids/</link>
-      <pubDate>Sat, 12 Feb 2022 08:00:00 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/adaptive-sparse-grids/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Banking</title>
-      <link>https://julienpascal.github.io/tags/banking/</link>
-      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/banking/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Classification</title>
-      <link>https://julienpascal.github.io/tags/classification/</link>
-      <pubDate>Fri, 22 Nov 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/classification/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Commuting</title>
-      <link>https://julienpascal.github.io/tags/commuting/</link>
-      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/commuting/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Competition</title>
-      <link>https://julienpascal.github.io/tags/competition/</link>
-      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/competition/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Computer Vision</title>
-      <link>https://julienpascal.github.io/tags/computer-vision/</link>
-      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/computer-vision/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Directed Search</title>
-      <link>https://julienpascal.github.io/tags/directed-search/</link>
-      <pubDate>Mon, 21 Oct 2019 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/directed-search/</guid>
-      <description></description>
-    </item>
+    <lastBuildDate>Wed, 03 Dec 2025 15:51:54 +0100</lastBuildDate>
+    <atom:link href="https://julienpascal.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Dynamic Programming</title>
@@ -90,159 +15,6 @@
       <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
       
       <guid>https://julienpascal.github.io/tags/dynamic-programming/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Dynamic programming</title>
-      <link>https://julienpascal.github.io/tags/dynamic-programming/</link>
-      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/dynamic-programming/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Dynamical systems</title>
-      <link>https://julienpascal.github.io/tags/dynamical-systems/</link>
-      <pubDate>Sun, 05 Apr 2020 16:00:00 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/dynamical-systems/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Econometrics</title>
-      <link>https://julienpascal.github.io/tags/econometrics/</link>
-      <pubDate>Fri, 22 Nov 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/econometrics/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Efficiency</title>
-      <link>https://julienpascal.github.io/tags/efficiency/</link>
-      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/efficiency/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Emerging markets</title>
-      <link>https://julienpascal.github.io/tags/emerging-markets/</link>
-      <pubDate>Tue, 07 Mar 2017 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/emerging-markets/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Expectations</title>
-      <link>https://julienpascal.github.io/tags/expectations/</link>
-      <pubDate>Sat, 03 Sep 2022 18:00:00 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/expectations/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>HA models</title>
-      <link>https://julienpascal.github.io/tags/ha-models/</link>
-      <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/ha-models/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Heterogeneity</title>
-      <link>https://julienpascal.github.io/tags/heterogeneity/</link>
-      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/heterogeneity/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Housing</title>
-      <link>https://julienpascal.github.io/tags/housing/</link>
-      <pubDate>Mon, 21 Oct 2019 18:11:07 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/housing/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Labor</title>
-      <link>https://julienpascal.github.io/tags/labor/</link>
-      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/labor/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Literature Review</title>
-      <link>https://julienpascal.github.io/tags/literature-review/</link>
-      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/literature-review/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Machine Learning</title>
-      <link>https://julienpascal.github.io/tags/machine-learning/</link>
-      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/machine-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Machine learning</title>
-      <link>https://julienpascal.github.io/tags/machine-learning/</link>
-      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/machine-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Macroeconomics</title>
-      <link>https://julienpascal.github.io/tags/macroeconomics/</link>
-      <pubDate>Mon, 18 Jan 2021 18:53:22 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/macroeconomics/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Migration</title>
-      <link>https://julienpascal.github.io/tags/migration/</link>
-      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/migration/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Monetary Policy</title>
-      <link>https://julienpascal.github.io/tags/monetary-policy/</link>
-      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/monetary-policy/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Monte Carlo</title>
-      <link>https://julienpascal.github.io/tags/monte-carlo/</link>
-      <pubDate>Mon, 01 Dec 2025 08:00:00 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/monte-carlo/</guid>
       <description></description>
     </item>
     
@@ -265,20 +37,38 @@
     </item>
     
     <item>
-      <title>Neural network</title>
-      <link>https://julienpascal.github.io/tags/neural-network/</link>
-      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      <title>PEA</title>
+      <link>https://julienpascal.github.io/tags/pea/</link>
+      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/neural-network/</guid>
+      <guid>https://julienpascal.github.io/tags/pea/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Numerical</title>
-      <link>https://julienpascal.github.io/tags/numerical/</link>
-      <pubDate>Sat, 12 Feb 2022 08:00:00 +0100</pubDate>
+      <title>Heterogeneity</title>
+      <link>https://julienpascal.github.io/tags/heterogeneity/</link>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/numerical/</guid>
+      <guid>https://julienpascal.github.io/tags/heterogeneity/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Literature Review</title>
+      <link>https://julienpascal.github.io/tags/literature-review/</link>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/literature-review/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Monetary Policy</title>
+      <link>https://julienpascal.github.io/tags/monetary-policy/</link>
+      <pubDate>Mon, 01 Dec 2025 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/monetary-policy/</guid>
       <description></description>
     </item>
     
@@ -292,47 +82,65 @@
     </item>
     
     <item>
-      <title>PEA</title>
-      <link>https://julienpascal.github.io/tags/pea/</link>
-      <pubDate>Wed, 03 Dec 2025 15:51:54 +0100</pubDate>
+      <title>Monte Carlo</title>
+      <link>https://julienpascal.github.io/tags/monte-carlo/</link>
+      <pubDate>Mon, 01 Dec 2025 08:00:00 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/pea/</guid>
+      <guid>https://julienpascal.github.io/tags/monte-carlo/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Policy</title>
-      <link>https://julienpascal.github.io/tags/policy/</link>
+      <title>Machine Learning</title>
+      <link>https://julienpascal.github.io/tags/machine-learning/</link>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Neural Network</title>
+      <link>https://julienpascal.github.io/tags/neural-network/</link>
+      <pubDate>Mon, 01 Apr 2024 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/neural-network/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Commuting</title>
+      <link>https://julienpascal.github.io/tags/commuting/</link>
       <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/policy/</guid>
+      <guid>https://julienpascal.github.io/tags/commuting/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Statistics</title>
-      <link>https://julienpascal.github.io/tags/statistics/</link>
-      <pubDate>Sat, 03 Sep 2022 18:00:00 +0100</pubDate>
-      
-      <guid>https://julienpascal.github.io/tags/statistics/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Urban</title>
-      <link>https://julienpascal.github.io/tags/urban/</link>
+      <title>Efficiency</title>
+      <link>https://julienpascal.github.io/tags/efficiency/</link>
       <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/urban/</guid>
+      <guid>https://julienpascal.github.io/tags/efficiency/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>WIP</title>
-      <link>https://julienpascal.github.io/tags/wip/</link>
-      <pubDate>Tue, 12 Mar 2019 18:11:07 +0100</pubDate>
+      <title>Labor</title>
+      <link>https://julienpascal.github.io/tags/labor/</link>
+      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
       
-      <guid>https://julienpascal.github.io/tags/wip/</guid>
+      <guid>https://julienpascal.github.io/tags/labor/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Migration</title>
+      <link>https://julienpascal.github.io/tags/migration/</link>
+      <pubDate>Wed, 26 Jul 2023 15:51:54 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/tags/migration/</guid>
       <description></description>
     </item>
     

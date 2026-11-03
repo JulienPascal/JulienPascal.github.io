@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -424,7 +424,8 @@
     <div class="article-style">
       
       Introduction This blog post is about my work on a generalization of the Parameterized Expectations Algorithm, available here.
-The Parameterized Expectations Algorithm (PEA) is a classic computational approach to numerically &ldquo;solve&rdquo; economic models with rational expectations, i.e. finding an approximate solution. Usually, to solve economic models of this type, one has to find a policy function (e.g. how much to consume today, given a current level of capital) that satisfies a functional equation that holds in expectation (e.
+The Parameterized Expectations Algorithm (PEA) is a classic computational approach to numerically &ldquo;solve&rdquo; economic models with rational expectations, i.e. finding an approximate solution. Usually, to solve economic models of this type, one has to find a policy function (e.g. how much to consume today, given a current level of capital) that satisfies a functional equation that holds in expectation (e.g. the Euler equation). The PEA flips this idea on its head: if we know the expectation term, we can recover the unknown policy function. For several reasons, this works better this way.
+
       
     </div>
   </div>
@@ -434,7 +435,8 @@ The Parameterized Expectations Algorithm (PEA) is a classic computational approa
     <div class="article-style">
       
       Introduction In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
-Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(.
+Theory Structure of economic models In many cases, solving an economic model involves finding a policy function \(g(.)\), which is a mapping from a state vector \(s\) to a decision vector \(a\). Usually, it is assumed that the economy is hit by random disturbances, which is usually modelled as zero-mean innovation vector \(\varepsilon\), often considered to be normally distributed. The policy function \(g(.)\) is such that the following stochastic equation holds:
+
       
     </div>
   </div>
@@ -443,7 +445,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
     <h2><a href="/publication/bc-mc-2024/">Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</a></h2>
     <div class="article-style">
       
-      Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model's stochastic functional …
+      Artificial Neural Networks (ANNs) are powerful tools that can solve dynamic programming problems arising in economics. In this context, estimating ANN parameters involves minimizing a loss function based on the model&#39;s stochastic functional …
       
     </div>
   </div>
@@ -457,7 +459,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -606,7 +608,7 @@ Theory Structure of economic models In many cases, solving an economic model inv
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

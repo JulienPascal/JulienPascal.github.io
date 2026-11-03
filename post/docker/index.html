@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,7 +28,11 @@
   
     
   
-  <meta name="description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was to wrap your code in a neat library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia.">
+  <meta name="description" content="In my quest for the perfect tool for reproducible science, I thought that the silver
+bullet was to wrap your code in a neat library/package and make it available to the world.
+Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing
+your work with a broad audience. This post is a 101 introduction to Docker.
+I describe what is Docker and show one simple application with a script in Julia.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/docker/">
@@ -100,9 +104,6 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -125,7 +126,11 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/docker/">
   <meta property="og:title" content="Docker for Dummies | Julien Pascal">
-  <meta property="og:description" content="In my quest for the perfect tool for reproducible science, I thought that the silver bullet was to wrap your code in a neat library/package and make it available to the world. Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing your work with a broad audience. This post is a 101 introduction to Docker. I describe what is Docker and show one simple application with a script in Julia."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="In my quest for the perfect tool for reproducible science, I thought that the silver
+bullet was to wrap your code in a neat library/package and make it available to the world.
+Yet, I was wrong. Docker is a much cooler and a much more effective way for sharing
+your work with a broad audience. This post is a 101 introduction to Docker.
+I describe what is Docker and show one simple application with a script in Julia."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2019-10-18T18:53:22&#43;01:00">
@@ -518,37 +523,27 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p>In my quest for the perfect tool for reproducible science, I thought that the silver
+      <p>In my quest for the perfect tool for reproducible science, I thought that the silver
 bullet was to wrap your code in a neat library/package and make it available to the world.
-Yet, I was wrong. <a href="https://www.docker.com/" target="_blank">Docker</a> is a much cooler and a much more effective way for sharing
+Yet, I was wrong. <a href="https://www.docker.com/" target="_blank" rel="noopener">Docker</a> is a much cooler and a much more effective way for sharing
 your work with a broad audience. This post is a 101 introduction to Docker.
 I describe what is Docker and show one simple application with a script in Julia.</p>
-
 <h2 id="why-docker">Why Docker?</h2>
-
 <p>Your script works locally, but not on your friend&rsquo;s laptop because of dependency
-issues. Docker solves the <a href="https://en.wikipedia.org/wiki/Dependency_hell" target="_blank">dependency hell</a>
-by giving you the opportunity to &ldquo;ship&rdquo; your application in a &ldquo;container&rdquo;. One can think of a &ldquo;container&rdquo; as some sort of lightweight virtual image. Some technical details can be found <a href="https://docs.docker.com/engine/docker-overview/" target="_blank">here</a> and <a href="https://devopscube.com/what-is-docker/" target="_blank">here</a>. In a nutshell, if your application works on your local machine, Docker helps you to put your application inside an container. Once in a container, your application will run smoothly for the rest of the world.</p>
-
+issues. Docker solves the <a href="https://en.wikipedia.org/wiki/Dependency_hell" target="_blank" rel="noopener">dependency hell</a>
+by giving you the opportunity to &ldquo;ship&rdquo; your application in a &ldquo;container&rdquo;. One can think of a &ldquo;container&rdquo; as some sort of lightweight virtual image. Some technical details can be found <a href="https://docs.docker.com/engine/docker-overview/" target="_blank" rel="noopener">here</a> and <a href="https://devopscube.com/what-is-docker/" target="_blank" rel="noopener">here</a>. In a nutshell, if your application works on your local machine, Docker helps you to put your application inside an container. Once in a container, your application will run smoothly for the rest of the world.</p>
 <h2 id="application-in-julia">Application in Julia</h2>
-
 <p>The goal is to create a container with a simple script to calculate an approximation
-of π. Here I am making a copy-paste from <a href="https://julienpascal.github.io/post/buildyourcluster/" target="_blank">this post</a>, in which I calculated an approximation of π using Monte-Carlo. I create a folder
-<code>julia-app</code>, which contains 3 files (see the Github repository with the 3 files <a href="https://github.com/JulienPascal/MyFirstDockerApp" target="_blank">here</a>)</p>
-
-<pre><code>julia-app
+of π. Here I am making a copy-paste from <a href="https://julienpascal.github.io/post/buildyourcluster/" target="_blank" rel="noopener">this post</a>, in which I calculated an approximation of π using Monte-Carlo. I create a folder
+<code>julia-app</code>, which contains 3 files (see the Github repository with the 3 files <a href="https://github.com/JulienPascal/MyFirstDockerApp" target="_blank" rel="noopener">here</a>)</p>
+<pre tabindex="0"><code>julia-app
   ├ app.jl
   ├ deps.jl
   └ Dockerfile
-</code></pre>
-
-<p>The file <code>app.jl</code> contains the application we want to containerize. The file <code>deps.jl</code>
+</code></pre><p>The file <code>app.jl</code> contains the application we want to containerize. The file <code>deps.jl</code>
 contains the list of libraries/packages that are used within <code>app.jl</code>. The file <code>Dockerfile</code>
-is a <a href="https://docs.docker.com/engine/reference/builder/" target="_blank">text document</a> that contains instructions to build the container.
+is a <a href="https://docs.docker.com/engine/reference/builder/" target="_blank" rel="noopener">text document</a> that contains instructions to build the container.
 Generally, a <code>Dockerfile</code> contains 4 types of instructions:</p>
-
 <ul>
 <li><code>FROM</code>: specifies the &ldquo;base image&rdquo; we want to use within the container. In our case,
 we want to run an application with Julia. Luckily, we can pull a base image with
@@ -558,8 +553,7 @@ Julia pre-installed on it using <code>FROM julia:&lt;julia-version-you-want&gt;<
 for installing packages</li>
 <li><code>CMD</code>: specifies what command to run within the container</li>
 </ul>
-
-<pre><code>#choose a base image
+<pre tabindex="0"><code>#choose a base image
 FROM julia:1.0.3
 
 # install julia dependencies
@@ -570,27 +564,17 @@ RUN julia /usr/src/app/deps.jl
 COPY app.jl /usr/src/app/
 
 # run the application
-CMD [&quot;julia&quot;, &quot;/usr/src/app/app.jl&quot;]
-</code></pre>
-
-<p>To create the container, use the command <code>docker build</code>. You can give a name
+CMD [&#34;julia&#34;, &#34;/usr/src/app/app.jl&#34;]
+</code></pre><p>To create the container, use the command <code>docker build</code>. You can give a name
 to your container using the <code>--tag , -t</code> option:</p>
-
-<pre><code>docker build julia-app -t &lt;your-tag&gt;
-</code></pre>
-
-<p>To run the container you have just created:</p>
-
-<pre><code>docker run --name julia-app &lt;your-tag&gt;
-</code></pre>
-
-<p>After a few seconds, you should see an approximation of π showing up in your
+<pre tabindex="0"><code>docker build julia-app -t &lt;your-tag&gt;
+</code></pre><p>To run the container you have just created:</p>
+<pre tabindex="0"><code>docker run --name julia-app &lt;your-tag&gt;
+</code></pre><p>After a few seconds, you should see an approximation of π showing up in your
 terminal. Voilà, you have have just created your first container. The next step
-is to put your container on <a href="https://hub.docker.com/" target="_blank">DockerHub</a>. <a href="https://docs.docker.com/docker-hub/" target="_blank">Here</a>
+is to put your container on <a href="https://hub.docker.com/" target="_blank" rel="noopener">DockerHub</a>. <a href="https://docs.docker.com/docker-hub/" target="_blank" rel="noopener">Here</a>
 is a tutorial on how to do it.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>From an academic perspective, Docker solves the dependency hell and helps in producing
 reproducible research. I will try to use it more often for sharing my own research.</p>
 
@@ -621,7 +605,7 @@ reproducible research. I will try to use it more often for sharing my own resear
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -751,7 +735,7 @@ reproducible research. I will try to use it more often for sharing my own resear
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -905,7 +889,7 @@ reproducible research. I will try to use it more often for sharing my own resear
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

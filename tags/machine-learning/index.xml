@@ -1,16 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Machine learning on Julien Pascal</title>
+    <title>Machine Learning on Julien Pascal</title>
     <link>https://julienpascal.github.io/tags/machine-learning/</link>
-    <description>Recent content in Machine learning on Julien Pascal</description>
+    <description>Recent content in Machine Learning on Julien Pascal</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Julien Pascal</copyright>
     <lastBuildDate>Mon, 01 Apr 2024 15:51:54 +0100</lastBuildDate>
-    
-	<atom:link href="https://julienpascal.github.io/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
-    
+    <atom:link href="https://julienpascal.github.io/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Artificial Neural Networks to solve dynamic programming problems: a bias-corrected Monte Carlo operator</title>
@@ -19,6 +16,284 @@
       
       <guid>https://julienpascal.github.io/publication/bc-mc-2024/</guid>
       <description></description>
+    </item>
+    
+    <item>
+      <title>A Primer on Computer Vision</title>
+      <link>https://julienpascal.github.io/post/cnn/</link>
+      <pubDate>Thu, 05 Dec 2019 18:53:22 +0100</pubDate>
+      
+      <guid>https://julienpascal.github.io/post/cnn/</guid>
+      <description>&lt;p&gt;For a specific project on the housing market (&lt;a href=&#34;https://julienpascal.github.io/project/rentalmarket/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;), I had to analyze thousands of photos. To do that, I used a &lt;strong&gt;convolutional neural network&lt;/strong&gt; (CNN), which is a fancy name for a complicated function that can be &amp;ldquo;trained&amp;rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &lt;strong&gt;&amp;ldquo;Hello World&amp;rdquo;&lt;/strong&gt; of computer vision and CNN: the classification of hand-written digits from the &lt;a href=&#34;https://en.wikipedia.org/wiki/MNIST_database&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MNIST dataset&lt;/a&gt;. There are thousands of tutorials on the same topic using Python freely available on the Internet. Instead, let&amp;rsquo;s use Julia and the package &lt;strong&gt;Flux.jl&lt;/strong&gt;. Why? Because &lt;strong&gt;Julia is fast&lt;/strong&gt;, and if you have millions of images to analyze, the speed up could be substantial compared to Python. The Jupyter notebook used to generate this post can be found &lt;a href=&#34;https://github.com/JulienPascal/CNNPrimer&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;data&#34;&gt;Data&lt;/h2&gt;
+&lt;p&gt;The MNIST dataset contains images of hand-written digits (0 to 9) in grayscale and that are nicely centered. Each pixel is represented by a number in between 0 (black) and 255 (white). Each image is 28 by 28 pixels. One way to represent an image is to see it as a 1d-column vector of 28*28 = 784 pixels. However, this representation ignores the &amp;ldquo;structure&amp;rdquo; of an image: pixels that are close to each others are informative on the digit we are trying to identify. A CNN is a good tool to keep the spatial structure of an image, while avoiding issues linked to the &lt;a href=&#34;https://en.wikipedia.org/wiki/Curse_of_dimensionality&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;curse of dimensionality&lt;/a&gt;: images are noisy and high-dimensional input data.&lt;/p&gt;
+&lt;h2 id=&#34;a-crash-course-on-cnn&#34;&gt;A crash course on CNN&lt;/h2&gt;
+&lt;p&gt;Two of the key ingredients of a CNN are a &lt;strong&gt;convolutional layer&lt;/strong&gt; (hence the name) and a &lt;strong&gt;maxpool layer&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;convolutional-layer&#34;&gt;Convolutional layer&lt;/h3&gt;
+&lt;p&gt;A convolutional layer applies a &lt;em&gt;stencil&lt;/em&gt; to each point. The output of a convolutional layer is an &amp;ldquo;image&amp;rdquo; of lower dimension, that is informative on some features of the input image (shapes, edges, etc.). The figure below shows how a convolutional layer works:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/convolution.gif&#34; alt=&#34;alt text&#34;&gt;
+source:https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&lt;/p&gt;
+&lt;h3 id=&#34;maxpool-layer&#34;&gt;Maxpool layer&lt;/h3&gt;
+&lt;p&gt;A maxpool layer is a &lt;em&gt;stencil&lt;/em&gt; that selects the maximum value within a square. Below is an illustration of a maxpool layer applied to a \( 4 \times 4\) image:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/maxpool.gif&#34; alt=&#34;alt text&#34;&gt;
+source:https://mauriciocodesso.com/post/convolution-neural-network/&lt;/p&gt;
+&lt;h3 id=&#34;stride-and-padding&#34;&gt;Stride and Padding&lt;/h3&gt;
+&lt;p&gt;When building a CNN, one must specify two hyper parameters: &lt;strong&gt;stride and padding&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;When the stride is equal to 1, we move the filters one pixel at a time. When stride is equal to 2, we move the filters two pixel at a time, etc.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Padding refers to &amp;ldquo;adding zeroes&amp;rdquo; at the border of an image. Padding can be used to control the size of the output volume and helps in keeping information at the border of images&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Below is an example of a \(3 \times 3\) filter applied to a \(5 \times 5\) input padded with a \(1 \times 1\) border of zeros using \(2 \times 2\) strides:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/padding_strides.gif&#34; alt=&#34;alt text&#34;&gt;
+source: &lt;a href=&#34;http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The typical infrastructure of a CNN is first to apply a convolutional layer to the input image, then to use a maxpool layer, before using a fully-connected layer. Several &amp;ldquo;convolutional layer - maxpool layer&amp;rdquo; units can be stacked together before using a fully-connected (FC) layer. Note that an activation layer (often &lt;a href=&#34;https://en.wikipedia.org/wiki/Rectifier_%28neural_networks%29&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ReLU&lt;/a&gt;) is generally inserted between the the convolutional and the maxpool layer.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/architecture.png&#34; alt=&#34;alt text&#34;&gt;
+source: &lt;a href=&#34;https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;using-fluxjl&#34;&gt;Using Flux.jl&lt;/h2&gt;
+&lt;p&gt;Flux.jl is a leading machine learning package in the Julia ecosystem. In what follows, we load both the train and the test samples of the MNIST dataset. The train sample is a set of images used to fine-tune the parameters of the CNN, while the test sample contains images used to check that we did not overfit the train sample. A smoking gun for overfitting is when the accuracy in the train sample is much better than the accuracy using images from the test sample.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; Flux, Flux&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Data&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;MNIST, Statistics
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; Flux&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; onehotbatch, onecold, crossentropy, throttle
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; Base&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Iterators&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; repeated, partition
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; Printf, BSON
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; ImageView
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Load labels and images from Flux.Data.MNIST&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Train set: images used to estimate the CNN&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;train_labels &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; MNIST&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;labels(&lt;span style=&#34;color:#e6db74&#34;&gt;:train&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;train_imgs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; MNIST&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;images(&lt;span style=&#34;color:#e6db74&#34;&gt;:train&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Test set: images used to see how well the CNN perform &amp;#34;out-of-the-sample&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test_imgs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; MNIST&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;images(&lt;span style=&#34;color:#e6db74&#34;&gt;:test&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test_labels &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; MNIST&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;labels(&lt;span style=&#34;color:#e6db74&#34;&gt;:test&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Images in the train set: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(size(train_imgs))&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Images in the test set: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(size(test_imgs))&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Visualization of one digit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NROWS, NCOLS &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;28&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;28&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; reshape(train_imgs[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;], NROWS, NCOLS)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;Images in the train set: (60000,)Images in the test set: (10000,)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_13_1.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;cnn-architecture&#34;&gt;CNN architecture&lt;/h2&gt;
+&lt;p&gt;Our CNN has the usual CONV-&amp;gt;ReLU-&amp;gt;MaxPool components, before using a FC layer. We use a \(1 \times 1\) padding and a stride of \(1\) (the default value). The size of input is gradually reduced by using \(2 \times 2\) maxpool layers. The default activation in Flux.jl is the function is \( x-&amp;gt;x \). Here, we use the Rectified Linear Unit function (ReLU) instead:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;model &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Chain(
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# First convolution, operating upon a 28x28 image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Conv((&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;), &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;16&lt;/span&gt;, pad&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), relu),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    MaxPool((&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)), &lt;span style=&#34;color:#75715e&#34;&gt;#maxpooling&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Second convolution, operating upon a 14x14 image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Conv((&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;), &lt;span style=&#34;color:#ae81ff&#34;&gt;16&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;32&lt;/span&gt;, pad&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), relu),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    MaxPool((&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)), &lt;span style=&#34;color:#75715e&#34;&gt;#maxpooling&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Third convolution, operating upon a 7x7 image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Conv((&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;), &lt;span style=&#34;color:#ae81ff&#34;&gt;32&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;32&lt;/span&gt;,pad&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), relu),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    MaxPool((&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Reshape 3d tensor into a 2d one, at this point it should be (3, 3, 32, N)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# which is where we get the 288 in the `Dense` layer below:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    x &lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt; reshape(x, &lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;, size(x, &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;)),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Dense(&lt;span style=&#34;color:#ae81ff&#34;&gt;288&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;),
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Softmax to get probabilities&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    softmax,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The ReLU activation function is a piece-wise linear function. In the &lt;a href=&#34;https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;“ImageNet Classification with Deep Convolutional Neural Networks&amp;quot;&lt;/a&gt; paper by Krizhevsky and coauthors, the authors write:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs). Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The ReLU activation function also helps in reducing the practical issues caused by &lt;a href=&#34;https://en.wikipedia.org/wiki/Vanishing_gradient_problem&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;the vanishing gradient problem&lt;/a&gt;. That is, the failure of the minizimation algorithm used to find the parameters of our CNN. Below is a plot of the ReLU activation function:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;xgrid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; collect(range(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, length&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;plot(xgrid, NNlib&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;relu&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;(xgrid), label &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;relu(x)&amp;#34;&lt;/span&gt;, title&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ReLU activation function&amp;#34;&lt;/span&gt;, xlabel&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;x&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_18_0.svg&#34; alt=&#34;svg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;training&#34;&gt;Training&lt;/h2&gt;
+&lt;h3 id=&#34;batching&#34;&gt;Batching&lt;/h3&gt;
+&lt;p&gt;The batch size is a parameter that tells us how many images the network will &amp;ldquo;see&amp;rdquo; at once when &amp;ldquo;training&amp;rdquo;.
+In technical terms, when performing gradient descent, we don&amp;rsquo;t use all the information at once (because of memory limitations and because it is not necessarily efficient). The following function generates &amp;ldquo;batches&amp;rdquo; of images:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Bundle images together with labels and group into minibatchess&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; make_minibatch(X, Y, idxs)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    X_batch &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;Array&lt;/span&gt;{&lt;span style=&#34;color:#66d9ef&#34;&gt;Float32&lt;/span&gt;}(undef, size(X[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;])&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, length(idxs))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i &lt;span style=&#34;color:#66d9ef&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;length(idxs)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        X_batch[&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;, &lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;, i] &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;Float32&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;(X[idxs[i]])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Y_batch &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; onehotbatch(Y[idxs], &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;9&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; (X_batch, Y_batch)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# The CNN only &amp;#34;sees&amp;#34; 128 images at each training cycle:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;batch_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;128&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mb_idxs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; partition(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;length(train_imgs), batch_size)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# train set in the form of batches&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;train_set &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [make_minibatch(train_imgs, train_labels, i) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i &lt;span style=&#34;color:#66d9ef&#34;&gt;in&lt;/span&gt; mb_idxs];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# train set in one-go: used to calculate accuracy with the train set&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;train_set_full &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; make_minibatch(train_imgs, train_labels, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;length(train_imgs));
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# test set: to check we do not overfit the train data:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test_set &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; make_minibatch(test_imgs, test_labels, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;length(test_imgs));
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;loss-function-and-minimization&#34;&gt;Loss function and minimization&lt;/h3&gt;
+&lt;p&gt;For the CNN to &amp;ldquo;learn&amp;rdquo; anything at all, it must have a notion of &amp;ldquo;wrong&amp;rdquo; or &amp;ldquo;right&amp;rdquo;. The loss function does exactly that, by quantifying how well the model performs at recognizing digits. When the output is a probability, the &lt;a href=&#34;https://en.wikipedia.org/wiki/Cross_entropy&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;cross entropy&lt;/a&gt; loss function is appropriate. The final step is to select an algorithm to minimize the loss function. Here, let&amp;rsquo;s select the &lt;a href=&#34;https://arxiv.org/abs/1412.6980&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ADAM&lt;/a&gt; algorithm, which I understand as some sort of &lt;a href=&#34;https://julienpascal.github.io/post/ols_ml/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Stochastic Gradient Descent&lt;/a&gt; with momentum and adaptive learning rate:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# `loss()` calculates the crossentropy loss between our prediction `y_hat`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# We augment the data a bit, adding gaussian random noise to our image to make it more robust.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; loss(x, y)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Add some noise to the image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# we reduce the risk of overfitting the train sample by doing so:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    x_aug &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;.+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1f0&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;gpu(randn(eltype(x), size(x)))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    y_hat &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model(x_aug)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; crossentropy(y_hat, y)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;accuracy(x, y) &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; mean(onecold(model(x)) &lt;span style=&#34;color:#f92672&#34;&gt;.==&lt;/span&gt; onecold(y))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# ADAM optimizer&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;opt &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ADAM(&lt;span style=&#34;color:#ae81ff&#34;&gt;0.001&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This block &amp;ldquo;train&amp;rdquo; (fine-tune the CNN parameter values) the model until a pre-determined accuracy level is reached:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;best_acc &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;last_improvement &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;accuracy_target &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.97&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;#Set an accuracy target. When reached, we stop training.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;max_epochs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;#Maximum&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; epoch_idx &lt;span style=&#34;color:#66d9ef&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;global&lt;/span&gt; best_acc, last_improvement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Train for a single epoch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    Flux&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;train!(loss, params(model), train_set, opt)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Calculate accuracy:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    acc &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; accuracy(train_set_full&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@info&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;@sprintf&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;[&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%d&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;]: Train accuracy: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%.4f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;, epoch_idx, acc))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# Calculate accuracy:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    acc &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; accuracy(test_set&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@info&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;@sprintf&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;[&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%d&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;]: Test accuracy: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;%.4f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;, epoch_idx, acc))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# If our accuracy is good enough, quit out.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; acc &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;=&lt;/span&gt; accuracy_target
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;@info&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34; -&amp;gt; Early-exiting: We reached our target accuracy of &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(accuracy_target&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;)&lt;span style=&#34;color:#e6db74&#34;&gt;%&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; epoch_idx &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; last_improvement &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#a6e22e&#34;&gt;@warn&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34; -&amp;gt; We&amp;#39;re calling this converged.&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;┌ Info: [1]: Train accuracy: 0.9579
+└ @ Main In[14]:12
+┌ Info: [1]: Test accuracy: 0.9605
+└ @ Main In[14]:16
+┌ Info: [2]: Train accuracy: 0.9749
+└ @ Main In[14]:12
+┌ Info: [2]: Test accuracy: 0.9756
+└ @ Main In[14]:16
+┌ Info:  -&amp;gt; Early-exiting: We reached our target accuracy of 97.0%
+└ @ Main In[14]:20
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;predictions&#34;&gt;Predictions&lt;/h2&gt;
+&lt;p&gt;Once the model is trained, predicted values are easily obtained as follows:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get predictions and convert data to Array:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pred &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Tracker&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data(model(test_set[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;]));
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Show the first 5 predictions&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# One column is an image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Each row corresponds to the probability of a digit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pred[&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Function to get the row index of the max value:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;f1(x) &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; getindex&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;(argmax(x, dims&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Final predicted value is the one with the maximum probability:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pred &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; f1(pred) &lt;span style=&#34;color:#f92672&#34;&gt;.-&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;; &lt;span style=&#34;color:#75715e&#34;&gt;#minus 1 because the first element is 0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Let&amp;rsquo;s see how the model performs on the test set. Can the CNN recognize digits using images that were not used when training the model? As you can see below, our model does an amazing job at recognizing hand-written digits:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;println(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Predicted value = &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(pred[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;])&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; reshape(test_imgs[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;], NROWS, NCOLS)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;Predicted value = 7
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_30_1.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;println(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Predicted value = &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(pred[&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;])&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; reshape(test_imgs[&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;], NROWS, NCOLS)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;Predicted value = 2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_31_1.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;println(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Predicted value = &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(pred[&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;])&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; reshape(test_imgs[&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;], NROWS, NCOLS)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;Predicted value = 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_32_1.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;accuracy-checks&#34;&gt;Accuracy checks&lt;/h3&gt;
+&lt;p&gt;We now have a model that seems to do quite a good job in recognizing digits. But can we improve it? If yes, how?
+To improve our model, we first need to identify when and why it fails.&lt;/p&gt;
+&lt;h4 id=&#34;confusion-matrix&#34;&gt;Confusion matrix&lt;/h4&gt;
+&lt;p&gt;To do that, a useful reporting
+tool is a &lt;strong&gt;confusion matrix&lt;/strong&gt;. Each row of a confusion matrix shows instances of the true value, while each column displays instances of the predicted value. Ideally, we would like our model to perfectly predict the outcome. With a perfect model, all instances would be located on the diagonal elements of the confusion matrix.&lt;/p&gt;
+&lt;p&gt;The last time I checked, &lt;code&gt;Flux.jl&lt;/code&gt; did not have an in-built function to calculate confusion matrices. Fortunately, an implementation is available in the package &lt;code&gt;MLBase&lt;/code&gt;. The next block of code calculates the confusion matrix and displays it. Most of instances are on located on the diagonal, which is not a surprise given that the accuracy rate for our model is more than \(97.0\%\)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; MLBase
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Adding 1 to outcome because the index 0 in arrays does not exist in Julia&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cm &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; confusmat(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, test_labels &lt;span style=&#34;color:#f92672&#34;&gt;.+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, vec(pred) &lt;span style=&#34;color:#f92672&#34;&gt;.+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;10×10 Array{Int64,2}:
+ 968     1     1    0    0    4    3    1    2    0
+   0  1128     3    0    0    0    1    0    3    0
+   3     5  1003    6    1    1    0    6    7    0
+   0     0     1  992    0   10    0    2    4    1
+   0     1     2    0  972    0    0    1    1    5
+   1     0     1    4    0  883    1    1    1    0
+   1     4     0    0    1   13  936    0    3    0
+   1     7    10    5    0    1    0  986    3   15
+   2     0     4    6    4    8    2    4  942    2
+   4     4     0    7    7   10    0    8    2  967
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Normalize output:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cm  &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Cm &lt;span style=&#34;color:#f92672&#34;&gt;./&lt;/span&gt; sum(Cm, dims&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Labels&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;xs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [string(i) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;9&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;heatmap(xs, xs, Cm, aspect_ratio&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, color&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;:plasma&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_41_0.svg&#34; alt=&#34;svg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;To visualize where our model makes mistakes, one can use the optional argument &lt;code&gt;clim&lt;/code&gt;, to put an upper bound on
+the underlying colormap. For instance, the next plot shows that our model has troubles differencing 7 and 2 or 8 and 2.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Limits to colormap, so we can see where errors are located:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;xs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [string(i) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;9&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;heatmap(xs, xs, Cm, aspect_ratio&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, color&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;:plasma&lt;/span&gt;, clim&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0.&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.01&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/CNN_43_0.svg&#34; alt=&#34;svg&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;error-analysis&#34;&gt;Error Analysis&lt;/h4&gt;
+&lt;p&gt;The next block of code displays digits for which our CNN failed:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# indices for errors:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;using&lt;/span&gt; ImageView, Gtk&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ShortNames
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mistakes &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; test_labels &lt;span style=&#34;color:#f92672&#34;&gt;.!=&lt;/span&gt; vec(pred)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;max_images &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;grid, frames, canvases &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; canvasgrid((&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,max_images)); &lt;span style=&#34;color:#75715e&#34;&gt;# 1 row&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-julia&#34; data-lang=&#34;julia&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;k&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#counter for mistakes&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; (j, i) &lt;span style=&#34;color:#66d9ef&#34;&gt;in&lt;/span&gt; enumerate(mistakes)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; true
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        k&lt;span style=&#34;color:#f92672&#34;&gt;+=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# a false value has been found&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        println(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Predicted value = &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(pred[j])&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        println(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;True value = &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(test_labels[j])&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        imshow(canvases[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,k], test_imgs[j])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        idx &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ImageView&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;annotate!(guidict, AnnotationText(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;$&lt;/span&gt;(pred[j])&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;, color&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;RGB(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;), fontsize&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; k &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;=&lt;/span&gt; max_images
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;win &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Window(grid);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Gtk&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;showall(win);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;Predicted value = 5
+True value = 9
+Predicted value = 5
+True value = 6
+Predicted value = 4
+True value = 8
+Predicted value = 3
+True value = 2
+Predicted value = 7
+True value = 2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://julienpascal.github.io/post/cnn/false_values.png&#34; alt=&#34;alt&#34;&gt;&lt;/p&gt;
+&lt;p&gt;While it seems obvious that the two digits starting from the left are a 9 and a 6, the remaining 3 elements are not trivial. The 8 in the middle could be easily confused with something else and the two remaining digits are weirdly shaped.&lt;/p&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;When dealing with images, a convolutional neural network generally does an amazing job at recognizing patterns. This blog post was a non-technical introduction to the topic. While Python is the tool of predilection in machine learning (Keras, TensorFlow, etc.), my guess is that Julia will get increasingly popular because Julia is both easy to use and fast.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;This blog post is heavily based on this Flux.jl tutorial: &lt;a href=&#34;https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;On the links between CNN and PDEs: &lt;a href=&#34;https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://mitmath.github.io/18337/lecture14/pdes_and_convolutions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;A full course on CNN. Most of the content is available online: &lt;a href=&#34;http://cs231n.github.io/convolutional-networks/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;http://cs231n.github.io/convolutional-networks/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
   </channel>

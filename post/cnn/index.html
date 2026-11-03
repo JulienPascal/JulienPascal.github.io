@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,7 +28,7 @@
   
     
   
-  <meta name="description" content="For a specific project on the housing market (here), I had to analyze thousands of photos. To do that, I used a convolutional neural network (CNN), which is a fancy name for a complicated function that can be &ldquo;trained&rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &ldquo;Hello World&rdquo; of computer vision and CNN: the classification of hand-written digits from the MNIST dataset.">
+  <meta name="description" content="For a specific project on the housing market (here), I had to analyze thousands of photos. To do that, I used a convolutional neural network (CNN), which is a fancy name for a complicated function that can be &ldquo;trained&rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &ldquo;Hello World&rdquo; of computer vision and CNN: the classification of hand-written digits from the MNIST dataset. There are thousands of tutorials on the same topic using Python freely available on the Internet. Instead, let&rsquo;s use Julia and the package Flux.jl. Why? Because Julia is fast, and if you have millions of images to analyze, the speed up could be substantial compared to Python. The Jupyter notebook used to generate this post can be found here.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/cnn/">
@@ -100,9 +100,6 @@
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -125,7 +122,7 @@
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/cnn/">
   <meta property="og:title" content="A Primer on Computer Vision | Julien Pascal">
-  <meta property="og:description" content="For a specific project on the housing market (here), I had to analyze thousands of photos. To do that, I used a convolutional neural network (CNN), which is a fancy name for a complicated function that can be &ldquo;trained&rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &ldquo;Hello World&rdquo; of computer vision and CNN: the classification of hand-written digits from the MNIST dataset."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="For a specific project on the housing market (here), I had to analyze thousands of photos. To do that, I used a convolutional neural network (CNN), which is a fancy name for a complicated function that can be &ldquo;trained&rdquo; to recognize patterns in images. In this blog post, I would like to introduce the &ldquo;Hello World&rdquo; of computer vision and CNN: the classification of hand-written digits from the MNIST dataset. There are thousands of tutorials on the same topic using Python freely available on the Internet. Instead, let&rsquo;s use Julia and the package Flux.jl. Why? Because Julia is fast, and if you have millions of images to analyze, the speed up could be substantial compared to Python. The Jupyter notebook used to generate this post can be found here."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2019-12-05T18:53:22&#43;01:00">
@@ -520,205 +517,160 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p>For a specific project on the housing market (<a href="https://julienpascal.github.io/project/rentalmarket/" target="_blank">here</a>), I had to analyze thousands of photos. To do that, I used a <strong>convolutional neural network</strong> (CNN), which is a fancy name for a complicated function that can be &ldquo;trained&rdquo; to recognize patterns in images. In this blog post, I would like to introduce the <strong>&ldquo;Hello World&rdquo;</strong> of computer vision and CNN: the classification of hand-written digits from the <a href="https://en.wikipedia.org/wiki/MNIST_database" target="_blank">MNIST dataset</a>. There are thousands of tutorials on the same topic using Python freely available on the Internet. Instead, let&rsquo;s use Julia and the package <strong>Flux.jl</strong>. Why? Because <strong>Julia is fast</strong>, and if you have millions of images to analyze, the speed up could be substantial compared to Python. The Jupyter notebook used to generate this post can be found <a href="https://github.com/JulienPascal/CNNPrimer" target="_blank">here</a>.</p>
-
+      <p>For a specific project on the housing market (<a href="https://julienpascal.github.io/project/rentalmarket/" target="_blank" rel="noopener">here</a>), I had to analyze thousands of photos. To do that, I used a <strong>convolutional neural network</strong> (CNN), which is a fancy name for a complicated function that can be &ldquo;trained&rdquo; to recognize patterns in images. In this blog post, I would like to introduce the <strong>&ldquo;Hello World&rdquo;</strong> of computer vision and CNN: the classification of hand-written digits from the <a href="https://en.wikipedia.org/wiki/MNIST_database" target="_blank" rel="noopener">MNIST dataset</a>. There are thousands of tutorials on the same topic using Python freely available on the Internet. Instead, let&rsquo;s use Julia and the package <strong>Flux.jl</strong>. Why? Because <strong>Julia is fast</strong>, and if you have millions of images to analyze, the speed up could be substantial compared to Python. The Jupyter notebook used to generate this post can be found <a href="https://github.com/JulienPascal/CNNPrimer" target="_blank" rel="noopener">here</a>.</p>
 <h2 id="data">Data</h2>
-
-<p>The MNIST dataset contains images of hand-written digits (0 to 9) in grayscale and that are nicely centered. Each pixel is represented by a number in between 0 (black) and 255 (white). Each image is 28 by 28 pixels. One way to represent an image is to see it as a 1d-column vector of 28*28 = 784 pixels. However, this representation ignores the &ldquo;structure&rdquo; of an image: pixels that are close to each others are informative on the digit we are trying to identify. A CNN is a good tool to keep the spatial structure of an image, while avoiding issues linked to the <a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality" target="_blank">curse of dimensionality</a>: images are noisy and high-dimensional input data.</p>
-
+<p>The MNIST dataset contains images of hand-written digits (0 to 9) in grayscale and that are nicely centered. Each pixel is represented by a number in between 0 (black) and 255 (white). Each image is 28 by 28 pixels. One way to represent an image is to see it as a 1d-column vector of 28*28 = 784 pixels. However, this representation ignores the &ldquo;structure&rdquo; of an image: pixels that are close to each others are informative on the digit we are trying to identify. A CNN is a good tool to keep the spatial structure of an image, while avoiding issues linked to the <a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality" target="_blank" rel="noopener">curse of dimensionality</a>: images are noisy and high-dimensional input data.</p>
 <h2 id="a-crash-course-on-cnn">A crash course on CNN</h2>
-
 <p>Two of the key ingredients of a CNN are a <strong>convolutional layer</strong> (hence the name) and a <strong>maxpool layer</strong>.</p>
-
 <h3 id="convolutional-layer">Convolutional layer</h3>
-
 <p>A convolutional layer applies a <em>stencil</em> to each point. The output of a convolutional layer is an &ldquo;image&rdquo; of lower dimension, that is informative on some features of the input image (shapes, edges, etc.). The figure below shows how a convolutional layer works:</p>
-
-<p><img src="convolution.gif" alt="alt text" />
-source:<a href="https://mitmath.github.io/18337/lecture14/pdes_and_convolutions" target="_blank">https://mitmath.github.io/18337/lecture14/pdes_and_convolutions</a></p>
-
+<p><img src="/post/cnn/convolution.gif" alt="alt text">
+source:https://mitmath.github.io/18337/lecture14/pdes_and_convolutions</p>
 <h3 id="maxpool-layer">Maxpool layer</h3>
-
-<p>A maxpool layer is a <em>stencil</em> that selects the maximum value within a square. Below is an illustration of a maxpool layer applied to a $ 4 \times 4$ image:</p>
-
-<p><img src="maxpool.gif" alt="alt text" />
-source:<a href="https://mauriciocodesso.com/post/convolution-neural-network/" target="_blank">https://mauriciocodesso.com/post/convolution-neural-network/</a></p>
-
+<p>A maxpool layer is a <em>stencil</em> that selects the maximum value within a square. Below is an illustration of a maxpool layer applied to a \( 4 \times 4\) image:</p>
+<p><img src="/post/cnn/maxpool.gif" alt="alt text">
+source:https://mauriciocodesso.com/post/convolution-neural-network/</p>
 <h3 id="stride-and-padding">Stride and Padding</h3>
-
 <p>When building a CNN, one must specify two hyper parameters: <strong>stride and padding</strong></p>
-
 <ul>
-<li><p>When the stride is equal to 1, we move the filters one pixel at a time. When stride is equal to 2, we move the filters two pixel at a time, etc.</p></li>
-
-<li><p>Padding refers to &ldquo;adding zeroes&rdquo; at the border of an image. Padding can be used to control the size of the output volume and helps in keeping information at the border of images</p></li>
+<li>
+<p>When the stride is equal to 1, we move the filters one pixel at a time. When stride is equal to 2, we move the filters two pixel at a time, etc.</p>
+</li>
+<li>
+<p>Padding refers to &ldquo;adding zeroes&rdquo; at the border of an image. Padding can be used to control the size of the output volume and helps in keeping information at the border of images</p>
+</li>
 </ul>
-
-<p>Below is an example of a $3 \times 3$ filter applied to a $5 \times 5$ input padded with a $1 \times 1$ border of zeros using $2 \times 2$ strides:</p>
-
-<p><img src="padding_strides.gif" alt="alt text" />
-source: <a href="http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html" target="_blank">http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html</a></p>
-
-<p>The typical infrastructure of a CNN is first to apply a convolutional layer to the input image, then to use a maxpool layer, before using a fully-connected layer. Several &ldquo;convolutional layer - maxpool layer&rdquo; units can be stacked together before using a fully-connected (FC) layer. Note that an activation layer (often <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)" target="_blank">ReLU</a>) is generally inserted between the the convolutional and the maxpool layer.</p>
-
-<p><img src="architecture.png" alt="alt text" />
-source: <a href="https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69" target="_blank">https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69</a></p>
-
-<h2 id="using-flux-jl">Using Flux.jl</h2>
-
+<p>Below is an example of a \(3 \times 3\) filter applied to a \(5 \times 5\) input padded with a \(1 \times 1\) border of zeros using \(2 \times 2\) strides:</p>
+<p><img src="/post/cnn/padding_strides.gif" alt="alt text">
+source: <a href="http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html" target="_blank" rel="noopener">http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html</a></p>
+<p>The typical infrastructure of a CNN is first to apply a convolutional layer to the input image, then to use a maxpool layer, before using a fully-connected layer. Several &ldquo;convolutional layer - maxpool layer&rdquo; units can be stacked together before using a fully-connected (FC) layer. Note that an activation layer (often <a href="https://en.wikipedia.org/wiki/Rectifier_%28neural_networks%29" target="_blank" rel="noopener">ReLU</a>) is generally inserted between the the convolutional and the maxpool layer.</p>
+<p><img src="/post/cnn/architecture.png" alt="alt text">
+source: <a href="https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69" target="_blank" rel="noopener">https://towardsdatascience.com/visualizing-the-fundamentals-of-convolutional-neural-networks-6021e5b07f69</a></p>
+<h2 id="using-fluxjl">Using Flux.jl</h2>
 <p>Flux.jl is a leading machine learning package in the Julia ecosystem. In what follows, we load both the train and the test samples of the MNIST dataset. The train sample is a set of images used to fine-tune the parameters of the CNN, while the test sample contains images used to check that we did not overfit the train sample. A smoking gun for overfitting is when the accuracy in the train sample is much better than the accuracy using images from the test sample.</p>
-
-<pre><code class="language-julia">using Flux, Flux.Data.MNIST, Statistics
-using Flux: onehotbatch, onecold, crossentropy, throttle
-using Base.Iterators: repeated, partition
-using Printf, BSON
-using ImageView
-
-# Load labels and images from Flux.Data.MNIST
-# Train set: images used to estimate the CNN
-train_labels = MNIST.labels(:train)
-train_imgs = MNIST.images(:train);
-
-# Test set: images used to see how well the CNN perform &quot;out-of-the-sample&quot;
-test_imgs = MNIST.images(:test)
-test_labels = MNIST.labels(:test)
-
-print(&quot;Images in the train set: $(size(train_imgs))&quot;)
-print(&quot;Images in the test set: $(size(test_imgs))&quot;)
-
-# Visualization of one digit
-NROWS, NCOLS = 28, 28
-a = reshape(train_imgs[1], NROWS, NCOLS)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Flux, Flux<span style="color:#f92672">.</span>Data<span style="color:#f92672">.</span>MNIST, Statistics
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Flux<span style="color:#f92672">:</span> onehotbatch, onecold, crossentropy, throttle
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Base<span style="color:#f92672">.</span>Iterators<span style="color:#f92672">:</span> repeated, partition
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Printf, BSON
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> ImageView
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load labels and images from Flux.Data.MNIST</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Train set: images used to estimate the CNN</span>
+</span></span><span style="display:flex;"><span>train_labels <span style="color:#f92672">=</span> MNIST<span style="color:#f92672">.</span>labels(<span style="color:#e6db74">:train</span>)
+</span></span><span style="display:flex;"><span>train_imgs <span style="color:#f92672">=</span> MNIST<span style="color:#f92672">.</span>images(<span style="color:#e6db74">:train</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Test set: images used to see how well the CNN perform &#34;out-of-the-sample&#34;</span>
+</span></span><span style="display:flex;"><span>test_imgs <span style="color:#f92672">=</span> MNIST<span style="color:#f92672">.</span>images(<span style="color:#e6db74">:test</span>)
+</span></span><span style="display:flex;"><span>test_labels <span style="color:#f92672">=</span> MNIST<span style="color:#f92672">.</span>labels(<span style="color:#e6db74">:test</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Images in the train set: </span><span style="color:#e6db74">$</span>(size(train_imgs))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Images in the test set: </span><span style="color:#e6db74">$</span>(size(test_imgs))<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Visualization of one digit</span>
+</span></span><span style="display:flex;"><span>NROWS, NCOLS <span style="color:#f92672">=</span> <span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>
+</span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> reshape(train_imgs[<span style="color:#ae81ff">1</span>], NROWS, NCOLS)
+</span></span></code></pre></div><pre><code>Images in the train set: (60000,)Images in the test set: (10000,)
 </code></pre>
-
-<pre><code>Images in the train set: (60000,)Images in the test set: (10000,)
-</code></pre>
-
-<p><img src="CNN_13_1.png" alt="png" /></p>
-
+<p><img src="/post/cnn/CNN_13_1.png" alt="png"></p>
 <h2 id="cnn-architecture">CNN architecture</h2>
-
-<p>Our CNN has the usual CONV-&gt;ReLU-&gt;MaxPool components, before using a FC layer. We use a $1 \times 1$ padding and a stride of $1$ (the default value). The size of input is gradually reduced by using $2 \times 2$ maxpool layers. The default activation in Flux.jl is the function is $ x-&gt;x $. Here, we use the Rectified Linear Unit function (ReLU) instead:</p>
-
-<pre><code class="language-julia">model = Chain(
-    # First convolution, operating upon a 28x28 image
-    Conv((3, 3), 1=&gt;16, pad=(1,1), relu),
-    MaxPool((2,2)), #maxpooling
-
-    # Second convolution, operating upon a 14x14 image
-    Conv((3, 3), 16=&gt;32, pad=(1,1), relu),
-    MaxPool((2,2)), #maxpooling
-
-    # Third convolution, operating upon a 7x7 image
-    Conv((3, 3), 32=&gt;32,pad=(1,1), relu),
-    MaxPool((2,2)),
-
-    # Reshape 3d tensor into a 2d one, at this point it should be (3, 3, 32, N)
-    # which is where we get the 288 in the `Dense` layer below:
-    x -&gt; reshape(x, :, size(x, 4)),
-    Dense(288, 10),
-
-    # Softmax to get probabilities
-    softmax,
-)
-</code></pre>
-
-<p>The ReLU activation function is a piece-wise linear function. In the <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks" target="_blank">“ImageNet Classification with Deep Convolutional Neural Networks&rdquo;</a> paper by Krizhevsky and coauthors, the authors write:</p>
-
+<p>Our CNN has the usual CONV-&gt;ReLU-&gt;MaxPool components, before using a FC layer. We use a \(1 \times 1\) padding and a stride of \(1\) (the default value). The size of input is gradually reduced by using \(2 \times 2\) maxpool layers. The default activation in Flux.jl is the function is \( x-&gt;x \). Here, we use the Rectified Linear Unit function (ReLU) instead:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> Chain(
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># First convolution, operating upon a 28x28 image</span>
+</span></span><span style="display:flex;"><span>    Conv((<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">3</span>), <span style="color:#ae81ff">1</span><span style="color:#f92672">=&gt;</span><span style="color:#ae81ff">16</span>, pad<span style="color:#f92672">=</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>), relu),
+</span></span><span style="display:flex;"><span>    MaxPool((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)), <span style="color:#75715e">#maxpooling</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Second convolution, operating upon a 14x14 image</span>
+</span></span><span style="display:flex;"><span>    Conv((<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">3</span>), <span style="color:#ae81ff">16</span><span style="color:#f92672">=&gt;</span><span style="color:#ae81ff">32</span>, pad<span style="color:#f92672">=</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>), relu),
+</span></span><span style="display:flex;"><span>    MaxPool((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)), <span style="color:#75715e">#maxpooling</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Third convolution, operating upon a 7x7 image</span>
+</span></span><span style="display:flex;"><span>    Conv((<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">3</span>), <span style="color:#ae81ff">32</span><span style="color:#f92672">=&gt;</span><span style="color:#ae81ff">32</span>,pad<span style="color:#f92672">=</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>), relu),
+</span></span><span style="display:flex;"><span>    MaxPool((<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)),
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Reshape 3d tensor into a 2d one, at this point it should be (3, 3, 32, N)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># which is where we get the 288 in the `Dense` layer below:</span>
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">-&gt;</span> reshape(x, <span style="color:#f92672">:</span>, size(x, <span style="color:#ae81ff">4</span>)),
+</span></span><span style="display:flex;"><span>    Dense(<span style="color:#ae81ff">288</span>, <span style="color:#ae81ff">10</span>),
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Softmax to get probabilities</span>
+</span></span><span style="display:flex;"><span>    softmax,
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>The ReLU activation function is a piece-wise linear function. In the <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks" target="_blank" rel="noopener">“ImageNet Classification with Deep Convolutional Neural Networks&quot;</a> paper by Krizhevsky and coauthors, the authors write:</p>
 <blockquote>
 <p>we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs). Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units.</p>
 </blockquote>
-
-<p>The ReLU activation function also helps in reducing the practical issues caused by <a href="https://en.wikipedia.org/wiki/Vanishing_gradient_problem" target="_blank">the vanishing gradient problem</a>. That is, the failure of the minizimation algorithm used to find the parameters of our CNN. Below is a plot of the ReLU activation function:</p>
-
-<pre><code class="language-julia">xgrid = collect(range(-1, 1, length=100))
-plot(xgrid, NNlib.relu.(xgrid), label = &quot;relu(x)&quot;, title=&quot;ReLU activation function&quot;, xlabel=&quot;x&quot;)
-</code></pre>
-
-<p><img src="CNN_18_0.svg" alt="svg" /></p>
-
+<p>The ReLU activation function also helps in reducing the practical issues caused by <a href="https://en.wikipedia.org/wiki/Vanishing_gradient_problem" target="_blank" rel="noopener">the vanishing gradient problem</a>. That is, the failure of the minizimation algorithm used to find the parameters of our CNN. Below is a plot of the ReLU activation function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>xgrid <span style="color:#f92672">=</span> collect(range(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, length<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>))
+</span></span><span style="display:flex;"><span>plot(xgrid, NNlib<span style="color:#f92672">.</span>relu<span style="color:#f92672">.</span>(xgrid), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;relu(x)&#34;</span>, title<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;ReLU activation function&#34;</span>, xlabel<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;x&#34;</span>)
+</span></span></code></pre></div><p><img src="/post/cnn/CNN_18_0.svg" alt="svg"></p>
 <h2 id="training">Training</h2>
-
 <h3 id="batching">Batching</h3>
-
 <p>The batch size is a parameter that tells us how many images the network will &ldquo;see&rdquo; at once when &ldquo;training&rdquo;.
 In technical terms, when performing gradient descent, we don&rsquo;t use all the information at once (because of memory limitations and because it is not necessarily efficient). The following function generates &ldquo;batches&rdquo; of images:</p>
-
-<pre><code class="language-julia"># Bundle images together with labels and group into minibatchess
-function make_minibatch(X, Y, idxs)
-    X_batch = Array{Float32}(undef, size(X[1])..., 1, length(idxs))
-    for i in 1:length(idxs)
-        X_batch[:, :, :, i] = Float32.(X[idxs[i]])
-    end
-    Y_batch = onehotbatch(Y[idxs], 0:9)
-    return (X_batch, Y_batch)
-end
-# The CNN only &quot;sees&quot; 128 images at each training cycle:
-batch_size = 128
-mb_idxs = partition(1:length(train_imgs), batch_size)
-# train set in the form of batches
-train_set = [make_minibatch(train_imgs, train_labels, i) for i in mb_idxs];
-# train set in one-go: used to calculate accuracy with the train set
-train_set_full = make_minibatch(train_imgs, train_labels, 1:length(train_imgs));
-# test set: to check we do not overfit the train data:
-test_set = make_minibatch(test_imgs, test_labels, 1:length(test_imgs));
-</code></pre>
-
-<h3 id="loss-function-and-minimization">Loss function and minimization</h3>
-
-<p>For the CNN to &ldquo;learn&rdquo; anything at all, it must have a notion of &ldquo;wrong&rdquo; or &ldquo;right&rdquo;. The loss function does exactly that, by quantifying how well the model performs at recognizing digits. When the output is a probability, the <a href="https://en.wikipedia.org/wiki/Cross_entropy" target="_blank">cross entropy</a> loss function is appropriate. The final step is to select an algorithm to minimize the loss function. Here, let&rsquo;s select the <a href="https://arxiv.org/abs/1412.6980" target="_blank">ADAM</a> algorithm, which I understand as some sort of <a href="https://julienpascal.github.io/post/ols_ml/" target="_blank">Stochastic Gradient Descent</a> with momentum and adaptive learning rate:</p>
-
-<pre><code class="language-julia"># `loss()` calculates the crossentropy loss between our prediction `y_hat`
-# We augment the data a bit, adding gaussian random noise to our image to make it more robust.
-function loss(x, y)
-    # Add some noise to the image
-    # we reduce the risk of overfitting the train sample by doing so:
-    x_aug = x .+ 0.1f0*gpu(randn(eltype(x), size(x)))
-
-    y_hat = model(x_aug)
-    return crossentropy(y_hat, y)
-end
-accuracy(x, y) = mean(onecold(model(x)) .== onecold(y))
-
-# ADAM optimizer
-opt = ADAM(0.001);
-</code></pre>
-
-<p>This block &ldquo;train&rdquo; (fine-tune the CNN parameter values) the model until a pre-determined accuracy level is reached:</p>
-
-<pre><code class="language-julia">best_acc = 0.0
-last_improvement = 0
-accuracy_target = 0.97 #Set an accuracy target. When reached, we stop training.
-max_epochs = 100 #Maximum
-for epoch_idx in 1:100
-    global best_acc, last_improvement
-    # Train for a single epoch
-    Flux.train!(loss, params(model), train_set, opt)
-
-    # Calculate accuracy:
-    acc = accuracy(train_set_full...)
-    @info(@sprintf(&quot;[%d]: Train accuracy: %.4f&quot;, epoch_idx, acc))
-
-    # Calculate accuracy:
-    acc = accuracy(test_set...)
-    @info(@sprintf(&quot;[%d]: Test accuracy: %.4f&quot;, epoch_idx, acc))
-
-    # If our accuracy is good enough, quit out.
-    if acc &gt;= accuracy_target
-        @info(&quot; -&gt; Early-exiting: We reached our target accuracy of $(accuracy_target*100)%&quot;)
-        break
-    end
-
-    if epoch_idx - last_improvement &gt;= 10
-        @warn(&quot; -&gt; We're calling this converged.&quot;)
-        break
-    end
-end
-</code></pre>
-
-<pre><code>┌ Info: [1]: Train accuracy: 0.9579
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Bundle images together with labels and group into minibatchess</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> make_minibatch(X, Y, idxs)
+</span></span><span style="display:flex;"><span>    X_batch <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float32</span>}(undef, size(X[<span style="color:#ae81ff">1</span>])<span style="color:#f92672">...</span>, <span style="color:#ae81ff">1</span>, length(idxs))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(idxs)
+</span></span><span style="display:flex;"><span>        X_batch[<span style="color:#f92672">:</span>, <span style="color:#f92672">:</span>, <span style="color:#f92672">:</span>, i] <span style="color:#f92672">=</span> <span style="color:#66d9ef">Float32</span><span style="color:#f92672">.</span>(X[idxs[i]])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    Y_batch <span style="color:#f92672">=</span> onehotbatch(Y[idxs], <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">9</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (X_batch, Y_batch)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The CNN only &#34;sees&#34; 128 images at each training cycle:</span>
+</span></span><span style="display:flex;"><span>batch_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">128</span>
+</span></span><span style="display:flex;"><span>mb_idxs <span style="color:#f92672">=</span> partition(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(train_imgs), batch_size)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># train set in the form of batches</span>
+</span></span><span style="display:flex;"><span>train_set <span style="color:#f92672">=</span> [make_minibatch(train_imgs, train_labels, i) <span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> mb_idxs];
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># train set in one-go: used to calculate accuracy with the train set</span>
+</span></span><span style="display:flex;"><span>train_set_full <span style="color:#f92672">=</span> make_minibatch(train_imgs, train_labels, <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(train_imgs));
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># test set: to check we do not overfit the train data:</span>
+</span></span><span style="display:flex;"><span>test_set <span style="color:#f92672">=</span> make_minibatch(test_imgs, test_labels, <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(test_imgs));
+</span></span></code></pre></div><h3 id="loss-function-and-minimization">Loss function and minimization</h3>
+<p>For the CNN to &ldquo;learn&rdquo; anything at all, it must have a notion of &ldquo;wrong&rdquo; or &ldquo;right&rdquo;. The loss function does exactly that, by quantifying how well the model performs at recognizing digits. When the output is a probability, the <a href="https://en.wikipedia.org/wiki/Cross_entropy" target="_blank" rel="noopener">cross entropy</a> loss function is appropriate. The final step is to select an algorithm to minimize the loss function. Here, let&rsquo;s select the <a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">ADAM</a> algorithm, which I understand as some sort of <a href="https://julienpascal.github.io/post/ols_ml/" target="_blank" rel="noopener">Stochastic Gradient Descent</a> with momentum and adaptive learning rate:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># `loss()` calculates the crossentropy loss between our prediction `y_hat`</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># We augment the data a bit, adding gaussian random noise to our image to make it more robust.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> loss(x, y)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Add some noise to the image</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># we reduce the risk of overfitting the train sample by doing so:</span>
+</span></span><span style="display:flex;"><span>    x_aug <span style="color:#f92672">=</span> x <span style="color:#f92672">.+</span> <span style="color:#ae81ff">0.1f0</span><span style="color:#f92672">*</span>gpu(randn(eltype(x), size(x)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    y_hat <span style="color:#f92672">=</span> model(x_aug)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> crossentropy(y_hat, y)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>accuracy(x, y) <span style="color:#f92672">=</span> mean(onecold(model(x)) <span style="color:#f92672">.==</span> onecold(y))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ADAM optimizer</span>
+</span></span><span style="display:flex;"><span>opt <span style="color:#f92672">=</span> ADAM(<span style="color:#ae81ff">0.001</span>);
+</span></span></code></pre></div><p>This block &ldquo;train&rdquo; (fine-tune the CNN parameter values) the model until a pre-determined accuracy level is reached:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>best_acc <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span><span style="display:flex;"><span>last_improvement <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>accuracy_target <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.97</span> <span style="color:#75715e">#Set an accuracy target. When reached, we stop training.</span>
+</span></span><span style="display:flex;"><span>max_epochs <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span> <span style="color:#75715e">#Maximum</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> epoch_idx <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> best_acc, last_improvement
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Train for a single epoch</span>
+</span></span><span style="display:flex;"><span>    Flux<span style="color:#f92672">.</span>train!(loss, params(model), train_set, opt)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Calculate accuracy:</span>
+</span></span><span style="display:flex;"><span>    acc <span style="color:#f92672">=</span> accuracy(train_set_full<span style="color:#f92672">...</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@info</span>(<span style="color:#a6e22e">@sprintf</span>(<span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">]: Train accuracy: </span><span style="color:#e6db74">%.4f</span><span style="color:#e6db74">&#34;</span>, epoch_idx, acc))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Calculate accuracy:</span>
+</span></span><span style="display:flex;"><span>    acc <span style="color:#f92672">=</span> accuracy(test_set<span style="color:#f92672">...</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@info</span>(<span style="color:#a6e22e">@sprintf</span>(<span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">]: Test accuracy: </span><span style="color:#e6db74">%.4f</span><span style="color:#e6db74">&#34;</span>, epoch_idx, acc))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># If our accuracy is good enough, quit out.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> acc <span style="color:#f92672">&gt;=</span> accuracy_target
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@info</span>(<span style="color:#e6db74">&#34; -&gt; Early-exiting: We reached our target accuracy of </span><span style="color:#e6db74">$</span>(accuracy_target<span style="color:#f92672">*</span><span style="color:#ae81ff">100</span>)<span style="color:#e6db74">%&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> epoch_idx <span style="color:#f92672">-</span> last_improvement <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@warn</span>(<span style="color:#e6db74">&#34; -&gt; We&#39;re calling this converged.&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>┌ Info: [1]: Train accuracy: 0.9579
 └ @ Main In[14]:12
 ┌ Info: [1]: Test accuracy: 0.9605
 └ @ Main In[14]:16
@@ -729,70 +681,45 @@ end
 ┌ Info:  -&gt; Early-exiting: We reached our target accuracy of 97.0%
 └ @ Main In[14]:20
 </code></pre>
-
 <h2 id="predictions">Predictions</h2>
-
 <p>Once the model is trained, predicted values are easily obtained as follows:</p>
-
-<pre><code class="language-julia"># Get predictions and convert data to Array:
-pred = Tracker.data(model(test_set[1]));
-# Show the first 5 predictions
-# One column is an image
-# Each row corresponds to the probability of a digit
-pred[:,1:5]
-# Function to get the row index of the max value:
-f1(x) = getindex.(argmax(x, dims=1), 1)
-# Final predicted value is the one with the maximum probability:
-pred = f1(pred) .- 1; #minus 1 because the first element is 0
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Get predictions and convert data to Array:</span>
+</span></span><span style="display:flex;"><span>pred <span style="color:#f92672">=</span> Tracker<span style="color:#f92672">.</span>data(model(test_set[<span style="color:#ae81ff">1</span>]));
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Show the first 5 predictions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># One column is an image</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Each row corresponds to the probability of a digit</span>
+</span></span><span style="display:flex;"><span>pred[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>]
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Function to get the row index of the max value:</span>
+</span></span><span style="display:flex;"><span>f1(x) <span style="color:#f92672">=</span> getindex<span style="color:#f92672">.</span>(argmax(x, dims<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>), <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Final predicted value is the one with the maximum probability:</span>
+</span></span><span style="display:flex;"><span>pred <span style="color:#f92672">=</span> f1(pred) <span style="color:#f92672">.-</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">#minus 1 because the first element is 0</span>
+</span></span></code></pre></div><p>Let&rsquo;s see how the model performs on the test set. Can the CNN recognize digits using images that were not used when training the model? As you can see below, our model does an amazing job at recognizing hand-written digits:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Predicted value = </span><span style="color:#e6db74">$</span>(pred[<span style="color:#ae81ff">1</span>])<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> reshape(test_imgs[<span style="color:#ae81ff">1</span>], NROWS, NCOLS)
+</span></span></code></pre></div><pre><code>Predicted value = 7
 </code></pre>
-
-<p>Let&rsquo;s see how the model performs on the test set. Can the CNN recognize digits using images that were not used when training the model? As you can see below, our model does an amazing job at recognizing hand-written digits:</p>
-
-<pre><code class="language-julia">println(&quot;Predicted value = $(pred[1])&quot;)
-a = reshape(test_imgs[1], NROWS, NCOLS)
+<p><img src="/post/cnn/CNN_30_1.png" alt="png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Predicted value = </span><span style="color:#e6db74">$</span>(pred[<span style="color:#ae81ff">2</span>])<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> reshape(test_imgs[<span style="color:#ae81ff">2</span>], NROWS, NCOLS)
+</span></span></code></pre></div><pre><code>Predicted value = 2
 </code></pre>
-
-<pre><code>Predicted value = 7
+<p><img src="/post/cnn/CNN_31_1.png" alt="png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;Predicted value = </span><span style="color:#e6db74">$</span>(pred[<span style="color:#ae81ff">3</span>])<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> reshape(test_imgs[<span style="color:#ae81ff">3</span>], NROWS, NCOLS)
+</span></span></code></pre></div><pre><code>Predicted value = 1
 </code></pre>
-
-<p><img src="CNN_30_1.png" alt="png" /></p>
-
-<pre><code class="language-julia">println(&quot;Predicted value = $(pred[2])&quot;)
-a = reshape(test_imgs[2], NROWS, NCOLS)
-</code></pre>
-
-<pre><code>Predicted value = 2
-</code></pre>
-
-<p><img src="CNN_31_1.png" alt="png" /></p>
-
-<pre><code class="language-julia">println(&quot;Predicted value = $(pred[3])&quot;)
-a = reshape(test_imgs[3], NROWS, NCOLS)
-</code></pre>
-
-<pre><code>Predicted value = 1
-</code></pre>
-
-<p><img src="CNN_32_1.png" alt="png" /></p>
-
+<p><img src="/post/cnn/CNN_32_1.png" alt="png"></p>
 <h3 id="accuracy-checks">Accuracy checks</h3>
-
 <p>We now have a model that seems to do quite a good job in recognizing digits. But can we improve it? If yes, how?
 To improve our model, we first need to identify when and why it fails.</p>
-
 <h4 id="confusion-matrix">Confusion matrix</h4>
-
 <p>To do that, a useful reporting
 tool is a <strong>confusion matrix</strong>. Each row of a confusion matrix shows instances of the true value, while each column displays instances of the predicted value. Ideally, we would like our model to perfectly predict the outcome. With a perfect model, all instances would be located on the diagonal elements of the confusion matrix.</p>
-
-<p>The last time I checked, <code>Flux.jl</code> did not have an in-built function to calculate confusion matrices. Fortunately, an implementation is available in the package <code>MLBase</code>. The next block of code calculates the confusion matrix and displays it. Most of instances are on located on the diagonal, which is not a surprise given that the accuracy rate for our model is more than $97.0\%$</p>
-
-<pre><code class="language-julia">using MLBase
-# Adding 1 to outcome because the index 0 in arrays does not exist in Julia
-Cm = confusmat(10, test_labels .+ 1, vec(pred) .+ 1)
-</code></pre>
-
-<pre><code>10×10 Array{Int64,2}:
+<p>The last time I checked, <code>Flux.jl</code> did not have an in-built function to calculate confusion matrices. Fortunately, an implementation is available in the package <code>MLBase</code>. The next block of code calculates the confusion matrix and displays it. Most of instances are on located on the diagonal, which is not a surprise given that the accuracy rate for our model is more than \(97.0\%\)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> MLBase
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Adding 1 to outcome because the index 0 in arrays does not exist in Julia</span>
+</span></span><span style="display:flex;"><span>Cm <span style="color:#f92672">=</span> confusmat(<span style="color:#ae81ff">10</span>, test_labels <span style="color:#f92672">.+</span> <span style="color:#ae81ff">1</span>, vec(pred) <span style="color:#f92672">.+</span> <span style="color:#ae81ff">1</span>)
+</span></span></code></pre></div><pre><code>10×10 Array{Int64,2}:
  968     1     1    0    0    4    3    1    2    0
    0  1128     3    0    0    0    1    0    3    0
    3     5  1003    6    1    1    0    6    7    0
@@ -804,55 +731,41 @@ Cm = confusmat(10, test_labels .+ 1, vec(pred) .+ 1)
    2     0     4    6    4    8    2    4  942    2
    4     4     0    7    7   10    0    8    2  967
 </code></pre>
-
-<pre><code class="language-julia"># Normalize output:
-Cm  = Cm ./ sum(Cm, dims=2)
-# Labels
-xs = [string(i) for i = 0:9]
-heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma)
-</code></pre>
-
-<p><img src="CNN_41_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Normalize output:</span>
+</span></span><span style="display:flex;"><span>Cm  <span style="color:#f92672">=</span> Cm <span style="color:#f92672">./</span> sum(Cm, dims<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Labels</span>
+</span></span><span style="display:flex;"><span>xs <span style="color:#f92672">=</span> [string(i) <span style="color:#66d9ef">for</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">9</span>]
+</span></span><span style="display:flex;"><span>heatmap(xs, xs, Cm, aspect_ratio<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, color<span style="color:#f92672">=</span><span style="color:#e6db74">:plasma</span>)
+</span></span></code></pre></div><p><img src="/post/cnn/CNN_41_0.svg" alt="svg"></p>
 <p>To visualize where our model makes mistakes, one can use the optional argument <code>clim</code>, to put an upper bound on
 the underlying colormap. For instance, the next plot shows that our model has troubles differencing 7 and 2 or 8 and 2.</p>
-
-<pre><code class="language-julia"># Limits to colormap, so we can see where errors are located:
-xs = [string(i) for i = 0:9]
-heatmap(xs, xs, Cm, aspect_ratio=1, color=:plasma, clim=(0., 0.01))
-</code></pre>
-
-<p><img src="CNN_43_0.svg" alt="svg" /></p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Limits to colormap, so we can see where errors are located:</span>
+</span></span><span style="display:flex;"><span>xs <span style="color:#f92672">=</span> [string(i) <span style="color:#66d9ef">for</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">9</span>]
+</span></span><span style="display:flex;"><span>heatmap(xs, xs, Cm, aspect_ratio<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, color<span style="color:#f92672">=</span><span style="color:#e6db74">:plasma</span>, clim<span style="color:#f92672">=</span>(<span style="color:#ae81ff">0.</span>, <span style="color:#ae81ff">0.01</span>))
+</span></span></code></pre></div><p><img src="/post/cnn/CNN_43_0.svg" alt="svg"></p>
 <h4 id="error-analysis">Error Analysis</h4>
-
 <p>The next block of code displays digits for which our CNN failed:</p>
-
-<pre><code class="language-julia"># indices for errors:
-using ImageView, Gtk.ShortNames
-mistakes = test_labels .!= vec(pred)
-max_images = 5
-grid, frames, canvases = canvasgrid((1,max_images)); # 1 row
-</code></pre>
-
-<pre><code class="language-julia">k=0#counter for mistakes
-for (j, i) in enumerate(mistakes)
-    if i == true
-        k+=1 # a false value has been found
-        println(&quot;Predicted value = $(pred[j])&quot;)
-        println(&quot;True value = $(test_labels[j])&quot;)
-        imshow(canvases[1,k], test_imgs[j])
-        idx = ImageView.annotate!(guidict, AnnotationText(0, 0, &quot;$(pred[j])&quot;, color=RGB(0,0,0), fontsize=3))
-    end
-    if k &gt;= max_images
-        break
-    end
-end
-win = Window(grid);
-Gtk.showall(win);
-</code></pre>
-
-<pre><code>Predicted value = 5
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># indices for errors:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> ImageView, Gtk<span style="color:#f92672">.</span>ShortNames
+</span></span><span style="display:flex;"><span>mistakes <span style="color:#f92672">=</span> test_labels <span style="color:#f92672">.!=</span> vec(pred)
+</span></span><span style="display:flex;"><span>max_images <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>grid, frames, canvases <span style="color:#f92672">=</span> canvasgrid((<span style="color:#ae81ff">1</span>,max_images)); <span style="color:#75715e"># 1 row</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>k<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#75715e">#counter for mistakes</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (j, i) <span style="color:#66d9ef">in</span> enumerate(mistakes)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>        k<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span> <span style="color:#75715e"># a false value has been found</span>
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;Predicted value = </span><span style="color:#e6db74">$</span>(pred[j])<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;True value = </span><span style="color:#e6db74">$</span>(test_labels[j])<span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        imshow(canvases[<span style="color:#ae81ff">1</span>,k], test_imgs[j])
+</span></span><span style="display:flex;"><span>        idx <span style="color:#f92672">=</span> ImageView<span style="color:#f92672">.</span>annotate!(guidict, AnnotationText(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">$</span>(pred[j])<span style="color:#e6db74">&#34;</span>, color<span style="color:#f92672">=</span>RGB(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>), fontsize<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> k <span style="color:#f92672">&gt;=</span> max_images
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>win <span style="color:#f92672">=</span> Window(grid);
+</span></span><span style="display:flex;"><span>Gtk<span style="color:#f92672">.</span>showall(win);
+</span></span></code></pre></div><pre><code>Predicted value = 5
 True value = 9
 Predicted value = 5
 True value = 6
@@ -863,21 +776,15 @@ True value = 2
 Predicted value = 7
 True value = 2
 </code></pre>
-
-<p><img src="false_values.png" alt="alt" /></p>
-
+<p><img src="/post/cnn/false_values.png" alt="alt"></p>
 <p>While it seems obvious that the two digits starting from the left are a 9 and a 6, the remaining 3 elements are not trivial. The 8 in the middle could be easily confused with something else and the two remaining digits are weirdly shaped.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>When dealing with images, a convolutional neural network generally does an amazing job at recognizing patterns. This blog post was a non-technical introduction to the topic. While Python is the tool of predilection in machine learning (Keras, TensorFlow, etc.), my guess is that Julia will get increasingly popular because Julia is both easy to use and fast.</p>
-
 <h2 id="references">References</h2>
-
 <ul>
-<li>This blog post is heavily based on this Flux.jl tutorial: <a href="https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl" target="_blank">https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl</a></li>
-<li>On the links between CNN and PDEs: <a href="https://mitmath.github.io/18337/lecture14/pdes_and_convolutions" target="_blank">https://mitmath.github.io/18337/lecture14/pdes_and_convolutions</a></li>
-<li>A full course on CNN. Most of the content is available online: <a href="http://cs231n.github.io/convolutional-networks/" target="_blank">http://cs231n.github.io/convolutional-networks/</a></li>
+<li>This blog post is heavily based on this Flux.jl tutorial: <a href="https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl" target="_blank" rel="noopener">https://github.com/FluxML/model-zoo/blob/master/vision/mnist/conv.jl</a></li>
+<li>On the links between CNN and PDEs: <a href="https://mitmath.github.io/18337/lecture14/pdes_and_convolutions" target="_blank" rel="noopener">https://mitmath.github.io/18337/lecture14/pdes_and_convolutions</a></li>
+<li>A full course on CNN. Most of the content is available online: <a href="http://cs231n.github.io/convolutional-networks/" target="_blank" rel="noopener">http://cs231n.github.io/convolutional-networks/</a></li>
 </ul>
 
     </div>
@@ -915,7 +822,7 @@ True value = 2
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -1045,7 +952,7 @@ True value = 2
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1199,7 +1106,7 @@ True value = 2
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

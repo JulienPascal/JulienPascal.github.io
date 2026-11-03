@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -28,8 +28,11 @@
   
     
   
-  <meta name="description" content="Introduction In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
-Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(.">
+  <meta name="description" content="Introduction
+In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
+Theory
+Structure of economic models
+In many cases, solving an economic model involves finding a policy function \(g(.)\), which is a mapping from a state vector \(s\) to a decision vector \(a\). Usually, it is assumed that the economy is hit by random disturbances, which is usually modelled as zero-mean innovation vector \(\varepsilon\), often considered to be normally distributed. The policy function \(g(.)\) is such that the following stochastic equation holds:">
 
   
   <link rel="alternate" hreflang="en-us" href="https://julienpascal.github.io/post/bc_mc/">
@@ -101,9 +104,6 @@ Theory Structure of economic models In many cases, solving an economic model inv
   
 
   
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
@@ -126,8 +126,11 @@ Theory Structure of economic models In many cases, solving an economic model inv
   <meta property="og:site_name" content="Julien Pascal">
   <meta property="og:url" content="https://julienpascal.github.io/post/bc_mc/">
   <meta property="og:title" content="The bias-corrected Monte Carlo operator | Julien Pascal">
-  <meta property="og:description" content="Introduction In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
-Theory Structure of economic models In many cases, solving an economic model involves finding a policy function $g(."><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
+  <meta property="og:description" content="Introduction
+In this blog post, I am going to present my recent work on the bias-corrected Monte Carlo operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published here in the JEDC. In this paper, I propose a new methodology to combine Monte Carlo and neural networks to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.
+Theory
+Structure of economic models
+In many cases, solving an economic model involves finding a policy function \(g(.)\), which is a mapping from a state vector \(s\) to a decision vector \(a\). Usually, it is assumed that the economy is hit by random disturbances, which is usually modelled as zero-mean innovation vector \(\varepsilon\), often considered to be normally distributed. The policy function \(g(.)\) is such that the following stochastic equation holds:"><meta property="og:image" content="https://julienpascal.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2024-05-01T08:00:00&#43;01:00">
@@ -520,205 +523,118 @@ Theory Structure of economic models In many cases, solving an economic model inv
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<h2 id="introduction">Introduction</h2>
-
-<p>In this blog post, I am going to present my recent work on the <strong>bias-corrected Monte Carlo</strong> operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published <a href="https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459" target="_blank">here</a> in the JEDC. In this paper, I propose a new methodology to combine <strong>Monte Carlo</strong> and <strong>neural networks</strong> to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.</p>
-
+      <h2 id="introduction">Introduction</h2>
+<p>In this blog post, I am going to present my recent work on the <strong>bias-corrected Monte Carlo</strong> operator, or more compactly &ldquo;bc-MC operator&rdquo;, which was recently published <a href="https://www.sciencedirect.com/science/article/abs/pii/S0165188924000459" target="_blank" rel="noopener">here</a> in the JEDC. In this paper, I propose a new methodology to combine <strong>Monte Carlo</strong> and <strong>neural networks</strong> to solve large scale economic models. In this blog post, my goal is to give an intuitive description of this method.</p>
 <h2 id="theory">Theory</h2>
-
 <h3 id="structure-of-economic-models">Structure of economic models</h3>
-
-<p>In many cases, solving an economic model involves finding a policy function $g(.)$, which is a mapping from a state vector $s$ to a decision vector $a$. Usually, it is assumed that the economy is hit by random disturbances, which is usually modelled as zero-mean innovation vector $\varepsilon$, often considered to be normally distributed. The policy function $g(.)$ is such that the following stochastic equation holds:</p>
-
-<p>$$ E_{\varepsilon}(f(s, \varepsilon)) = 0 $$</p>
-
-<p>where $f(.)$ depends implicitly on the policy function $g(.)$ and on the particularities of the model under consideration. It looks a bit abstract, but we can usually write economic models in that form. For instance, in macroeconomic models, you usually have an Euler equation that can be written as such.</p>
-
-<p>Here, let&rsquo;s assume that we restrict ourselves to policy functions that depend on a parameter vector $\theta$: $g(. |\theta)$. Further, let&rsquo;s assume that we use a multilayer perceptron for the policy function, so that the elements of $\theta$ are actually the weights and biases of that specific neural network. Now, the problem is in many ways much simpler, because it consists in finding a finite-size vector $\theta$, rather than finding a function, which is an infinite-dimensional object:</p>
-
-<p>$$ E_{\varepsilon}(f(s, \varepsilon | \theta )) = 0 $$</p>
-
-<p>We want the equation above to be true for all values of $s$. The common way to proceed is to define a grid for $s$ and to find $g(. |\theta)$ such that the previous equation holds on these grid points. For off-grid point values, interpolation schemes can be used. This is fine when $s$ is low-dimensional, but if $s$ is high-dimensional, the curse of dimensionality is going to bite: the number of grid points grows exponentially with the dimension of $s$, not linearly. The trick here is treat $s$ as a random variable, living within an ergodic set $S$ and to solve the following problem:</p>
-
-<p>$$ E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) = 0 $$</p>
-
-<p>This probabilistic formulation works well even if $s$ is high-dimensional, because we have numerical methods that can handle high-dimensional expectations. In particular, we have Monte Carlo integration, which consists in approximating expectations using sample means.</p>
-
-<p>Now define $L(\theta)$ as the left-hand side of the previous equation:</p>
-
-<p>$$ L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) $$</p>
-
-<p>One way to find $\theta$ is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for $\theta$, denoted $\theta_{i}$, and we update the guess using the information contained in the gradient of $L$ evaluated at $\theta_i$ denoted by $\nabla_{\theta} L(\theta_i)$, which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step $\gamma$ in the opposite direction of the gradient:</p>
-
-<p>$$ \theta_{i+1} = \theta_{i} - \gamma \nabla_{\theta} L(\theta_{i}) $$</p>
-
-<p>Below is an example of gradient descent for the function $x^2 + 2 y^2$. As expected, we iteratively converge to the minimum of this simple function, at $(0,0)$.</p>
-
-<pre><code class="language-python"># Illustration of gradient descent using Python
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from IPython.display import Image
-
-# Define the function and its gradient
-def f(x, y, a=1, b=2):
-    return a*x**2 + b*y**2
-
-def grad_f(x, y, a=1, b=2):
-    return a*2*x, b*2*y
-
-# Parameters
-alpha = 0.1  # Learning rate
-n_iterations = 25 #Number of steps
-
-# Initial point
-x, y = -10, -8
-trajectory = []
-
-# Gradient Descent Algorithm
-for _ in range(n_iterations):
-    trajectory.append((x, y))
-    dx, dy = grad_f(x, y)
-    x -= alpha * dx
-    y -= alpha * dy
-
-# Setting up the visualization
-x_vals = np.linspace(-10, 10, 400)
-y_vals = np.linspace(-10, 10, 400)
-X, Y = np.meshgrid(x_vals, y_vals)
-Z = f(X, Y)
-
-fig, ax = plt.subplots(figsize=(8, 8))
-CS = ax.contour(X, Y, Z, levels=np.logspace(-1, 3, 20), cmap='viridis')
-ax.plot(0, 0, 'ro')  # Mark the minimum
-
-# Animation function
-def update(frame):
-    ax.cla()
-    ax.contour(X, Y, Z, levels=np.logspace(-1, 3, 20), cmap='viridis')
-    ax.plot(0, 0, 'ro')  # Minimum
-    # Current point and arrow
-    x, y = trajectory[frame]
-    dx, dy = grad_f(x, y)
-    # Direction of update
-    ax.arrow(x, y, -alpha * dx, -alpha * dy, head_width=0.5, head_length=0.5, fc='k', ec='k')
-    ax.set_xlim([-10, 10])
-    ax.set_ylim([-10, 10])
-    ax.set_title(f&quot;Gradient Descent Algorithm for $x^2 + 2y^2$. Iteration {frame + 1}&quot;)
-
-ani = FuncAnimation(fig, update, frames=n_iterations, repeat=False)
-ani.save('gradient_descent.gif', writer='imagemagick', fps=1)
-plt.close()
-
-Image(url='gradient_descent.gif')  
-</code></pre>
-
-<p><img src="gradient_descent.gif"/></p>
-
+<p>In many cases, solving an economic model involves finding a policy function \(g(.)\), which is a mapping from a state vector \(s\) to a decision vector \(a\). Usually, it is assumed that the economy is hit by random disturbances, which is usually modelled as zero-mean innovation vector \(\varepsilon\), often considered to be normally distributed. The policy function \(g(.)\) is such that the following stochastic equation holds:</p>
+\[ E_{\varepsilon}(f(s, \varepsilon)) = 0 \]<p>where \(f(.)\) depends implicitly on the policy function \(g(.)\) and on the particularities of the model under consideration. It looks a bit abstract, but we can usually write economic models in that form. For instance, in macroeconomic models, you usually have an Euler equation that can be written as such.</p>
+<p>Here, let&rsquo;s assume that we restrict ourselves to policy functions that depend on a parameter vector \(\theta\): \(g(. |\theta)\). Further, let&rsquo;s assume that we use a multilayer perceptron for the policy function, so that the elements of \(\theta\) are actually the weights and biases of that specific neural network. Now, the problem is in many ways much simpler, because it consists in finding a finite-size vector \(\theta\), rather than finding a function, which is an infinite-dimensional object:</p>
+\[ E_{\varepsilon}(f(s, \varepsilon | \theta )) = 0 \]<p>We want the equation above to be true for all values of \(s\). The common way to proceed is to define a grid for \(s\) and to find \(g(. |\theta)\) such that the previous equation holds on these grid points. For off-grid point values, interpolation schemes can be used. This is fine when \(s\) is low-dimensional, but if \(s\) is high-dimensional, the curse of dimensionality is going to bite: the number of grid points grows exponentially with the dimension of \(s\), not linearly. The trick here is treat \(s\) as a random variable, living within an ergodic set \(S\) and to solve the following problem:</p>
+\[ E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) = 0 \]<p>This probabilistic formulation works well even if \(s\) is high-dimensional, because we have numerical methods that can handle high-dimensional expectations. In particular, we have Monte Carlo integration, which consists in approximating expectations using sample means.</p>
+<p>Now define \(L(\theta)\) as the left-hand side of the previous equation:</p>
+\[ L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big) \]<p>One way to find \(\theta\) is to use the gradient descent algorithm, which is an iterative method. We start with a random guess for \(\theta\), denoted \(\theta_{i}\), and we update the guess using the information contained in the gradient of \(L\) evaluated at \(\theta_i\) denoted by \(\nabla_{\theta} L(\theta_i)\), which is the direction of the steepest ascent. Because we are minimizing a function, we take a small step \(\gamma\) in the opposite direction of the gradient:</p>
+\[ \theta_{i&#43;1} = \theta_{i} - \gamma \nabla_{\theta} L(\theta_{i}) \]<p>Below is an example of gradient descent for the function \(x^2 &#43; 2 y^2\). As expected, we iteratively converge to the minimum of this simple function, at \((0,0)\).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Illustration of gradient descent using Python</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> matplotlib.animation <span style="color:#f92672">import</span> FuncAnimation
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> IPython.display <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define the function and its gradient</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">f</span>(x, y, a<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, b<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a<span style="color:#f92672">*</span>x<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">+</span> b<span style="color:#f92672">*</span>y<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">grad_f</span>(x, y, a<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, b<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>x, b<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Parameters</span>
+</span></span><span style="display:flex;"><span>alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>  <span style="color:#75715e"># Learning rate</span>
+</span></span><span style="display:flex;"><span>n_iterations <span style="color:#f92672">=</span> <span style="color:#ae81ff">25</span> <span style="color:#75715e">#Number of steps</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initial point</span>
+</span></span><span style="display:flex;"><span>x, y <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">8</span>
+</span></span><span style="display:flex;"><span>trajectory <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Gradient Descent Algorithm</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(n_iterations):
+</span></span><span style="display:flex;"><span>    trajectory<span style="color:#f92672">.</span>append((x, y))
+</span></span><span style="display:flex;"><span>    dx, dy <span style="color:#f92672">=</span> grad_f(x, y)
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">-=</span> alpha <span style="color:#f92672">*</span> dx
+</span></span><span style="display:flex;"><span>    y <span style="color:#f92672">-=</span> alpha <span style="color:#f92672">*</span> dy
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Setting up the visualization</span>
+</span></span><span style="display:flex;"><span>x_vals <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>linspace(<span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">400</span>)
+</span></span><span style="display:flex;"><span>y_vals <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>linspace(<span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">400</span>)
+</span></span><span style="display:flex;"><span>X, Y <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>meshgrid(x_vals, y_vals)
+</span></span><span style="display:flex;"><span>Z <span style="color:#f92672">=</span> f(X, Y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fig, ax <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</span>subplots(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">8</span>))
+</span></span><span style="display:flex;"><span>CS <span style="color:#f92672">=</span> ax<span style="color:#f92672">.</span>contour(X, Y, Z, levels<span style="color:#f92672">=</span>np<span style="color:#f92672">.</span>logspace(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">20</span>), cmap<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;viridis&#39;</span>)
+</span></span><span style="display:flex;"><span>ax<span style="color:#f92672">.</span>plot(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#39;ro&#39;</span>)  <span style="color:#75715e"># Mark the minimum</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Animation function</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(frame):
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>cla()
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>contour(X, Y, Z, levels<span style="color:#f92672">=</span>np<span style="color:#f92672">.</span>logspace(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">20</span>), cmap<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;viridis&#39;</span>)
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>plot(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#39;ro&#39;</span>)  <span style="color:#75715e"># Minimum</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Current point and arrow</span>
+</span></span><span style="display:flex;"><span>    x, y <span style="color:#f92672">=</span> trajectory[frame]
+</span></span><span style="display:flex;"><span>    dx, dy <span style="color:#f92672">=</span> grad_f(x, y)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Direction of update</span>
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>arrow(x, y, <span style="color:#f92672">-</span>alpha <span style="color:#f92672">*</span> dx, <span style="color:#f92672">-</span>alpha <span style="color:#f92672">*</span> dy, head_width<span style="color:#f92672">=</span><span style="color:#ae81ff">0.5</span>, head_length<span style="color:#f92672">=</span><span style="color:#ae81ff">0.5</span>, fc<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;k&#39;</span>, ec<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;k&#39;</span>)
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>set_xlim([<span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">10</span>])
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>set_ylim([<span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">10</span>])
+</span></span><span style="display:flex;"><span>    ax<span style="color:#f92672">.</span>set_title(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Gradient Descent Algorithm for $x^2 + 2y^2$. Iteration </span><span style="color:#e6db74">{</span>frame <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ani <span style="color:#f92672">=</span> FuncAnimation(fig, update, frames<span style="color:#f92672">=</span>n_iterations, repeat<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>ani<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#39;gradient_descent.gif&#39;</span>, writer<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;imagemagick&#39;</span>, fps<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Image(url<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gradient_descent.gif&#39;</span>)  
+</span></span></code></pre></div><img src="gradient_descent.gif"/>
 <h3 id="the-bc-mc-operator">The bc-MC operator</h3>
-
 <p>As it is now clear from the previous visual illustration, knowledge of the gradient of the loss function is enough to find numerically a solution of our economic model, at least a local one (for the gradient descent algorithm to converge to a global minimum, we usually need the function to be convex over its domain).</p>
-
-<p>One difficulty here is that we cannot compute the expectations appearing in $L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big)$. However, as suggested before, we can use Monte Carlo integration, which consists in using sample means to approximate expectations:</p>
-
-<p>$$ L^{B}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M}\Big[ \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2 $$</p>
-
-<p>Clearly, this is an <a href="https://en.wikipedia.org/wiki/Estimator" target="_blank">estimator</a> of $L(\theta)$ that makes a lot of sense. However, because of some unpleasant arithmetic regarding the <a href="https://journals.sagepub.com/doi/abs/10.1177/0008068319750115" target="_blank">estimation the square of the mean</a>, this is a biased one.</p>
-
-<p>Start with the formula for the variance $Var(X) = E(X^2) - E(X)^2 \Leftrightarrow E(X^2) = E(X)^2 + Var(X)$. Using this formula</p>
-
-<p>$$ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \Big( E_{\varepsilon}\Big[ \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big] \Big)^2 + Var_{\varepsilon} \Big( \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big) $$</p>
-
-<p>Using the linearity of the expectation operator, and the fact that $Var(a X) = a^2 V(X)$, one gets:</p>
-
-<p>$$ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \mu_{s_m}^2 + \frac{\sigma_{s_m}^2}{N} $$</p>
-
-<p>In words, one gets the square of the mean, plus a bias term equal to the variance of $f$ (conditional on $s = s_m$) divided by $N$. Fortunately for us, there exists an unbiased estimator of the variance, given by the sample variance. An easy way to neutralize the bias is to subtract the sample variance (divided by N):</p>
-
-<p>$$ L^{U}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M }\Big( \Big[ \frac{1}{N}  \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2
- - \frac{S_m^2}{N} \Big) $$</p>
-
-<p>The term &ldquo;bc-MC operator&rdquo; comes from bias correction.</p>
-
+<p>One difficulty here is that we cannot compute the expectations appearing in \(L(\theta) = E_{s} \Big( \Big[ E_{\varepsilon}(f(s, \varepsilon | \theta )) \Big]^2 \Big)\). However, as suggested before, we can use Monte Carlo integration, which consists in using sample means to approximate expectations:</p>
+\[ L^{B}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M}\Big[ \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2 \]<p>Clearly, this is an <a href="https://en.wikipedia.org/wiki/Estimator" target="_blank" rel="noopener">estimator</a> of \(L(\theta)\) that makes a lot of sense. However, because of some unpleasant arithmetic regarding the <a href="https://journals.sagepub.com/doi/abs/10.1177/0008068319750115" target="_blank" rel="noopener">estimation the square of the mean</a>, this is a biased one.</p>
+<p>Start with the formula for the variance \(Var(X) = E(X^2) - E(X)^2 \Leftrightarrow E(X^2) = E(X)^2 &#43; Var(X)\). Using this formula</p>
+\[ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \Big( E_{\varepsilon}\Big[ \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big] \Big)^2 &#43; Var_{\varepsilon} \Big( \frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big) \]<p>Using the linearity of the expectation operator, and the fact that \(Var(a X) = a^2 V(X)\), one gets:</p>
+\[ E_{\varepsilon}\Big[ \Big(\frac{1}{N} \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big)^2 \Big] = \mu_{s_m}^2 &#43; \frac{\sigma_{s_m}^2}{N} \]<p>In words, one gets the square of the mean, plus a bias term equal to the variance of \(f\) (conditional on \(s = s_m\)) divided by \(N\). Fortunately for us, there exists an unbiased estimator of the variance, given by the sample variance. An easy way to neutralize the bias is to subtract the sample variance (divided by N):</p>
+\[ L^{U}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M }\Big( \Big[ \frac{1}{N}  \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2 - \frac{S_m^2}{N} \Big) \]<p>The term &ldquo;bc-MC operator&rdquo; comes from bias correction.</p>
 <p>The previous expression can be rewritten as:</p>
-
-<p>$$ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} \sum_{m=1}^{M} \sum_{1 \leq i &lt; j}^{N} f(s_m, \varepsilon^{i}_m | \theta ) f(s_m, \varepsilon^{j}_m | \theta ) $$</p>
-
-<p>where $\varepsilon^{i}$ and $\varepsilon^{j}$ are i.i.d. shocks with the same distribution as $\varepsilon$. This expression is more convenient because it can be written as a sparse matrix multiplication:</p>
-
-<p>$$ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} f&rsquo; \Lambda f $$</p>
-
-<p>where $\Lambda$ is a sparse matrix. More specifically</p>
-
+\[ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} \sum_{m=1}^{M} \sum_{1 \leq i &lt; j}^{N} f(s_m, \varepsilon^{i}_m | \theta ) f(s_m, \varepsilon^{j}_m | \theta ) \]<p>where \(\varepsilon^{i}\) and \(\varepsilon^{j}\) are i.i.d. shocks with the same distribution as \(\varepsilon\). This expression is more convenient because it can be written as a sparse matrix multiplication:</p>
+\[ L^{U}_{M,N}(\theta) = \frac{2}{MN(N-1)} f&#39; \Lambda f \]<p>where \(\Lambda\) is a sparse matrix. More specifically</p>
 <ul>
-<li>$f$ is MN column vector such that $f&rsquo; = (f(s_1, \varepsilon^{1}_1), &hellip;, f(s_1, \varepsilon^{N}_1), f(s_2, \varepsilon^{1}_2), &hellip;, f(s_2, \varepsilon^{N}_2), &hellip;, f(s_M, \varepsilon^{N}_M))$</li>
-<li>$\Lambda = I_{M} \otimes U_{N}$ is $MN \times MN$ sparse matrix, with $ I_{M}$ the $M \times M$ identity matrix and $U_{N}$ a $N \times N$ upper triangular matrix whose diagonal elements are equal to zero, while the entries above the main diagonal are all equal to one. The symbol $\otimes$ denotes the Kronecker product.</li>
+<li>\(f\) is MN column vector such that \(f&#39; = (f(s_1, \varepsilon^{1}_1), ..., f(s_1, \varepsilon^{N}_1), f(s_2, \varepsilon^{1}_2), ..., f(s_2, \varepsilon^{N}_2), ..., f(s_M, \varepsilon^{N}_M))\)</li>
+<li>\(\Lambda = I_{M} \otimes U_{N}\) is \(MN \times MN\) sparse matrix, with \( I_{M}\) the \(M \times M\) identity matrix and \(U_{N}\) a \(N \times N\) upper triangular matrix whose diagonal elements are equal to zero, while the entries above the main diagonal are all equal to one. The symbol \(\otimes\) denotes the Kronecker product.</li>
 </ul>
-
 <p>This expression can be very efficiently calculated using Python and Pytorch, with no loops involved.</p>
-
 <h3 id="minimum-variance-unbiased-estimator">Minimum Variance Unbiased Estimator</h3>
-
-<p>Actually, under certain conditions on the economic model under consideration, I show that $L^{U}_{M,N}(\theta)$ it the Minimum Variance Unbiased Estimator (MVUE) of the loss function $L(\theta)$. That is, if one is willing to only consider unbiased estimators of $L(\theta)$, then $L^{U}_{M,N}(\theta)$ is the one with the lowest variance. In the paper, I use the <a href="https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem" target="_blank">Lehmann-Scheffé theorem</a>. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.</p>
-
-<p>But there is another simpler proof, if one is willing to only consider estimators that <strong>linearly</strong> combine estimators of the square of means (conditional on $s=s_m$), denoted by $E_m$</p>
-
-<p>$$ L_{a} = \sum_{m=1}^{M} a_m E_m $$</p>
-
-<p>It is easy to show that for $L_{a}$ to be the MVUE of $L(\theta)$, its must be a linear combination of MVUEs for the square of means, denoted by $\tilde{E}_m$</p>
-
-<p>$$ L_{a} = \sum_{m=1}^{M} a_m \tilde{E}_m $$</p>
-
-<p>The proof relies on the <a href="https://pages.stat.wisc.edu/~shao/stat610/stat610-04.pdf" target="_blank">following lemma</a>: &ldquo;An unbiased estimator $T(X)$ of $h(\theta)$ is UMVUE iff $T(X)$ is uncorrelated with all unbiased estimators of 0&rdquo;.</p>
-
-<p>It is clear here that taking unbiased estimators for $E_m$ will result in $L_{a}$ being unbiased as well, by linearity of the expectation operator. Then, we can consider an unbiased estimator of $0$, denoted by $U$:</p>
-
-<p>$$ Cov(\sum_{m=1}^{M} a_m \tilde{E}_m, U) =  \sum_{m=1}^{M} a_m cov(\tilde{E}_m, U) = 0 $$</p>
-
-<p>where $cov(\tilde{E}_m, U) = 0$, because each $\tilde{E}_m$ is itself a MVUE by assumption. We still have to determine the optimal values for the $a_m$, under the constraint that they all sum up to one. Now, as long as the estimators $\tilde{E}_m$ have equal variance, the optimal way to select the coefficient $a_m$ is to use equal weighting: $a_m = \frac{1}{M}$ (otherwise, one may use <a href="https://en.wikipedia.org/wiki/Inverse-variance_weighting" target="_blank">inverse-variance weighting</a>, as we do with weighted least squares):</p>
-
-<p>$$ L_{a} = \frac{1}{M} \sum_{m=1}^{M} \tilde{E}_m $$</p>
-
-<p>For an i.i.d sample normally distributed with finite variance, the <a href="https://journals.sagepub.com/doi/abs/10.1177/0008068319750115" target="_blank">MVUE of the square of the mean</a> is the square of the empirical mean, minus the sample variance divided by the sample size. Said differently, we are back to the expression for the bc-MC operator, exactly as before:</p>
-
-<p>$$ L_{a} =  \frac{1}{M} \sum_{m=1}^{M }\Big( \Big[ \frac{1}{N}  \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2
- - \frac{S_m^2}{N} \Big) $$</p>
-
-<h3 id="choice-of-the-hyperparameters-m-and-n">Choice of the hyperparameters $M$ and $N$</h3>
-
-<p>One question that remains open is the optimal choice of the hyperparameters $M$ and $N$. In an ideal world in which computations are costless, we would like to take $M$ and $N$ to infinity. But in practice, the bc-MC estimator involves evaluating $f(s_m, \varepsilon_n)$ MN times, before combining these values using the formula $\frac{2}{MN(N-1)} f&rsquo; \Lambda f $. A natural starting point for a &ldquo;computational budget&rdquo; consists in considering a multiple of $MN$, even if more sophisticated techniques could be used.</p>
-
-<p>If you do that, you will find the variance of the loss (for a given $\theta$) can be written as $\frac{1}{MN} \times h(M, N, \theta) $, where $h(M, N, \theta)$ can be estimated using simulated data from the model (propositions 4-6 in the paper). Said differently, for a given &ldquo;computational budget&rdquo;, we can find the best combination of $M$ and $N$ such that $h(M, N, \theta)$ is minimized. We can train the neural network (update the value for $\theta$), while simultaneously changing the values for $M$ and $N$.</p>
-
-<p>Note that if $N=2$ all the time, then we have</p>
-
-<p>$$ L^{U}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M} f(s_m, \varepsilon^{1}_m | \theta ) f(s_m, \varepsilon^{2}_m | \theta ) $$</p>
-
-<p>which is an estimator that was already suggested in <a href="https://www.sciencedirect.com/science/article/abs/pii/S0304393221000799" target="_blank">this paper</a>.</p>
-
+<p>Actually, under certain conditions on the economic model under consideration, I show that \(L^{U}_{M,N}(\theta)\) it the Minimum Variance Unbiased Estimator (MVUE) of the loss function \(L(\theta)\). That is, if one is willing to only consider unbiased estimators of \(L(\theta)\), then \(L^{U}_{M,N}(\theta)\) is the one with the lowest variance. In the paper, I use the <a href="https://en.wikipedia.org/wiki/Lehmann%E2%80%93Scheff%C3%A9_theorem" target="_blank" rel="noopener">Lehmann-Scheffé theorem</a>. This theorem states that any estimator that is unbiased for a given unknown quantity and that depends on the data only through a complete, sufficient statistic is the unique best unbiased estimator of that quantity.</p>
+<p>But there is another simpler proof, if one is willing to only consider estimators that <strong>linearly</strong> combine estimators of the square of means (conditional on \(s=s_m\)), denoted by \(E_m\)</p>
+\[ L_{a} = \sum_{m=1}^{M} a_m E_m \]<p>It is easy to show that for \(L_{a}\) to be the MVUE of \(L(\theta)\), its must be a linear combination of MVUEs for the square of means, denoted by \(\tilde{E}_m\)</p>
+\[ L_{a} = \sum_{m=1}^{M} a_m \tilde{E}_m \]<p>The proof relies on the <a href="https://pages.stat.wisc.edu/~shao/stat610/stat610-04.pdf" target="_blank" rel="noopener">following lemma</a>: &ldquo;An unbiased estimator \(T(X)\) of \(h(\theta)\) is UMVUE iff \(T(X)\) is uncorrelated with all unbiased estimators of 0&rdquo;.</p>
+<p>It is clear here that taking unbiased estimators for \(E_m\) will result in \(L_{a}\) being unbiased as well, by linearity of the expectation operator. Then, we can consider an unbiased estimator of \(0\), denoted by \(U\):</p>
+\[ Cov(\sum_{m=1}^{M} a_m \tilde{E}_m, U) =  \sum_{m=1}^{M} a_m cov(\tilde{E}_m, U) = 0 \]<p>where \(cov(\tilde{E}_m, U) = 0\), because each \(\tilde{E}_m\) is itself a MVUE by assumption. We still have to determine the optimal values for the \(a_m\), under the constraint that they all sum up to one. Now, as long as the estimators \(\tilde{E}_m\) have equal variance, the optimal way to select the coefficient \(a_m\) is to use equal weighting: \(a_m = \frac{1}{M}\) (otherwise, one may use <a href="https://en.wikipedia.org/wiki/Inverse-variance_weighting" target="_blank" rel="noopener">inverse-variance weighting</a>, as we do with weighted least squares):</p>
+\[ L_{a} = \frac{1}{M} \sum_{m=1}^{M} \tilde{E}_m \]<p>For an i.i.d sample normally distributed with finite variance, the <a href="https://journals.sagepub.com/doi/abs/10.1177/0008068319750115" target="_blank" rel="noopener">MVUE of the square of the mean</a> is the square of the empirical mean, minus the sample variance divided by the sample size. Said differently, we are back to the expression for the bc-MC operator, exactly as before:</p>
+\[ L_{a} =  \frac{1}{M} \sum_{m=1}^{M }\Big( \Big[ \frac{1}{N}  \sum_{n=1}^{N} f(s_m, \varepsilon_n | \theta ) \Big]^2 - \frac{S_m^2}{N} \Big) \]<h3 id="choice-of-the-hyperparameters--and">Choice of the hyperparameters \(M\) and \(N\)</h3>
+<p>One question that remains open is the optimal choice of the hyperparameters \(M\) and \(N\). In an ideal world in which computations are costless, we would like to take \(M\) and \(N\) to infinity. But in practice, the bc-MC estimator involves evaluating \(f(s_m, \varepsilon_n)\) MN times, before combining these values using the formula \(\frac{2}{MN(N-1)} f&#39; \Lambda f \). A natural starting point for a &ldquo;computational budget&rdquo; consists in considering a multiple of \(MN\), even if more sophisticated techniques could be used.</p>
+<p>If you do that, you will find the variance of the loss (for a given \(\theta\)) can be written as \(\frac{1}{MN} \times h(M, N, \theta) \), where \(h(M, N, \theta)\) can be estimated using simulated data from the model (propositions 4-6 in the paper). Said differently, for a given &ldquo;computational budget&rdquo;, we can find the best combination of \(M\) and \(N\) such that \(h(M, N, \theta)\) is minimized. We can train the neural network (update the value for \(\theta\)), while simultaneously changing the values for \(M\) and \(N\).</p>
+<p>Note that if \(N=2\) all the time, then we have</p>
+\[ L^{U}_{M,N}(\theta) = \frac{1}{M} \sum_{m=1}^{M} f(s_m, \varepsilon^{1}_m | \theta ) f(s_m, \varepsilon^{2}_m | \theta ) \]<p>which is an estimator that was already suggested in <a href="https://www.sciencedirect.com/science/article/abs/pii/S0304393221000799" target="_blank" rel="noopener">this paper</a>.</p>
 <h3 id="review-of-applications">Review of applications</h3>
-
-<p>In the paper, I start with the really simple <a href="https://github.com/JulienPascal/bc-MC_Operator/tree/main/6.Brock_Mirman_Colab" target="_blank">Brock-Mirman Stochastic Growth Model from 1972</a>. For this model, we get a closed-form solution for the policy function and we can very sharply characterize the best choice for the hyperparameters $M$ and $N$. So it is good warm-up.</p>
-
-<p>A more interesting application is <a href="https://github.com/JulienPascal/bc-MC_Operator/blob/main/9.large_scale_model_2/bc-MC-consumption-savings_large_scale_1.ipynb" target="_blank">consumption-savings model with a borrowing constraint</a>.</p>
-
-<p>But you can also apply this methodology to <a href="https://github.com/JulienPascal/bc-MC_Operator/blob/main/10.OLG_model/OLG.ipynb" target="_blank">OLG models</a> with a large number of different age groups.</p>
-
+<p>In the paper, I start with the really simple <a href="https://github.com/JulienPascal/bc-MC_Operator/tree/main/6.Brock_Mirman_Colab" target="_blank" rel="noopener">Brock-Mirman Stochastic Growth Model from 1972</a>. For this model, we get a closed-form solution for the policy function and we can very sharply characterize the best choice for the hyperparameters \(M\) and \(N\). So it is good warm-up.</p>
+<p>A more interesting application is <a href="https://github.com/JulienPascal/bc-MC_Operator/blob/main/9.large_scale_model_2/bc-MC-consumption-savings_large_scale_1.ipynb" target="_blank" rel="noopener">consumption-savings model with a borrowing constraint</a>.</p>
+<p>But you can also apply this methodology to <a href="https://github.com/JulienPascal/bc-MC_Operator/blob/main/10.OLG_model/OLG.ipynb" target="_blank" rel="noopener">OLG models</a> with a large number of different age groups.</p>
 <p>Probably the next step would be to use the methodology for a Krusell-Smith model.</p>
-
 <h2 id="references">References</h2>
-
 <ul>
 <li>Julien Pascal, Artificial neural networks to solve dynamic programming problems: A bias-corrected Monte Carlo operator,
 Journal of Economic Dynamics and Control, Volume 162, 2024, 104853, ISSN 0165-1889,
-<a href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank">https://doi.org/10.1016/j.jedc.2024.104853</a>. (<a href="https://www.sciencedirect.com/science/article/pii/S0165188924000459" target="_blank">https://www.sciencedirect.com/science/article/pii/S0165188924000459</a>)</li>
+<a href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank" rel="noopener">https://doi.org/10.1016/j.jedc.2024.104853</a>. (<a href="https://www.sciencedirect.com/science/article/pii/S0165188924000459" target="_blank" rel="noopener">https://www.sciencedirect.com/science/article/pii/S0165188924000459</a>)</li>
 </ul>
-
 <p>To cite this work:</p>
-
-<pre><code>@article{PASCAL2024104853,
+<pre tabindex="0"><code>@article{PASCAL2024104853,
 title = {Artificial neural networks to solve dynamic programming problems: A bias-corrected Monte Carlo operator},
 journal = {Journal of Economic Dynamics and Control},
 volume = {162},
@@ -730,7 +646,6 @@ url = {https://www.sciencedirect.com/science/article/pii/S0165188924000459},
 author = {Julien Pascal}
 }
 </code></pre>
-
     </div>
 
     
@@ -766,7 +681,7 @@ author = {Julien Pascal}
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -906,7 +821,7 @@ author = {Julien Pascal}
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1060,7 +975,7 @@ author = {Julien Pascal}
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>

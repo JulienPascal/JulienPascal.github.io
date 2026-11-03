@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="generator" content="Source Themes Academic 4.1.0">
-  <meta name="generator" content="Hugo 0.54.0" />
+  <meta name="generator" content="Hugo 0.169.0">
 
   
 
@@ -99,9 +99,6 @@
   
   
 
-  
-  <link rel="alternate" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
-  <link rel="feed" href="https://julienpascal.github.io/index.xml" type="application/rss+xml" title="Julien Pascal">
   
 
   <link rel="manifest" href="/site.webmanifest">
@@ -518,124 +515,58 @@
   <div class="article-container">
 
     <div class="article-style" itemprop="articleBody">
-      
-
-<p>The details of solving rational expectation models are somewhat tricky. Yet, a recent paper by <a href="https://sites.google.com/site/pontusrendahl/" target="_blank">Pontus Rendahl</a> underlines that an easy (and fast) method exists. What&rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agent models and uses Reiter&rsquo;s (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.</p>
-
+      <p>The details of solving rational expectation models are somewhat tricky. Yet, a recent paper by <a href="https://sites.google.com/site/pontusrendahl/" target="_blank" rel="noopener">Pontus Rendahl</a> underlines that an easy (and fast) method exists. What&rsquo;s more, this method seems to be adapted to regime switching models and to models with a large state variable. The last point is particularly relevant if one studies heterogeneous agent models and uses Reiter&rsquo;s (2009) method to solve them. In this post, I describe the method (closely following the paper) and give simple examples in Julia.</p>
 <h2 id="intuition">Intuition</h2>
-
 <p>Below, I quote some fundamental passages from the paper, discussing the intuition of the method:</p>
-
 <blockquote>
 <p>&ldquo;The logic underlying the procedure is simple enough to be described in words. Envisage an agent having a certain amount of an asset, facing the choice between how much of this asset to <strong>consume and how much to save</strong>. An optimal choice would <strong>trade off the marginal benefit of saving (future consumption) with its marginal cost (forgone current consumption)</strong>. The resulting optimal decision is implied by a linear(ized) second-order difference equation&rdquo;</p>
-
+</blockquote>
+<blockquote>
 <p>&ldquo;[&hellip;] the future marginal benefit of saving depends on <strong>the optimal saving choice in the future</strong>. Thus, an optimal choice today can only be determined under the condition that the optimal choice in <strong>the future is known</strong>; thus the problem amounts to <strong>finding a fixed point</strong>. To solve this problem, this paper proposes to <strong>guess for the optimal choice</strong> of saving in the future as a <strong>linear function of the associated state</strong> (which is given by the optimal choice in the present). Given such a guess, the optimal choice in the present is then trivially given by solving a linear equation. However, the current optimal choice provides us with another suggestion regarding future optimal behavior, and the guess is updated accordingly.&rdquo;</p>
 </blockquote>
-
 <p>To summarize (i) solving a rational expectation model is intrinsically a fixed-point problem (ii) the Linear Time Iteration approach assumes a particular form for the solution and iterates until convergence is reached. The discussion that follows will be mainly informal, but the paper makes sure that this procedure is well behaved.</p>
-
 <h2 id="the-method">The Method</h2>
-
 <p>We are interested in solving a model of the form:</p>
-
-<p>$$Ax_{t-1}+B x_{t}+CE_{t}[x_{t+1}]+u_{t}=0$$</p>
-
-<p>Where $x_t$ is an n × 1 vector containing endogenous and exogenous variables, $u_t$ is an n × 1 vector of mean-zero disturbances, and $A$, $B$ and $C$ are conformable matrices.</p>
-
+\[Ax_{t-1}&#43;B x_{t}&#43;CE_{t}[x_{t&#43;1}]&#43;u_{t}=0\]<p>Where \(x_t\) is an n × 1 vector containing endogenous and exogenous variables, \(u_t\) is an n × 1 vector of mean-zero disturbances, and \(A\), \(B\) and \(C\) are conformable matrices.</p>
 <p>Let us assume that the solution is:</p>
-
-<p>$$ x_{t} = F x_{t-1} + Q u_{t} $$</p>
-
-<p>where $F$ and $Q$ are unknown matrices.</p>
-
-<p>Substituting the linear law of motion into the first equation (and using the fact that $u_{t+1}$ is a mean-zero random noise term) yields:</p>
-
-<p>$$ A x_{t−1} + B x_{t} + CF x_{t} + u_{t} = 0. $$</p>
-
-<p>This equation can be written as:</p>
-
-<p>$$ x_{t} = -(B + CF)^{-1} A x_{t−1} + (-(B + CF)^{-1})u_t $$</p>
-
-<p>Comparing the solution we assumed in the first place, and the last equation, we see that:</p>
-
-<p>$$ Q = -(B + CF)^{-1} $$</p>
-
-<p>The previous manipulations show that if one knows $F$, finding $Q$ is trivial (because $B$ and $C$ are known).
-In practical terms, we can focus on solving the deterministic part of the problem (ignoring the $u_t$), since
-we can then back out the stochastic solution using our equation for $Q$.</p>
-
+\[ x_{t} = F x_{t-1} &#43; Q u_{t} \]<p>where \(F\) and \(Q\) are unknown matrices.</p>
+<p>Substituting the linear law of motion into the first equation (and using the fact that \(u_{t&#43;1}\) is a mean-zero random noise term) yields:</p>
+\[ A x_{t−1} &#43; B x_{t} &#43; CF x_{t} &#43; u_{t} = 0. \]<p>This equation can be written as:</p>
+\[ x_{t} = -(B &#43; CF)^{-1} A x_{t−1} &#43; (-(B &#43; CF)^{-1})u_t \]<p>Comparing the solution we assumed in the first place, and the last equation, we see that:</p>
+\[ Q = -(B &#43; CF)^{-1} \]<p>The previous manipulations show that if one knows \(F\), finding \(Q\) is trivial (because \(B\) and \(C\) are known).
+In practical terms, we can focus on solving the deterministic part of the problem (ignoring the \(u_t\)), since
+we can then back out the stochastic solution using our equation for \(Q\).</p>
 <p>The deterministic problem is:</p>
-
-<p>$$ A x_{t-1} + B x_{t} + C x_{t+1}  = 0 $$</p>
-
-<p>And its associated solution is:</p>
-
-<p>$$ x_{t} = F x_{t-1} $$</p>
-
-<p>Now let&rsquo;s guess a value for $F$, denoted by $F_{n}$.</p>
-
+\[ A x_{t-1} &#43; B x_{t} &#43; C x_{t&#43;1}  = 0 \]<p>And its associated solution is:</p>
+\[ x_{t} = F x_{t-1} \]<p>Now let&rsquo;s guess a value for \(F\), denoted by \(F_{n}\).</p>
 <p>A simple substitution gives:</p>
-
-<p>$$ A x_{t-1} + B x_{t} + F_{n} C x_{t}  = 0 $$</p>
-
-<p>Which can be re-written as:</p>
-
-<p>$$ x_{t}  = - (B + F_{n} C)^{-1}A x_{t-1}  $$</p>
-
-<p>Comparing the solution we assumed in the first place and the last equation, the following <strong>updating rule</strong> seems to make sense:</p>
-
-<p>$$ F_{n+1} = - (B + F_{n} C)^{-1} A $$</p>
-
-<p>One could apply the updating rule until the distance between $F_{n+1}$ and $F_{n}$ is small, but the paper uses
+\[ A x_{t-1} &#43; B x_{t} &#43; F_{n} C x_{t}  = 0 \]<p>Which can be re-written as:</p>
+\[ x_{t}  = - (B &#43; F_{n} C)^{-1}A x_{t-1}  \]<p>Comparing the solution we assumed in the first place and the last equation, the following <strong>updating rule</strong> seems to make sense:</p>
+\[ F_{n&#43;1} = - (B &#43; F_{n} C)^{-1} A \]<p>One could apply the updating rule until the distance between \(F_{n&#43;1}\) and \(F_{n}\) is small, but the paper uses
 another stopping rule. Let&rsquo;s start with an observation and then give a definition:</p>
-
 <h4 id="fact">Fact</h4>
-
-<p>If $F$ solves</p>
-
-<p>$$ A x_{t−1} + B x_{t} + CF x_{t} = 0 $$</p>
-
-<p>then $F$ solves the quadratic matrix equation:</p>
-
-<p>$$ A + B F + C F^2 = 0 $$</p>
-
-<h4 id="definition">Definition</h4>
-
+<p>If \(F\) solves</p>
+\[ A x_{t−1} &#43; B x_{t} &#43; CF x_{t} = 0 \]<p>then \(F\) solves the quadratic matrix equation:</p>
+\[ A &#43; B F &#43; C F^2 = 0 \]<h4 id="definition">Definition</h4>
 <p>A solution to the equation</p>
-
-<p>$$ A + B F + C F^2 = 0 $$</p>
-
-<p>is called a <strong>solvent</strong>.</p>
-
+\[ A &#43; B F &#43; C F^2 = 0 \]<p>is called a <strong>solvent</strong>.</p>
 <p>We now have all the elements to describe the Linear Time Iteration algorithm.</p>
-
 <h4 id="algorithm">Algorithm</h4>
-
 <ul>
-<li>Guess a value for $F_0$</li>
-<li>Calculate $ F_{1} = - (B + F_{0} C)^{-1} A $</li>
-<li>If $ || A + B F_1 + C F_1^2 || &lt; tol $ stop. $F_1$ is a solvent</li>
-<li>Else, increment the index for $F$ and start again</li>
+<li>Guess a value for \(F_0\)</li>
+<li>Calculate \( F_{1} = - (B &#43; F_{0} C)^{-1} A \)</li>
+<li>If \( || A &#43; B F_1 &#43; C F_1^2 || &lt; tol \) stop. \(F_1\) is a solvent</li>
+<li>Else, increment the index for \(F\) and start again</li>
 </ul>
-
-<p>If all the eigenvalues of the resulting solvent are less than $1$ in absolute value, then we found a stable solution
+<p>If all the eigenvalues of the resulting solvent are less than \(1\) in absolute value, then we found a stable solution
 to the quadratic matrix equation. However, it is not necessarily the unique stable solution. For discussion on uniqueness and stability, an interested reader may refer to proposition 2 of the paper.</p>
-
 <h2 id="examples">Examples</h2>
-
 <p>Let&rsquo;s now see how the Linear Time Iteration performs on two simple examples described in the original paper.</p>
-
 <h3 id="example-1-a-uni-dimensional-example">Example 1: a uni-dimensional example</h3>
-
-<p>$$ 0.75 x_{t−1} − 2 x_{t} + x_{t+1} = 0 $$</p>
-
-<p>In this example, using Linear Time Iteration is clearly an overkill since we can calculate the solution by hand.
-The two solvents are $1.5$ and $0.5$. As we will see, the method laid above converges to the smaller of the two values.</p>
-
-<pre><code class="language-julia">versioninfo()
-</code></pre>
-
-<pre><code>Julia Version 1.0.3
+\[ 0.75 x_{t−1} − 2 x_{t} &#43; x_{t&#43;1} = 0 \]<p>In this example, using Linear Time Iteration is clearly an overkill since we can calculate the solution by hand.
+The two solvents are \(1.5\) and \(0.5\). As we will see, the method laid above converges to the smaller of the two values.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span>versioninfo()
+</span></span></code></pre></div><pre><code>Julia Version 1.0.3
 Commit 099e826241 (2018-12-18 01:34 UTC)
 Platform Info:
   OS: Linux (x86_64-pc-linux-gnu)
@@ -644,226 +575,193 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-6.0.0 (ORCJIT, skylake)
 </code></pre>
-
-<pre><code class="language-julia"># Parameters
-a = 0.75
-b = -2.0
-c = 1.0
-# Tolerance
-tol = 1e-6
-# Maximum iterations
-max_iter = 1000
-# Initial guess for F
-F_n = 0.0
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Parameters</span>
+</span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.75</span>
+</span></span><span style="display:flex;"><span>b <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>
+</span></span><span style="display:flex;"><span>c <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Tolerance</span>
+</span></span><span style="display:flex;"><span>tol <span style="color:#f92672">=</span> <span style="color:#ae81ff">1e-6</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Maximum iterations</span>
+</span></span><span style="display:flex;"><span>max_iter <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initial guess for F</span>
+</span></span><span style="display:flex;"><span>F_n <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+</span></span></code></pre></div><pre><code>0.0
 </code></pre>
-
-<pre><code>0.0
-</code></pre>
-
-<pre><code class="language-julia">for i=1:max_iter
-    # Updating rule:
-    F_n_new =  -a*(1/(b + F_n*c))
-    # Stopping rule:
-    if abs(a + b *F_n_new + c*F_n_new^2) &lt; tol
-        println(&quot;convergence after $i iterations&quot;)
-        println(&quot;final value for F is $F_n&quot;)
-        break
-    end
-    F_n = copy(F_n_new)
-    if i == max_iter
-        println(&quot;convergence NOT reached $i iterations&quot;)
-    end
-end
-
-</code></pre>
-
-<pre><code>convergence after 12 iterations
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>max_iter
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Updating rule:</span>
+</span></span><span style="display:flex;"><span>    F_n_new <span style="color:#f92672">=</span>  <span style="color:#f92672">-</span>a<span style="color:#f92672">*</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>(b <span style="color:#f92672">+</span> F_n<span style="color:#f92672">*</span>c))
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Stopping rule:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> abs(a <span style="color:#f92672">+</span> b <span style="color:#f92672">*</span>F_n_new <span style="color:#f92672">+</span> c<span style="color:#f92672">*</span>F_n_new<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>) <span style="color:#f92672">&lt;</span> tol
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;convergence after </span><span style="color:#e6db74">$i</span><span style="color:#e6db74"> iterations&#34;</span>)
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;final value for F is </span><span style="color:#e6db74">$F_n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    F_n <span style="color:#f92672">=</span> copy(F_n_new)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> max_iter
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;convergence NOT reached </span><span style="color:#e6db74">$i</span><span style="color:#e6db74"> iterations&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>convergence after 12 iterations
 final value for F is 0.4999981183200362
 </code></pre>
-
 <h3 id="dealing-with-singular-solvents">Dealing with singular solvents</h3>
-
 <p>Even in some reasonable cases, the simple Linear Time Iteration algorithm described above might fail. For instance, because the model contains accounting identities, in which case the solvent may be &ldquo;singular&rdquo;.</p>
-
 <h4 id="definition-1">Definition</h4>
-
 <p>A solvent is <strong>singular</strong> if it contains at least one eigenvalue equal to 1.</p>
-
 <p>Fortunately, a simple trick extends the Linear Time Iteration method to singular solvents.
 One solves the modified quadratic matrix equation</p>
-
-<p>$$ \hat{A} S^2 + \hat{B} S + \hat{C} = 0 $$</p>
-
-<p>where</p>
-
-<p>$$ \hat{A} = C M^2 + B M + A $$
-$$ \hat{B} = B + 2 C M$$
-$$ \hat{C} = C$$
-$$ M = \mu I $$</p>
-
-<p>with $\mu$ a small positive real number and $I$ a conformable identity matrix. If the Linear Time Iteration
-algorithm applied to the modified system converges to $S$, the $F = S + M$ is solution to the original system.
+\[ \hat{A} S^2 &#43; \hat{B} S &#43; \hat{C} = 0 \]<p>where</p>
+\[ \hat{A} = C M^2 &#43; B M &#43; A \]<p>
+</p>
+\[ \hat{B} = B &#43; 2 C M\]<p>
+</p>
+\[ \hat{C} = C\]<p>
+</p>
+\[ M = \mu I \]<p>with \(\mu\) a small positive real number and \(I\) a conformable identity matrix. If the Linear Time Iteration
+algorithm applied to the modified system converges to \(S\), the \(F = S &#43; M\) is solution to the original system.
 Below I define a function <code>t_iteration</code> the solves the modified system</p>
-
-<pre><code class="language-julia">using LinearAlgebra
-
-# Source: adapted from the matlab version made available by Pontus Rendahl on his website
-# https://sites.google.com/site/pontusrendahl/Research
-# This function solves the model Ax_{t-1}+Bx_{t}+CE_t[x_{t+1}]+u_t=0, and
-# finds the solution x_t=Fx_{t-1}+Qu_t. The parameter mu should be set
-# equal to a small number, e.g. mu=1e-6;
-
-function t_iteration(A::Array{Float64,2},
-                    B::Array{Float64,2},
-                    C::Array{Float64,2},
-                    mu::Float64;
-                    tol::Float64=1e-12,
-                    max_iter::Int64 = 1000,
-                    F0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
-                    S0::Array{Float64,2} = Array{Float64}(undef, 0, 0),
-                    verbose::Bool=false)
-
-# success flag:
-flag = 0
-
-# Initialization
-dim = size(A,2)
-if isempty(F0) == true
-    F = zeros(dim,dim)
-else
-    F = F0
-end
-if isempty(S0) == true
-    S = zeros(dim,dim)
-else
-    S = S0
-end
-
-eye = zeros(dim,dim)
-for i = 1:dim
-    eye[i,i] = 1.0
-end
-
-I = eye*mu
-Ch = C
-Bh = (B+C*2*I)
-Ah = (C*I^2+B*I+A)
-
-#Check the reciprocal condition number
-#if rcond(Ah)&lt;1e-16
-#    disp('Matrix Ah is singular')
-#end
-
-metric = 1;
-nb_iter = 0
-
-while metric&gt;tol
-    nb_iter+=1
-    #\(x, y)
-    #Left division operator:
-    #multiplication of y by the inverse of x on the left.
-    F = -(Bh+Ch*F)\Ah
-    S = -(Bh+Ah*S)\Ch;
-
-    metric1 = maximum(abs.(Ah+Bh*F+Ch*F*F))
-    metric2 = maximum(abs.(Ah*S*S+Bh*S+Ch))
-    metric = max(metric1, metric2)
-
-    if nb_iter == max_iter
-        if verbose == true
-            print(&quot;Maximum number of iterations reached. Convergence not reached.&quot;)
-            print(&quot;metric = $metric&quot;)
-        end
-        break
-    end
-end
-
-
-eig_F = maximum(abs.(eigvals(F)));
-eig_S = maximum(abs.(eigvals(S)));
-
-if eig_F&gt;1 || eig_S&gt;1 || mu&gt;1-eig_S
-    if verbose == true
-        println(&quot;Conditions of Proposition 3 violated&quot;)
-    end
-else
-    flag = 1
-end
-
-F = F+I;
-Q = -inv(B+C*F);
-
-return F, Q, flag
-
-end
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> LinearAlgebra
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Source: adapted from the matlab version made available by Pontus Rendahl on his website</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># https://sites.google.com/site/pontusrendahl/Research</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># This function solves the model Ax_{t-1}+Bx_{t}+CE_t[x_{t+1}]+u_t=0, and</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># finds the solution x_t=Fx_{t-1}+Qu_t. The parameter mu should be set</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># equal to a small number, e.g. mu=1e-6;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> t_iteration(A<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>},
+</span></span><span style="display:flex;"><span>                    B<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>},
+</span></span><span style="display:flex;"><span>                    C<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>},
+</span></span><span style="display:flex;"><span>                    mu<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span>;
+</span></span><span style="display:flex;"><span>                    tol<span style="color:#f92672">::</span><span style="color:#66d9ef">Float64</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1e-12</span>,
+</span></span><span style="display:flex;"><span>                    max_iter<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>,
+</span></span><span style="display:flex;"><span>                    F0<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>} <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>}(undef, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>),
+</span></span><span style="display:flex;"><span>                    S0<span style="color:#f92672">::</span><span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>,<span style="color:#ae81ff">2</span>} <span style="color:#f92672">=</span> <span style="color:#66d9ef">Array</span>{<span style="color:#66d9ef">Float64</span>}(undef, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>),
+</span></span><span style="display:flex;"><span>                    verbose<span style="color:#f92672">::</span><span style="color:#66d9ef">Bool</span><span style="color:#f92672">=</span>false)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># success flag:</span>
+</span></span><span style="display:flex;"><span>flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initialization</span>
+</span></span><span style="display:flex;"><span>dim <span style="color:#f92672">=</span> size(A,<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> isempty(F0) <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>    F <span style="color:#f92672">=</span> zeros(dim,dim)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    F <span style="color:#f92672">=</span> F0
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> isempty(S0) <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>    S <span style="color:#f92672">=</span> zeros(dim,dim)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    S <span style="color:#f92672">=</span> S0
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>eye <span style="color:#f92672">=</span> zeros(dim,dim)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>dim
+</span></span><span style="display:flex;"><span>    eye[i,i] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>I <span style="color:#f92672">=</span> eye<span style="color:#f92672">*</span>mu
+</span></span><span style="display:flex;"><span>Ch <span style="color:#f92672">=</span> C
+</span></span><span style="display:flex;"><span>Bh <span style="color:#f92672">=</span> (B<span style="color:#f92672">+</span>C<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>I)
+</span></span><span style="display:flex;"><span>Ah <span style="color:#f92672">=</span> (C<span style="color:#f92672">*</span>I<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">+</span>B<span style="color:#f92672">*</span>I<span style="color:#f92672">+</span>A)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#Check the reciprocal condition number</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#if rcond(Ah)&lt;1e-16</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#    disp(&#39;Matrix Ah is singular&#39;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>metric <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>nb_iter <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> metric<span style="color:#f92672">&gt;</span>tol
+</span></span><span style="display:flex;"><span>    nb_iter<span style="color:#f92672">+=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#\(x, y)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#Left division operator:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#multiplication of y by the inverse of x on the left.</span>
+</span></span><span style="display:flex;"><span>    F <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>(Bh<span style="color:#f92672">+</span>Ch<span style="color:#f92672">*</span>F)<span style="color:#f92672">\</span>Ah
+</span></span><span style="display:flex;"><span>    S <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>(Bh<span style="color:#f92672">+</span>Ah<span style="color:#f92672">*</span>S)<span style="color:#f92672">\</span>Ch;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    metric1 <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(Ah<span style="color:#f92672">+</span>Bh<span style="color:#f92672">*</span>F<span style="color:#f92672">+</span>Ch<span style="color:#f92672">*</span>F<span style="color:#f92672">*</span>F))
+</span></span><span style="display:flex;"><span>    metric2 <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(Ah<span style="color:#f92672">*</span>S<span style="color:#f92672">*</span>S<span style="color:#f92672">+</span>Bh<span style="color:#f92672">*</span>S<span style="color:#f92672">+</span>Ch))
+</span></span><span style="display:flex;"><span>    metric <span style="color:#f92672">=</span> max(metric1, metric2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> nb_iter <span style="color:#f92672">==</span> max_iter
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> verbose <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;Maximum number of iterations reached. Convergence not reached.&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;metric = </span><span style="color:#e6db74">$metric</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>eig_F <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(eigvals(F)));
+</span></span><span style="display:flex;"><span>eig_S <span style="color:#f92672">=</span> maximum(abs<span style="color:#f92672">.</span>(eigvals(S)));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> eig_F<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">||</span> eig_S<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">||</span> mu<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span><span style="color:#f92672">-</span>eig_S
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> verbose <span style="color:#f92672">==</span> true
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;Conditions of Proposition 3 violated&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>F <span style="color:#f92672">=</span> F<span style="color:#f92672">+</span>I;
+</span></span><span style="display:flex;"><span>Q <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>inv(B<span style="color:#f92672">+</span>C<span style="color:#f92672">*</span>F);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">return</span> F, Q, flag
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span></code></pre></div><pre><code>t_iteration (generic function with 1 method)
 </code></pre>
-
-<pre><code>t_iteration (generic function with 1 method)
-</code></pre>
-
 <h3 id="example-2-a-bi-dimensional-problem">Example 2: a bi-dimensional problem</h3>
-
 <p>The problem is</p>
-
-<p>$$ 0.75 y_t - 0.5 y_{t+1} = 0 $$
-$$ -2 x_t + x_{t-1} - y_{t} = 0 $$</p>
-
-<p>This problem has three solvents. Two of them lead to an unstable solution. The solvent associated to a stable solution is given by:</p>
-
-<p>$\begin{bmatrix} 0 &amp; 0 \\ 0 &amp; 0.5\end{bmatrix}$</p>
-
-<pre><code class="language-julia"># Defining the problem
-A = [[0. 0.];
-     [0. 1.]]
-
-B = [[0.75 0.];
-     [-1. -2.]]
-
-C = [[-0.5 0.];
-     [0. 0.]]
-
-# Finding a solvent
-F_n, Q_n, flag = t_iteration(A, B, C, 0.01, max_iter=1000)
-
-println(&quot;F is :&quot;, F_n)
-
-# Simulating the model forward
-using Plots
-pyplot()
-
-nb_periods = 20
-x = ones(2, nb_periods)
-#initialization
-x[:,1] = [1.0 1.0] #starting value
-
-for t=2:nb_periods
-    # Update rule
-    x[:,t] = F_n * x[:,t-1]
-end
-
-plot(x[1,:], label = &quot;xt&quot;)
-plot!(x[2,:], label = &quot;yt&quot;)
+\[ 0.75 y_t - 0.5 y_{t&#43;1} = 0 \]<p>
+</p>
+\[ -2 x_t &#43; x_{t-1} - y_{t} = 0 \]<p>This problem has three solvents. Two of them lead to an unstable solution. The solvent associated to a stable solution is given by:</p>
+<p>\(\begin{bmatrix} 0 &amp; 0 \\ 0 &amp; 0.5\end{bmatrix}\)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-julia" data-lang="julia"><span style="display:flex;"><span><span style="color:#75715e"># Defining the problem</span>
+</span></span><span style="display:flex;"><span>A <span style="color:#f92672">=</span> [[<span style="color:#ae81ff">0.</span> <span style="color:#ae81ff">0.</span>];
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0.</span> <span style="color:#ae81ff">1.</span>]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>B <span style="color:#f92672">=</span> [[<span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.</span>];
+</span></span><span style="display:flex;"><span>     [<span style="color:#f92672">-</span><span style="color:#ae81ff">1.</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">2.</span>]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>C <span style="color:#f92672">=</span> [[<span style="color:#f92672">-</span><span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.</span>];
+</span></span><span style="display:flex;"><span>     [<span style="color:#ae81ff">0.</span> <span style="color:#ae81ff">0.</span>]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Finding a solvent</span>
+</span></span><span style="display:flex;"><span>F_n, Q_n, flag <span style="color:#f92672">=</span> t_iteration(A, B, C, <span style="color:#ae81ff">0.01</span>, max_iter<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>println(<span style="color:#e6db74">&#34;F is :&#34;</span>, F_n)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Simulating the model forward</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Plots
+</span></span><span style="display:flex;"><span>pyplot()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nb_periods <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> ones(<span style="color:#ae81ff">2</span>, nb_periods)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#initialization</span>
+</span></span><span style="display:flex;"><span>x[<span style="color:#f92672">:</span>,<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.0</span> <span style="color:#ae81ff">1.0</span>] <span style="color:#75715e">#starting value</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> t<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>nb_periods
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Update rule</span>
+</span></span><span style="display:flex;"><span>    x[<span style="color:#f92672">:</span>,t] <span style="color:#f92672">=</span> F_n <span style="color:#f92672">*</span> x[<span style="color:#f92672">:</span>,t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plot(x[<span style="color:#ae81ff">1</span>,<span style="color:#f92672">:</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xt&#34;</span>)
+</span></span><span style="display:flex;"><span>plot!(x[<span style="color:#ae81ff">2</span>,<span style="color:#f92672">:</span>], label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;yt&#34;</span>)
+</span></span></code></pre></div><pre><code>F is :[0.0 0.0; 0.0 0.5]
 </code></pre>
-
-<pre><code>F is :[0.0 0.0; 0.0 0.5]
-</code></pre>
-
 <p>We successfully recovered the stable solution.
 Starting an initial condition, we can simulate the behavior of the system
-using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)</p>
-
-<p><img src="Linear%20Time%20Iteration_50_1.png" alt="png" /></p>
-
+using the law of motion  \(x_{t} = F x_{t-1} &#43; Q u_{t}\) (see the next plot)</p>
+<p><img src="/post/lineartimeiteration/Linear%20Time%20Iteration_50_1.png" alt="png"></p>
 <h2 id="conclusion">Conclusion</h2>
-
 <p>Linear Time Iteration is an intuitive and easily applicable method to solve (linear) rational expectation models. This post aimed at describing the intuition for it and give simple examples. In a subsequent post, I will use this technique to solve the stochastic growth model.</p>
-
 <h3 id="references">References</h3>
-
 <ul>
 <li>Rendahl, Pontus. Linear time iteration. No. 330. IHS Economics Series, 2017.
-(<a href="https://www.ihs.ac.at/publications/eco/es-330.pdf" target="_blank">https://www.ihs.ac.at/publications/eco/es-330.pdf</a>)</li>
+(<a href="https://www.ihs.ac.at/publications/eco/es-330.pdf" target="_blank" rel="noopener">https://www.ihs.ac.at/publications/eco/es-330.pdf</a>)</li>
 <li>Reiter, Michael. &ldquo;Solving heterogeneous-agent models by projection and perturbation.&rdquo; Journal of Economic Dynamics and Control 33.3 (2009): 649-665.</li>
 </ul>
 
@@ -894,7 +792,7 @@ using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)</p>
 <div class="media author-card" itemscope itemtype="http://schema.org/Person">
   
   
-  <img class="portrait mr-3" src="/author/admin/avatar_hua874ac19f86782cda4b3a3191cd90706_32633_250x250_fill_q90_lanczos_center.jpg" itemprop="image" alt="Avatar">
+  <img class="portrait mr-3" src="/author/admin/avatar_hu_9b9420c305f4c850.jpg" itemprop="image" alt="Avatar">
   
 
   <div class="media-body">
@@ -1024,7 +922,7 @@ using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)</p>
   
 
   <p class="powered-by">
-    &copy; 2017 Julien Pascal &middot; 
+    © 2017 Julien Pascal &middot; 
 
     Powered by the
     <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
@@ -1178,7 +1076,7 @@ using the law of motion  $x_{t} = F x_{t-1} + Q u_{t}$ (see the next plot)</p>
     
     
     
-    <script src="/js/academic.min.d7381f2d79e6271d4da28f474f49096c.js"></script>
+    <script src="/js/academic.min.ea162ce936ff5c0b54d2273f03a9367e.js"></script>
 
   </body>
 </html>
