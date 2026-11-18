@@ -438,7 +438,7 @@ The Parameterized Expectations Algorithm (PEA) is a classic computational approa
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    47 min read
+    51 min read
   </span>
   
 
@@ -523,8 +523,8 @@ The Parameterized Expectations Algorithm (PEA) is a classic computational approa
 <p>This blog post is about my work on a <em>generalization of the Parameterized Expectations Algorithm</em>, available <a href="https://doi.org/10.1016/j.econlet.2025.112790" target="_blank" rel="noopener">here</a>.</p>
 <p>The Parameterized Expectations Algorithm (PEA) is a classic computational approach to numerically &ldquo;solve&rdquo; economic models with rational expectations, i.e. finding an approximate solution. Usually, to solve economic models of this type, one has to find a policy function (e.g. how much to consume today, given a current level of capital) that satisfies a functional equation that holds in expectation (e.g. the Euler equation). The PEA flips this idea on its head: if we know the expectation term, we can recover the unknown policy function. For several reasons, this works better this way.</p>
 <p>In my view, the paper <em>A Generalization of the Parameterized Expectations Algorithm</em> can be read from two angles:</p>
-<p><strong>TL;DR 1 [Practical side]:</strong> This paper is a variance-reduced version of standard PEA that uses multiple innovation draws per state vector. The optimal number of innovation draws (given a fixed computational budget constraint) is calculated in closed form using only a small number of hyperparameters.</p>
-<p><strong>TL;DR 2 [Theoretical side]:</strong> This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. <a href="https://onlinelibrary.wiley.com/doi/10.1111/iere.12575" target="_blank" rel="noopener">Deep Equilibrium Nets</a>; <a href="https://doi.org/10.1016/j.jmoneco.2021.07.004" target="_blank" rel="noopener">All-in-One Operator</a>; <a href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank" rel="noopener">bc-MC Operator</a>) and the old-school PEA. This connection can be summarized as: NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS.</p>
+<p><strong>TL;DR 1 [Practical side]:</strong> This paper is a <strong>variance-reduced version of standard PEA that uses multiple innovation draws per state vector</strong>. The optimal number of innovation draws (given a fixed computational budget constraint) is calculated in closed form using only a small number of hyperparameters.</p>
+<p><strong>TL;DR 2 [Theoretical side]:</strong> This paper shows that there is a deep connection between the modern neural network (NN) computational approaches (e.g. <a href="https://onlinelibrary.wiley.com/doi/10.1111/iere.12575" target="_blank" rel="noopener">Deep Equilibrium Nets</a>; <a href="https://doi.org/10.1016/j.jmoneco.2021.07.004" target="_blank" rel="noopener">All-in-One Operator</a>; <a href="https://doi.org/10.1016/j.jedc.2024.104853" target="_blank" rel="noopener">bc-MC Operator</a>) and the old-school PEA. This connection can be summarized as: <strong>NN + bc-MC operator + backpropagation ≈ multi-innovation-draws PEA + OLS</strong>.</p>
 <p>On the one hand, the result of <em>TL;DR 2</em> is expected, because both approaches share many features (Monte Carlo integration, focus on the ergodic set for the state vector). On the other hand, this could be surprising because there are also substantial differences: NNs are highly non-linear and their parameters are tuned using gradient descent and backpropagation, while the PEA typically relies on a linear or log-linear model, where the parameters are calculated using linear or non-linear least squares.</p>
 <h2 id="i-theory">I. Theory</h2>
 <h3 id="setting">Setting</h3>
@@ -606,8 +606,9 @@ k_{t&#43;1} = z_t k_t^{\alpha} - c_t &#43; (1-\delta)k_t
 <h3 id="extension-to-serially-correlated-state-vectors">Extension to serially correlated state vectors</h3>
 <p>The i.i.d. assumption for the state vectors is a bit too restrictive. Often, data comes from serially correlated series. For instance, the logarithm of TFP is often assumed to be AR(1):</p>
 \[ \log(z_{t&#43;1}) = \rho \log(z_{t}) &#43; \varepsilon_{t&#43;1} \]<p>with \( | \rho |&lt; 1 \) and \(\varepsilon\) an i.i.d. zero-mean Gaussian random variable. Under the assumption that the state vector \(s_t\) has such an AR(1) structure, with persistence parameter \( | \rho |&lt; 1 \), the new optimal value for \(M\) is given by:</p>
-\[ M^{\star \star} = M^{\star}\frac{1 &#43; \rho^2}{1 - \rho^2} \]<p>This point appears in the Online Appendix of the paper.</p>
+\[ M^{\star \star} = M^{\star} \sqrt{\frac{1 &#43; \rho^2}{1 - \rho^2}} \]<p>This point appears in Section B.6. of the Online Appendix of the paper.</p>
 <p>The serial correlation correction term \(\frac{1 &#43; \rho^2}{1 - \rho^2}\) increases the optimal value for \(M\). This makes sense, because with serially correlated observations, each realization of \(s_t\) is less information-rich (it is correlated with \(s_{t-1}\)). The larger the value for \(|\rho|\), the bigger this correction term is.</p>
+<p><strong>Erratum</strong> Actually in Section B.6., I wrote \( M^{**} = M^{*} \frac{1 &#43; \rho^2}{1 - \rho^2} \), which is valid for the special case \(\alpha_{M} = 0\) (cost of OLS estimation step is null) and \(\alpha &gt; 1\) (using low discrepancy sequences for the innovation vectors). See the &ldquo;Appendix&rdquo; section of this blog post, right at the bottom.</p>
 <h3 id="extension-to-log-linear-models">Extension to log-linear models</h3>
 <p>Often, economic models are such that the <strong>logarithm</strong> of the conditional expectation is a linear function of the state vector. Or more generally, it is linear in a continuous transformation of the state vector denoted by \(x_t\) (e.g. taking logs):</p>
 <p>\(E_{\varepsilon}\left[g(\boldsymbol{s}_t, \varepsilon) \mid \boldsymbol{s}_t \right] = \exp(\boldsymbol{x}_t&#39; \boldsymbol{\theta})\).</p>
@@ -1588,7 +1589,26 @@ dtype: float64
 \[ \boxed{N^{\star} = \frac{\alpha_{M}}{\alpha_{MN}} \big(\frac{1 - \rho^2}{1 &#43; \rho^2} \frac{M}{k&#43;1} - 1 \big)}\]<p><a href="https://github.com/JulienPascal/bc-MC-PEA/blob/main/3.irreversible_investment/irreversible_investment_Colab_9.ipynb" target="_blank" rel="noopener">Here</a>, I find that \(\frac{\alpha_{M}}{\alpha_{MN}} \approx 4.175\). Note that this ratio obviously depends on the model you consider and on the actual software implementation. Here, let&rsquo;s use a rough estimate for \(\frac{\alpha_{M}}{\alpha_{MN}} \approx 4\). If you do not know this ratio and you do not want to estimate it, you may even use rough guesses (e.g. \(\frac{\alpha_{M}}{\alpha_{MN}} = 1\)).</p>
 <p>Below is a function that returns such a \(N^{\star}\).</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">optimal_N</span>(alpha_ratio: float, rho: float, M: int, k: int) <span style="color:#f92672">-&gt;</span> int:
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Correct for serial correlation in state vector</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Compute the optimal number of innovation draws N* for the generalized PEA.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Formula is valid for the special case </span><span style="color:#ae81ff">\a</span><span style="color:#e6db74">lpha = 1 (i.i.d. draws for random innovation vectors).
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    See the bottom of this blog post for the general alpha &gt; 1 case.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Parameters
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ----------
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    alpha_ratio : float
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        The ratio alpha_M / alpha_MN from the computational cost model.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    rho : float
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        The persistence parameter of the AR(1) state process (|rho| &lt; 1).
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    M : int
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        The number of state vector observations (simulation length).
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    k : int
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        The number of explanatory variables in the linear model.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Returns
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    -------
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    int: Optimal N, rounded to the nearest positive integer (minimum 1).
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
 </span></span><span style="display:flex;"><span>    rho_sq <span style="color:#f92672">=</span> rho <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
 </span></span><span style="display:flex;"><span>    serial_correction <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> rho_sq) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> rho_sq)
 </span></span><span style="display:flex;"><span>    
@@ -2446,7 +2466,42 @@ doi = {https://doi.org/10.1016/j.econlet.2025.112790},
 url = {https://www.sciencedirect.com/science/article/pii/S0165176525006275},
 author = {Julien Pascal}
 }
-</code></pre>
+</code></pre><hr>
+<h2 id="appendix">Appendix</h2>
+<h3 id="deriving-optimal-mn-under-serial-correlation-of-the-state-vector">Deriving optimal (M,N) under serial correlation of the state vector</h3>
+<p>Section B.6. of the (rather long) Online Appendix shows that Mean Square Integration Error (MSIE) is approximately proportional to:</p>
+\[ MSIE(M,N) \propto \frac{1}{N^{\alpha} \Big( \frac{M}{\kappa} - (k&#43;1) \Big)} \propto \frac{1}{N^{\alpha} \Big( M - d \Big)} \]<p>where \( d \equiv \kappa (k&#43;1)\) and \(\kappa \equiv \frac{1 &#43; \rho^2}{1 - \rho^2}\). <strong>This nests the i.i.d. state case</strong> because you can always set \(\rho = 0 \rightarrow \kappa = 1\). (Getting to the above formula is actually the hard part. The rest is a standard minimization problem with one equality constraint).</p>
+<p>The goal is to choose \(M\) and \(N\) to minimize the MSIE while keeping a constant computational budget (in seconds): \( C = \alpha_M M &#43; \alpha_{MN} MN\), where \(C \equiv T - \alpha_0 &gt; 0\). Note that this is equivalent to <strong>maximizing the logarithm of the denominator</strong>:</p>
+\[ \max_{(M,N)} \alpha \log(N) &#43; \log(M - d ) \]<p>One way to solve that is to define a Lagrangian \(\mathcal{L}\):</p>
+\[  \mathcal{L}(M,N) = \alpha \log(N) &#43; \log(M - d ) &#43; \lambda (C -  \alpha_M M - \alpha_{MN} MN) \]<p>.</p>
+<p>The FOC with respect to \(N\) gives:</p>
+\[ \lambda = \frac{\alpha}{\alpha_{MN} M N} \]<p>The FOC with respect to \(M\) gives:</p>
+\[ \frac{1}{M - d } = \lambda \big( \alpha_M &#43; \alpha_{MN} N \big) \rightarrow  \frac{1}{M - d } =   \alpha \frac{\alpha_M &#43; \alpha_{MN} N }{\alpha_{MN} M N} \]<p>.</p>
+<p>This can be rewritten as (cross-multiply, expand and simplify):</p>
+\[ \boxed{ N^{\star}(M) = \big( \frac{\alpha_M}{\alpha_{MN} } \big) \frac{\alpha (M - d) }{\alpha d - (\alpha - 1) M } } \tag{1}\]<p>Note that if you set \(\alpha = 1\) (random sampling for innovation vector), you get:</p>
+\[ \boxed{ N^{\star}(M) =  \frac{\alpha_M}{\alpha_{MN}}  \big( \frac{M}{\kappa(k&#43;1)} - 1\big)}\]<p>as stated above.</p>
+<p>Let&rsquo;s now derive the explicit formula for \(M^\star\). The budget constraint (BC) implies:</p>
+\[ N= \frac{C-\alpha_M M}{\alpha_{MN}M} \]<p>Using Equation (1) with this BC implies:</p>
+\[ \frac{\alpha_M}{\alpha_{MN}}\frac{\alpha(M-d)}{\alpha d-(\alpha-1)M} = \frac{C-\alpha_M M}{\alpha_{MN}M} \]<p>Expanding both sides and collecting terms yields the quadratic equation</p>
+\[
+\alpha_M M^2 &#43;(\alpha-1)CM -\alpha Cd=0 \tag{2}
+\]<p>This is a standard quadratic equation that we know and love since high-school. The relevant solution is the positive root:</p>
+\[ \frac{ -(\alpha - 1)C &#43; \sqrt{(\alpha - 1)^2 C^2&#43; 4 \alpha_M \alpha C d} } {2 \alpha_{M}} \]<p>Using \(d=\kappa(k&#43;1)\), we get:</p>
+\[ \boxed{M^{\star \star }= \frac{ -(\alpha - 1)C &#43; \sqrt{(\alpha - 1)^2 C^2&#43; 4 \alpha_M \alpha C \kappa(k&#43;1)} } {2 \alpha_{M}}}\tag{3}\]<p>This generalizes Equation (16) of the paper to <strong>serially correlated states</strong>. (Equation (16) in the paper is for \(\rho = 0 \rightarrow \kappa = 1\)).</p>
+<p><strong>Note</strong>. \((M,N)\) are <strong>rounded to nearest feasible integers</strong>.</p>
+<h4 id="standard-monte-carlo-integration">Standard Monte Carlo integration \(\alpha=1\)</h4>
+<p>Take equation (3) above and set \(\alpha=1\):</p>
+\[ M^{\star \star} = \sqrt{\frac{C\kappa(k&#43;1)}{\alpha_{M} }} \]<p>Under <strong>independent state sampling</strong> (\(\rho=0\), hence \(\kappa=1\)) we instead have</p>
+\[ M^{\star} = \sqrt{ \frac{C (k&#43;1)}{ \alpha_{M} }} \]<p>We get:</p>
+\[ \boxed{M^{\star \star} = M^{\star} \sqrt{\kappa}} \tag{4}\]<p>This is a correction to Equation (60) of the original Online Appendix, which proposed multiplying the optimal number of state draws by \(\kappa\), rather than \(\sqrt{\kappa}\).</p>
+<h4 id="special-case-negligible-ols-step-computing-costs--and-">Special case: negligible OLS-step computing costs \(\alpha_M=0\) and \(\alpha &gt; 1\).</h4>
+<p>When the OLS-step time is negligible (\(\alpha_M=0\)), we get a different result.
+If \(\alpha &gt; 1\) (i.e., we use low discrepancy sequences for the innovation vectors), then \((\alpha-1)C&gt;0\). Use L&rsquo;Hôpital&rsquo;s rule (we have a \(0/0\) form) on Equation (3) to get:</p>
+\[\lim_{\alpha_M\to 0} M^{\star \star} = \frac{\alpha\,\kappa\,(k&#43;1)}{\alpha-1} \tag{5}\]<p>Under <strong>independent state sampling</strong> (\(\kappa=1\)):</p>
+\[ M^{\star} =  \frac{\alpha(k&#43;1)}{\alpha-1},\]<p>and we finally get:</p>
+\[ \boxed{M^{\star \star} = M^{\star} \kappa} \tag{6}.\]<p>Interestingly, Equation (60) in the original Online Appendix is correct, but under different assumptions: negligible OLS-step (\(\alpha_M=0\)) and integration convergence rate faster than standard Monte Carlo (\(\alpha&gt;1\))</p>
+<p><strong>Remark:</strong> When \(\alpha = 1\), \(M^{\star \star} = \sqrt{C\kappa(k&#43;1)/\alpha_M}\) and we get \(\lim_{\alpha_M\to 0} M^{\star \star} = &#43; \infty\). Hence, there is no interior solution and the optimum is attained at the smallest admissible number of innovation draws: \(N^{\star}=1\). Once again, &ldquo;standard PEA&rdquo; can be optimal, but only under the knife-edge condition \(\alpha = 1\) and \(\alpha_M=0\).</p>
+
     </div>
 
     
